@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.MatchProposalListController"
+            prefWidth="900" prefHeight="600">
+    <top>
+        <VBox style="-fx-padding: 10 15 5 15;">
+            <Label text="AI Match Proposals" style="-fx-font-size: 22px; -fx-font-weight: bold;" />
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 8 0 0 0;">
+                <Label text="Event ID:" style="-fx-font-weight: bold;" />
+                <TextField fx:id="txtEventId" prefWidth="100" promptText="e.g. 1" />
+                <Button text="⚡ Generate Proposals" onAction="#generateProposals"
+                        style="-fx-background-color: #9C27B0; -fx-text-fill: white; -fx-font-weight: bold;" />
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <TableView fx:id="tableProposals" style="-fx-padding: 0 15 0 15;">
+            <columns>
+                <TableColumn fx:id="colId"            text="ID"          prefWidth="50"  />
+                <TableColumn fx:id="colEventId"       text="Event ID"    prefWidth="80"  />
+                <TableColumn fx:id="colFighter1Id"    text="Fighter 1"   prefWidth="90"  />
+                <TableColumn fx:id="colFighter2Id"    text="Fighter 2"   prefWidth="90"  />
+                <TableColumn fx:id="colCompatibility" text="Compat. %"   prefWidth="100" />
+                <TableColumn fx:id="colStatus"        text="Status"      prefWidth="110" />
+            </columns>
+            <placeholder><Label text="No proposals. Enter Event ID and click Generate." /></placeholder>
+        </TableView>
+    </center>
+    <bottom>
+        <HBox spacing="10" alignment="CENTER" style="-fx-padding: 12px;">
+            <Button text="✅ Accept" prefWidth="140" onAction="#acceptProposal" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" />
+            <Button text="❌ Reject" prefWidth="140" onAction="#rejectProposal" style="-fx-background-color: #F44336; -fx-text-fill: white;" />
+            <Button text="🏠 Menu"   prefWidth="140" onAction="#navigateToMenu" style="-fx-background-color: #607D8B; -fx-text-fill: white;" />
+        </HBox>
+    </bottom>
+</BorderPane>

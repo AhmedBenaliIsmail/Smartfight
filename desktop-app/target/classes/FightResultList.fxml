@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.FightResultListController"
+            prefWidth="900" prefHeight="560">
+    <top>
+        <Label text="Fight Results" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-padding: 15 0 10 15;" />
+    </top>
+    <center>
+        <TableView fx:id="tableFightResults" style="-fx-padding: 0 15 0 15;">
+            <columns>
+                <TableColumn fx:id="colId"            text="ID"         prefWidth="50"  />
+                <TableColumn fx:id="colEventId"       text="Event ID"   prefWidth="80"  />
+                <TableColumn fx:id="colFighterRedId"  text="Red"        prefWidth="80"  />
+                <TableColumn fx:id="colFighterBlueId" text="Blue"       prefWidth="80"  />
+                <TableColumn fx:id="colWinnerId"      text="Winner"     prefWidth="80"  />
+                <TableColumn fx:id="colMethod"        text="Method"     prefWidth="120" />
+                <TableColumn fx:id="colFightDate"     text="Fight Date" prefWidth="120" />
+            </columns>
+            <placeholder><Label text="No fight results found." /></placeholder>
+        </TableView>
+    </center>
+    <bottom>
+        <HBox spacing="10" alignment="CENTER" style="-fx-padding: 12px;">
+            <Button text="➕ Add"    prefWidth="130" onAction="#navigateToAdd"     style="-fx-background-color: #4CAF50; -fx-text-fill: white;" />
+            <Button text="✏️ Edit"   prefWidth="130" onAction="#navigateToEdit"    style="-fx-background-color: #2196F3; -fx-text-fill: white;" />
+            <Button text="🗑️ Delete" prefWidth="130" onAction="#deleteFightResult" style="-fx-background-color: #F44336; -fx-text-fill: white;" />
+            <Button text="🏠 Menu"   prefWidth="130" onAction="#navigateToMenu"    style="-fx-background-color: #607D8B; -fx-text-fill: white;" />
+        </HBox>
+    </bottom>
+</BorderPane>

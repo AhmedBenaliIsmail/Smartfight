@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Button?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.UpdateUserController"
+            prefWidth="620" prefHeight="440">
+    <top>
+        <Label text="Update User" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 15 0 10 20;" />
+    </top>
+    <center>
+        <GridPane hgap="12" vgap="14" style="-fx-padding: 10 30 10 30;">
+            <Label text="First Name: *"  GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <TextField fx:id="txtFirstName" prefWidth="320" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+            <Label text="Last Name: *"   GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <TextField fx:id="txtLastName"  prefWidth="320" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+            <Label text="Email: *"       GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <TextField fx:id="txtEmail"     prefWidth="320" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+            <Label text="Password: *"    GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <TextField fx:id="txtPassword"  prefWidth="320" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+            <Label text="Phone:"         GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <TextField fx:id="txtPhone"     prefWidth="320" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+            <Label text="Role:"          GridPane.rowIndex="5" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <ComboBox fx:id="cbRole"        prefWidth="320" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+        </GridPane>
+    </center>
+    <bottom>
+        <HBox spacing="12" alignment="CENTER" style="-fx-padding: 14px;">
+            <Button text="✏️ Update" prefWidth="130" onAction="#updateUser"       style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold;" />
+            <Button text="✖ Cancel"  prefWidth="130" onAction="#navigateToList"  style="-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-font-weight: bold;" />
+        </HBox>
+    </bottom>
+</BorderPane>

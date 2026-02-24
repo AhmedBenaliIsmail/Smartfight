@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.Button?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.AddFightResultController"
+            prefWidth="680" prefHeight="520">
+    <top>
+        <Label text="Add Fight Result" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 15 0 10 20;" />
+    </top>
+    <center>
+        <GridPane hgap="12" vgap="12" style="-fx-padding: 10 30 10 30;">
+            <Label text="Event: *"      GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <ComboBox fx:id="cbEventId"     prefWidth="310" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+            <Label text="Fighter Red: *" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <ComboBox fx:id="cbFighterRed"  prefWidth="310" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+            <Label text="Fighter Blue: *" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <ComboBox fx:id="cbFighterBlue" prefWidth="310" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+            <Label text="Winner:"       GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <ComboBox fx:id="cbWinner"      prefWidth="310" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+            <Label text="Method: *"     GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <ChoiceBox fx:id="cbMethod"     prefWidth="310" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+            <Label text="Round Ended:"  GridPane.rowIndex="5" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <TextField fx:id="txtRoundEnded" prefWidth="310" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+            <Label text="Fight Date:"   GridPane.rowIndex="6" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <DatePicker fx:id="dpFightDate" prefWidth="310" GridPane.rowIndex="6" GridPane.columnIndex="1" />
+            <Label text="Notes:"        GridPane.rowIndex="7" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <TextArea fx:id="txtNotes"  prefWidth="310" prefHeight="60" GridPane.rowIndex="7" GridPane.columnIndex="1" />
+        </GridPane>
+    </center>
+    <bottom>
+        <HBox spacing="12" alignment="CENTER" style="-fx-padding: 14px;">
+            <Button text="💾 Save"   prefWidth="130" onAction="#saveFightResult"   style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;" />
+            <Button text="✖ Cancel" prefWidth="130" onAction="#navigateToList"    style="-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-font-weight: bold;" />
+        </HBox>
+    </bottom>
+</BorderPane>

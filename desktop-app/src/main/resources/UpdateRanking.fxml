@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Button?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.UpdateRankingController"
+            prefWidth="600" prefHeight="400">
+    <top>
+        <Label text="Update Ranking" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 15 0 10 20;" />
+    </top>
+    <center>
+        <GridPane hgap="12" vgap="14" style="-fx-padding: 10 30 10 30;">
+            <Label text="Fighter:"     GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <ComboBox fx:id="cbFighterId"    prefWidth="300" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+            <Label text="Discipline:"  GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <ComboBox fx:id="cbDisciplineId" prefWidth="300" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+            <Label text="Rank Pos: *"  GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <TextField fx:id="txtRankPosition" prefWidth="300" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+            <Label text="Points: *"    GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <TextField fx:id="txtPoints"       prefWidth="300" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+            <Label text="Season:"      GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-font-weight: bold;" />
+            <TextField fx:id="txtSeason"       prefWidth="300" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+        </GridPane>
+    </center>
+    <bottom>
+        <HBox spacing="12" alignment="CENTER" style="-fx-padding: 14px;">
+            <Button text="✏️ Update" prefWidth="130" onAction="#updateRanking"    style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold;" />
+            <Button text="✖ Cancel"  prefWidth="130" onAction="#navigateToList"  style="-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-font-weight: bold;" />
+        </HBox>
+    </bottom>
+</BorderPane>

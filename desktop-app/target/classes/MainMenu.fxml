@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Separator?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.MainMenuController"
+            prefWidth="900" prefHeight="650"
+            style="-fx-background-color: #0D0D0D;">
+
+    <top>
+        <VBox spacing="4"
+              style="-fx-padding: 18 32 16 32;
+                     -fx-background-color: #0D0D0D;">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="🥊"
+                       style="-fx-font-size: 26px; -fx-text-fill: #E50914;"/>
+                <Label fx:id="lblTitle" text="SMARTFIGHT"
+                       style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #FFFFFF;"/>
+            </HBox>
+            <Label text="COMBAT SPORTS MANAGEMENT PLATFORM"
+                   style="-fx-text-fill: #00D4FF;
+                          -fx-font-size: 11px;
+                          -fx-font-weight: bold;
+                          -fx-letter-spacing: 2px;"/>
+            <Separator style="-fx-background-color: #2A2A3E;"/>
+        </VBox>
+    </top>
+
+    <center>
+        <GridPane hgap="18" vgap="18"
+                  style="-fx-padding: 32 48 24 48;">
+
+            <VBox GridPane.rowIndex="0" GridPane.columnIndex="0" spacing="8"
+                  style="-fx-background-color: #1A1A2E;
+                         -fx-background-radius: 12;
+                         -fx-border-color: #E50914;
+                         -fx-border-width: 0 0 0 3;
+                         -fx-border-radius: 12;
+                         -fx-padding: 16;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 14, 0, 0, 6);">
+                <Label text="EVENT MANAGEMENT"
+                       style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Label text="Create and manage combat events, venues, and disciplines."
+                       wrapText="true"
+                       style="-fx-text-fill: #8A8A9A; -fx-font-size: 11px;"/>
+                <Button text="Open Events"
+                        onAction="#openEvents"
+                        maxWidth="1.7976931348623157E308"
+                        style="-fx-background-color: #E50914;
+                               -fx-text-fill: white;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 8;
+                               -fx-padding: 8 18 8 18;"/>
+            </VBox>
+
+            <VBox GridPane.rowIndex="0" GridPane.columnIndex="1" spacing="8"
+                  style="-fx-background-color: #1A1A2E;
+                         -fx-background-radius: 12;
+                         -fx-border-color: #E50914;
+                         -fx-border-width: 0 0 0 3;
+                         -fx-border-radius: 12;
+                         -fx-padding: 16;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 14, 0, 0, 6);">
+                <Label text="FIGHTER MANAGEMENT"
+                       style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Label text="Profiles, records, and weight classes for all fighters."
+                       wrapText="true"
+                       style="-fx-text-fill: #8A8A9A; -fx-font-size: 11px;"/>
+                <Button text="Open Fighters"
+                        onAction="#openFighters"
+                        maxWidth="1.7976931348623157E308"
+                        style="-fx-background-color: #00D4FF;
+                               -fx-text-fill: #0D0D0D;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 8;
+                               -fx-padding: 8 18 8 18;"/>
+            </VBox>
+
+            <VBox GridPane.rowIndex="1" GridPane.columnIndex="0" spacing="8"
+                  style="-fx-background-color: #1A1A2E;
+                         -fx-background-radius: 12;
+                         -fx-border-color: #E50914;
+                         -fx-border-width: 0 0 0 3;
+                         -fx-border-radius: 12;
+                         -fx-padding: 16;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 14, 0, 0, 6);">
+                <Label text="COACH MANAGEMENT"
+                       style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Label text="Track coaching staff, certifications, and experience."
+                       wrapText="true"
+                       style="-fx-text-fill: #8A8A9A; -fx-font-size: 11px;"/>
+                <Button text="Open Coaches"
+                        onAction="#openCoaches"
+                        maxWidth="1.7976931348623157E308"
+                        style="-fx-background-color: #00D4FF;
+                               -fx-text-fill: #0D0D0D;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 8;
+                               -fx-padding: 8 18 8 18;"/>
+            </VBox>
+
+            <VBox GridPane.rowIndex="1" GridPane.columnIndex="1" spacing="8"
+                  style="-fx-background-color: #1A1A2E;
+                         -fx-background-radius: 12;
+                         -fx-border-color: #E50914;
+                         -fx-border-width: 0 0 0 3;
+                         -fx-border-radius: 12;
+                         -fx-padding: 16;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 14, 0, 0, 6);">
+                <Label text="AI MATCHMAKING"
+                       style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Label text="Generate optimal fight cards using rule-based AI."
+                       wrapText="true"
+                       style="-fx-text-fill: #8A8A9A; -fx-font-size: 11px;"/>
+                <Button text="Open Matchmaking"
+                        onAction="#openMatchmaking"
+                        maxWidth="1.7976931348623157E308"
+                        style="-fx-background-color: #7C3AED;
+                               -fx-text-fill: white;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 8;
+                               -fx-padding: 8 18 8 18;"/>
+            </VBox>
+
+            <VBox GridPane.rowIndex="2" GridPane.columnIndex="0" spacing="8"
+                  style="-fx-background-color: #1A1A2E;
+                         -fx-background-radius: 12;
+                         -fx-border-color: #E50914;
+                         -fx-border-width: 0 0 0 3;
+                         -fx-border-radius: 12;
+                         -fx-padding: 16;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 14, 0, 0, 6);">
+                <Label text="RANKINGS"
+                       style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Label text="Dynamic ladder across seasons and disciplines."
+                       wrapText="true"
+                       style="-fx-text-fill: #8A8A9A; -fx-font-size: 11px;"/>
+                <Button text="Open Rankings"
+                        onAction="#openRankings"
+                        maxWidth="1.7976931348623157E308"
+                        style="-fx-background-color: #00C853;
+                               -fx-text-fill: #0D0D0D;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 8;
+                               -fx-padding: 8 18 8 18;"/>
+            </VBox>
+
+            <VBox GridPane.rowIndex="2" GridPane.columnIndex="1" spacing="8"
+                  style="-fx-background-color: #1A1A2E;
+                         -fx-background-radius: 12;
+                         -fx-border-color: #E50914;
+                         -fx-border-width: 0 0 0 3;
+                         -fx-border-radius: 12;
+                         -fx-padding: 16;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 14, 0, 0, 6);">
+                <Label text="FIGHT RESULTS"
+                       style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Label text="Official outcomes, methods, and scorecards."
+                       wrapText="true"
+                       style="-fx-text-fill: #8A8A9A; -fx-font-size: 11px;"/>
+                <Button text="Open Fight Results"
+                        onAction="#openFightResults"
+                        maxWidth="1.7976931348623157E308"
+                        style="-fx-background-color: #E50914;
+                               -fx-text-fill: white;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 8;
+                               -fx-padding: 8 18 8 18;"/>
+            </VBox>
+
+            <VBox GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="2" spacing="8"
+                  style="-fx-background-color: #1A1A2E;
+                         -fx-background-radius: 12;
+                         -fx-border-color: #E50914;
+                         -fx-border-width: 0 0 0 3;
+                         -fx-border-radius: 12;
+                         -fx-padding: 16;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 14, 0, 0, 6);">
+                <Label text="USER &amp; ACCESS CONTROL"
+                       style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Label text="Fans, admins, roles, and secure access to SmartFight."
+                       wrapText="true"
+                       style="-fx-text-fill: #8A8A9A; -fx-font-size: 11px;"/>
+                <Button text="Open User Management"
+                        onAction="#openUsers"
+                        maxWidth="1.7976931348623157E308"
+                        style="-fx-background-color: transparent;
+                               -fx-border-color: #2A2A3E;
+                               -fx-border-width: 1;
+                               -fx-border-radius: 8;
+                               -fx-text-fill: #FFFFFF;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 8;
+                               -fx-padding: 8 18 8 18;"/>
+            </VBox>
+        </GridPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_RIGHT"
+              style="-fx-padding: 8 24 12 24;">
+            <Label text="v1.0 • Academic project (PIDEV)"
+                   style="-fx-text-fill: #8A8A9A; -fx-font-size: 10px;"/>
+        </HBox>
+    </bottom>
+</BorderPane>
