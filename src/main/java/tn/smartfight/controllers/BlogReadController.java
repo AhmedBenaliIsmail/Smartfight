@@ -32,6 +32,9 @@ public class BlogReadController {
     private final javafx.scene.control.ContextMenu suggestionPopup = new javafx.scene.control.ContextMenu();
     { suggestionPopup.getStyleClass().add("search-suggestions"); }
 
+    private int lastBreakpoint = -1;
+    private javafx.animation.Timeline resizeDebounce;
+
     @FXML
     private void initialize() {
         cbCategory.getItems().add("All Categories");
@@ -54,8 +57,11 @@ public class BlogReadController {
                 if (newVal.doubleValue() > 50) {
                     newsGrid.widthProperty().removeListener(this);
                     loadNews();
-                    // Persistent listener: reflow grid on every width change
-                    newsGrid.widthProperty().addListener((o, ov, nv) -> loadNews());
+                    // Listen to scrollPane width (not newsGrid) to avoid scrollbar-appear/disappear
+                    // feedback loops: when content height changes, the scrollbar toggles, which
+                    // shrinks newsGrid width and can flip the breakpoint, causing infinite reloads.
+                    // The scrollPane's own width only changes on window resize, not on content change.
+                    scrollPane.widthProperty().addListener((o, ov, nv) -> scheduleReload(nv.doubleValue()));
                 }
             }
         });
@@ -67,9 +73,22 @@ public class BlogReadController {
     @FXML
     private void onSearch() { loadNews(); }
 
+    private void scheduleReload(double newWidth) {
+        int bp = newWidth >= 1100 ? 2 : newWidth >= 700 ? 1 : 0;
+        if (bp == lastBreakpoint) return;
+        if (resizeDebounce != null) resizeDebounce.stop();
+        resizeDebounce = new javafx.animation.Timeline(
+            new javafx.animation.KeyFrame(Duration.millis(150), e -> loadNews()));
+        resizeDebounce.play();
+    }
+
     private void loadNews() {
         double w = newsGrid.getWidth();
         if (w < 50) return;
+        // Track lastBreakpoint from scrollPane width (consistent with the resize listener source)
+        // so breakpoint comparisons in scheduleReload never produce a mismatch.
+        double scrollW = scrollPane.getWidth();
+        lastBreakpoint = scrollW >= 1100 ? 2 : scrollW >= 700 ? 1 : 0;
 
         List<BlogArticle> articles = fetchArticles();
         newsGrid.getChildren().clear();
@@ -102,11 +121,12 @@ public class BlogReadController {
         int idx = 0;
 
         if (idx < articles.size()) {
+            int featuredH = (int)(w * 0.27);
             HBox row = new HBox(20);
             row.setMaxWidth(Double.MAX_VALUE);
-            StackPane featured = buildFeaturedCard(articles.get(idx++));
-            featured.setMinHeight(w * 0.27);
-            featured.setMaxHeight(w * 0.27);
+            row.setMinHeight(featuredH);
+            row.setMaxHeight(featuredH);
+            StackPane featured = buildFeaturedCard(articles.get(idx++), featuredH);
             HBox.setHgrow(featured, Priority.ALWAYS);
             row.getChildren().add(featured);
 
@@ -119,11 +139,12 @@ public class BlogReadController {
         }
 
         if (idx < articles.size()) {
+            int videoH = (int)(w * 0.24);
             HBox row = new HBox(20);
             row.setMaxWidth(Double.MAX_VALUE);
-            StackPane videoCard = buildVideoCard(articles.get(idx++));
-            videoCard.setMinHeight(w * 0.24);
-            videoCard.setMaxHeight(w * 0.24);
+            row.setMinHeight(videoH);
+            row.setMaxHeight(videoH);
+            StackPane videoCard = buildVideoCard(articles.get(idx++), videoH);
             HBox.setHgrow(videoCard, Priority.ALWAYS);
             row.getChildren().add(videoCard);
 
@@ -156,17 +177,15 @@ public class BlogReadController {
         int idx = 0;
 
         if (idx < articles.size()) {
-            StackPane featured = buildFeaturedCard(articles.get(idx++));
-            featured.setMinHeight(w * 0.30);
-            featured.setMaxHeight(w * 0.30);
+            int featuredH = (int)(w * 0.30);
+            StackPane featured = buildFeaturedCard(articles.get(idx++), featuredH);
             featured.setMaxWidth(Double.MAX_VALUE);
             container.getChildren().add(featured);
         }
 
         if (idx < articles.size()) {
-            StackPane videoCard = buildVideoCard(articles.get(idx++));
-            videoCard.setMinHeight(w * 0.25);
-            videoCard.setMaxHeight(w * 0.25);
+            int videoH = (int)(w * 0.25);
+            StackPane videoCard = buildVideoCard(articles.get(idx++), videoH);
             videoCard.setMaxWidth(Double.MAX_VALUE);
             container.getChildren().add(videoCard);
         }
@@ -199,17 +218,17 @@ public class BlogReadController {
     // ---------------------------------------------------------------
     // Featured card (large, image overlay)
     // ---------------------------------------------------------------
-    private StackPane buildFeaturedCard(BlogArticle article) {
+    private StackPane buildFeaturedCard(BlogArticle article, int height) {
         StackPane card = new StackPane();
-        card.setMinHeight(360);
-        card.setMaxHeight(360);
+        card.setMinHeight(height);
+        card.setMaxHeight(height);
         card.setStyle(
             "-fx-border-color: #27272a; -fx-border-width: 1; -fx-border-radius: 14;" +
             " -fx-background-radius: 14; -fx-background-color: #18181b;"
         );
         card.setCursor(javafx.scene.Cursor.HAND);
 
-        addCoverImage(card, article, 360);
+        addCoverImage(card, article, height);
         addGradientOverlay(card);
 
         VBox content = new VBox(8);
@@ -249,10 +268,10 @@ public class BlogReadController {
     // ---------------------------------------------------------------
     // Video card (large, dominant play button, VIDEO badge, no-image fallback)
     // ---------------------------------------------------------------
-    private StackPane buildVideoCard(BlogArticle article) {
+    private StackPane buildVideoCard(BlogArticle article, int height) {
         StackPane card = new StackPane();
-        card.setMinHeight(310);
-        card.setMaxHeight(310);
+        card.setMinHeight(height);
+        card.setMaxHeight(height);
         card.setStyle(
             "-fx-border-color: #27272a; -fx-border-width: 1; -fx-border-radius: 14;" +
             " -fx-background-radius: 14; -fx-background-color: #09090b;"
@@ -260,7 +279,7 @@ public class BlogReadController {
         card.setCursor(javafx.scene.Cursor.HAND);
 
         // Cover image (only when present)
-        addCoverImage(card, article, 310);
+        addCoverImage(card, article, height);
 
         // When there is no image the card is a plain dark surface; add a subtle
         // cinematic letterbox pattern so it doesn't look broken.
@@ -419,10 +438,10 @@ public class BlogReadController {
             try {
                 InputStream thumbStream = MediaCache.getImageStream(article);
                 if (thumbStream == null) throw new Exception("no image");
-                ImageView thumb = new ImageView(new Image(thumbStream, thumbW, thumbH, false, true));
+                ImageView thumb = new ImageView(new Image(thumbStream, thumbW, thumbH, true, true));
                 thumb.setFitWidth(thumbW);
                 thumb.setFitHeight(thumbH);
-                thumb.setPreserveRatio(false);
+                thumb.setPreserveRatio(true);
 
                 // Clip image to rounded rectangle
                 Rectangle thumbClip = new Rectangle(thumbW, thumbH);
@@ -520,8 +539,11 @@ public class BlogReadController {
         if (!article.hasImage()) return;
         try {
             StackPane imgPane = new StackPane();
+            // height is now always the card's actual min=max height (passed from the layout
+            // method), so imgPane.minHeight=height never conflicts with the card's maxHeight.
             imgPane.setMinHeight(height);
             imgPane.setMaxHeight(height);
+            imgPane.setMaxWidth(Double.MAX_VALUE);
 
             InputStream imgStream = MediaCache.getImageStream(article);
             if (imgStream == null) return;
@@ -863,8 +885,7 @@ public class BlogReadController {
         titleBar.setOnMouseDragged(ev -> { stage.setX(ev.getScreenX() - xOffset[0]); stage.setY(ev.getScreenY() - yOffset[0]); });
 
         try {
-            byte[] videoBytes = blogService.getVideoData(article.getId());
-            String videoUri = MediaCache.getVideoUri(article.getId(), videoBytes);
+            String videoUri = MediaCache.getVideoUri(article.getVideoPath());
             if (videoUri == null) throw new Exception("No video data");
 
             Media media = new Media(videoUri);

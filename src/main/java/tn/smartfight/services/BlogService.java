@@ -3,10 +3,7 @@ package tn.smartfight.services;
 import tn.smartfight.database.DBConnection;
 import tn.smartfight.models.*;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,13 +12,13 @@ public class BlogService {
     private final Connection conn = DBConnection.getInstance().getConnection();
 
     // ---------------------------------------------------------------
-    // Shared JOIN fragment — excludes video_data (too large for list
-    // queries); includes image_data and a boolean flag for video.
+    // Shared JOIN fragment — selects image_path and video_path.
+    // No BLOB columns are fetched in list queries.
     // ---------------------------------------------------------------
     private static final String ARTICLE_BASE =
         "SELECT ba.id, ba.category_id, ba.author_id, ba.title, ba.content, ba.summary, " +
         "       ba.status, ba.view_count, ba.created_at, ba.updated_at, " +
-        "       ba.image_data, (ba.video_data IS NOT NULL) AS has_video, " +
+        "       ba.image_path, ba.video_path, " +
         "       bc.name AS category_name, " +
         "       CONCAT(u.first_name,' ',u.last_name) AS author_name " +
         "FROM blog_article ba " +
@@ -149,113 +146,52 @@ public class BlogService {
     }
 
     // ---------------------------------------------------------------
-    // getVideoData — lazy loader for video BLOB (only when playing)
+    // create — returns the generated article ID
     // ---------------------------------------------------------------
-    public byte[] getVideoData(int id) {
-        String sql = "SELECT video_data FROM blog_article WHERE id=?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return rs.getBytes("video_data");
-            }
-        } catch (SQLException e) {
-            System.err.println("[BlogService] getVideoData: " + e.getMessage());
-        }
-        return null;
-    }
-
-    // ---------------------------------------------------------------
-    // create
-    // ---------------------------------------------------------------
-    public void create(BlogArticle a) {
+    public int create(BlogArticle a) {
         String sql = "INSERT INTO blog_article " +
-                     "(category_id, author_id, title, content, summary, image_data, video_data, status) " +
+                     "(category_id, author_id, title, content, summary, image_path, video_path, status) " +
                      "VALUES (?,?,?,?,?,?,?,?)";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, a.getCategoryId());
             ps.setInt(2, a.getAuthorId());
             ps.setString(3, a.getTitle());
             ps.setString(4, a.getContent());
             ps.setString(5, a.getSummary());
-            ps.setBytes(6, a.getImageData());
-            ps.setBytes(7, a.getVideoData());
+            ps.setString(6, a.getImagePath());
+            ps.setString(7, a.getVideoPath());
             ps.setString(8, a.getStatus());
             ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) return keys.getInt(1);
+            }
         } catch (SQLException e) {
             System.err.println("[BlogService] create: " + e.getMessage());
         }
+        return -1;
     }
 
     // ---------------------------------------------------------------
-    // update
+    // update — uses COALESCE so null paths preserve the existing value
     // ---------------------------------------------------------------
     public void update(BlogArticle a) {
-        // If no new media was attached (null), keep existing data in DB
-        if (a.getImageData() != null && a.getVideoData() != null) {
-            String sql = "UPDATE blog_article " +
-                         "SET category_id=?, title=?, content=?, summary=?, " +
-                         "image_data=?, video_data=?, status=?, " +
-                         "updated_at=CURRENT_TIMESTAMP WHERE id=?";
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, a.getCategoryId());
-                ps.setString(2, a.getTitle());
-                ps.setString(3, a.getContent());
-                ps.setString(4, a.getSummary());
-                ps.setBytes(5, a.getImageData());
-                ps.setBytes(6, a.getVideoData());
-                ps.setString(7, a.getStatus());
-                ps.setInt(8, a.getId());
-                ps.executeUpdate();
-            } catch (SQLException e) {
-                System.err.println("[BlogService] update(both): " + e.getMessage());
-            }
-        } else if (a.getImageData() != null) {
-            String sql = "UPDATE blog_article " +
-                         "SET category_id=?, title=?, content=?, summary=?, " +
-                         "image_data=?, status=?, updated_at=CURRENT_TIMESTAMP WHERE id=?";
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, a.getCategoryId());
-                ps.setString(2, a.getTitle());
-                ps.setString(3, a.getContent());
-                ps.setString(4, a.getSummary());
-                ps.setBytes(5, a.getImageData());
-                ps.setString(6, a.getStatus());
-                ps.setInt(7, a.getId());
-                ps.executeUpdate();
-            } catch (SQLException e) {
-                System.err.println("[BlogService] update(image): " + e.getMessage());
-            }
-        } else if (a.getVideoData() != null) {
-            String sql = "UPDATE blog_article " +
-                         "SET category_id=?, title=?, content=?, summary=?, " +
-                         "video_data=?, status=?, updated_at=CURRENT_TIMESTAMP WHERE id=?";
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, a.getCategoryId());
-                ps.setString(2, a.getTitle());
-                ps.setString(3, a.getContent());
-                ps.setString(4, a.getSummary());
-                ps.setBytes(5, a.getVideoData());
-                ps.setString(6, a.getStatus());
-                ps.setInt(7, a.getId());
-                ps.executeUpdate();
-            } catch (SQLException e) {
-                System.err.println("[BlogService] update(video): " + e.getMessage());
-            }
-        } else {
-            String sql = "UPDATE blog_article " +
-                         "SET category_id=?, title=?, content=?, summary=?, " +
-                         "status=?, updated_at=CURRENT_TIMESTAMP WHERE id=?";
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, a.getCategoryId());
-                ps.setString(2, a.getTitle());
-                ps.setString(3, a.getContent());
-                ps.setString(4, a.getSummary());
-                ps.setString(5, a.getStatus());
-                ps.setInt(6, a.getId());
-                ps.executeUpdate();
-            } catch (SQLException e) {
-                System.err.println("[BlogService] update(text): " + e.getMessage());
-            }
+        String sql = "UPDATE blog_article " +
+                     "SET category_id=?, title=?, content=?, summary=?, " +
+                     "image_path = COALESCE(?, image_path), " +
+                     "video_path = COALESCE(?, video_path), " +
+                     "status=?, updated_at=CURRENT_TIMESTAMP WHERE id=?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, a.getCategoryId());
+            ps.setString(2, a.getTitle());
+            ps.setString(3, a.getContent());
+            ps.setString(4, a.getSummary());
+            ps.setString(5, a.getImagePath());
+            ps.setString(6, a.getVideoPath());
+            ps.setString(7, a.getStatus());
+            ps.setInt(8, a.getId());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("[BlogService] update: " + e.getMessage());
         }
     }
 
@@ -310,8 +246,8 @@ public class BlogService {
         a.setTitle(rs.getString("title"));
         a.setContent(rs.getString("content"));
         a.setSummary(rs.getString("summary"));
-        a.setImageData(rs.getBytes("image_data"));
-        a.setHasVideoStored(rs.getBoolean("has_video"));
+        a.setImagePath(rs.getString("image_path"));
+        a.setVideoPath(rs.getString("video_path"));
         a.setStatus(rs.getString("status"));
         a.setViewCount(rs.getInt("view_count"));
         a.setCategoryName(rs.getString("category_name"));

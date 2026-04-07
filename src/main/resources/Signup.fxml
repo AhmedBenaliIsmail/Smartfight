@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:id="root"
+            fx:controller="controllers.SignupController"
+            prefWidth="1000.0" prefHeight="650.0"
+            style="-fx-background-color: #0D0D0D;">
+
+    <center>
+        <HBox prefWidth="1000.0" prefHeight="650.0">
+
+            <!-- Left visual panel -->
+            <VBox prefWidth="500.0" prefHeight="650.0" spacing="16.0"
+                  style="-fx-background-color: #000000;
+                         -fx-padding: 40 40 30 40;">
+                <VBox spacing="8.0">
+                    <Label text="SMARTFIGHT"
+                           style="-fx-text-fill: #E50914;
+                                  -fx-font-size: 48px;
+                                  -fx-font-weight: bold;"/>
+                    <Label text="COMBAT SPORTS MANAGEMENT PLATFORM"
+                           style="-fx-text-fill: #00D4FF;
+                                  -fx-font-size: 13px;
+                                  -fx-font-weight: bold;"/>
+                    <Label text="Train. Fight. Dominate."
+                           style="-fx-text-fill: #8A8A9A;
+                                  -fx-font-size: 14px;
+                                  -fx-font-style: italic;
+                                  -fx-padding: 6 0 0 0;"/>
+                </VBox>
+
+                <Pane VBox.vgrow="ALWAYS"/>
+
+                <Region prefHeight="2.0"
+                        style="-fx-background-color: linear-gradient(to right, transparent, #E50914, transparent);"/>
+            </VBox>
+
+            <!-- Right signup form panel -->
+            <VBox prefWidth="500.0" prefHeight="650.0" spacing="18.0"
+                  style="-fx-background-color: #1A1A2E;
+                         -fx-padding: 30 50 28 50;">
+
+                <VBox spacing="6.0">
+                    <Label text="CREATE ACCOUNT"
+                           style="-fx-text-fill: #FFFFFF;
+                                  -fx-font-size: 28px;
+                                  -fx-font-weight: bold;"/>
+                    <Label text="Join the SmartFight platform"
+                           style="-fx-text-fill: #8A8A9A;
+                                  -fx-font-size: 13px;"/>
+                </VBox>
+
+                <GridPane hgap="10.0" vgap="10.0">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50.0"/>
+                        <ColumnConstraints percentWidth="50.0"/>
+                    </columnConstraints>
+
+                    <Label text="First Name"
+                           GridPane.rowIndex="0" GridPane.columnIndex="0"
+                           style="-fx-text-fill: #8A8A9A; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtFirstName"
+                               GridPane.rowIndex="1" GridPane.columnIndex="0"
+                               promptText="First name"
+                               style="-fx-background-color: #2A2A3E;
+                                      -fx-text-fill: #FFFFFF;
+                                      -fx-prompt-text-fill: #8A8A9A;
+                                      -fx-background-radius: 6;
+                                      -fx-padding: 10 14 10 14;
+                                      -fx-border-color: #3A3A4E;
+                                      -fx-border-radius: 6;"/>
+
+                    <Label text="Last Name"
+                           GridPane.rowIndex="0" GridPane.columnIndex="1"
+                           style="-fx-text-fill: #8A8A9A; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtLastName"
+                               GridPane.rowIndex="1" GridPane.columnIndex="1"
+                               promptText="Last name"
+                               style="-fx-background-color: #2A2A3E;
+                                      -fx-text-fill: #FFFFFF;
+                                      -fx-prompt-text-fill: #8A8A9A;
+                                      -fx-background-radius: 6;
+                                      -fx-padding: 10 14 10 14;
+                                      -fx-border-color: #3A3A4E;
+                                      -fx-border-radius: 6;"/>
+
+                    <Label text="Email"
+                           GridPane.rowIndex="2" GridPane.columnIndex="0"
+                           style="-fx-text-fill: #8A8A9A; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtEmail"
+                               GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="2"
+                               promptText="Email address"
+                               style="-fx-background-color: #2A2A3E;
+                                      -fx-text-fill: #FFFFFF;
+                                      -fx-prompt-text-fill: #8A8A9A;
+                                      -fx-background-radius: 6;
+                                      -fx-padding: 10 14 10 14;
+                                      -fx-border-color: #3A3A4E;
+                                      -fx-border-radius: 6;"/>
+
+                    <Label text="Password"
+                           GridPane.rowIndex="4" GridPane.columnIndex="0"
+                           style="-fx-text-fill: #8A8A9A; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <PasswordField fx:id="txtPassword"
+                                   GridPane.rowIndex="5" GridPane.columnIndex="0"
+                                   promptText="Password"
+                                   style="-fx-background-color: #2A2A3E;
+                                          -fx-text-fill: #FFFFFF;
+                                          -fx-prompt-text-fill: #8A8A9A;
+                                          -fx-background-radius: 6;
+                                          -fx-padding: 10 14 10 14;
+                                          -fx-border-color: #3A3A4E;
+                                          -fx-border-radius: 6;"/>
+
+                    <Label fx:id="lblPasswordStrength" text="" visible="false"
+                           GridPane.rowIndex="6" GridPane.columnIndex="0" GridPane.columnSpan="2"
+                           style="-fx-font-size: 11px; -fx-font-weight: bold;"/>
+
+                    <Label text="Phone"
+                           GridPane.rowIndex="4" GridPane.columnIndex="1"
+                           style="-fx-text-fill: #8A8A9A; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtPhone"
+                               GridPane.rowIndex="5" GridPane.columnIndex="1"
+                               promptText="Phone"
+                               style="-fx-background-color: #2A2A3E;
+                                      -fx-text-fill: #FFFFFF;
+                                      -fx-prompt-text-fill: #8A8A9A;
+                                      -fx-background-radius: 6;
+                                      -fx-padding: 10 14 10 14;
+                                      -fx-border-color: #3A3A4E;
+                                      -fx-border-radius: 6;"/>
+                </GridPane>
+
+                <VBox spacing="6.0">
+                    <Label text="SELECT YOUR ROLE"
+                           style="-fx-text-fill: #00D4FF;
+                                  -fx-font-size: 12px;
+                                  -fx-font-weight: bold;"/>
+
+                    <GridPane hgap="10.0" vgap="10.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50.0"/>
+                            <ColumnConstraints percentWidth="50.0"/>
+                        </columnConstraints>
+
+                        <!-- ADMIN -->
+                        <VBox fx:id="cardAdmin"
+                              onMouseClicked="#selectAdmin"
+                              spacing="4.0"
+                              GridPane.rowIndex="0" GridPane.columnIndex="0"
+                              style="-fx-background-color: #1A1A2E;
+                                     -fx-background-radius: 10;
+                                     -fx-border-color: transparent;
+                                     -fx-border-width: 1;
+                                     -fx-border-radius: 10;
+                                     -fx-padding: 10 12 10 12;">
+                            <Label text="&#x1F451; Admin"
+                                   style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
+                            <Label text="Full system access"
+                                   style="-fx-text-fill: #8A8A9A; -fx-font-size: 11px;"/>
+                        </VBox>
+
+                        <!-- ORGANIZER -->
+                        <VBox fx:id="cardOrganizer"
+                              onMouseClicked="#selectOrganizer"
+                              spacing="4.0"
+                              GridPane.rowIndex="0" GridPane.columnIndex="1"
+                              style="-fx-background-color: #1A1A2E;
+                                     -fx-background-radius: 10;
+                                     -fx-border-color: transparent;
+                                     -fx-border-width: 1;
+                                     -fx-border-radius: 10;
+                                     -fx-padding: 10 12 10 12;">
+                            <Label text="&#x1F4C5; Organizer"
+                                   style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
+                            <Label text="Manage events and fights"
+                                   style="-fx-text-fill: #8A8A9A; -fx-font-size: 11px;"/>
+                        </VBox>
+
+                        <!-- FIGHTER -->
+                        <VBox fx:id="cardFighter"
+                              onMouseClicked="#selectFighter"
+                              spacing="4.0"
+                              GridPane.rowIndex="1" GridPane.columnIndex="0"
+                              style="-fx-background-color: #1A1A2E;
+                                     -fx-background-radius: 10;
+                                     -fx-border-color: transparent;
+                                     -fx-border-width: 1;
+                                     -fx-border-radius: 10;
+                                     -fx-padding: 10 12 10 12;">
+                            <Label text="&#x1F94A; Fighter"
+                                   style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
+                            <Label text="Track your career"
+                                   style="-fx-text-fill: #8A8A9A; -fx-font-size: 11px;"/>
+                        </VBox>
+
+                        <!-- FAN -->
+                        <VBox fx:id="cardFan"
+                              onMouseClicked="#selectFan"
+                              spacing="4.0"
+                              GridPane.rowIndex="1" GridPane.columnIndex="1"
+                              style="-fx-background-color: #1A1A2E;
+                                     -fx-background-radius: 10;
+                                     -fx-border-color: transparent;
+                                     -fx-border-width: 1;
+                                     -fx-border-radius: 10;
+                                     -fx-padding: 10 12 10 12;">
+                            <Label text="&#x1F3AF; Fan"
+                                   style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
+                            <Label text="Follow the action"
+                                   style="-fx-text-fill: #8A8A9A; -fx-font-size: 11px;"/>
+                        </VBox>
+
+                        <!-- COACH -->
+                        <VBox fx:id="cardCoach"
+                              onMouseClicked="#selectCoach"
+                              spacing="4.0"
+                              GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="2"
+                              style="-fx-background-color: #1A1A2E;
+                                     -fx-background-radius: 10;
+                                     -fx-border-color: transparent;
+                                     -fx-border-width: 1;
+                                     -fx-border-radius: 10;
+                                     -fx-padding: 10 12 10 12;">
+                            <Label text="&#x1F45A; Coach"
+                                   style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
+                            <Label text="Train champions"
+                                   style="-fx-text-fill: #8A8A9A; -fx-font-size: 11px;"/>
+                        </VBox>
+                    </GridPane>
+                </VBox>
+
+                <Button text="← Back to Login"
+                        onAction="#goToLogin"
+                        maxWidth="1.7976931348623157E308"
+                        style="-fx-background-color: transparent;
+                               -fx-border-color: #8A8A9A;
+                               -fx-border-width: 1;
+                               -fx-border-radius: 6;
+                               -fx-text-fill: #8A8A9A;
+                               -fx-background-radius: 6;
+                               -fx-padding: 10 20;
+                               -fx-cursor: hand;"/>
+
+                <Button text="SIGN UP"
+                        onAction="#handleSignup"
+                        maxWidth="1.7976931348623157E308"
+                        prefHeight="48.0"
+                        style="-fx-background-color: #E50914;
+                               -fx-text-fill: #FFFFFF;
+                               -fx-font-size: 14px;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 8;
+                               -fx-cursor: hand;"/>
+
+                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                    <Label text="Already have an account?"
+                           style="-fx-text-fill: #8A8A9A; -fx-font-size: 12px;"/>
+                    <Button text="SIGN IN"
+                            onAction="#goToLogin"
+                            style="-fx-background-color: transparent;
+                                   -fx-text-fill: #00D4FF;
+                                   -fx-font-size: 12px;
+                                   -fx-font-weight: bold;
+                                   -fx-border-color: transparent;
+                                   -fx-padding: 0;
+                                   -fx-cursor: hand;"/>
+                </HBox>
+
+                <Label fx:id="lblError"
+                       visible="false"
+                       wrapText="true"
+                       style="-fx-text-fill: #E53935; -fx-font-size: 12px;"/>
+
+                <Label fx:id="lblSuccess"
+                       visible="false"
+                       wrapText="true"
+                       style="-fx-text-fill: #00C853; -fx-font-size: 12px;"/>
+
+                <Pane VBox.vgrow="ALWAYS"/>
+
+                <Label text="SmartFight v1.0"
+                       style="-fx-text-fill: #8A8A9A;
+                              -fx-font-size: 11px;"/>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>

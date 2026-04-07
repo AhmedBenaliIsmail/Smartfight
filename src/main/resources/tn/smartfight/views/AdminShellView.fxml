@@ -1,51 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.geometry.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21"
             fx:controller="tn.smartfight.controllers.AdminShellController"
             stylesheets="@../styles/smartfight.css">
 
     <left>
-        <VBox fx:id="sidebar" styleClass="sidebar" spacing="0" minWidth="64" prefWidth="256" maxWidth="256">
+        <VBox fx:id="sidebar" styleClass="sidebar" spacing="0" minWidth="58" prefWidth="220" maxWidth="220">
 
             <!-- Branding -->
-            <VBox fx:id="vboxBrand" style="-fx-background-color: transparent; -fx-padding: 24 16 16 20;" spacing="0">
+            <VBox fx:id="vboxBrand" style="-fx-padding:22 14 14 18;" spacing="2">
                 <Label fx:id="lblBrand" text="SMARTFIGHT" styleClass="app-title"
-                       style="-fx-font-style: italic; -fx-font-weight: 900; -fx-font-size: 20px;"/>
+                       style="-fx-font-style:italic;-fx-font-weight:900;-fx-font-size:18px;"/>
                 <Label fx:id="lblSubtitle" text="ADMIN PANEL" styleClass="app-subtitle"
-                       style="-fx-letter-spacing: 2px;"/>
+                       style="-fx-letter-spacing:2px;-fx-font-size:9px;"/>
             </VBox>
 
             <!-- User Info -->
             <VBox fx:id="vboxUser"
-                  style="-fx-padding: 4 16 24 20; -fx-border-color: transparent transparent #27272a transparent; -fx-border-width: 0 0 1 0;"
-                  spacing="3">
+                  style="-fx-padding:4 14 18 18;-fx-border-color:transparent transparent #27272a transparent;-fx-border-width:0 0 1 0;"
+                  spacing="2">
                 <Label fx:id="lblSignedIn" text="SIGNED IN AS"
-                       style="-fx-font-size: 9px; -fx-text-fill: #a1a1aa; -fx-font-weight: bold;"/>
+                       style="-fx-font-size:9px;-fx-text-fill:#a1a1aa;-fx-font-weight:bold;"/>
                 <Label fx:id="lblAdminName" styleClass="user-label" text="Admin"/>
             </VBox>
 
-            <!-- Navigation -->
-            <VBox style="-fx-padding: 16 8 0 8;" spacing="4" VBox.vgrow="ALWAYS">
-                <Button fx:id="btnBlog"          text="BLOG"        styleClass="nav-btn" onAction="#onBlogClicked"          maxWidth="Infinity"/>
-                <Button fx:id="btnBookings"      text="BOOKINGS"    styleClass="nav-btn" onAction="#onBookingsClicked"      maxWidth="Infinity"/>
-                <Button fx:id="btnPredictions"   text="PREDICTIONS" styleClass="nav-btn" onAction="#onPredictionsClicked"   maxWidth="Infinity"/>
-                <Button fx:id="btnReactions"     text="REACTIONS"   styleClass="nav-btn" onAction="#onReactionsClicked"     maxWidth="Infinity"/>
-                <Button fx:id="btnBroadcasts"    text="BROADCASTS"  styleClass="nav-btn" onAction="#onNotificationsClicked" maxWidth="Infinity"/>
+            <!-- Navigation — Management section -->
+            <VBox style="-fx-padding:14 7 0 7;" spacing="3">
+                <Label text="MANAGEMENT" style="-fx-font-size:9px;-fx-text-fill:#52525b;-fx-font-weight:bold;-fx-padding:4 8 2 8;"/>
+                <Button fx:id="btnUsers"     text="USERS"         styleClass="nav-btn" onAction="#onUsersClicked"     maxWidth="Infinity"/>
+                <Button fx:id="btnFighters"  text="FIGHTERS"      styleClass="nav-btn" onAction="#onFightersClicked"  maxWidth="Infinity"/>
+                <Button fx:id="btnEvents"    text="EVENTS"        styleClass="nav-btn" onAction="#onEventsClicked"    maxWidth="Infinity"/>
+                <Button fx:id="btnResults"   text="FIGHT RESULTS" styleClass="nav-btn" onAction="#onResultsClicked"   maxWidth="Infinity"/>
+
+                <Label text="FAN EXPERIENCE" style="-fx-font-size:9px;-fx-text-fill:#52525b;-fx-font-weight:bold;-fx-padding:10 8 2 8;"/>
+                <Button fx:id="btnBlog"         text="BLOG"        styleClass="nav-btn" onAction="#onBlogClicked"         maxWidth="Infinity"/>
+                <Button fx:id="btnBookings"     text="BOOKINGS"    styleClass="nav-btn" onAction="#onBookingsClicked"     maxWidth="Infinity"/>
+                <Button fx:id="btnPredictions"  text="PREDICTIONS" styleClass="nav-btn" onAction="#onPredictionsClicked"  maxWidth="Infinity"/>
+                <Button fx:id="btnReactions"    text="REACTIONS"   styleClass="nav-btn" onAction="#onReactionsClicked"    maxWidth="Infinity"/>
+                <Button fx:id="btnBroadcasts"   text="BROADCASTS"  styleClass="nav-btn" onAction="#onBroadcastsClicked"   maxWidth="Infinity"/>
                 <Region VBox.vgrow="ALWAYS"/>
             </VBox>
 
             <!-- Divider -->
-            <Region style="-fx-background-color: #27272a; -fx-pref-height: 1; -fx-min-height: 1;"/>
+            <Region style="-fx-background-color:#27272a;-fx-pref-height:1;-fx-min-height:1;"/>
 
-            <!-- Bottom actions -->
-            <VBox style="-fx-padding: 12 8 8 8;" spacing="4">
-                <Button fx:id="btnSwitchRole" text="SWITCH ROLE" styleClass="nav-btn" onAction="#onSwitchRoleClicked"
-                        maxWidth="Infinity" style="-fx-text-fill: #a1a1aa; -fx-font-size: 11px;"/>
+            <!-- Bottom -->
+            <VBox style="-fx-padding:10 7 8 7;" spacing="4">
+                <Button fx:id="btnLogout" text="LOGOUT" styleClass="nav-btn" onAction="#onLogoutClicked"
+                        maxWidth="Infinity"
+                        style="-fx-text-fill:#a1a1aa;-fx-font-size:11px;"/>
                 <Button fx:id="btnCollapse" text="‹" onAction="#onToggleSidebar" maxWidth="Infinity"
-                        style="-fx-background-color: transparent; -fx-text-fill: #52525b; -fx-font-size: 16px;
-                               -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 6 0; -fx-border-color: transparent;"/>
+                        style="-fx-background-color:transparent;-fx-text-fill:#52525b;-fx-font-size:16px;-fx-font-weight:bold;-fx-cursor:hand;-fx-padding:4 0;-fx-border-color:transparent;"/>
             </VBox>
         </VBox>
     </left>

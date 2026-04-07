@@ -18,9 +18,9 @@ public class Main extends Application {
         MediaCache.init();
         DBMigration.run();
         MediaSeeder.seed();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/tn/smartfight/views/RolePickerView.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Login.fxml"));
         Scene scene = new Scene(loader.load(), 1280, 800);
-        stage.setTitle("SmartFight — Module 5");
+        stage.setTitle("SmartFight — Integrated Platform");
         stage.setMinWidth(1024);
         stage.setMinHeight(700);
         stage.setScene(scene);

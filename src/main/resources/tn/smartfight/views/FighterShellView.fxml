@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21"
+            fx:controller="tn.smartfight.controllers.FighterShellController"
+            stylesheets="@../styles/smartfight.css">
+    <left>
+        <VBox fx:id="sidebar" styleClass="sidebar" spacing="0" minWidth="58" prefWidth="220" maxWidth="220">
+            <VBox fx:id="vboxBrand" style="-fx-padding:22 14 14 18;" spacing="2">
+                <Label fx:id="lblBrand" text="SMARTFIGHT" styleClass="app-title"
+                       style="-fx-font-style:italic;-fx-font-weight:900;-fx-font-size:18px;"/>
+                <Label fx:id="lblSubtitle" text="FIGHTER" styleClass="app-subtitle"
+                       style="-fx-letter-spacing:2px;-fx-font-size:9px;"/>
+            </VBox>
+            <VBox fx:id="vboxUser"
+                  style="-fx-padding:4 14 18 18;-fx-border-color:transparent transparent #27272a transparent;-fx-border-width:0 0 1 0;"
+                  spacing="2">
+                <Label fx:id="lblSignedIn" text="SIGNED IN AS"
+                       style="-fx-font-size:9px;-fx-text-fill:#a1a1aa;-fx-font-weight:bold;"/>
+                <Label fx:id="lblUserName" styleClass="user-label" text="Fighter"/>
+            </VBox>
+            <VBox style="-fx-padding:14 7 0 7;" spacing="3" VBox.vgrow="ALWAYS">
+                <Button fx:id="btnProfile" text="MY PROFILE" styleClass="nav-btn" onAction="#onProfileClicked" maxWidth="Infinity"/>
+                <Button fx:id="btnFights"  text="MY FIGHTS"  styleClass="nav-btn" onAction="#onFightsClicked"  maxWidth="Infinity"/>
+                <Region VBox.vgrow="ALWAYS"/>
+            </VBox>
+            <Region style="-fx-background-color:#27272a;-fx-pref-height:1;-fx-min-height:1;"/>
+            <VBox style="-fx-padding:10 7 8 7;" spacing="4">
+                <Button fx:id="btnLogout"   text="LOGOUT" styleClass="nav-btn" onAction="#onLogoutClicked"
+                        maxWidth="Infinity" style="-fx-text-fill:#a1a1aa;-fx-font-size:11px;"/>
+                <Button fx:id="btnCollapse" text="‹" onAction="#onToggleSidebar" maxWidth="Infinity"
+                        style="-fx-background-color:transparent;-fx-text-fill:#52525b;-fx-font-size:16px;-fx-font-weight:bold;-fx-cursor:hand;-fx-padding:4 0;-fx-border-color:transparent;"/>
+            </VBox>
+        </VBox>
+    </left>
+    <center>
+        <StackPane fx:id="contentArea" styleClass="content-area" BorderPane.alignment="CENTER"/>
+    </center>
+</BorderPane>

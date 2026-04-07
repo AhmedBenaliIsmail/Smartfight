@@ -153,11 +153,11 @@ public class FanNotificationService {
     public List<Map<String, Object>> getBroadcastHistory() {
         List<Map<String, Object>> list = new ArrayList<>();
         String sql =
-            "SELECT fn.title, fn.type, fn.created_at, COUNT(*) AS recipients " +
+            "SELECT fn.title, fn.type, MIN(fn.created_at) AS created_at, COUNT(*) AS recipients " +
             "FROM fan_notification fn " +
             "WHERE fn.type='ADMIN_BROADCAST' " +
-            "GROUP BY fn.title, fn.created_at " +
-            "ORDER BY fn.created_at DESC";
+            "GROUP BY fn.title, fn.type " +
+            "ORDER BY MIN(fn.created_at) DESC";
         try (PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {

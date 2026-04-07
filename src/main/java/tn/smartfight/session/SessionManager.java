@@ -5,36 +5,72 @@ import tn.smartfight.models.User;
 public class SessionManager {
 
     private static User currentUser;
-    private static boolean adminMode;
+    private static String roleName;
 
     private SessionManager() {}
 
-    public static void loginAsAdmin(User user) {
+    // ── Login helpers ────────────────────────────────────────────────────────
+
+    public static void loginAs(User user, String role) {
         currentUser = user;
-        adminMode = true;
+        roleName = role.toUpperCase();
+    }
+
+    public static void loginAsAdmin(User user) {
+        loginAs(user, "ADMIN");
     }
 
     public static void loginAsFan(User user) {
-        currentUser = user;
-        adminMode = false;
+        loginAs(user, "FAN");
+    }
+
+    public static void loginAsOrganizer(User user) {
+        loginAs(user, "ORGANIZER");
+    }
+
+    public static void loginAsFighter(User user) {
+        loginAs(user, "FIGHTER");
+    }
+
+    public static void loginAsCoach(User user) {
+        loginAs(user, "COACH");
     }
 
     public static void logout() {
         currentUser = null;
-        adminMode = false;
+        roleName = null;
     }
 
+    // ── Role checks ──────────────────────────────────────────────────────────
+
     public static boolean isAdmin() {
-        return adminMode;
+        return "ADMIN".equals(roleName);
     }
 
     public static boolean isFan() {
-        return currentUser != null && !adminMode;
+        return "FAN".equals(roleName);
     }
 
-    public static User getCurrentUser() {
-        return currentUser;
+    public static boolean isOrganizer() {
+        return "ORGANIZER".equals(roleName);
     }
+
+    public static boolean isFighter() {
+        return "FIGHTER".equals(roleName);
+    }
+
+    public static boolean isCoach() {
+        return "COACH".equals(roleName);
+    }
+
+    public static boolean isLoggedIn() {
+        return currentUser != null;
+    }
+
+    // ── Getters ──────────────────────────────────────────────────────────────
+
+    public static User getCurrentUser() { return currentUser; }
+    public static String getRoleName()  { return roleName; }
 
     public static int getCurrentUserId() {
         return currentUser != null ? currentUser.getId() : -1;

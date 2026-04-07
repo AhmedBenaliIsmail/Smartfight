@@ -10,7 +10,7 @@
 
     <!-- LEFT: Article list -->
     <left>
-        <VBox
+        <VBox prefWidth="300"
               style="-fx-background-color: #0a0a0a; -fx-border-color: transparent #1e1e1e transparent transparent; -fx-border-width: 0 1 0 0;"
               spacing="0">
 

@@ -64,7 +64,7 @@ public class FanShellController {
     private void onSwitchRoleClicked() {
         SessionManager.logout();
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/tn/smartfight/views/RolePickerView.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/Login.fxml"));
             Stage stage = (Stage) contentArea.getScene().getWindow();
             stage.getScene().setRoot(root);
         } catch (IOException e) { e.printStackTrace(); }

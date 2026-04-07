@@ -32,58 +32,60 @@ public class MediaSeeder {
             // --- Images ---
             List<Integer> noImage = new ArrayList<>();
             try (PreparedStatement ps = conn.prepareStatement(
-                    "SELECT id FROM blog_article WHERE image_data IS NULL ORDER BY id")) {
+                    "SELECT id FROM blog_article WHERE image_path IS NULL ORDER BY id")) {
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()) noImage.add(rs.getInt("id"));
             }
             int imgSeeded = 0;
             for (int i = 0; i < noImage.size(); i++) {
-                String imgFile = IMAGE_FILES.get(i % IMAGE_FILES.size());
-                Path f = mediaDir.resolve(imgFile);
-                if (Files.exists(f)) {
-                    byte[] bytes = Files.readAllBytes(f);
-                    int articleId = noImage.get(i);
-                    // Save to DB
-                    try (PreparedStatement ps = conn.prepareStatement(
-                            "UPDATE blog_article SET image_data=? WHERE id=?")) {
-                        ps.setBytes(1, bytes);
-                        ps.setInt(2, articleId);
-                        ps.executeUpdate();
-                    }
-                    // Cache locally with article ID as filename
-                    String ext = imgFile.substring(imgFile.lastIndexOf('.'));
-                    Path cached = mediaDir.resolve("img_" + articleId + ext);
-                    if (Files.notExists(cached)) Files.copy(f, cached);
-                    imgSeeded++;
+                String srcFile = IMAGE_FILES.get(i % IMAGE_FILES.size());
+                Path src = mediaDir.resolve(srcFile);
+                if (!Files.exists(src)) continue;
+
+                int articleId = noImage.get(i);
+                String ext = srcFile.substring(srcFile.lastIndexOf('.'));
+                String filename = "img_" + articleId + ext;
+                Path dest = mediaDir.resolve(filename);
+                if (Files.notExists(dest)) {
+                    try { Files.copy(src, dest); }
+                    catch (IOException e) { System.err.println("[MediaSeeder] " + e.getMessage()); continue; }
                 }
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE blog_article SET image_path=? WHERE id=?")) {
+                    ps.setString(1, filename);
+                    ps.setInt(2, articleId);
+                    ps.executeUpdate();
+                }
+                imgSeeded++;
             }
 
             // --- Videos ---
             List<Integer> noVideo = new ArrayList<>();
             try (PreparedStatement ps = conn.prepareStatement(
-                    "SELECT id FROM blog_article WHERE video_data IS NULL ORDER BY id")) {
+                    "SELECT id FROM blog_article WHERE video_path IS NULL ORDER BY id")) {
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()) noVideo.add(rs.getInt("id"));
             }
             int videoSeeded = 0;
             int videoCount = Math.min(noVideo.size(), VIDEO_FILES.size());
             for (int i = 0; i < videoCount; i++) {
-                Path f = mediaDir.resolve(VIDEO_FILES.get(i));
-                if (Files.exists(f)) {
-                    byte[] bytes = Files.readAllBytes(f);
-                    int articleId = noVideo.get(i);
-                    // Save to DB
-                    try (PreparedStatement ps = conn.prepareStatement(
-                            "UPDATE blog_article SET video_data=? WHERE id=?")) {
-                        ps.setBytes(1, bytes);
-                        ps.setInt(2, articleId);
-                        ps.executeUpdate();
-                    }
-                    // Cache locally with article ID as filename
-                    Path cached = mediaDir.resolve("vid_" + articleId + ".mp4");
-                    if (Files.notExists(cached)) Files.copy(f, cached);
-                    videoSeeded++;
+                Path src = mediaDir.resolve(VIDEO_FILES.get(i));
+                if (!Files.exists(src)) continue;
+
+                int articleId = noVideo.get(i);
+                String filename = "vid_" + articleId + ".mp4";
+                Path dest = mediaDir.resolve(filename);
+                if (Files.notExists(dest)) {
+                    try { Files.copy(src, dest); }
+                    catch (IOException e) { System.err.println("[MediaSeeder] " + e.getMessage()); continue; }
                 }
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE blog_article SET video_path=? WHERE id=?")) {
+                    ps.setString(1, filename);
+                    ps.setInt(2, articleId);
+                    ps.executeUpdate();
+                }
+                videoSeeded++;
             }
 
             System.out.println("[MediaSeeder] Seeded images=" + imgSeeded + ", videos=" + videoSeeded);

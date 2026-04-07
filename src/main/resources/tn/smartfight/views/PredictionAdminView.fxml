@@ -10,7 +10,7 @@
 
     <!-- LEFT -->
     <left>
-        <VBox spacing="0"
+        <VBox spacing="0" prefWidth="280"
               style="-fx-background-color: #0a0a0a; -fx-border-color: transparent #1e1e1e transparent transparent; -fx-border-width: 0 1 0 0;">
 
             <HBox styleClass="section-header" alignment="CENTER_LEFT"

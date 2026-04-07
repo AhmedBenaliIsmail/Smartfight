@@ -179,6 +179,7 @@ public class BookingController {
 
     private void addCancelButtonColumn() {
         colActions.setCellFactory(col -> new TableCell<>() {
+            private EventBooking currentBooking;
             private final Button btnCancel = new Button("Cancel");
             private final Button btnQR = new Button("QR");
             private final HBox box = new HBox(6, btnQR, btnCancel);
@@ -191,33 +192,31 @@ public class BookingController {
                         "-fx-border-color: #dc2626; -fx-border-radius: 4; -fx-background-radius: 4; " +
                         "-fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 4 10; -fx-cursor: hand;");
                 btnCancel.setOnAction(e -> {
-                    EventBooking booking = getTableView().getItems().get(getIndex());
-                    if (booking.isConfirmed()) {
-                        Alert a = new Alert(Alert.AlertType.CONFIRMATION,
-                                "Cancel booking " + booking.getBookingReference() + "?",
-                                ButtonType.YES, ButtonType.NO);
-                        a.showAndWait().ifPresent(bt -> {
-                            if (bt == ButtonType.YES) {
-                                bookingService.cancelBooking(booking.getId());
-                                loadMyBookings();
-                            }
-                        });
-                    }
+                    if (currentBooking == null || !currentBooking.isConfirmed()) return;
+                    Alert a = new Alert(Alert.AlertType.CONFIRMATION,
+                            "Cancel booking " + currentBooking.getBookingReference() + "?",
+                            ButtonType.YES, ButtonType.NO);
+                    a.showAndWait().ifPresent(bt -> {
+                        if (bt == ButtonType.YES) {
+                            bookingService.cancelBooking(currentBooking.getId());
+                            loadMyBookings();
+                        }
+                    });
                 });
                 btnQR.setOnAction(e -> {
-                    EventBooking booking = getTableView().getItems().get(getIndex());
-                    showQRPopup(booking);
+                    if (currentBooking != null) showQRPopup(currentBooking);
                 });
             }
 
             @Override
             protected void updateItem(Void v, boolean empty) {
                 super.updateItem(v, empty);
-                if (empty) {
+                if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
                     setGraphic(null);
+                    currentBooking = null;
                 } else {
-                    EventBooking booking = getTableView().getItems().get(getIndex());
-                    setGraphic(booking.isConfirmed() ? box : null);
+                    currentBooking = getTableView().getItems().get(getIndex());
+                    setGraphic(currentBooking.isConfirmed() ? box : null);
                 }
             }
         });

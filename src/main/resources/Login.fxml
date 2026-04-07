@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.LoginController"
+            prefWidth="1000.0" prefHeight="650.0"
+            style="-fx-background-color: #0D0D0D;">
+
+    <center>
+        <HBox prefWidth="1000.0" prefHeight="650.0">
+
+            <!-- Left visual panel -->
+            <VBox prefWidth="500.0" prefHeight="650.0" spacing="16.0"
+                  style="-fx-background-color: #000000;
+                         -fx-padding: 40 40 30 40;">
+                <VBox spacing="8.0">
+                    <Label text="SMARTFIGHT"
+                           style="-fx-text-fill: #E50914;
+                                  -fx-font-size: 48px;
+                                  -fx-font-weight: bold;"/>
+                    <Label text="COMBAT SPORTS MANAGEMENT PLATFORM"
+                           style="-fx-text-fill: #00D4FF;
+                                  -fx-font-size: 13px;
+                                  -fx-font-weight: bold;"/>
+                    <Label text="Train. Fight. Dominate."
+                           style="-fx-text-fill: #8A8A9A;
+                                  -fx-font-size: 14px;
+                                  -fx-font-style: italic;
+                                  -fx-padding: 6 0 0 0;"/>
+                </VBox>
+
+                <Pane VBox.vgrow="ALWAYS"/>
+
+                <Region prefHeight="2.0"
+                        style="-fx-background-color: linear-gradient(to right, transparent, #E50914, transparent);"/>
+            </VBox>
+
+            <!-- Right form panel -->
+            <VBox prefWidth="500.0" prefHeight="650.0" spacing="18.0"
+                  style="-fx-background-color: #1A1A2E;
+                         -fx-padding: 40 56 32 56;">
+
+                <VBox spacing="6.0">
+                    <Label text="WELCOME BACK"
+                           style="-fx-text-fill: #FFFFFF;
+                                  -fx-font-size: 28px;
+                                  -fx-font-weight: bold;"/>
+                    <Label text="Sign in to your account"
+                           style="-fx-text-fill: #8A8A9A;
+                                  -fx-font-size: 13px;"/>
+                </VBox>
+
+                <VBox spacing="10.0">
+                    <Label text="Email address"
+                           style="-fx-text-fill: #8A8A9A;
+                                  -fx-font-size: 12px;
+                                  -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtEmail"
+                               promptText="Email address"
+                               style="-fx-background-color: #2A2A3E;
+                                      -fx-text-fill: #FFFFFF;
+                                      -fx-prompt-text-fill: #8A8A9A;
+                                      -fx-background-radius: 6;
+                                      -fx-padding: 10 14 10 14;
+                                      -fx-border-color: #3A3A4E;
+                                      -fx-border-radius: 6;"/>
+                </VBox>
+
+                <VBox spacing="10.0">
+                    <Label text="Password"
+                           style="-fx-text-fill: #8A8A9A;
+                                  -fx-font-size: 12px;
+                                  -fx-font-weight: bold;"/>
+                    <PasswordField fx:id="txtPassword"
+                                   promptText="Password"
+                                   style="-fx-background-color: #2A2A3E;
+                                          -fx-text-fill: #FFFFFF;
+                                          -fx-prompt-text-fill: #8A8A9A;
+                                          -fx-background-radius: 6;
+                                          -fx-padding: 10 14 10 14;
+                                          -fx-border-color: #3A3A4E;
+                                          -fx-border-radius: 6;"/>
+                </VBox>
+
+                <Label fx:id="lblRoleInfo"
+                       text=""
+                       visible="false"
+                       style="-fx-text-fill: #8A8A9A;
+                              -fx-font-size: 11px;"/>
+
+                <Button fx:id="btnLogin"
+                        text="LOGIN"
+                        onAction="#handleLogin"
+                        maxWidth="1.7976931348623157E308"
+                        prefHeight="48.0"
+                        style="-fx-background-color: #E50914;
+                               -fx-text-fill: #FFFFFF;
+                               -fx-font-size: 14px;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 8;
+                               -fx-cursor: hand;"/>
+
+                <HBox alignment="CENTER" spacing="10.0">
+                    <Region prefHeight="1.0" HBox.hgrow="ALWAYS"
+                            style="-fx-background-color: #2A2A3E;"/>
+                    <Label text="OR"
+                           style="-fx-text-fill: #8A8A9A; -fx-font-size: 11px;"/>
+                    <Region prefHeight="1.0" HBox.hgrow="ALWAYS"
+                            style="-fx-background-color: #2A2A3E;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                    <Label text="Don't have an account?"
+                           style="-fx-text-fill: #8A8A9A; -fx-font-size: 12px;"/>
+                    <Hyperlink text="SIGN UP"
+                               onAction="#goToSignup"
+                               style="-fx-text-fill: #00D4FF;
+                                      -fx-font-size: 12px;
+                                      -fx-font-weight: bold;
+                                      -fx-border-color: transparent;
+                                      -fx-padding: 0;"/>
+                </HBox>
+
+                <Label fx:id="lblError"
+                       textFill="#E53935"
+                       visible="false"
+                       wrapText="true"
+                       style="-fx-font-size: 12px;"/>
+
+                <Pane VBox.vgrow="ALWAYS"/>
+
+                <Label text="SmartFight v1.0"
+                       style="-fx-text-fill: #8A8A9A;
+                              -fx-font-size: 11px;"/>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>
+

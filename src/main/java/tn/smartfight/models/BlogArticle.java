@@ -10,9 +10,8 @@ public class BlogArticle {
     private String title;
     private String content;
     private String summary;
-    private byte[] imageData;
-    private byte[] videoData;
-    private boolean hasVideoStored;
+    private String imagePath;
+    private String videoPath;
     private String status;
     private int viewCount;
     private String createdAt;
@@ -31,11 +30,11 @@ public class BlogArticle {
     }
 
     public boolean hasImage() {
-        return imageData != null && imageData.length > 0;
+        return imagePath != null && !imagePath.isEmpty();
     }
 
     public boolean hasVideo() {
-        return hasVideoStored;
+        return videoPath != null && !videoPath.isEmpty();
     }
 
     @Override
@@ -69,14 +68,11 @@ public class BlogArticle {
     public String getSummary() { return summary; }
     public void setSummary(String summary) { this.summary = summary; }
 
-    public byte[] getImageData() { return imageData; }
-    public void setImageData(byte[] imageData) { this.imageData = imageData; }
+    public String getImagePath() { return imagePath; }
+    public void setImagePath(String imagePath) { this.imagePath = imagePath; }
 
-    public byte[] getVideoData() { return videoData; }
-    public void setVideoData(byte[] videoData) { this.videoData = videoData; }
-
-    public boolean isHasVideoStored() { return hasVideoStored; }
-    public void setHasVideoStored(boolean hasVideoStored) { this.hasVideoStored = hasVideoStored; }
+    public String getVideoPath() { return videoPath; }
+    public void setVideoPath(String videoPath) { this.videoPath = videoPath; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

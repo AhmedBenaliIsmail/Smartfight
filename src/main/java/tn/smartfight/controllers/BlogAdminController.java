@@ -175,7 +175,7 @@ public class BlogAdminController {
         selectedImageFile = null;
         selectedVideoFile = null;
         if (selectedArticle.hasImage()) {
-            lblImagePath.setText("Current image set");
+            lblImagePath.setText(selectedArticle.getImagePath());
             try {
                 java.io.InputStream s = MediaCache.getImageStream(selectedArticle);
                 imgPreview.setImage(s != null ? new Image(s, 260, 160, true, true) : null);
@@ -184,7 +184,7 @@ public class BlogAdminController {
             lblImagePath.setText("No image");
             imgPreview.setImage(null);
         }
-        lblVideoPath.setText(selectedArticle.hasVideo() ? "Current video set" : "No video");
+        lblVideoPath.setText(selectedArticle.hasVideo() ? selectedArticle.getVideoPath() : "No video");
         showEditorPanel();
     }
 
@@ -235,25 +235,45 @@ public class BlogAdminController {
         if (cbEditorCategory.getValue() != null) {
             a.setCategoryId(cbEditorCategory.getValue().getId());
         }
-        // Handle media uploads — save to media/ folder and DB
-        int tempId = isNewArticle ? (int)(System.currentTimeMillis() % 100000) : a.getId();
-        if (selectedImageFile != null) {
-            try {
-                a.setImageData(MediaCache.saveImage(selectedImageFile, tempId));
-            } catch (IOException e) {
-                System.err.println("[BlogAdmin] save image: " + e.getMessage());
-            }
-        }
-        if (selectedVideoFile != null) {
-            try {
-                a.setVideoData(MediaCache.saveVideo(selectedVideoFile, tempId));
-            } catch (IOException e) {
-                System.err.println("[BlogAdmin] save video: " + e.getMessage());
-            }
-        }
         if (isNewArticle) {
-            blogService.create(a);
+            // Create row first to get the real ID, then save media with that ID
+            int newId = blogService.create(a);
+            if (newId > 0) {
+                a.setId(newId);
+                if (selectedImageFile != null) {
+                    try {
+                        a.setImagePath(MediaCache.saveImage(selectedImageFile, newId));
+                    } catch (IOException e) {
+                        System.err.println("[BlogAdmin] save image: " + e.getMessage());
+                    }
+                }
+                if (selectedVideoFile != null) {
+                    try {
+                        a.setVideoPath(MediaCache.saveVideo(selectedVideoFile, newId));
+                    } catch (IOException e) {
+                        System.err.println("[BlogAdmin] save video: " + e.getMessage());
+                    }
+                }
+                // Update media paths if any media was chosen
+                if (selectedImageFile != null || selectedVideoFile != null) {
+                    blogService.update(a);
+                }
+            }
         } else {
+            if (selectedImageFile != null) {
+                try {
+                    a.setImagePath(MediaCache.saveImage(selectedImageFile, a.getId()));
+                } catch (IOException e) {
+                    System.err.println("[BlogAdmin] save image: " + e.getMessage());
+                }
+            }
+            if (selectedVideoFile != null) {
+                try {
+                    a.setVideoPath(MediaCache.saveVideo(selectedVideoFile, a.getId()));
+                } catch (IOException e) {
+                    System.err.println("[BlogAdmin] save video: " + e.getMessage());
+                }
+            }
             blogService.update(a);
         }
         selectedImageFile = null;
