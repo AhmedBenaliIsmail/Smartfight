@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Stream – SmartFight</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── Fight Result Banner ── */
+    .fight-result-banner {
+      background: var(--bg-surface);
+      border-bottom: 3px solid var(--primary);
+      padding: 48px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .fight-result-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(220,38,38,0.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .live-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+    .live-dot::before {
+      content: '';
+      width: 10px;
+      height: 10px;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: pulse-dot 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+    .result-event-name {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+    .result-fighter-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .result-fighter {
+      text-align: center;
+      min-width: 160px;
+    }
+    .result-fighter .fighter-img-wrap {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: 0 auto 12px;
+      border: 3px solid var(--border-color);
+    }
+    .result-fighter .fighter-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .result-fighter.winner .fighter-img-wrap { border-color: var(--gold); }
+    .result-fighter .fighter-corner {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .result-fighter.red-corner .fighter-corner  { color: var(--primary); }
+    .result-fighter.blue-corner .fighter-corner { color: #3b82f6; }
+    .result-fighter .fighter-name-result {
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-primary);
+    }
+    .result-fighter.winner .fighter-name-result { color: var(--gold); }
+    .result-fighter .fighter-record-small {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .result-vs-block {
+      text-align: center;
+    }
+    .vs-badge {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: block;
+      margin-bottom: 10px;
+    }
+    .result-badge {
+      display: inline-block;
+      padding: 6px 18px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .result-badge-tko   { background: var(--primary); color: #fff; }
+    .result-badge-dec   { background: var(--gold); color: #000; }
+    .result-badge-sub   { background: #7c3aed; color: #fff; }
+    .result-round-time {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+    .winner-label {
+      display: inline-block;
+      background: var(--gold);
+      color: #000;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 2px;
+      margin-top: 6px;
+    }
+
+    /* ── Reaction Feed ── */
+    .reaction-emoji-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+    }
+    .reaction-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 50px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .reaction-btn:hover, .reaction-btn.reacted {
+      border-color: var(--primary);
+      background: rgba(220,38,38,0.12);
+      color: var(--primary);
+    }
+    .reaction-btn .emoji { font-size: 1.2rem; }
+    .reaction-btn .count { color: var(--text-muted); font-size: 0.82rem; }
+    .reaction-btn.reacted .count { color: var(--primary); }
+
+    /* ── Reaction Cards Grid ── */
+    .reaction-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    @media (max-width: 767px) { .reaction-cards-grid { grid-template-columns: 1fr; } }
+
+    .reaction-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 18px;
+      transition: border-color 0.2s;
+    }
+    .reaction-card:hover { border-color: var(--primary); }
+    .reaction-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .reaction-card-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .reaction-card-username {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+    .reaction-card-time {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+    .reaction-card-text {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .reaction-card-emoji {
+      font-size: 1.5rem;
+    }
+
+    /* ── Add Reaction Form ── */
+    .add-reaction-form {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 28px;
+    }
+    .add-reaction-form h4 {
+      font-size: 1rem;
+      margin-bottom: 18px;
+      color: var(--text-primary);
+    }
+    .add-reaction-form textarea {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-primary);
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 0.9rem;
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .add-reaction-form textarea:focus { border-color: var(--primary); }
+    .emoji-picker-row {
+      display: flex;
+      gap: 8px;
+      margin: 14px 0;
+      flex-wrap: wrap;
+    }
+    .emoji-pick-btn {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      line-height: 1;
+    }
+    .emoji-pick-btn:hover, .emoji-pick-btn.selected {
+      border-color: var(--primary);
+      background: rgba(220,38,38,0.12);
+    }
+
+    /* ── Fight Card Sidebar ── */
+    .fight-card-sidebar {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .fight-card-sidebar-header {
+      background: var(--primary);
+      padding: 14px 18px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .sidebar-fight-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.85rem;
+    }
+    .sidebar-fight-row:last-child { border-bottom: none; }
+    .sidebar-fight-names {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .sidebar-fight-result-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .sbr-tko  { background: var(--primary); color: #fff; }
+    .sbr-dec  { background: var(--gold); color: #000; }
+    .sbr-sub  { background: #7c3aed; color: #fff; }
+    .sbr-live { background: rgba(220,38,38,0.2); color: var(--primary); border: 1px solid var(--primary); }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="sf-navbar navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">SMART<span>FIGHT</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sfNavCollapse"
+            aria-controls="sfNavCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="sfNavCollapse">
+      <ul class="navbar-nav mx-auto gap-1">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="matches.html">Events</a></li>
+        <li class="nav-item"><a class="nav-link" href="team.html">Fighters</a></li>
+        <li class="nav-item"><a class="nav-link" href="blog.html">News</a></li>
+        <li class="nav-item"><a class="nav-link" href="gallery.html">Gallery</a></li>
+        <li class="nav-item"><a class="nav-link live-badge-nav active" href="live-stream.html">Live</a></li>
+        <li class="nav-item"><a class="nav-link" href="predictions.html">Predictions</a></li>
+        <li class="nav-item"><a class="nav-link" href="booking.html">Bookings</a></li>
+      </ul>
+      <div class="nav-actions d-flex align-items-center gap-2 mt-2 mt-lg-0">
+        <a href="#" class="btn btn-sf-ghost">Login</a>
+        <a href="#" class="btn btn-sf-primary">Register</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== FIGHT RESULT BANNER ===== -->
+<section class="fight-result-banner">
+  <div class="container">
+    <div class="text-center">
+      <div class="live-dot">SmartFight 45 – Live Results</div>
+      <div class="result-event-name">Barclays Center, Brooklyn · April 7, 2026</div>
+
+      <div class="result-fighter-row">
+        <!-- Red Corner -->
+        <div class="result-fighter red-corner winner">
+          <div class="fighter-img-wrap">
+            <img src="https://placehold.co/110x110/18181b/dc2626?text=TDZ" alt="Thompson Diaz" />
+          </div>
+          <div class="fighter-corner">Red Corner</div>
+          <div class="fighter-name-result">Derek Thompson</div>
+          <div class="fighter-record-small">21-4-0</div>
+          <div class="winner-label">Winner</div>
+        </div>
+
+        <!-- VS Block -->
+        <div class="result-vs-block">
+          <span class="vs-badge">VS</span>
+          <span class="result-badge result-badge-tko">TKO</span>
+          <div class="result-round-time">Round 3 · 2:47</div>
+        </div>
+
+        <!-- Blue Corner -->
+        <div class="result-fighter blue-corner">
+          <div class="fighter-img-wrap" style="border-color:#3b82f6;">
+            <img src="https://placehold.co/110x110/18181b/3b82f6?text=NDZ" alt="Nick Diaz" />
+          </div>
+          <div class="fighter-corner">Blue Corner</div>
+          <div class="fighter-name-result">Nick Diaz</div>
+          <div class="fighter-record-small">18-7-0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MAIN CONTENT ===== -->
+<section class="section-pad">
+  <div class="container">
+    <div class="row g-5">
+
+      <!-- Left: Reaction Feed -->
+      <div class="col-lg-8">
+
+        <!-- Section Title -->
+        <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+          <div>
+            <span class="label">Community</span>
+            <h2 class="heading-line">Reaction Feed</h2>
+          </div>
+          <span style="font-size:0.8rem; color:var(--text-muted);">
+            <i class="fa-solid fa-comments" style="color:var(--primary);"></i> 677 reactions
+          </span>
+        </div>
+
+        <!-- Emoji Reaction Bar -->
+        <div class="reaction-emoji-bar">
+          <button class="reaction-btn" data-reaction="fire">
+            <span class="emoji">🔥</span> Fire <span class="count" id="cnt-fire">234</span>
+          </button>
+          <button class="reaction-btn" data-reaction="power">
+            <span class="emoji">👊</span> Power <span class="count" id="cnt-power">189</span>
+          </button>
+          <button class="reaction-btn" data-reaction="shocked">
+            <span class="emoji">😮</span> Shocked <span class="count" id="cnt-shocked">98</span>
+          </button>
+          <button class="reaction-btn" data-reaction="love">
+            <span class="emoji">❤️</span> Love <span class="count" id="cnt-love">156</span>
+          </button>
+        </div>
+
+        <!-- Reaction Cards -->
+        <div class="reaction-cards-grid" id="reactionFeed">
+
+          <div class="reaction-card">
+            <div class="reaction-card-header">
+              <div class="reaction-card-avatar">MF</div>
+              <div>
+                <div class="reaction-card-username">MikeFighter99</div>
+              </div>
+              <div class="reaction-card-time">2 min ago</div>
+            </div>
+            <div class="reaction-card-text">That TKO was absolutely devastating! Thompson landed that right hook perfectly. Didn't see that coming in round 3!</div>
+            <div class="reaction-card-emoji">🔥</div>
+          </div>
+
+          <div class="reaction-card">
+            <div class="reaction-card-header">
+              <div class="reaction-card-avatar" style="background:var(--gold); color:#000;">SB</div>
+              <div>
+                <div class="reaction-card-username">SarahBoxing</div>
+              </div>
+              <div class="reaction-card-time">4 min ago</div>
+            </div>
+            <div class="reaction-card-text">Diaz showed heart but the cardio just wasn't there tonight. Thompson looked like a completely different fighter from last year.</div>
+            <div class="reaction-card-emoji">👊</div>
+          </div>
+
+          <div class="reaction-card">
+            <div class="reaction-card-header">
+              <div class="reaction-card-avatar" style="background:#7c3aed;">KG</div>
+              <div>
+                <div class="reaction-card-username">KingGrappler</div>
+              </div>
+              <div class="reaction-card-time">6 min ago</div>
+            </div>
+            <div class="reaction-card-text">SHOCKED. I had Diaz winning via submission in round 2. Back to the drawing board for my predictions. 😅</div>
+            <div class="reaction-card-emoji">😮</div>
+          </div>
+
+          <div class="reaction-card">
+            <div class="reaction-card-header">
+              <div class="reaction-card-avatar" style="background:#3b82f6;">TW</div>
+              <div>
+                <div class="reaction-card-username">ToughWatcher</div>
+              </div>
+              <div class="reaction-card-time">9 min ago</div>
+            </div>
+            <div class="reaction-card-text">Incredible performance! Thompson deserves every bit of that win. The pressure he applied in round 3 was relentless. True champion mentality.</div>
+            <div class="reaction-card-emoji">❤️</div>
+          </div>
+
+          <div class="reaction-card">
+            <div class="reaction-card-header">
+              <div class="reaction-card-avatar" style="background:#059669;">OC</div>
+              <div>
+                <div class="reaction-card-username">OctagonChampion</div>
+              </div>
+              <div class="reaction-card-time">11 min ago</div>
+            </div>
+            <div class="reaction-card-text">The way Thompson slipped that jab and countered with the overhand right was textbook. His coach deserves credit for that game plan.</div>
+            <div class="reaction-card-emoji">🔥</div>
+          </div>
+
+          <div class="reaction-card">
+            <div class="reaction-card-header">
+              <div class="reaction-card-avatar" style="background:#dc7533;">LM</div>
+              <div>
+                <div class="reaction-card-username">LegendMMA</div>
+              </div>
+              <div class="reaction-card-time">14 min ago</div>
+            </div>
+            <div class="reaction-card-text">Rematch NEEDED. Diaz had him hurt in round 1. If he hadn't gassed out this would have been a completely different fight. Rematch clause!</div>
+            <div class="reaction-card-emoji">👊</div>
+          </div>
+
+        </div>
+
+        <!-- Add Your Reaction Form -->
+        <div class="add-reaction-form">
+          <h4><i class="fa-solid fa-plus-circle" style="color:var(--primary); margin-right:8px;"></i> Add Your Reaction</h4>
+          <textarea rows="3" id="reactionText" placeholder="Share your thoughts on the fight..."></textarea>
+          <div class="emoji-picker-row">
+            <button class="emoji-pick-btn" data-emoji="🔥" title="Fire">🔥</button>
+            <button class="emoji-pick-btn" data-emoji="👊" title="Power">👊</button>
+            <button class="emoji-pick-btn" data-emoji="😮" title="Shocked">😮</button>
+            <button class="emoji-pick-btn" data-emoji="❤️" title="Love">❤️</button>
+            <button class="emoji-pick-btn" data-emoji="😂" title="LOL">😂</button>
+            <button class="emoji-pick-btn" data-emoji="🏆" title="Champion">🏆</button>
+            <button class="emoji-pick-btn" data-emoji="💪" title="Strong">💪</button>
+            <button class="emoji-pick-btn" data-emoji="🤯" title="Mind Blown">🤯</button>
+          </div>
+          <button class="btn btn-sf-primary" id="submitReaction"><i class="fa-solid fa-paper-plane"></i> Post Reaction</button>
+        </div>
+
+      </div><!-- /col-lg-8 -->
+
+      <!-- Right: Fight Card Sidebar -->
+      <div class="col-lg-4">
+        <div class="sticky-top" style="top:80px;">
+
+          <!-- Event Info Card -->
+          <div class="sf-card mb-4" style="padding:20px;">
+            <div style="font-size:0.68rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--primary); margin-bottom:6px;">Now Live</div>
+            <div style="font-size:1.1rem; font-weight:700; margin-bottom:4px;">SmartFight 45</div>
+            <div style="font-size:0.8rem; color:var(--text-muted);"><i class="fa-solid fa-location-dot" style="color:var(--primary);"></i> Barclays Center, Brooklyn</div>
+            <div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;"><i class="fa-regular fa-calendar" style="color:var(--primary);"></i> April 7, 2026</div>
+            <hr style="border-color:var(--border-color); margin:14px 0;">
+            <div style="display:flex; gap:20px; text-align:center;">
+              <div style="flex:1;">
+                <div style="font-size:1.3rem; font-weight:700; color:var(--gold);">677</div>
+                <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em;">Reactions</div>
+              </div>
+              <div style="flex:1; border-left:1px solid var(--border-color);">
+                <div style="font-size:1.3rem; font-weight:700; color:var(--primary);">4.2K</div>
+                <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em;">Watching</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fight Card Results -->
+          <div class="fight-card-sidebar">
+            <div class="fight-card-sidebar-header">
+              <i class="fa-solid fa-list-ol"></i> Fight Card Results
+            </div>
+            <div class="sidebar-fight-row">
+              <div>
+                <div class="sidebar-fight-names">Thompson vs Diaz</div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">Welterweight · Main Event</div>
+              </div>
+              <span class="sidebar-fight-result-badge sbr-tko">TKO</span>
+            </div>
+            <div class="sidebar-fight-row">
+              <div>
+                <div class="sidebar-fight-names">Rosa vs Park</div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">Featherweight</div>
+              </div>
+              <span class="sidebar-fight-result-badge sbr-sub">SUB</span>
+            </div>
+            <div class="sidebar-fight-row">
+              <div>
+                <div class="sidebar-fight-names">Evans vs Carter</div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">Lightweight</div>
+              </div>
+              <span class="sidebar-fight-result-badge sbr-dec">DEC</span>
+            </div>
+            <div class="sidebar-fight-row">
+              <div>
+                <div class="sidebar-fight-names">Ward vs Gomez</div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">Middleweight</div>
+              </div>
+              <span class="sidebar-fight-result-badge sbr-live">LIVE</span>
+            </div>
+            <div class="sidebar-fight-row">
+              <div>
+                <div class="sidebar-fight-names">Bell vs Huang</div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">Bantamweight</div>
+              </div>
+              <span style="font-size:0.72rem; color:var(--text-muted);">Upcoming</span>
+            </div>
+          </div>
+
+          <!-- Prediction reminder -->
+          <div class="mt-4" style="background:rgba(220,38,38,0.08); border:1px solid rgba(220,38,38,0.25); border-radius:8px; padding:18px;">
+            <div style="font-size:0.8rem; font-weight:700; color:var(--primary); margin-bottom:8px;"><i class="fa-solid fa-trophy"></i> Your Prediction</div>
+            <div style="font-size:0.85rem; color:var(--text-muted);">You predicted <strong style="color:var(--text-primary);">Thompson by TKO</strong>. You earned <strong style="color:var(--gold);">+75 points!</strong></div>
+            <a href="predictions.html" class="btn btn-sf-outline btn-sm mt-3 w-100">View All Predictions</a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="sf-footer">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-4 col-md-6">
+        <a href="index.html" class="footer-logo">SMART<span>FIGHT</span></a>
+        <p class="footer-about">The premier destination for UFC and MMA fans. Live results, fighter profiles, event bookings, and community predictions — all in one place.</p>
+        <div class="social-links">
+          <a href="#" class="social-link" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" class="social-link" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="social-link" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" class="social-link" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#" class="social-link" aria-label="Discord"><i class="fa-brands fa-discord"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Home</a></li>
+          <li><a href="matches.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Events</a></li>
+          <li><a href="team.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Fighters</a></li>
+          <li><a href="blog.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> News</a></li>
+          <li><a href="gallery.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Gallery</a></li>
+          <li><a href="contact.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Contact</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Features</div>
+        <ul class="footer-links">
+          <li><a href="live-stream.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Live Stream</a></li>
+          <li><a href="predictions.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Predictions</a></li>
+          <li><a href="leaderboard.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Leaderboard</a></li>
+          <li><a href="booking.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Book Tickets</a></li>
+          <li><a href="notifications.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Notifications</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="footer-col-title">Newsletter</div>
+        <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:12px;">Get fight cards, results, and exclusive content delivered straight to your inbox.</p>
+        <div class="newsletter-form">
+          <input type="email" placeholder="Your email address" />
+          <button type="button"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+        <p style="font-size:0.72rem; color:var(--text-subtle); margin-top:10px;">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 SmartFight. All rights reserved.</p>
+      <div style="display:flex; gap:20px; flex-wrap:wrap;">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Settings</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/main.js"></script>
+<script>
+  // ── Emoji reaction counter ──
+  document.querySelectorAll('.reaction-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.reaction;
+      const countEl = btn.querySelector('.count');
+      const already = btn.classList.contains('reacted');
+      document.querySelectorAll('.reaction-btn').forEach(b => b.classList.remove('reacted'));
+      if (!already) {
+        btn.classList.add('reacted');
+        countEl.textContent = parseInt(countEl.textContent) + 1;
+      }
+    });
+  });
+
+  // ── Emoji picker ──
+  let selectedEmoji = '🔥';
+  document.querySelectorAll('.emoji-pick-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.emoji-pick-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedEmoji = btn.dataset.emoji;
+    });
+  });
+  document.querySelector('.emoji-pick-btn').classList.add('selected');
+
+  // ── Submit reaction ──
+  document.getElementById('submitReaction').addEventListener('click', () => {
+    const text = document.getElementById('reactionText').value.trim();
+    if (!text) return;
+    const feed = document.getElementById('reactionFeed');
+    const card = document.createElement('div');
+    card.className = 'reaction-card';
+    card.innerHTML = `
+      <div class="reaction-card-header">
+        <div class="reaction-card-avatar" style="background:#7c3aed;">YO</div>
+        <div><div class="reaction-card-username">You</div></div>
+        <div class="reaction-card-time">Just now</div>
+      </div>
+      <div class="reaction-card-text">${text}</div>
+      <div class="reaction-card-emoji">${selectedEmoji}</div>
+    `;
+    feed.prepend(card);
+    document.getElementById('reactionText').value = '';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Article Form — SmartFight Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/smartfight-admin.css" />
+</head>
+<body class="antialiased">
+<div class="wrapper">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────── -->
+  <aside class="navbar navbar-vertical navbar-expand-lg" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+    <div class="container-fluid flex-column align-items-stretch p-0">
+      <div class="p-3 border-bottom" style="border-color:#27272a!important">
+        <a href="../dashboard.html" class="smartfight-logo">
+          <div class="logo-icon"><i class="fa-solid fa-fist-raised"></i></div>
+          <div class="logo-text">Smart<span>Fight</span></div>
+        </a>
+      </div>
+      <nav class="flex-fill py-2">
+        <div class="navbar-vertical-section">Management</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../dashboard.html"><span class="nav-link-icon"><i class="fa-solid fa-chart-line fa-fw"></i></span><span class="nav-link-title">Dashboard</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../users/index.html"><span class="nav-link-icon"><i class="fa-solid fa-users fa-fw"></i></span><span class="nav-link-title">Users</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fighters/index.html"><span class="nav-link-icon"><i class="fa-solid fa-boxing-glove fa-fw"></i></span><span class="nav-link-title">Fighters</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../events/index.html"><span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span><span class="nav-link-title">Events</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fight-results/index.html"><span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span><span class="nav-link-title">Fight Results</span></a></li>
+        </ul>
+        <div class="navbar-vertical-section mt-2">Fan Experience</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link active" href="index.html"><span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw"></i></span><span class="nav-link-title">Blog Articles</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../bookings/index.html"><span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw"></i></span><span class="nav-link-title">Event Bookings</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../predictions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span><span class="nav-link-title">Predictions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../reactions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-comments fa-fw"></i></span><span class="nav-link-title">Reactions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../notifications/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span><span class="nav-link-title">Notifications</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- ── Main ─────────────────────────────────────────────────── -->
+  <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
+    <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
+      <div class="d-flex align-items-center gap-3 flex-fill">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="../dashboard.html" style="color:#a1a1aa;text-decoration:none;">Dashboard</a></li>
+          <li class="breadcrumb-item"><a href="index.html" style="color:#a1a1aa;text-decoration:none;">Blog Articles</a></li>
+          <li class="breadcrumb-item active">New Article</li>
+        </ol>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="../notifications/index.html" class="nav-link p-1 position-relative text-muted">
+          <i class="fa-solid fa-bell"></i>
+          <span class="badge bg-danger rounded-pill" style="position:absolute;top:-4px;right:-4px;font-size:.6rem;padding:2px 5px;">7</span>
+        </a>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+            <div class="avatar avatar-sm" style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">A</div>
+            <span style="font-size:.875rem;color:#fafafa;">Admin</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user fa-fw me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-fill p-4" style="background:#09090b;">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">New Article</h1>
+          <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Create a new blog post or news article.</p>
+        </div>
+        <a href="index.html" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left me-2"></i>Cancel</a>
+      </div>
+
+      <form>
+        <div class="row g-4">
+          <!-- Main Fields -->
+          <div class="col-lg-8">
+            <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+              <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                <h3 class="card-title mb-0" style="color:#fafafa;font-weight:600;font-size:.9375rem;"><i class="fa-solid fa-pen me-2" style="color:#dc2626;"></i>Article Details</h3>
+              </div>
+              <div class="card-body" style="padding:1.5rem;">
+                <div class="mb-3">
+                  <label class="form-label">Article Title <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" placeholder="e.g. UFC 310: Everything You Need to Know Before Fight Night" id="titleInput" oninput="generateSlug(this.value)" />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Slug <span style="font-size:.75rem;color:#52525b;">(auto-generated)</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text" style="font-size:.8rem;color:#52525b;">/blog/</span>
+                    <input type="text" class="form-control" id="slugInput" placeholder="ufc-310-everything-you-need-to-know" />
+                  </div>
+                </div>
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Category <span class="text-danger">*</span></label>
+                    <select class="form-select">
+                      <option value="">Select category...</option>
+                      <option>News</option>
+                      <option>Fighter Spotlight</option>
+                      <option>Event Preview</option>
+                      <option>Results</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Author <span class="text-danger">*</span></label>
+                    <select class="form-select">
+                      <option value="">Select author...</option>
+                      <option>Jake Morrison</option>
+                      <option>Sarah Reyes</option>
+                      <option>Tom Bradley</option>
+                      <option>Priya Singh</option>
+                      <option>Marcus Bell</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Content <span class="text-danger">*</span></label>
+                  <textarea class="form-control" rows="10" placeholder="Write the full article content here. Supports plain text formatting..."></textarea>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Excerpt <span style="font-size:.75rem;color:#52525b;">(shown in article listings)</span></label>
+                  <textarea class="form-control" rows="3" placeholder="A short summary of the article, up to 200 characters..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar Fields -->
+          <div class="col-lg-4">
+            <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+              <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                <h3 class="card-title mb-0" style="color:#fafafa;font-weight:600;font-size:.9375rem;"><i class="fa-solid fa-sliders me-2" style="color:#c9a227;"></i>Publishing</h3>
+              </div>
+              <div class="card-body" style="padding:1.25rem;">
+                <div class="mb-3">
+                  <label class="form-label">Status</label>
+                  <select class="form-select">
+                    <option>Draft</option>
+                    <option>Published</option>
+                    <option>Archived</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Published Date</label>
+                  <input type="datetime-local" class="form-control" value="2026-04-07T10:00" />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Tags <span style="font-size:.75rem;color:#52525b;">(comma separated)</span></label>
+                  <input type="text" class="form-control" placeholder="e.g. UFC, heavyweight, Santos, Jensen" />
+                </div>
+                <div class="d-grid gap-2 mt-4">
+                  <button type="submit" class="btn btn-danger"><i class="fa-solid fa-floppy-disk me-2"></i>Save Article</button>
+                  <a href="index.html" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="background:#18181b;border:1px solid #27272a;">
+              <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                <h3 class="card-title mb-0" style="color:#fafafa;font-weight:600;font-size:.9375rem;"><i class="fa-solid fa-image me-2" style="color:#3b82f6;"></i>Cover Image</h3>
+              </div>
+              <div class="card-body" style="padding:1.25rem;">
+                <div style="border:2px dashed #27272a;border-radius:8px;padding:2rem;text-align:center;">
+                  <i class="fa-solid fa-cloud-arrow-up" style="font-size:2rem;color:#3f3f46;margin-bottom:.5rem;display:block;"></i>
+                  <p style="color:#52525b;font-size:.8rem;margin:0;">Click to upload or drag and drop</p>
+                  <p style="color:#3f3f46;font-size:.75rem;margin:.25rem 0 0;">PNG, JPG, WEBP up to 5MB</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+<script>
+  function generateSlug(title) {
+    const slug = title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
+    document.getElementById('slugInput').value = slug;
+  }
+</script>
+</body>
+</html>

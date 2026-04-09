@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Media Gallery – SmartFight</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── Gallery page styles ── */
+    .page-hero {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      padding: 64px 0 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(220,38,38,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .page-hero .eyebrow {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+    .page-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      margin-bottom: 12px;
+    }
+    .page-hero h1 span { color: var(--primary); }
+    .page-hero p { color: var(--text-muted); max-width: 520px; }
+
+    /* Filter bar */
+    .gallery-filter-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 28px 0;
+    }
+    .gallery-filter-bar .filter-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 8px 20px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .gallery-filter-bar .filter-btn:hover,
+    .gallery-filter-bar .filter-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    /* Gallery grid */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 991px) { .gallery-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 575px)  { .gallery-grid { grid-template-columns: 1fr; } }
+
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      aspect-ratio: 3/2;
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .gallery-item:hover img { transform: scale(1.06); }
+    .gallery-item-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(9,9,11,0.88) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 16px;
+    }
+    .gallery-item:hover .gallery-item-overlay { opacity: 1; }
+    .gallery-item-overlay .caption {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .gallery-item-overlay .category-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--primary);
+    }
+    .gallery-item-overlay .zoom-icon {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 36px;
+      height: 36px;
+      background: rgba(220,38,38,0.85);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 0.85rem;
+    }
+
+    /* Lightbox */
+    .sf-lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(9,9,11,0.96);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+    .sf-lightbox.open { display: flex; }
+    .sf-lightbox-inner {
+      position: relative;
+      max-width: 900px;
+      width: 90%;
+    }
+    .sf-lightbox-inner img {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+    .sf-lightbox-caption {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+    .sf-lightbox-close {
+      position: absolute;
+      top: -16px;
+      right: -16px;
+      width: 40px;
+      height: 40px;
+      background: var(--primary);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+    .sf-lightbox-close:hover { background: var(--primary-hover); }
+    .sf-lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      background: rgba(220,38,38,0.7);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sf-lightbox-nav:hover { background: var(--primary); }
+    .sf-lightbox-prev { left: -56px; }
+    .sf-lightbox-next { right: -56px; }
+    @media (max-width: 767px) {
+      .sf-lightbox-prev { left: 4px; }
+      .sf-lightbox-next { right: 4px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="sf-navbar navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">SMART<span>FIGHT</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sfNavCollapse"
+            aria-controls="sfNavCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="sfNavCollapse">
+      <ul class="navbar-nav mx-auto gap-1">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="matches.html">Events</a></li>
+        <li class="nav-item"><a class="nav-link" href="team.html">Fighters</a></li>
+        <li class="nav-item"><a class="nav-link" href="blog.html">News</a></li>
+        <li class="nav-item"><a class="nav-link active" href="gallery.html">Gallery</a></li>
+        <li class="nav-item"><a class="nav-link live-badge-nav" href="live-stream.html">Live</a></li>
+        <li class="nav-item"><a class="nav-link" href="predictions.html">Predictions</a></li>
+        <li class="nav-item"><a class="nav-link" href="booking.html">Bookings</a></li>
+      </ul>
+      <div class="nav-actions d-flex align-items-center gap-2 mt-2 mt-lg-0">
+        <a href="#" class="btn btn-sf-ghost">Login</a>
+        <a href="#" class="btn btn-sf-primary">Register</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== PAGE HERO ===== -->
+<section class="page-hero">
+  <div class="container">
+    <div class="eyebrow">SmartFight Media</div>
+    <h1>MEDIA <span>GALLERY</span></h1>
+    <p>Relive the most electrifying moments from the octagon. Browse event highlights, fighter portraits, and behind-the-scenes training footage.</p>
+  </div>
+</section>
+
+<!-- ===== GALLERY SECTION ===== -->
+<section class="section-pad">
+  <div class="container">
+    <!-- Filter Bar -->
+    <div class="gallery-filter-bar">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="events">Events</button>
+      <button class="filter-btn" data-filter="fighters">Fighters</button>
+      <button class="filter-btn" data-filter="training">Training</button>
+    </div>
+
+    <!-- Gallery Grid -->
+    <div class="gallery-grid" id="galleryGrid">
+
+      <div class="gallery-item" data-category="events" data-caption="UFC 310 – Main Event Walkout" data-src="https://placehold.co/900x600/18181b/dc2626?text=UFC+310+Walkout">
+        <img src="https://placehold.co/600x400/18181b/dc2626?text=UFC+310+Walkout" alt="UFC 310 Walkout" />
+        <div class="gallery-item-overlay">
+          <div class="zoom-icon"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+          <div class="category-tag">Events</div>
+          <div class="caption">UFC 310 – Main Event Walkout</div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="fighters" data-caption="Marcus Santos – Champion Portrait" data-src="https://placehold.co/900x600/18181b/c9a227?text=Marcus+Santos+Portrait">
+        <img src="https://placehold.co/600x400/18181b/c9a227?text=Marcus+Santos+Portrait" alt="Marcus Santos" />
+        <div class="gallery-item-overlay">
+          <div class="zoom-icon"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+          <div class="category-tag">Fighters</div>
+          <div class="caption">Marcus Santos – Champion Portrait</div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="training" data-caption="Rafa Morales – Morning Sparring Session" data-src="https://placehold.co/900x600/18181b/dc2626?text=Morales+Training">
+        <img src="https://placehold.co/600x400/18181b/dc2626?text=Morales+Training" alt="Morales Training" />
+        <div class="gallery-item-overlay">
+          <div class="zoom-icon"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+          <div class="category-tag">Training</div>
+          <div class="caption">Rafa Morales – Morning Sparring Session</div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="events" data-caption="SmartFight Grand Prix – Crowd Atmosphere" data-src="https://placehold.co/900x600/18181b/c9a227?text=Grand+Prix+Crowd">
+        <img src="https://placehold.co/600x400/18181b/c9a227?text=Grand+Prix+Crowd" alt="Grand Prix Crowd" />
+        <div class="gallery-item-overlay">
+          <div class="zoom-icon"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+          <div class="category-tag">Events</div>
+          <div class="caption">SmartFight Grand Prix – Crowd Atmosphere</div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="fighters" data-caption="Kyle Jensen – Pre-Fight Preparation" data-src="https://placehold.co/900x600/18181b/dc2626?text=Kyle+Jensen+Pre-Fight">
+        <img src="https://placehold.co/600x400/18181b/dc2626?text=Kyle+Jensen+Pre-Fight" alt="Kyle Jensen" />
+        <div class="gallery-item-overlay">
+          <div class="zoom-icon"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+          <div class="category-tag">Fighters</div>
+          <div class="caption">Kyle Jensen – Pre-Fight Preparation</div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="training" data-caption="Jake Williams – Heavy Bag Work" data-src="https://placehold.co/900x600/18181b/c9a227?text=Williams+Heavy+Bag">
+        <img src="https://placehold.co/600x400/18181b/c9a227?text=Williams+Heavy+Bag" alt="Williams Training" />
+        <div class="gallery-item-overlay">
+          <div class="zoom-icon"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+          <div class="category-tag">Training</div>
+          <div class="caption">Jake Williams – Heavy Bag Work</div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="events" data-caption="SmartFight 45 – Post-Fight Celebration" data-src="https://placehold.co/900x600/18181b/dc2626?text=SF45+Celebration">
+        <img src="https://placehold.co/600x400/18181b/dc2626?text=SF45+Celebration" alt="SF45 Celebration" />
+        <div class="gallery-item-overlay">
+          <div class="zoom-icon"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+          <div class="category-tag">Events</div>
+          <div class="caption">SmartFight 45 – Post-Fight Celebration</div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="fighters" data-caption="Rafa Morales – Official Fight Photo" data-src="https://placehold.co/900x600/18181b/c9a227?text=Morales+Official">
+        <img src="https://placehold.co/600x400/18181b/c9a227?text=Morales+Official" alt="Rafa Morales" />
+        <div class="gallery-item-overlay">
+          <div class="zoom-icon"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+          <div class="category-tag">Fighters</div>
+          <div class="caption">Rafa Morales – Official Fight Photo</div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="training" data-caption="Santos vs Jensen – Open Workout" data-src="https://placehold.co/900x600/18181b/dc2626?text=Open+Workout">
+        <img src="https://placehold.co/600x400/18181b/dc2626?text=Open+Workout" alt="Open Workout" />
+        <div class="gallery-item-overlay">
+          <div class="zoom-icon"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+          <div class="category-tag">Training</div>
+          <div class="caption">Santos vs Jensen – Open Workout</div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="events" data-caption="UFC 310 – Octagon Girls & Ceremony" data-src="https://placehold.co/900x600/18181b/c9a227?text=UFC+310+Ceremony">
+        <img src="https://placehold.co/600x400/18181b/c9a227?text=UFC+310+Ceremony" alt="UFC Ceremony" />
+        <div class="gallery-item-overlay">
+          <div class="zoom-icon"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+          <div class="category-tag">Events</div>
+          <div class="caption">UFC 310 – Octagon Ceremony</div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="fighters" data-caption="Jake Williams – Post-Fight Interview" data-src="https://placehold.co/900x600/18181b/dc2626?text=Williams+Interview">
+        <img src="https://placehold.co/600x400/18181b/dc2626?text=Williams+Interview" alt="Williams Interview" />
+        <div class="gallery-item-overlay">
+          <div class="zoom-icon"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+          <div class="category-tag">Fighters</div>
+          <div class="caption">Jake Williams – Post-Fight Interview</div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="training" data-caption="Team SmartFight – Full Camp Session" data-src="https://placehold.co/900x600/18181b/c9a227?text=Team+Camp">
+        <img src="https://placehold.co/600x400/18181b/c9a227?text=Team+Camp" alt="Team Camp" />
+        <div class="gallery-item-overlay">
+          <div class="zoom-icon"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+          <div class="category-tag">Training</div>
+          <div class="caption">Team SmartFight – Full Camp Session</div>
+        </div>
+      </div>
+
+    </div><!-- /gallery-grid -->
+
+    <!-- Load More -->
+    <div class="text-center mt-5">
+      <button class="btn btn-sf-outline"><i class="fa-solid fa-images"></i> Load More Photos</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== LIGHTBOX ===== -->
+<div class="sf-lightbox" id="sfLightbox">
+  <div class="sf-lightbox-inner">
+    <button class="sf-lightbox-close" id="lbClose"><i class="fa-solid fa-xmark"></i></button>
+    <button class="sf-lightbox-nav sf-lightbox-prev" id="lbPrev"><i class="fa-solid fa-chevron-left"></i></button>
+    <button class="sf-lightbox-nav sf-lightbox-next" id="lbNext"><i class="fa-solid fa-chevron-right"></i></button>
+    <img src="" id="lbImg" alt="Gallery Image" />
+    <div class="sf-lightbox-caption" id="lbCaption"></div>
+  </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer class="sf-footer">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-4 col-md-6">
+        <a href="index.html" class="footer-logo">SMART<span>FIGHT</span></a>
+        <p class="footer-about">The premier destination for UFC and MMA fans. Live results, fighter profiles, event bookings, and community predictions — all in one place.</p>
+        <div class="social-links">
+          <a href="#" class="social-link" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" class="social-link" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="social-link" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" class="social-link" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#" class="social-link" aria-label="Discord"><i class="fa-brands fa-discord"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Home</a></li>
+          <li><a href="matches.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Events</a></li>
+          <li><a href="team.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Fighters</a></li>
+          <li><a href="blog.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> News</a></li>
+          <li><a href="gallery.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Gallery</a></li>
+          <li><a href="contact.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Contact</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Features</div>
+        <ul class="footer-links">
+          <li><a href="live-stream.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Live Stream</a></li>
+          <li><a href="predictions.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Predictions</a></li>
+          <li><a href="leaderboard.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Leaderboard</a></li>
+          <li><a href="booking.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Book Tickets</a></li>
+          <li><a href="notifications.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Notifications</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="footer-col-title">Newsletter</div>
+        <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:12px;">Get fight cards, results, and exclusive content delivered straight to your inbox.</p>
+        <div class="newsletter-form">
+          <input type="email" placeholder="Your email address" />
+          <button type="button"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+        <p style="font-size:0.72rem; color:var(--text-subtle); margin-top:10px;">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 SmartFight. All rights reserved.</p>
+      <div style="display:flex; gap:20px; flex-wrap:wrap;">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Settings</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/main.js"></script>
+<script>
+  // ── Filter logic ──
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const galleryItems = document.querySelectorAll('.gallery-item');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      galleryItems.forEach(item => {
+        if (filter === 'all' || item.dataset.category === filter) {
+          item.style.display = '';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // ── Lightbox ──
+  const lightbox = document.getElementById('sfLightbox');
+  const lbImg    = document.getElementById('lbImg');
+  const lbCap    = document.getElementById('lbCaption');
+  let currentIndex = 0;
+  let visibleItems = [];
+
+  function openLightbox(index) {
+    visibleItems = Array.from(galleryItems).filter(el => el.style.display !== 'none');
+    currentIndex = index;
+    showSlide(currentIndex);
+    lightbox.classList.add('open');
+  }
+
+  function showSlide(i) {
+    const item = visibleItems[i];
+    lbImg.src = item.dataset.src;
+    lbCap.textContent = item.dataset.caption;
+  }
+
+  galleryItems.forEach((item, i) => {
+    item.addEventListener('click', () => {
+      visibleItems = Array.from(galleryItems).filter(el => el.style.display !== 'none');
+      const visIdx = visibleItems.indexOf(item);
+      openLightbox(visIdx);
+    });
+  });
+
+  document.getElementById('lbClose').addEventListener('click', () => lightbox.classList.remove('open'));
+  document.getElementById('lbPrev').addEventListener('click', () => {
+    currentIndex = (currentIndex - 1 + visibleItems.length) % visibleItems.length;
+    showSlide(currentIndex);
+  });
+  document.getElementById('lbNext').addEventListener('click', () => {
+    currentIndex = (currentIndex + 1) % visibleItems.length;
+    showSlide(currentIndex);
+  });
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) lightbox.classList.remove('open');
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape')      lightbox.classList.remove('open');
+    if (e.key === 'ArrowLeft')  { currentIndex = (currentIndex - 1 + visibleItems.length) % visibleItems.length; showSlide(currentIndex); }
+    if (e.key === 'ArrowRight') { currentIndex = (currentIndex + 1) % visibleItems.length; showSlide(currentIndex); }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blog Articles — SmartFight Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/smartfight-admin.css" />
+</head>
+<body class="antialiased">
+<div class="wrapper">
+
+  <!-- Sidebar -->
+  <aside class="navbar navbar-vertical navbar-expand-lg" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+    <div class="container-fluid flex-column align-items-stretch p-0">
+      <div class="p-3 border-bottom" style="border-color:#27272a!important">
+        <a href="../dashboard.html" class="smartfight-logo">
+          <div class="logo-icon"><i class="fa-solid fa-fist-raised"></i></div>
+          <div class="logo-text">Smart<span>Fight</span></div>
+        </a>
+      </div>
+      <nav class="flex-fill py-2">
+        <div class="navbar-vertical-section">Management</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../dashboard.html"><span class="nav-link-icon"><i class="fa-solid fa-chart-line fa-fw"></i></span><span class="nav-link-title">Dashboard</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../users/index.html"><span class="nav-link-icon"><i class="fa-solid fa-users fa-fw"></i></span><span class="nav-link-title">Users</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fighters/index.html"><span class="nav-link-icon"><i class="fa-solid fa-boxing-glove fa-fw"></i></span><span class="nav-link-title">Fighters</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../events/index.html"><span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span><span class="nav-link-title">Events</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fight-results/index.html"><span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span><span class="nav-link-title">Fight Results</span></a></li>
+        </ul>
+        <div class="navbar-vertical-section mt-2">Fan Experience</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link active" href="index.html"><span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw"></i></span><span class="nav-link-title">Blog Articles</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../bookings/index.html"><span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw"></i></span><span class="nav-link-title">Event Bookings</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../predictions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span><span class="nav-link-title">Predictions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../reactions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-comments fa-fw"></i></span><span class="nav-link-title">Reactions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../notifications/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span><span class="nav-link-title">Notifications</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
+    <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
+      <div class="d-flex align-items-center gap-3 flex-fill">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="../dashboard.html" style="color:#a1a1aa;text-decoration:none;">Dashboard</a></li>
+          <li class="breadcrumb-item active">Blog Articles</li>
+        </ol>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="../notifications/index.html" class="nav-link p-1 position-relative text-muted">
+          <i class="fa-solid fa-bell"></i>
+          <span class="badge bg-danger rounded-pill" style="position:absolute;top:-4px;right:-4px;font-size:.6rem;padding:2px 5px;">7</span>
+        </a>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+            <div class="avatar avatar-sm" style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">A</div>
+            <span style="font-size:.875rem;color:#fafafa;">Admin</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user fa-fw me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-fill p-4" style="background:#09090b;">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Blog Articles</h1>
+          <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Manage news, previews, and fighter spotlights.</p>
+        </div>
+        <a href="form.html" class="btn btn-danger"><i class="fa-solid fa-plus me-2"></i>New Article</a>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+        <div class="card-body py-3">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-5">
+              <label class="form-label">Search</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <input type="text" class="form-control" placeholder="Search articles by title or author..." />
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Category</label>
+              <select class="form-select">
+                <option value="">All Categories</option>
+                <option>News</option>
+                <option>Fighter Spotlight</option>
+                <option>Event Preview</option>
+                <option>Results</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Status</label>
+              <select class="form-select">
+                <option value="">All Status</option>
+                <option>Published</option>
+                <option>Draft</option>
+                <option>Archived</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-outline-secondary w-100">Filter</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card" style="background:#18181b;border:1px solid #27272a;">
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th style="padding:.75rem 1.25rem;">ID</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Author</th>
+                <th>Status</th>
+                <th>Views</th>
+                <th>Published Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;">#101</td>
+                <td style="font-size:.875rem;font-weight:500;">UFC 310: Everything You Need to Know Before Fight Night</td>
+                <td><span class="badge" style="background:rgba(220,38,38,.15);color:#dc2626;">Event Preview</span></td>
+                <td style="font-size:.875rem;">Jake Morrison</td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Published</span></td>
+                <td style="font-size:.875rem;color:#a1a1aa;">4,821</td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 5, 2026</td>
+                <td>
+                  <div class="d-flex gap-2">
+                    <a href="show.html" class="btn btn-sm btn-outline-secondary" title="View"><i class="fa-solid fa-eye"></i></a>
+                    <a href="form.html" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fa-solid fa-pen"></i></a>
+                    <button class="btn btn-sm btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;">#100</td>
+                <td style="font-size:.875rem;font-weight:500;">Inside El Toro's Training Camp: Morales Prepares for Grand Prix</td>
+                <td><span class="badge" style="background:rgba(201,162,39,.15);color:#c9a227;">Fighter Spotlight</span></td>
+                <td style="font-size:.875rem;">Sarah Reyes</td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Published</span></td>
+                <td style="font-size:.875rem;color:#a1a1aa;">3,147</td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 3, 2026</td>
+                <td>
+                  <div class="d-flex gap-2">
+                    <a href="show.html" class="btn btn-sm btn-outline-secondary" title="View"><i class="fa-solid fa-eye"></i></a>
+                    <a href="form.html" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fa-solid fa-pen"></i></a>
+                    <button class="btn btn-sm btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;">#99</td>
+                <td style="font-size:.875rem;font-weight:500;">Top 10 KOs of 2026</td>
+                <td><span class="badge" style="background:rgba(59,130,246,.15);color:#3b82f6;">News</span></td>
+                <td style="font-size:.875rem;">Tom Bradley</td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Published</span></td>
+                <td style="font-size:.875rem;color:#a1a1aa;">7,304</td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 2, 2026</td>
+                <td>
+                  <div class="d-flex gap-2">
+                    <a href="show.html" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-eye"></i></a>
+                    <a href="form.html" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i></a>
+                    <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;">#98</td>
+                <td style="font-size:.875rem;font-weight:500;">April Rankings Drop: Three Weight Classes See Major Reshuffling</td>
+                <td><span class="badge" style="background:rgba(59,130,246,.15);color:#3b82f6;">News</span></td>
+                <td style="font-size:.875rem;">Jake Morrison</td>
+                <td><span class="badge" style="background:rgba(234,179,8,.15);color:#eab308;">Draft</span></td>
+                <td style="font-size:.875rem;color:#a1a1aa;">—</td>
+                <td style="font-size:.8rem;color:#a1a1aa;">—</td>
+                <td>
+                  <div class="d-flex gap-2">
+                    <a href="show.html" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-eye"></i></a>
+                    <a href="form.html" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i></a>
+                    <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;">#97</td>
+                <td style="font-size:.875rem;font-weight:500;">Kyle Jensen: The Unorthodox Striker Who Could Shock the World</td>
+                <td><span class="badge" style="background:rgba(201,162,39,.15);color:#c9a227;">Fighter Spotlight</span></td>
+                <td style="font-size:.875rem;">Sarah Reyes</td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Published</span></td>
+                <td style="font-size:.875rem;color:#a1a1aa;">2,098</td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Mar 30, 2026</td>
+                <td>
+                  <div class="d-flex gap-2">
+                    <a href="show.html" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-eye"></i></a>
+                    <a href="form.html" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i></a>
+                    <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;">#96</td>
+                <td style="font-size:.875rem;font-weight:500;">SmartFight 44 Full Results and Highlights</td>
+                <td><span class="badge" style="background:rgba(168,85,247,.15);color:#a855f7;">Results</span></td>
+                <td style="font-size:.875rem;">Tom Bradley</td>
+                <td><span class="badge" style="background:rgba(161,161,170,.15);color:#a1a1aa;">Archived</span></td>
+                <td style="font-size:.875rem;color:#a1a1aa;">5,561</td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Mar 25, 2026</td>
+                <td>
+                  <div class="d-flex gap-2">
+                    <a href="show.html" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-eye"></i></a>
+                    <a href="form.html" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i></a>
+                    <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;">#95</td>
+                <td style="font-size:.875rem;font-weight:500;">Grand Prix Main Event Preview: Morales vs Williams</td>
+                <td><span class="badge" style="background:rgba(220,38,38,.15);color:#dc2626;">Event Preview</span></td>
+                <td style="font-size:.875rem;">Jake Morrison</td>
+                <td><span class="badge" style="background:rgba(234,179,8,.15);color:#eab308;">Draft</span></td>
+                <td style="font-size:.875rem;color:#a1a1aa;">—</td>
+                <td style="font-size:.8rem;color:#a1a1aa;">—</td>
+                <td>
+                  <div class="d-flex gap-2">
+                    <a href="show.html" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-eye"></i></a>
+                    <a href="form.html" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-pen"></i></a>
+                    <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer d-flex align-items-center justify-content-between" style="background:#18181b;border-top:1px solid #27272a;padding:.75rem 1.25rem;">
+          <span style="font-size:.8rem;color:#a1a1aa;">Showing 7 of 101 articles</span>
+          <nav>
+            <ul class="pagination mb-0 pagination-sm">
+              <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+              <li class="page-item active"><a class="page-link" href="#">1</a></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item"><a class="page-link" href="#">Next</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+</body>
+</html>
