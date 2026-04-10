@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leaderboard – SmartFight</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── Page Hero ── */
+    .page-hero {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      padding: 64px 0 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(220,38,38,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .page-hero .eyebrow {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+    .page-hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 12px; }
+    .page-hero h1 span { color: var(--primary); }
+    .page-hero p { color: var(--text-muted); max-width: 520px; }
+
+    /* ── Season Selector ── */
+    .season-selector {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .season-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 9px 22px;
+      border-radius: 4px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .season-btn:hover, .season-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    /* ── Podium ── */
+    .podium-section {
+      margin-bottom: 48px;
+    }
+    .podium-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr 1fr;
+      gap: 16px;
+      align-items: end;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    @media (max-width: 575px) { .podium-grid { grid-template-columns: 1fr; align-items: center; } }
+
+    .podium-card {
+      background: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      padding: 24px 16px 20px;
+      text-align: center;
+      position: relative;
+    }
+    .podium-card.p1 { border-color: var(--gold); }
+    .podium-card.p2 { border-color: #9ca3af; }
+    .podium-card.p3 { border-color: #92400e; }
+
+    .podium-medal {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      font-size: 1.5rem;
+    }
+    .podium-card.p1 .podium-medal { background: rgba(201,162,39,0.15); border: 2px solid var(--gold); }
+    .podium-card.p2 .podium-medal { background: rgba(156,163,175,0.12); border: 2px solid #9ca3af; }
+    .podium-card.p3 .podium-medal { background: rgba(146,64,14,0.15); border: 2px solid #92400e; }
+
+    .podium-rank {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .podium-card.p1 .podium-rank { background: var(--gold); color: #000; }
+    .podium-card.p2 .podium-rank { background: #9ca3af; color: #000; }
+    .podium-card.p3 .podium-rank { background: #92400e; color: #fff; }
+
+    .podium-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+      overflow: hidden;
+      border: 2px solid var(--border-color);
+    }
+    .podium-card.p1 .podium-avatar { border-color: var(--gold); }
+    .podium-card.p2 .podium-avatar { border-color: #9ca3af; }
+    .podium-card.p3 .podium-avatar { border-color: #92400e; }
+    .podium-avatar img { width:100%; height:100%; object-fit:cover; }
+
+    .podium-username {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .podium-points {
+      font-size: 1.3rem;
+      font-weight: 700;
+      font-family: var(--font-heading);
+    }
+    .podium-card.p1 .podium-points { color: var(--gold); }
+    .podium-card.p2 .podium-points { color: #9ca3af; }
+    .podium-card.p3 .podium-points { color: #b45309; }
+    .podium-accuracy {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ── Rank Badges ── */
+    .badge-rank-gold   { background: #c9a227; color: #000; display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:6px; font-weight:700; font-size:0.85rem; }
+    .badge-rank-silver { background: #9ca3af; color: #000; display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:6px; font-weight:700; font-size:0.85rem; }
+    .badge-rank-bronze { background: #92400e; color: #fff;  display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:6px; font-weight:700; font-size:0.85rem; }
+    .badge-rank-other  { background: var(--bg-dark); color: var(--text-muted); border: 1px solid var(--border-color); display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:6px; font-weight:700; font-size:0.85rem; }
+
+    /* ── Table ── */
+    .sf-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .sf-table thead th {
+      background: var(--bg-surface);
+      padding: 12px 16px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 2px solid var(--border-color);
+      white-space: nowrap;
+    }
+    .sf-table tbody tr {
+      border-bottom: 1px solid var(--border-color);
+      transition: background 0.15s;
+    }
+    .sf-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+    .sf-table tbody tr.my-row { background: rgba(220,38,38,0.06); }
+    .sf-table tbody tr.my-row td:first-child { border-left: 3px solid var(--primary); }
+    .sf-table tbody td {
+      padding: 14px 16px;
+      font-size: 0.88rem;
+      vertical-align: middle;
+    }
+    .sf-table-wrap {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      overflow-x: auto;
+    }
+
+    /* Accuracy bar */
+    .acc-bar-wrap { display:flex; align-items:center; gap:8px; }
+    .acc-bar-bg   { flex:1; height:6px; background:var(--border-color); border-radius:3px; min-width:60px; }
+    .acc-bar-fill { height:6px; border-radius:3px; background:var(--primary); }
+    .acc-val { font-size:0.82rem; font-weight:700; color:var(--text-primary); white-space:nowrap; }
+
+    /* Change indicator */
+    .rank-up   { color: #34d399; font-size: 0.78rem; }
+    .rank-down { color: var(--primary); font-size: 0.78rem; }
+    .rank-same { color: var(--text-muted); font-size: 0.78rem; }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="sf-navbar navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">SMART<span>FIGHT</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sfNavCollapse"
+            aria-controls="sfNavCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="sfNavCollapse">
+      <ul class="navbar-nav mx-auto gap-1">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="matches.html">Events</a></li>
+        <li class="nav-item"><a class="nav-link" href="team.html">Fighters</a></li>
+        <li class="nav-item"><a class="nav-link" href="blog.html">News</a></li>
+        <li class="nav-item"><a class="nav-link" href="gallery.html">Gallery</a></li>
+        <li class="nav-item"><a class="nav-link live-badge-nav" href="live-stream.html">Live</a></li>
+        <li class="nav-item"><a class="nav-link" href="predictions.html">Predictions</a></li>
+        <li class="nav-item"><a class="nav-link" href="booking.html">Bookings</a></li>
+      </ul>
+      <div class="nav-actions d-flex align-items-center gap-2 mt-2 mt-lg-0">
+        <a href="#" class="btn btn-sf-ghost">Login</a>
+        <a href="#" class="btn btn-sf-primary">Register</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== PAGE HERO ===== -->
+<section class="page-hero">
+  <div class="container">
+    <div class="eyebrow">Community Rankings</div>
+    <h1><span>LEADER</span>BOARD</h1>
+    <p>The top prediction masters in the SmartFight community. Earn points, climb the ranks, and prove your fight IQ is unmatched.</p>
+  </div>
+</section>
+
+<!-- ===== LEADERBOARD SECTION ===== -->
+<section class="section-pad">
+  <div class="container">
+
+    <!-- Season Selector -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+      <div class="season-selector">
+        <button class="season-btn" data-season="1">Season 1</button>
+        <button class="season-btn" data-season="2">Season 2</button>
+        <button class="season-btn active" data-season="all">All Time</button>
+      </div>
+      <div style="font-size:0.82rem; color:var(--text-muted);">
+        <i class="fa-solid fa-users" style="color:var(--primary);"></i> 3,248 participants
+      </div>
+    </div>
+
+    <!-- Podium -->
+    <div class="podium-section">
+      <div class="text-center mb-4">
+        <span class="label">Top 3</span>
+        <h2 class="heading-line">HALL OF FAME</h2>
+      </div>
+      <div class="podium-grid">
+
+        <!-- 2nd Place -->
+        <div class="podium-card p2">
+          <div class="podium-rank">2</div>
+          <div class="podium-avatar">
+            <img src="https://placehold.co/60x60/18181b/9ca3af?text=II" alt="IronFistIQ" />
+          </div>
+          <div class="podium-username">IronFistIQ</div>
+          <div class="podium-points">4,615</div>
+          <div class="podium-accuracy">85% accuracy · 97 picks</div>
+        </div>
+
+        <!-- 1st Place -->
+        <div class="podium-card p1">
+          <div class="podium-rank">1</div>
+          <div class="podium-avatar">
+            <img src="https://placehold.co/60x60/18181b/c9a227?text=FO" alt="FightOracle_88" />
+          </div>
+          <div class="podium-username" style="color:var(--gold);">FightOracle_88</div>
+          <div class="podium-points">4,820</div>
+          <div class="podium-accuracy">89% accuracy · 108 picks</div>
+          <div style="margin-top:8px;">
+            <span style="background:var(--gold); color:#000; font-size:0.65rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; padding:3px 12px; border-radius:20px;">Champion</span>
+          </div>
+        </div>
+
+        <!-- 3rd Place -->
+        <div class="podium-card p3">
+          <div class="podium-rank">3</div>
+          <div class="podium-avatar">
+            <img src="https://placehold.co/60x60/18181b/92400e?text=OP" alt="OctagonProphet" />
+          </div>
+          <div class="podium-username">OctagonProphet</div>
+          <div class="podium-points">4,390</div>
+          <div class="podium-accuracy">82% accuracy · 89 picks</div>
+        </div>
+
+      </div>
+    </div><!-- /podium -->
+
+    <!-- Full Leaderboard Table -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+      <div>
+        <span class="label">Rankings</span>
+        <h2 class="heading-line">FULL LEADERBOARD</h2>
+      </div>
+      <a href="predictions.html" class="btn btn-sf-primary"><i class="fa-solid fa-crosshairs"></i> Make Predictions</a>
+    </div>
+
+    <div class="sf-table-wrap">
+      <table class="sf-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Username</th>
+            <th>Predictions Made</th>
+            <th>Correct</th>
+            <th>Accuracy</th>
+            <th>Points</th>
+            <th>Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge-rank-gold">1</span></td>
+            <td><strong style="color:var(--gold);">FightOracle_88</strong></td>
+            <td style="color:var(--text-muted);">108</td>
+            <td style="color:#34d399; font-weight:700;">96</td>
+            <td>
+              <div class="acc-bar-wrap">
+                <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:89%; background:var(--gold);"></div></div>
+                <span class="acc-val" style="color:var(--gold);">89%</span>
+              </div>
+            </td>
+            <td><strong style="color:var(--gold);">4,820</strong></td>
+            <td><span class="rank-same"><i class="fa-solid fa-minus"></i> —</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge-rank-silver">2</span></td>
+            <td><strong>IronFistIQ</strong></td>
+            <td style="color:var(--text-muted);">97</td>
+            <td style="color:#34d399; font-weight:700;">82</td>
+            <td>
+              <div class="acc-bar-wrap">
+                <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:85%; background:#9ca3af;"></div></div>
+                <span class="acc-val">85%</span>
+              </div>
+            </td>
+            <td><strong>4,615</strong></td>
+            <td><span class="rank-up"><i class="fa-solid fa-arrow-up"></i> +1</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge-rank-bronze">3</span></td>
+            <td><strong>OctagonProphet</strong></td>
+            <td style="color:var(--text-muted);">89</td>
+            <td style="color:#34d399; font-weight:700;">73</td>
+            <td>
+              <div class="acc-bar-wrap">
+                <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:82%;"></div></div>
+                <span class="acc-val">82%</span>
+              </div>
+            </td>
+            <td><strong>4,390</strong></td>
+            <td><span class="rank-down"><i class="fa-solid fa-arrow-down"></i> -1</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge-rank-other">4</span></td>
+            <td>KnockoutKing_24</td>
+            <td style="color:var(--text-muted);">91</td>
+            <td style="color:#34d399; font-weight:700;">72</td>
+            <td>
+              <div class="acc-bar-wrap">
+                <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:79%;"></div></div>
+                <span class="acc-val">79%</span>
+              </div>
+            </td>
+            <td><strong>4,105</strong></td>
+            <td><span class="rank-up"><i class="fa-solid fa-arrow-up"></i> +2</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge-rank-other">5</span></td>
+            <td>SilkFinisher</td>
+            <td style="color:var(--text-muted);">84</td>
+            <td style="color:#34d399; font-weight:700;">65</td>
+            <td>
+              <div class="acc-bar-wrap">
+                <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:77%;"></div></div>
+                <span class="acc-val">77%</span>
+              </div>
+            </td>
+            <td><strong>3,880</strong></td>
+            <td><span class="rank-same"><i class="fa-solid fa-minus"></i> —</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge-rank-other">6</span></td>
+            <td>CageSide_Expert</td>
+            <td style="color:var(--text-muted);">80</td>
+            <td style="color:#34d399; font-weight:700;">59</td>
+            <td>
+              <div class="acc-bar-wrap">
+                <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:74%;"></div></div>
+                <span class="acc-val">74%</span>
+              </div>
+            </td>
+            <td><strong>3,720</strong></td>
+            <td><span class="rank-down"><i class="fa-solid fa-arrow-down"></i> -2</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge-rank-other">7</span></td>
+            <td>SubmissionSpecialist</td>
+            <td style="color:var(--text-muted);">78</td>
+            <td style="color:#34d399; font-weight:700;">56</td>
+            <td>
+              <div class="acc-bar-wrap">
+                <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:72%;"></div></div>
+                <span class="acc-val">72%</span>
+              </div>
+            </td>
+            <td><strong>3,540</strong></td>
+            <td><span class="rank-up"><i class="fa-solid fa-arrow-up"></i> +1</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge-rank-other">8</span></td>
+            <td>GrappleGuru</td>
+            <td style="color:var(--text-muted);">72</td>
+            <td style="color:#34d399; font-weight:700;">50</td>
+            <td>
+              <div class="acc-bar-wrap">
+                <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:69%;"></div></div>
+                <span class="acc-val">69%</span>
+              </div>
+            </td>
+            <td><strong>3,310</strong></td>
+            <td><span class="rank-same"><i class="fa-solid fa-minus"></i> —</span></td>
+          </tr>
+          <!-- My Row (highlighted) -->
+          <tr class="my-row">
+            <td><span class="badge-rank-other">12</span></td>
+            <td>
+              <strong style="color:var(--primary);">You</strong>
+              <span style="font-size:0.72rem; background:rgba(220,38,38,0.15); color:var(--primary); padding:2px 8px; border-radius:3px; margin-left:6px;">You</span>
+            </td>
+            <td style="color:var(--text-muted);">34</td>
+            <td style="color:#34d399; font-weight:700;">26</td>
+            <td>
+              <div class="acc-bar-wrap">
+                <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:76%;"></div></div>
+                <span class="acc-val">76%</span>
+              </div>
+            </td>
+            <td><strong style="color:var(--primary);">1,240</strong></td>
+            <td><span class="rank-up"><i class="fa-solid fa-arrow-up"></i> +3</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge-rank-other">13</span></td>
+            <td>RingsideSage</td>
+            <td style="color:var(--text-muted);">68</td>
+            <td style="color:#34d399; font-weight:700;">44</td>
+            <td>
+              <div class="acc-bar-wrap">
+                <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:65%;"></div></div>
+                <span class="acc-val">65%</span>
+              </div>
+            </td>
+            <td><strong>3,050</strong></td>
+            <td><span class="rank-down"><i class="fa-solid fa-arrow-down"></i> -1</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge-rank-other">14</span></td>
+            <td>BrawlerAnalyst</td>
+            <td style="color:var(--text-muted);">65</td>
+            <td style="color:#34d399; font-weight:700;">42</td>
+            <td>
+              <div class="acc-bar-wrap">
+                <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:65%;"></div></div>
+                <span class="acc-val">65%</span>
+              </div>
+            </td>
+            <td><strong>2,910</strong></td>
+            <td><span class="rank-same"><i class="fa-solid fa-minus"></i> —</span></td>
+          </tr>
+          <tr>
+            <td><span class="badge-rank-other">15</span></td>
+            <td>NightlyNapper</td>
+            <td style="color:var(--text-muted);">60</td>
+            <td style="color:#34d399; font-weight:700;">38</td>
+            <td>
+              <div class="acc-bar-wrap">
+                <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:63%;"></div></div>
+                <span class="acc-val">63%</span>
+              </div>
+            </td>
+            <td><strong>2,740</strong></td>
+            <td><span class="rank-up"><i class="fa-solid fa-arrow-up"></i> +2</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="text-center mt-4">
+      <button class="btn btn-sf-outline"><i class="fa-solid fa-list"></i> Load More Rankings</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="sf-footer">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-4 col-md-6">
+        <a href="index.html" class="footer-logo">SMART<span>FIGHT</span></a>
+        <p class="footer-about">The premier destination for UFC and MMA fans. Live results, fighter profiles, event bookings, and community predictions — all in one place.</p>
+        <div class="social-links">
+          <a href="#" class="social-link" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" class="social-link" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="social-link" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" class="social-link" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#" class="social-link" aria-label="Discord"><i class="fa-brands fa-discord"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Home</a></li>
+          <li><a href="matches.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Events</a></li>
+          <li><a href="team.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Fighters</a></li>
+          <li><a href="blog.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> News</a></li>
+          <li><a href="gallery.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Gallery</a></li>
+          <li><a href="contact.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Contact</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Features</div>
+        <ul class="footer-links">
+          <li><a href="live-stream.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Live Stream</a></li>
+          <li><a href="predictions.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Predictions</a></li>
+          <li><a href="leaderboard.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Leaderboard</a></li>
+          <li><a href="booking.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Book Tickets</a></li>
+          <li><a href="notifications.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Notifications</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="footer-col-title">Newsletter</div>
+        <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:12px;">Get fight cards, results, and exclusive content delivered straight to your inbox.</p>
+        <div class="newsletter-form">
+          <input type="email" placeholder="Your email address" />
+          <button type="button"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+        <p style="font-size:0.72rem; color:var(--text-subtle); margin-top:10px;">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 SmartFight. All rights reserved.</p>
+      <div style="display:flex; gap:20px; flex-wrap:wrap;">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Settings</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/main.js"></script>
+<script>
+  document.querySelectorAll('.season-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.season-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fighters — SmartFight Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/smartfight-admin.css" />
+</head>
+<body class="antialiased">
+<div class="wrapper">
+  <aside class="navbar navbar-vertical navbar-expand-lg" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+    <div class="container-fluid flex-column align-items-stretch p-0">
+      <div class="p-3 border-bottom" style="border-color:#27272a!important">
+        <a href="../dashboard.html" class="smartfight-logo"><div class="logo-icon"><i class="fa-solid fa-fist-raised"></i></div><div class="logo-text">Smart<span>Fight</span></div></a>
+      </div>
+      <nav class="flex-fill py-2">
+        <div class="navbar-vertical-section">Management</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../dashboard.html"><span class="nav-link-icon"><i class="fa-solid fa-chart-line fa-fw"></i></span><span class="nav-link-title">Dashboard</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../users/index.html"><span class="nav-link-icon"><i class="fa-solid fa-users fa-fw"></i></span><span class="nav-link-title">Users</span></a></li>
+          <li class="nav-item"><a class="nav-link active" href="index.html"><span class="nav-link-icon"><i class="fa-solid fa-boxing-glove fa-fw"></i></span><span class="nav-link-title">Fighters</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../events/index.html"><span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span><span class="nav-link-title">Events</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fight-results/index.html"><span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span><span class="nav-link-title">Fight Results</span></a></li>
+        </ul>
+        <div class="navbar-vertical-section mt-2">Fan Experience</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../blog/index.html"><span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw"></i></span><span class="nav-link-title">Blog Articles</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../bookings/index.html"><span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw"></i></span><span class="nav-link-title">Event Bookings</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../predictions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span><span class="nav-link-title">Predictions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../reactions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-comments fa-fw"></i></span><span class="nav-link-title">Reactions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../notifications/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span><span class="nav-link-title">Notifications</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
+    <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
+      <div class="d-flex align-items-center gap-3 flex-fill">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="../dashboard.html" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+          <li class="breadcrumb-item active">Fighters</li>
+        </ol>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="#" class="nav-link p-1 text-muted"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="../notifications/index.html" class="nav-link p-1 position-relative text-muted"><i class="fa-solid fa-bell"></i><span class="badge bg-danger rounded-pill" style="position:absolute;top:-4px;right:-4px;font-size:.6rem;padding:2px 5px;">7</span></a>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+            <div style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">A</div>
+            <span style="font-size:.875rem;color:#fafafa;">Admin</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user fa-fw me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-fill p-4" style="background:#09090b;">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Fighters</h1>
+          <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Manage fighter roster and profiles</p>
+        </div>
+        <a href="form.html" class="btn btn-danger"><i class="fa-solid fa-plus me-2"></i>Add Fighter</a>
+      </div>
+
+      <!-- Filters -->
+      <div class="card mb-3" style="background:#18181b;border:1px solid #27272a;">
+        <div class="card-body py-3">
+          <div class="row g-2 align-items-center">
+            <div class="col-md-5">
+              <div class="input-group">
+                <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <input type="text" class="form-control" placeholder="Search fighters..." />
+              </div>
+            </div>
+            <div class="col-md-3">
+              <select class="form-select">
+                <option value="">All Weight Classes</option>
+                <option>Heavyweight</option>
+                <option>Light Heavyweight</option>
+                <option>Middleweight</option>
+                <option>Welterweight</option>
+                <option>Lightweight</option>
+                <option>Featherweight</option>
+                <option>Bantamweight</option>
+                <option>Flyweight</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <select class="form-select">
+                <option>All Status</option>
+                <option>Active</option>
+                <option>Inactive</option>
+                <option>Retired</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <button class="btn w-100" style="background:#dc2626;color:#fff;border:none;"><i class="fa-solid fa-filter me-1"></i>Filter</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="background:#18181b;border:1px solid #27272a;">
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th style="padding:.75rem 1.25rem;width:50px;">#</th>
+                <th style="width:56px;">Photo</th>
+                <th>Name</th>
+                <th>Nickname</th>
+                <th>Weight Class</th>
+                <th>Record</th>
+                <th>Nationality</th>
+                <th>Status</th>
+                <th class="text-end" style="padding-right:1.25rem;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#F01</td>
+                <td>
+                  <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#27272a,#3f3f46);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#52525b;border:2px solid #dc2626;">🥊</div>
+                </td>
+                <td style="font-size:.875rem;font-weight:600;">Jon Jones</td>
+                <td style="color:#c9a227;font-size:.8rem;font-style:italic;">"Bones"</td>
+                <td><span class="badge" style="background:rgba(59,130,246,.1);color:#60a5fa;border:1px solid rgba(59,130,246,.2);font-size:.75rem;">Heavyweight</span></td>
+                <td>
+                  <span style="color:#22c55e;font-weight:700;font-size:.875rem;">28</span>
+                  <span style="color:#a1a1aa;font-size:.75rem;">W</span>
+                  <span style="color:#dc2626;font-weight:700;font-size:.875rem;margin-left:4px;">1</span>
+                  <span style="color:#a1a1aa;font-size:.75rem;">L</span>
+                  <span style="color:#a1a1aa;font-weight:700;font-size:.875rem;margin-left:4px;">0</span>
+                  <span style="color:#a1a1aa;font-size:.75rem;">D</span>
+                </td>
+                <td style="font-size:.8rem;color:#a1a1aa;">🇺🇸 USA</td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Active</span></td>
+                <td class="text-end" style="padding-right:1.25rem;">
+                  <a href="show.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-eye"></i></a>
+                  <a href="form.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-pen"></i></a>
+                  <button class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#F02</td>
+                <td><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#27272a,#3f3f46);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#52525b;border:2px solid #3b82f6;">🥊</div></td>
+                <td style="font-size:.875rem;font-weight:600;">Israel Adesanya</td>
+                <td style="color:#c9a227;font-size:.8rem;font-style:italic;">"Last Stylebender"</td>
+                <td><span class="badge" style="background:rgba(168,85,247,.1);color:#c084fc;border:1px solid rgba(168,85,247,.2);font-size:.75rem;">Middleweight</span></td>
+                <td>
+                  <span style="color:#22c55e;font-weight:700;font-size:.875rem;">24</span><span style="color:#a1a1aa;font-size:.75rem;">W</span>
+                  <span style="color:#dc2626;font-weight:700;font-size:.875rem;margin-left:4px;">3</span><span style="color:#a1a1aa;font-size:.75rem;">L</span>
+                  <span style="color:#a1a1aa;font-weight:700;font-size:.875rem;margin-left:4px;">0</span><span style="color:#a1a1aa;font-size:.75rem;">D</span>
+                </td>
+                <td style="font-size:.8rem;color:#a1a1aa;">🇳🇿 NZL</td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Active</span></td>
+                <td class="text-end" style="padding-right:1.25rem;">
+                  <a href="show.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-eye"></i></a>
+                  <a href="form.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-pen"></i></a>
+                  <button class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#F03</td>
+                <td><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#27272a,#3f3f46);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#52525b;border:2px solid #22c55e;">🥊</div></td>
+                <td style="font-size:.875rem;font-weight:600;">Charles Oliveira</td>
+                <td style="color:#c9a227;font-size:.8rem;font-style:italic;">"Do Bronx"</td>
+                <td><span class="badge" style="background:rgba(234,179,8,.1);color:#fbbf24;border:1px solid rgba(234,179,8,.2);font-size:.75rem;">Lightweight</span></td>
+                <td>
+                  <span style="color:#22c55e;font-weight:700;font-size:.875rem;">34</span><span style="color:#a1a1aa;font-size:.75rem;">W</span>
+                  <span style="color:#dc2626;font-weight:700;font-size:.875rem;margin-left:4px;">10</span><span style="color:#a1a1aa;font-size:.75rem;">L</span>
+                  <span style="color:#a1a1aa;font-weight:700;font-size:.875rem;margin-left:4px;">0</span><span style="color:#a1a1aa;font-size:.75rem;">D</span>
+                </td>
+                <td style="font-size:.8rem;color:#a1a1aa;">🇧🇷 BRA</td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Active</span></td>
+                <td class="text-end" style="padding-right:1.25rem;">
+                  <a href="show.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-eye"></i></a>
+                  <a href="form.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-pen"></i></a>
+                  <button class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#F04</td>
+                <td><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#27272a,#3f3f46);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#52525b;border:2px solid #a1a1aa;">🥊</div></td>
+                <td style="font-size:.875rem;font-weight:600;">Amanda Nunes</td>
+                <td style="color:#c9a227;font-size:.8rem;font-style:italic;">"The Lioness"</td>
+                <td><span class="badge" style="background:rgba(236,72,153,.1);color:#f472b6;border:1px solid rgba(236,72,153,.2);font-size:.75rem;">Bantamweight</span></td>
+                <td>
+                  <span style="color:#22c55e;font-weight:700;font-size:.875rem;">22</span><span style="color:#a1a1aa;font-size:.75rem;">W</span>
+                  <span style="color:#dc2626;font-weight:700;font-size:.875rem;margin-left:4px;">6</span><span style="color:#a1a1aa;font-size:.75rem;">L</span>
+                  <span style="color:#a1a1aa;font-weight:700;font-size:.875rem;margin-left:4px;">0</span><span style="color:#a1a1aa;font-size:.75rem;">D</span>
+                </td>
+                <td style="font-size:.8rem;color:#a1a1aa;">🇧🇷 BRA</td>
+                <td><span class="badge" style="background:rgba(161,161,170,.15);color:#a1a1aa;">Retired</span></td>
+                <td class="text-end" style="padding-right:1.25rem;">
+                  <a href="show.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-eye"></i></a>
+                  <a href="form.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-pen"></i></a>
+                  <button class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#F05</td>
+                <td><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#27272a,#3f3f46);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#52525b;border:2px solid #c9a227;">🥊</div></td>
+                <td style="font-size:.875rem;font-weight:600;">Conor McGregor</td>
+                <td style="color:#c9a227;font-size:.8rem;font-style:italic;">"The Notorious"</td>
+                <td><span class="badge" style="background:rgba(234,179,8,.1);color:#fbbf24;border:1px solid rgba(234,179,8,.2);font-size:.75rem;">Lightweight</span></td>
+                <td>
+                  <span style="color:#22c55e;font-weight:700;font-size:.875rem;">22</span><span style="color:#a1a1aa;font-size:.75rem;">W</span>
+                  <span style="color:#dc2626;font-weight:700;font-size:.875rem;margin-left:4px;">6</span><span style="color:#a1a1aa;font-size:.75rem;">L</span>
+                  <span style="color:#a1a1aa;font-weight:700;font-size:.875rem;margin-left:4px;">1</span><span style="color:#a1a1aa;font-size:.75rem;">D</span>
+                </td>
+                <td style="font-size:.8rem;color:#a1a1aa;">🇮🇪 IRL</td>
+                <td><span class="badge" style="background:rgba(234,179,8,.15);color:#eab308;">Inactive</span></td>
+                <td class="text-end" style="padding-right:1.25rem;">
+                  <a href="show.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-eye"></i></a>
+                  <a href="form.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-pen"></i></a>
+                  <button class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer" style="background:#18181b;border-top:1px solid #27272a;">
+          <div class="d-flex align-items-center justify-content-between">
+            <span style="font-size:.8125rem;color:#a1a1aa;">Showing 1–5 of 148 fighters</span>
+            <nav><ul class="pagination pagination-sm mb-0 gap-1">
+              <li class="page-item disabled"><a class="page-link" href="#">‹</a></li>
+              <li class="page-item active"><a class="page-link" href="#">1</a></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item"><a class="page-link" href="#">›</a></li>
+            </ul></nav>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+</body>
+</html>
