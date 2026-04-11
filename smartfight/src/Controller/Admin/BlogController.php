@@ -6,7 +6,6 @@ use App\Entity\BlogArticle;
 use App\Form\BlogArticleType;
 use App\Repository\BlogArticleRepository;
 use App\Repository\BlogCategoryRepository;
-use App\Service\BlogService;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -41,18 +40,13 @@ class BlogController extends AbstractController
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em, BlogService $blogService): Response
+    public function new(Request $request, EntityManagerInterface $em): Response
     {
         $article = new BlogArticle();
         $form = $this->createForm(BlogArticleType::class, $article);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $imageFile = $form->get('imageFile')->getData();
-            if ($imageFile) {
-                $article->setImagePath($blogService->handleImageUpload($imageFile));
-            }
-
             $em->persist($article);
             $em->flush();
 
@@ -78,17 +72,12 @@ class BlogController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, BlogArticle $article, EntityManagerInterface $em, BlogService $blogService): Response
+    public function edit(Request $request, BlogArticle $article, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(BlogArticleType::class, $article);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $imageFile = $form->get('imageFile')->getData();
-            if ($imageFile) {
-                $article->setImagePath($blogService->handleImageUpload($imageFile));
-            }
-
             $em->flush();
 
             $this->addFlash('success', 'Article updated successfully.');

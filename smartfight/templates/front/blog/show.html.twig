@@ -19,7 +19,7 @@
 
                 {# Cover Image #}
                 {% if article.imagePath %}
-                    <img src="{{ asset(article.imagePath) }}" alt="{{ article.title }}"
+                    <img src="{{ vich_uploader_asset(article, 'imageFile') }}" alt="{{ article.title }}"
                          style="width:100%;max-height:450px;object-fit:cover;border-radius:10px;margin-bottom:2rem;">
                 {% endif %}
 
@@ -34,6 +34,16 @@
                 <div style="color:#d4d4d8;line-height:1.9;font-size:1rem;">
                     {{ article.content|nl2br }}
                 </div>
+
+                {# Video #}
+                {% if article.videoPath %}
+                    <div class="mt-4">
+                        <video controls style="width:100%;border-radius:10px;max-height:400px;">
+                            <source src="{{ vich_uploader_asset(article, 'videoFile') }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                {% endif %}
 
                 <div class="mt-4 pt-4" style="border-top:1px solid #27272a;">
                     <a href="{{ path('front_blog_index') }}" class="btn btn-outline-secondary">
@@ -53,7 +63,7 @@
                         {% for rel in related %}
                         <a href="{{ path('front_blog_show', {id: rel.id}) }}" class="d-flex gap-3 p-3 text-decoration-none" style="border-bottom:1px solid #27272a;">
                             {% if rel.imagePath %}
-                                <img src="{{ asset(rel.imagePath) }}" alt="" style="width:60px;height:60px;object-fit:cover;border-radius:6px;flex-shrink:0;">
+                                <img src="{{ vich_uploader_asset(rel, 'imageFile') }}" alt="" style="width:60px;height:60px;object-fit:cover;border-radius:6px;flex-shrink:0;">
                             {% endif %}
                             <div>
                                 <div style="color:#fff;font-size:.9rem;font-weight:500;">{{ rel.title|length > 55 ? rel.title|slice(0,55) ~ '…' : rel.title }}</div>

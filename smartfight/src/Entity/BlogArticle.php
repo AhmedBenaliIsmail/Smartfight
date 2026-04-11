@@ -4,8 +4,11 @@ namespace App\Entity;
 
 use App\Repository\BlogArticleRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
+#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: BlogArticleRepository::class)]
 #[ORM\Table(name: 'blog_article')]
 #[ORM\HasLifecycleCallbacks]
@@ -57,6 +60,12 @@ class BlogArticle
     #[ORM\Column(name: 'video_path', type: 'string', length: 255, nullable: true)]
     private ?string $videoPath = null;
 
+    #[Vich\UploadableField(mapping: 'blog_image', fileNameProperty: 'imagePath')]
+    private ?File $imageFile = null;
+
+    #[Vich\UploadableField(mapping: 'blog_video', fileNameProperty: 'videoPath')]
+    private ?File $videoFile = null;
+
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {
@@ -90,4 +99,20 @@ class BlogArticle
     public function setImagePath(?string $imagePath): static { $this->imagePath = $imagePath; return $this; }
     public function getVideoPath(): ?string { return $this->videoPath; }
     public function setVideoPath(?string $videoPath): static { $this->videoPath = $videoPath; return $this; }
+
+    public function setImageFile(?File $imageFile = null): static
+    {
+        $this->imageFile = $imageFile;
+        if ($imageFile !== null) { $this->updatedAt = new \DateTime(); }
+        return $this;
+    }
+    public function getImageFile(): ?File { return $this->imageFile; }
+
+    public function setVideoFile(?File $videoFile = null): static
+    {
+        $this->videoFile = $videoFile;
+        if ($videoFile !== null) { $this->updatedAt = new \DateTime(); }
+        return $this;
+    }
+    public function getVideoFile(): ?File { return $this->videoFile; }
 }
