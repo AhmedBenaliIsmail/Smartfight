@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SmartFight Admin{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/smartfight.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <style>
+        body { background: var(--bg-dark); color: var(--text-primary); font-family: var(--font-body); display: flex; min-height: 100vh; }
+        .sf-sidebar { width: 200px; min-height: 100vh; background: var(--bg-surface); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px 0; position: fixed; top: 0; left: 0; }
+        .sf-sidebar .brand { padding: 0 20px 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
+        .sf-sidebar .brand .smart { color: var(--text-primary); font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; }
+        .sf-sidebar .brand .fight { color: var(--primary); font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; }
+        .sf-sidebar .brand p { color: var(--text-muted); font-size: 0.6rem; letter-spacing: 0.1em; margin: 4px 0 0; }
+        .sf-sidebar .nav-label { padding: 0 20px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; }
+        .sf-sidebar ul { list-style: none; padding: 0; margin: 0; }
+        .sf-sidebar ul li a { display: flex; align-items: center; gap: 10px; padding: 12px 20px; color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.05em; transition: all var(--transition-fast); border-left: 3px solid transparent; }
+        .sf-sidebar ul li a:hover { color: var(--text-primary); background: var(--bg-surface-2); }
+        .sf-sidebar ul li.active a { color: var(--text-primary); background: var(--bg-surface-2); border-left-color: var(--primary); }
+        .sf-sidebar .version { margin-top: auto; padding: 20px; font-size: 0.7rem; color: var(--text-subtle); }
+        .sf-main { margin-left: 200px; flex: 1; padding: 32px; min-height: 100vh; }
+    </style>
+</head>
+<body>
+
+{# SIDEBAR #}
+<aside class="sf-sidebar">
+    <div class="brand">
+        <div>
+            <span class="smart">SMART</span><span class="fight">FIGHT</span>
+        </div>
+        <p>AI MATCHMAKING & RANKINGS</p>
+    </div>
+
+    <p class="nav-label">Navigation</p>
+    <ul>
+                <li class="{{ app.request.attributes.get('_route') starts with 'dashboard' ? 'active' : '' }}">
+            <a href="{{ path('dashboard') }}">
+                <i class="fa-solid fa-gauge"></i> DASHBOARD
+            </a>
+        </li>
+        <li class="{{ app.request.attributes.get('_route') starts with 'app_combattant' ? 'active' : '' }}">
+            <a href="{{ path('app_combattant_index') }}">
+                <i class="fa-solid fa-user-ninja"></i> COMBATTANTS
+            </a>
+        </li>
+        <li class="{{ app.request.attributes.get('_route') starts with 'app_combat' ? 'active' : '' }}">
+            <a href="{{ path('app_combat_index') }}">
+                <i class="fa-solid fa-x"></i> MATCHMAKING
+            </a>
+        </li>
+        <li class="{{ app.request.attributes.get('_route') starts with 'app_classement' ? 'active' : '' }}">
+            <a href="{{ path('app_classement_index') }}">
+                <i class="fa-solid fa-trophy"></i> CLASSEMENTS
+            </a>
+        </li>
+    </ul>
+
+    <div class="version">v1.0.0</div>
+</aside>
+
+{# MAIN CONTENT #}
+<main class="sf-main">
+    {% block body %}{% endblock %}
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block javascripts %}{% endblock %}
+</body>
+</html>

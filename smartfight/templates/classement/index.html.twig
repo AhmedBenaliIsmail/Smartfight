@@ -1,0 +1,139 @@
+{% extends 'base.html.twig' %}
+{% block title %}Classements - SmartFight{% endblock %}
+
+{% block body %}
+<div style="margin-bottom: 24px;">
+    <h1 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">
+        🏆 CLASSEMENTS
+    </h1>
+    <div style="width: 50px; height: 3px; background: var(--primary); margin-bottom: 8px;"></div>
+    <p style="color: var(--text-muted); font-size: 0.85rem;">Rankings dynamiques basés sur les performances</p>
+</div>
+
+{# Action Bar #}
+<form method="GET" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+    <label style="color: var(--text-muted); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;">DISCIPLINE :</label>
+    <select name="discipline" style="background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 8px 14px; color: var(--text-primary); font-size: 0.85rem;">
+        <option value="All" {{ discipline == 'All' ? 'selected' : '' }}>All</option>
+        <option value="MMA" {{ discipline == 'MMA' ? 'selected' : '' }}>MMA</option>
+        <option value="Boxing" {{ discipline == 'Boxing' ? 'selected' : '' }}>Boxing</option>
+        <option value="Kickboxing" {{ discipline == 'Kickboxing' ? 'selected' : '' }}>Kickboxing</option>
+        <option value="Muay Thai" {{ discipline == 'Muay Thai' ? 'selected' : '' }}>Muay Thai</option>
+        <option value="Wrestling" {{ discipline == 'Wrestling' ? 'selected' : '' }}>Wrestling</option>
+    </select>
+
+    <button type="submit" style="background: #3b82f6; color: white; border: none; border-radius: var(--radius-md); padding: 9px 18px; font-weight: 700; cursor: pointer; font-size: 0.85rem;">
+        Filtrer
+    </button>
+
+    <a href="{{ path('app_classement_index', {'discipline': discipline, 'recalculer': 1}) }}"
+       style="background: #f59e0b; color: black; border: none; border-radius: var(--radius-md); padding: 9px 18px; font-weight: 700; cursor: pointer; font-size: 0.85rem; text-decoration: none;">
+        ♻️ Recalculer
+    </a>
+
+    <a href="{{ path('app_classement_index') }}"
+       style="background: #22c55e; color: black; border: none; border-radius: var(--radius-md); padding: 9px 18px; font-weight: 700; cursor: pointer; font-size: 0.85rem; text-decoration: none;">
+        🔄 Actualiser
+    </a>
+
+    <input type="text" name="search" value="{{ search }}" placeholder="Rechercher un combattant..."
+           style="background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 9px 14px; color: var(--text-primary); font-size: 0.85rem; width: 200px;">
+
+    <span style="margin-left: auto; color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">
+        {{ total }} classements
+    </span>
+</form>
+
+{# Main Content - Table + Chart #}
+<div style="display: grid; grid-template-columns: 1fr 420px; gap: 20px;">
+
+    {# Table #}
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden;">
+        <table class="table table-dark table-hover mb-0">
+            <thead style="background: var(--primary);">
+                <tr>
+                    <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em; text-align: center;">RANG</th>
+                    <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em;">COMBATTANT</th>
+                    <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em; text-align: center;">SCORE</th>
+                    <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em; text-align: center;">DISCIPLINE</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for classement in classements %}
+                <tr>
+                    <td style="text-align: center;">
+                        {% if classement.rang == 1 %}
+                            <span style="color: #f59e0b; font-weight: 900; font-size: 1.1rem;">🥇 1</span>
+                        {% elseif classement.rang == 2 %}
+                            <span style="color: #9ca3af; font-weight: 700;">🥈 2</span>
+                        {% elseif classement.rang == 3 %}
+                            <span style="color: #92400e; font-weight: 700;">🥉 3</span>
+                        {% else %}
+                            <span style="color: var(--text-muted);">{{ classement.rang }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="font-weight: 700; color: var(--text-primary);">
+                        {{ classement.combattant.nickname }}
+                    </td>
+                    <td style="text-align: center; color: var(--gold); font-weight: 700;">
+                        {{ classement.score }}
+                    </td>
+                    <td style="text-align: center;">
+                        <span style="background: var(--bg-surface-2); border: 1px solid var(--border-color); border-radius: 20px; padding: 3px 12px; font-size: 0.75rem; color: var(--text-muted);">
+                            {{ classement.discipline }}
+                        </span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                        Aucun classement. Cliquez sur "♻️ Recalculer" pour générer.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {# Chart #}
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px;">
+        <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--text-primary);">
+            📊 Top 10 des Classements
+        </h3>
+        <canvas id="rankChart"></canvas>
+    </div>
+</div>
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('rankChart').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: [{% for c in top10 %}'{{ c.combattant.nickname }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            data: [{% for c in top10 %}{{ c.score }}{% if not loop.last %},{% endif %}{% endfor %}],
+            backgroundColor: '#dc2626',
+            borderRadius: 4,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: {
+                ticks: { color: '#a1a1aa', font: { size: 10 } },
+                grid: { color: '#27272a' }
+            },
+            y: {
+                ticks: { color: '#a1a1aa' },
+                grid: { color: '#27272a' }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
+
+{% endblock %}

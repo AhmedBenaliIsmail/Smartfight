@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau Combattant - SmartFight{% endblock %}
+
+{% block body %}
+<div style="margin-bottom: 32px;">
+    <h1 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">
+        + AJOUTER COMBATTANT
+    </h1>
+    <div style="width: 50px; height: 3px; background: var(--primary); margin-bottom: 8px;"></div>
+    <p style="color: var(--text-muted); font-size: 0.85rem;">Créer un nouveau combattant</p>
+</div>
+
+<div style="max-width: 600px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px;">
+    {{ form_start(form) }}
+
+    {# Nickname #}
+    <div style="margin-bottom: 20px;">
+        <label style="display: block; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">NICKNAME</label>
+        {{ form_widget(form.nickname, {'attr': {'style': 'width:100%; background: var(--bg-surface-2); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 10px 14px; color: var(--text-primary); font-size: 0.9rem;', 'placeholder': 'Ex: The Lion'}}) }}
+    </div>
+
+    {# Nationalite #}
+    <div style="margin-bottom: 20px;">
+        <label style="display: block; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">NATIONALITÉ</label>
+        {{ form_widget(form.nationalite, {'attr': {'style': 'width:100%; background: var(--bg-surface-2); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 10px 14px; color: var(--text-primary); font-size: 0.9rem;', 'placeholder': 'Ex: Tunisian'}}) }}
+    </div>
+
+    {# Weight Class #}
+    <div style="margin-bottom: 20px;">
+        <label style="display: block; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">WEIGHT CLASS</label>
+        {{ form_widget(form.weightClass, {'attr': {'style': 'width:100%; background: var(--bg-surface-2); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 10px 14px; color: var(--text-primary); font-size: 0.9rem;'}}) }}
+    </div>
+
+    {# Discipline #}
+    <div style="margin-bottom: 20px;">
+        <label style="display: block; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">DISCIPLINE</label>
+        {{ form_widget(form.discipline, {'attr': {'style': 'width:100%; background: var(--bg-surface-2); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 10px 14px; color: var(--text-primary); font-size: 0.9rem;'}}) }}
+    </div>
+
+    {# Wins / Losses / Draws #}
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+        <div>
+            <label style="display: block; color: #22c55e; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">WINS</label>
+            {{ form_widget(form.wins, {'attr': {'style': 'width:100%; background: var(--bg-surface-2); border: 1px solid #22c55e; border-radius: var(--radius-md); padding: 10px 14px; color: #22c55e; font-size: 0.9rem; font-weight: 700;'}}) }}
+        </div>
+        <div>
+            <label style="display: block; color: var(--primary); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">LOSSES</label>
+            {{ form_widget(form.losses, {'attr': {'style': 'width:100%; background: var(--bg-surface-2); border: 1px solid var(--primary); border-radius: var(--radius-md); padding: 10px 14px; color: var(--primary); font-size: 0.9rem; font-weight: 700;'}}) }}
+        </div>
+        <div>
+            <label style="display: block; color: var(--gold); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">DRAWS</label>
+            {{ form_widget(form.draws, {'attr': {'style': 'width:100%; background: var(--bg-surface-2); border: 1px solid var(--gold); border-radius: var(--radius-md); padding: 10px 14px; color: var(--gold); font-size: 0.9rem; font-weight: 700;'}}) }}
+        </div>
+    </div>
+
+    {# Token CSRF #}
+    {{ form_widget(form._token) }}
+
+    {# Buttons #}
+    <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button type="submit" style="background: var(--primary); color: white; border: none; border-radius: var(--radius-md); padding: 12px 28px; font-weight: 700; font-size: 0.9rem; cursor: pointer;">
+            <i class="fa-solid fa-save"></i> SAUVEGARDER
+        </button>
+        <a href="{{ path('app_combattant_index') }}" style="background: var(--bg-surface-2); color: var(--text-muted); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px 28px; font-weight: 700; font-size: 0.9rem; text-decoration: none;">
+            <i class="fa-solid fa-arrow-left"></i> RETOUR
+        </a>
+    </div>
+
+    {{ form_end(form, {'render_rest': false}) }}
+</div>
+{% endblock %}
