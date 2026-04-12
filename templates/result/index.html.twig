@@ -1,0 +1,109 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Fight Results — SmartFight Admin{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item active">Fight Results</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">{{ title|default('Fight Results') }}</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">
+            {% if isChampionsOnly|default(false) %}
+                Viewing high-stakes outcomes from Elite Champions Events
+            {% else %}
+                Pick an event to manage its fight card and results
+            {% endif %}
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_result_schedule') }}" class="btn btn-primary btn-sm"><i class="fa-solid fa-calendar-plus me-1"></i>Schedule New Fight</a>
+        {% endif %}
+        <a href="{{ path('app_result_export') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-download me-1"></i>Export CSV</a>
+    </div>
+</div>
+
+<!-- Event Picker Filter -->
+<div class="card mb-3" style="background:#18181b;border:1px solid #27272a;">
+    <div class="card-body py-3">
+        <form onsubmit="return false;">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0" style="border-color:#3f3f46;"><i class="fa-solid fa-magnifying-glass" style="color:#71717a;"></i></span>
+                        <input type="text" class="form-control border-start-0" placeholder="Search..." style="background:#27272a;border-color:#3f3f46;color:#fafafa;" data-live-search="#event-picker-table" data-live-search-filter-select="#search-category" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select id="search-category" class="form-select" style="background:#27272a;border-color:#3f3f46;color:#fafafa;cursor:pointer;">
+                        <option value="">All Categories</option>
+                        <option value="0">Event Name</option>
+                        <option value="1">Date</option>
+                        <option value="2">Location</option>
+                    </select>
+                </div>
+                <div class="col-md-4 text-end">
+                    <span class="badge bg-green-lt me-2">Context Search Active</span>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card" style="background:#18181b;border:1px solid #27272a;">
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-hover mb-0" id="event-picker-table">
+            <thead>
+            <tr>
+                <th style="padding:.75rem 1.25rem;">Event Name</th>
+                <th style="padding:.75rem 1.25rem;">Date</th>
+                <th style="padding:.75rem 1.25rem;">Location</th>
+                <th style="padding:.75rem 1.25rem;">Card Status</th>
+                <th style="padding:.75rem 1.25rem;text-align:right;">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for event in events %}
+                {% set stats = eventStats[event.eventId] %}
+                <tr style="{% if event.isChampionsEvent %}border-left: 4px solid #c9a227; background: rgba(201,162,39, 0.05);{% endif %}">
+                    <td style="padding:.75rem 1.25rem;font-weight:600;color:#fafafa;">
+                        {{ event.eventName }}
+                        {% if event.isChampionsEvent %}
+                            <span class="badge bg-yellow-lt ms-2" title="Champions Event — Higher Rewards"><i class="fa-solid fa-crown me-1 text-yellow"></i>CHAMPIONS</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding:.75rem 1.25rem;color:#a1a1aa;">{{ event.eventDate|date('M d, Y') }}</td>
+                    <td style="padding:.75rem 1.25rem;color:#a1a1aa;">{{ event.location }}</td>
+                    <td style="padding:.75rem 1.25rem;">
+                        {% if stats.total == 0 %}
+                            <span class="badge bg-secondary-lt">No Fights Scheduled</span>
+                        {% elseif stats.isFullyCompleted %}
+                            <span class="badge bg-green-lt"><i class="fa-solid fa-check-circle me-1"></i>Completed ({{ stats.completed }}/{{ stats.total }})</span>
+                        {% else %}
+                            <span class="badge bg-blue-lt">In Progress ({{ stats.completed }}/{{ stats.total }})</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding:.75rem 1.25rem;text-align:right;">
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('app_result_manage_card', {id: event.eventId}) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fa-solid fa-eye me-1"></i>Manage Card
+                            </a>
+                        {% else %}
+                            <a href="{{ path('app_result_manage_card', {id: event.eventId}) }}" class="btn btn-sm btn-outline-info">
+                                <i class="fa-solid fa-trophy me-1"></i>View Fight Results
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="5" class="text-center p-4 text-muted">No events found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

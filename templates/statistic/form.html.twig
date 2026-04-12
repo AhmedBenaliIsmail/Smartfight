@@ -1,0 +1,155 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bulk Fight Statistics — SmartFight Admin{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_stats') }}" style="color:#a1a1aa;text-decoration:none;">Statistics</a></li>
+    <li class="breadcrumb-item active">Paired Entry</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Step 3: Record Statistics for Fight #{{ fight.fightNumber }}</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">{{ event.eventName|default('Unknown Event') }} — {{ fighter1.fullName }} vs {{ fighter2.fullName }}</p>
+    </div>
+    <a href="{{ path('app_stat_new', {'eventId': event.eventId}) }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back to Fights</a>
+</div>
+
+<form method="post" id="statsForm">
+    <div class="row g-4">
+        <!-- Fighter 1 (Red Corner) -->
+        <div class="col-lg-6">
+            <div class="card" style="background:#18181b;border:1px solid #ef4444; border-top-width: 4px;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background:rgba(239, 68, 68, 0.05);border-bottom:1px solid #27272a;">
+                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-user-ninja me-2" style="color:#ef4444;"></i>{{ fighter1.fullName }} (Red)</h3>
+                    <span class="badge bg-danger">Fighter 1</span>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Strikes Thrown</label>
+                            <input type="number" name="s1_strikesThrown" id="s1_strikesThrown" class="form-control" value="{{ stat1 ? stat1.strikesThrown : 0 }}" min="0" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Strikes Landed</label>
+                            <input type="number" name="s1_strikesLanded" id="s1_strikesLanded" class="form-control" value="{{ stat1 ? stat1.strikesLanded : 0 }}" min="0" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Takedown Attempts</label>
+                            <input type="number" name="s1_takedownAttempts" id="s1_takedownAttempts" class="form-control" value="{{ stat1 ? stat1.takedownAttempts : 0 }}" min="0" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Takedowns Landed</label>
+                            <input type="number" name="s1_takedowns" id="s1_takedowns" class="form-control" value="{{ stat1 ? stat1.takedowns : 0 }}" min="0" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Submissions</label>
+                            <input type="number" name="s1_submissions" id="s1_submissions" class="form-control" value="{{ stat1 ? stat1.submissions : 0 }}" min="0" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Knockdowns</label>
+                            <input type="number" name="s1_knockdowns" id="s1_knockdowns" class="form-control" value="{{ stat1 ? stat1.knockdowns : 0 }}" min="0" required />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Control Time (Seconds)</label>
+                            <input type="number" name="s1_controlTime" id="s1_controlTime" class="form-control" value="{{ stat1 ? stat1.controlTimeSeconds : 0 }}" min="0" required />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fighter 2 (Blue Corner) -->
+        <div class="col-lg-6">
+            <div class="card" style="background:#18181b;border:1px solid #3b82f6; border-top-width: 4px;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background:rgba(59, 130, 246, 0.05);border-bottom:1px solid #27272a;">
+                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-user-ninja me-2" style="color:#3b82f6;"></i>{{ fighter2.fullName }} (Blue)</h3>
+                    <span class="badge bg-primary">Fighter 2</span>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Strikes Thrown</label>
+                            <input type="number" name="s2_strikesThrown" id="s2_strikesThrown" class="form-control" value="{{ stat2 ? stat2.strikesThrown : 0 }}" min="0" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Strikes Landed</label>
+                            <input type="number" name="s2_strikesLanded" id="s2_strikesLanded" class="form-control" value="{{ stat2 ? stat2.strikesLanded : 0 }}" min="0" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Takedown Attempts</label>
+                            <input type="number" name="s2_takedownAttempts" id="s2_takedownAttempts" class="form-control" value="{{ stat2 ? stat2.takedownAttempts : 0 }}" min="0" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Takedowns Landed</label>
+                            <input type="number" name="s2_takedowns" id="s2_takedowns" class="form-control" value="{{ stat2 ? stat2.takedowns : 0 }}" min="0" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Submissions</label>
+                            <input type="number" name="s2_submissions" id="s2_submissions" class="form-control" value="{{ stat2 ? stat2.submissions : 0 }}" min="0" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Knockdowns</label>
+                            <input type="number" name="s2_knockdowns" id="s2_knockdowns" class="form-control" value="{{ stat2 ? stat2.knockdowns : 0 }}" min="0" required />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Control Time (Seconds)</label>
+                            <input type="number" name="s2_controlTime" id="s2_controlTime" class="form-control" value="{{ stat2 ? stat2.controlTimeSeconds : 0 }}" min="0" required />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 mt-4">
+            <div class="card" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-body p-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="mb-0 text-muted small"><i class="fa-solid fa-circle-info me-2"></i>Comparison logic will highlight the better performer in the stats table after saving.</p>
+                    </div>
+                    <button type="submit" class="btn btn-lg btn-danger px-5"><i class="fa-solid fa-floppy-disk me-2"></i>Save Paired Statistics</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+// Live validation: Landed strikes cannot exceed Thrown strikes
+const validateStat = (landedId, thrownId, label) => {
+    const landed = document.getElementById(landedId);
+    const thrown = document.getElementById(thrownId);
+    
+    const sync = () => {
+        const lVal = parseInt(landed.value) || 0;
+        const tVal = parseInt(thrown.value) || 0;
+        
+        if (lVal > tVal) {
+            landed.classList.add('is-invalid');
+            landed.setCustomValidity(`${label}: Landed cannot exceed attempts.`);
+        } else {
+            landed.classList.remove('is-invalid');
+            landed.setCustomValidity('');
+        }
+    };
+
+    landed.addEventListener('input', sync);
+    thrown.addEventListener('input', sync);
+    sync(); // Initial check
+};
+
+validateStat('s1_strikesLanded', 's1_strikesThrown', 'F1 Strikes');
+validateStat('s2_strikesLanded', 's2_strikesThrown', 'F2 Strikes');
+validateStat('s1_takedowns', 's1_takedownAttempts', 'F1 Takedowns');
+validateStat('s2_takedowns', 's2_takedownAttempts', 'F2 Takedowns');
+</script>
+
+<style>
+    .is-invalid {
+        border-color: #dc3545 !important;
+        background-image: none !important;
+    }
+</style>
+{% endblock %}

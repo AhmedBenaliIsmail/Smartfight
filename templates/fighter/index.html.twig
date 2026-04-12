@@ -1,0 +1,114 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Fighters — SmartFight Admin{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item active">Fighters</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Fighters</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Manage fighter roster and profiles</p>
+    </div>
+    {% if is_granted('ROLE_ADMIN') %}
+    <a href="{{ path('app_fighter_new') }}" class="btn btn-danger"><i class="fa-solid fa-plus me-2"></i>Add Fighter</a>
+    {% endif %}
+</div>
+
+<!-- Filters -->
+<div class="card mb-3" style="background:#18181b;border:1px solid #27272a;">
+    <div class="card-body py-3">
+        <form method="get" action="{{ path('app_fighters') }}" onsubmit="return false;">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" name="q" class="form-control" placeholder="Type to search fighters..." value="{{ q }}" data-live-search="#fighter-table" />
+                    </div>
+                </div>
+                <div class="col-md-2 offset-md-5">
+                    <button type="button" class="btn disabled w-100" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-bolt me-1"></i>Live Filter Active</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card" style="background:#18181b;border:1px solid #27272a;">
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-hover mb-0" id="fighter-table">
+            <thead>
+            <tr>
+                <th style="padding:.75rem 1.25rem;width:50px;">ID</th>
+                <th>Name</th>
+                <th>Nickname</th>
+                <th>Weight Class</th>
+                <th>Ht (cm)</th>
+                <th>Reach (cm)</th>
+                <th>Record (W-L-D)</th>
+                <th>Nationality</th>
+                <th>ELO</th>
+                {% if is_granted('ROLE_ADMIN') %}
+                <th class="text-end" style="padding-right:1.25rem;">Actions</th>
+                {% endif %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for fighter in fighters %}
+                <tr>
+                    <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#{{ fighter.fighterId }}</td>
+                    <td style="font-size:.875rem;font-weight:600;">{{ fighter.fullName }}</td>
+                    <td style="color:#c9a227;font-size:.8rem;font-style:italic;">{{ fighter.nickname ? '"' ~ fighter.nickname ~ '"' : '-' }}</td>
+                    <td>
+                        {% if fighter.weightClass %}
+                            <span class="badge" style="background:rgba(59,130,246,.1);color:#60a5fa;border:1px solid rgba(59,130,246,.2);font-size:.75rem;">{{ fighter.weightClass }}</span>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td style="font-size:.8rem;color:#a1a1aa;">{{ fighter.height|default('-') }}</td>
+                    <td style="font-size:.8rem;color:#a1a1aa;">{{ fighter.reach|default('-') }}</td>
+                    <td>
+                        <span style="color:#22c55e;font-weight:700;font-size:.875rem;">{{ fighter.wins }}</span><span style="color:#a1a1aa;font-size:.75rem;">W</span>
+                        <span style="color:#dc2626;font-weight:700;font-size:.875rem;margin-left:4px;">{{ fighter.losses }}</span><span style="color:#a1a1aa;font-size:.75rem;">L</span>
+                        <span style="color:#a1a1aa;font-weight:700;font-size:.875rem;margin-left:4px;">{{ fighter.draws }}</span><span style="color:#a1a1aa;font-size:.75rem;">D</span>
+                    </td>
+                    <td style="font-size:.8rem;color:#a1a1aa;">{{ fighter.country|default('-') }}</td>
+                    <td>{{ fighter.eloRating|round }}</td>
+                    
+                    {% if is_granted('ROLE_ADMIN') %}
+                    <td class="text-end" style="padding-right:1.25rem;">
+                        <div class="d-flex justify-content-end gap-1">
+                            <a href="{{ path('app_fighter_edit', {'id': fighter.fighterId}) }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-pen"></i></a>
+                            <form action="{{ path('app_fighter_delete', {'id': fighter.fighterId}) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this fighter?');">
+                                <button type="submit" class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="8" class="text-center" style="padding: 2rem;">No fighters found.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer" style="background:#18181b;border-top:1px solid #27272a;">
+        <div class="d-flex align-items-center justify-content-between">
+            <span style="font-size:.8125rem;color:#a1a1aa;">Total {{ fighters|length }} fighters</span>
+            {% if is_granted('ROLE_ADMIN') %}
+            <form action="{{ path('app_fighter_recalc') }}" method="post">
+                <button type="submit" class="btn btn-sm btn-outline-warning">
+                    <i class="fa-solid fa-bolt me-1"></i> Recalculate Fast Stats All Ranked Files
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

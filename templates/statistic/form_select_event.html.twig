@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Select Event — SmartFight Admin{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_stats') }}" style="color:#a1a1aa;text-decoration:none;">Statistics</a></li>
+    <li class="breadcrumb-item active">Add Statistics</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Step 1: Select Finished Event</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Choose an event to record fight statistics</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for event in events %}
+    <div class="col-md-4">
+        <a href="{{ path('app_stat_new', {'eventId': event.eventId}) }}" style="text-decoration:none;">
+            <div class="card card-link" style="background:#18181b;border:1px solid #27272a;transition:transform 0.2s;">
+                <div class="card-body p-4 text-center">
+                    <div class="mb-3">
+                        <i class="fa-solid fa-calendar-check fa-3x" style="color:#3b82f6;"></i>
+                    </div>
+                    <h3 class="mb-1 fw-bold" style="color:#fafafa;">{{ event.eventName }}</h3>
+                    <div class="text-muted small">{{ event.eventDate|date('Y-m-d') }}</div>
+                    <div class="mt-2 text-muted small"><i class="fa-solid fa-location-dot me-1"></i>{{ event.location }}</div>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5">
+        <i class="fa-solid fa-calendar-xmark fa-4x mb-3 text-muted"></i>
+        <h3 class="text-muted">No finished events found.</h3>
+        <p class="text-muted">Statistics can only be added for events that are in the past.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+.card-link:hover { transform: translateY(-5px); border-color: #3b82f6 !important; }
+</style>
+{% endblock %}

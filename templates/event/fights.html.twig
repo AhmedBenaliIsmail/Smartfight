@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Manage Fights - {{ event.eventName }} — SmartFight Admin{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_events') }}" style="color:#a1a1aa;text-decoration:none;">Events</a></li>
+    <li class="breadcrumb-item active">Manage Fights</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Manage Fights for {{ event.eventName }}</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Build the match card (Max 3 fights per event)</p>
+    </div>
+    <a href="{{ path('app_events') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back Events</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <!-- Scheduled Fights -->
+        <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-list me-2" style="color:#dc2626;"></i>Scheduled Fights ({{ fights|length }}/3)</h3>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th style="padding:.75rem 1.25rem;">Fight #</th>
+                            <th>Fighter 1</th>
+                            <th>Fighter 2</th>
+                            <th>Status</th>
+                            {% if is_granted('ROLE_ADMIN') %}
+                            <th class="text-end" style="padding-right:1.25rem;">Actions</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fight in fights %}
+                            <tr>
+                                <td style="padding:.75rem 1.25rem;">Fight {{ fight.fightNumber }}</td>
+                                <td>{{ fighterMap[fight.fighter1Id]|default('Unknown') }}</td>
+                                <td>{{ fighterMap[fight.fighter2Id]|default('Unknown') }}</td>
+                                <td>
+                                    {% if fight.status == 'COMPLETED' %}
+                                        <span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">COMPLETED</span>
+                                    {% elseif fight.status == 'SCHEDULED' %}
+                                        <span class="badge" style="background:rgba(234,179,8,.15);color:#eab308;">SCHEDULED</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ fight.status }}</span>
+                                    {% endif %}
+                                </td>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                <td class="text-end" style="padding-right:1.25rem;">
+                                    {% if fight.status == 'SCHEDULED' %}
+                                    <form action="{{ path('app_event_fight_delete', {'fightId': fight.resultId}) }}" method="post" onsubmit="return confirm('Remove scheduled fight?');">
+                                        <input type="hidden" name="eventId" value="{{ event.eventId }}">
+                                        <button type="submit" class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i> Remove</button>
+                                    </form>
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </td>
+                                {% endif %}
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="5" class="text-center" style="padding:2rem;">No fights scheduled yet for this event.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% if is_granted('ROLE_ADMIN') %}
+    <div class="col-lg-4">
+        <!-- Add Fight Form -->
+        {% if availableNumbers|length > 0 %}
+        <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-plus me-2" style="color:#3b82f6;"></i>Add Fight</h3>
+            </div>
+            <div class="card-body p-4">
+                <form action="{{ path('app_event_fight_add', {'id': event.eventId}) }}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Fight Number</label>
+                        <select name="fightNumber" class="form-select" required>
+                            {% for num in availableNumbers %}
+                                <option value="{{ num }}">Fight {{ num }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fighter 1 (Red Corner)</label>
+                        <select name="fighter1Id" class="form-select" required>
+                            <option value="">Select Fighter...</option>
+                            {% for f in availableFighters %}
+                                <option value="{{ f.fighterId }}">{{ f.fullName }} ({{ f.weightClass }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Fighter 2 (Blue Corner)</label>
+                        <select name="fighter2Id" class="form-select" required>
+                            <option value="">Select Fighter...</option>
+                            {% for f in availableFighters %}
+                                <option value="{{ f.fighterId }}">{{ f.fullName }} ({{ f.weightClass }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn w-100" style="background:#dc2626;color:#fff;border:none;"><i class="fa-solid fa-calendar-plus me-2"></i>Schedule Match</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <i class="fa-solid fa-info-circle me-2"></i> This event has reached the maximum of 3 scheduled fights.
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

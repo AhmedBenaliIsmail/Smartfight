@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ event ? 'Edit' : 'Create' }} Event — SmartFight Admin{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_events') }}" style="color:#a1a1aa;text-decoration:none;">Events</a></li>
+    <li class="breadcrumb-item active">{{ event ? 'Edit' : 'Create' }} Event</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">{{ event ? 'Edit' : 'Create' }} Event</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Set up event details</p>
+    </div>
+    <a href="{{ path('app_events') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+</div>
+
+<form method="post">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-calendar me-2" style="color:#dc2626;"></i>Event Information</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Event Name <span style="color:#dc2626;">*</span></label>
+                            <input type="text" name="eventName" class="form-control" placeholder="e.g. UFC 300" value="{{ event ? event.eventName : '' }}" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Event Date <span style="color:#dc2626;">*</span></label>
+                            <input type="text" name="eventDate" class="form-control datepicker" placeholder="Select date..." value="{{ event and event.eventDate ? event.eventDate|date('Y-m-d') : '' }}" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Location</label>
+                            <input type="text" name="location" class="form-control" placeholder="e.g. T-Mobile Arena, Las Vegas" value="{{ event ? event.location : '' }}" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-body p-4">
+                    <button type="submit" class="btn btn-danger w-100 py-2"><i class="fa-solid fa-floppy-disk me-2"></i>Save Event Data</button>
+                    <a href="{{ path('app_events') }}" class="btn w-100 py-2 mt-2" style="background:#27272a;color:#a1a1aa;border:none;">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

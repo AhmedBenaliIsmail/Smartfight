@@ -1,0 +1,160 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ fighter ? 'Edit' : 'Add' }} Fighter — SmartFight Admin{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_fighters') }}" style="color:#a1a1aa;text-decoration:none;">Fighters</a></li>
+    <li class="breadcrumb-item active">{{ fighter ? 'Edit' : 'Add' }} Fighter</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">{{ fighter ? 'Edit' : 'Add' }} Fighter</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Modify fighter record and metrics in the roster</p>
+    </div>
+    <a href="{{ path('app_fighters') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+</div>
+
+<form method="post">
+    <div class="row g-4">
+        <!-- Left Column -->
+        <div class="col-lg-8">
+            <!-- Personal Info -->
+            <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-id-badge me-2" style="color:#dc2626;"></i>Personal Information</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name <span style="color:#dc2626;">*</span></label>
+                            <input type="text" name="firstName" class="form-control" value="{{ fighter ? fighter.firstName : '' }}" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name <span style="color:#dc2626;">*</span></label>
+                            <input type="text" name="lastName" class="form-control" value="{{ fighter ? fighter.lastName : '' }}" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nickname</label>
+                            <input type="text" name="nickname" class="form-control" value="{{ fighter ? fighter.nickname : '' }}" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nationality</label>
+                            <input type="text" name="country" class="form-control" value="{{ fighter ? fighter.country : '' }}" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Height (cm)</label>
+                            <input type="number" name="height" class="form-control" value="{{ fighter ? fighter.height : '' }}" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reach (cm)</label>
+                            <input type="number" name="reach" class="form-control" value="{{ fighter ? fighter.reach : '' }}" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Weight Class <span style="color:#dc2626;">*</span></label>
+                            <select name="weightClass" class="form-select" required>
+                                <option value="" {{ fighter and not fighter.weightClass ? 'selected' : '' }} disabled>Select weight class...</option>
+                                {% set wc_distribution = [
+                                    {'name': 'Flyweight', 'weight': '125 lbs'},
+                                    {'name': 'Bantamweight', 'weight': '135 lbs'},
+                                    {'name': 'Featherweight', 'weight': '145 lbs'},
+                                    {'name': 'Lightweight', 'weight': '155 lbs'},
+                                    {'name': 'Welterweight', 'weight': '170 lbs'},
+                                    {'name': 'Middleweight', 'weight': '185 lbs'},
+                                    {'name': 'Light Heavyweight', 'weight': '205 lbs'},
+                                    {'name': 'Heavyweight', 'weight': '265 lbs'}
+                                ] %}
+                                {% for wc in wc_distribution %}
+                                    <option value="{{ wc.name }}" {{ fighter and fighter.weightClass == wc.name ? 'selected' : '' }}>
+                                        {{ wc.name }} ({{ wc.weight }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Professional Record -->
+            <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-trophy me-2" style="color:#3b82f6;"></i>Professional Record</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Wins</label>
+                            <input type="number" name="wins" class="form-control" value="{{ fighter ? fighter.wins : 0 }}" min="0" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Losses</label>
+                            <input type="number" name="losses" class="form-control" value="{{ fighter ? fighter.losses : 0 }}" min="0" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Draws</label>
+                            <input type="number" name="draws" class="form-control" value="{{ fighter ? fighter.draws : 0 }}" min="0" required />
+                        </div>
+                        
+                        <div class="col-md-12 mt-3 mb-1"><hr class="my-0" style="border-color:#27272a;" /></div>
+                        <div class="col-12"><label class="form-label mb-0" style="color:#c9a227!important;">Win Method Breakdown</label></div>
+                        
+                        <div class="col-md-4">
+                            <label class="form-label">KO/TKO Wins</label>
+                            <input type="number" name="koWins" class="form-control" value="{{ fighter ? fighter.koWins : 0 }}" min="0" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Submission Wins</label>
+                            <input type="number" name="submissionWins" class="form-control" value="{{ fighter ? fighter.submissionWins : 0 }}" min="0" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Decision Wins</label>
+                            <input type="number" name="decisionWins" class="form-control" value="{{ fighter ? fighter.decisionWins : 0 }}" min="0" required />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-lg-4">
+            <!-- Advanced Info (View Only from here normally, but lets show it) -->
+            {% if fighter %}
+            <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-chart-pie me-2" style="color:#c9a227;"></i>Calculated Ratings</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label">ELO Rating</label>
+                        <input type="text" class="form-control disabled text-muted" value="{{ fighter.eloRating|round }}" disabled />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Performance Score</label>
+                        <input type="text" class="form-control disabled text-muted" value="{{ fighter.performanceScore|round(2) }}" disabled />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Win Streak</label>
+                        <input type="text" class="form-control disabled text-muted" value="{{ fighter.winStreak }}" disabled />
+                    </div>
+                    <div>
+                        <label class="form-label">Strength of Schedule</label>
+                        <input type="text" class="form-control disabled text-muted" value="{{ fighter.strengthOfSchedule|round }}" disabled />
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Save Actions -->
+            <div class="card" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-body p-4">
+                    <button type="submit" class="btn btn-danger w-100 py-2"><i class="fa-solid fa-floppy-disk me-2"></i>Save Fighter Data</button>
+                    <a href="{{ path('app_fighters') }}" class="btn w-100 py-2 mt-2" style="background:#27272a;color:#a1a1aa;border:none;">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

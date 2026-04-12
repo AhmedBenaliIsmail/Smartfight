@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Schedule Fight — SmartFight Admin{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_results') }}" style="color:#a1a1aa;text-decoration:none;">Fight Results</a></li>
+    <li class="breadcrumb-item active">Schedule Fight</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Schedule Fight</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Add a new fight to an upcoming event</p>
+    </div>
+    <a href="{{ path('app_results') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+</div>
+
+<form method="post">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-calendar-plus me-2" style="color:#dc2626;"></i>Setup Fight</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Event <span style="color:#dc2626;">*</span></label>
+                            <select name="eventId" class="form-select" required>
+                                <option value="">Select Event...</option>
+                                {% for event in events %}
+                                    <option value="{{ event.eventId }}">{{ event.eventName }} ({{ event.eventDate|date('Y-m-d') }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fight Number</label>
+                            <select name="fightNumber" class="form-select" required>
+                                <option value="1">Fight 1</option>
+                                <option value="2">Fight 2</option>
+                                <option value="3">Fight 3</option>
+                            </select>
+                            <small class="text-muted">Max 3 per event</small>
+                        </div>
+                        
+                        <div class="col-12 text-center my-3"><span class="badge bg-danger rounded-pill px-3 py-2 fs-6">VS</span></div>
+
+                        <div class="col-md-6">
+                            <label class="form-label text-danger fw-bold">Red Corner (Fighter 1) <span style="color:#dc2626;">*</span></label>
+                            <select name="fighter1Id" class="form-select" required style="border-left: 4px solid #ef4444;">
+                                <option value="">Select Fighter...</option>
+                                {% for fighter in fighters %}
+                                    <option value="{{ fighter.fighterId }}">{{ fighter.fullName }} ({{ fighter.weightClass }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-primary fw-bold">Blue Corner (Fighter 2) <span style="color:#dc2626;">*</span></label>
+                            <select name="fighter2Id" class="form-select" required style="border-left: 4px solid #3b82f6;">
+                                <option value="">Select Fighter...</option>
+                                {% for fighter in fighters %}
+                                    <option value="{{ fighter.fighterId }}">{{ fighter.fullName }} ({{ fighter.weightClass }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-body p-3">
+                    <button type="submit" class="btn btn-danger w-100 py-2"><i class="fa-solid fa-calendar-check me-2"></i>Schedule Match</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Register - SmartFight Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/smartfight-admin.css') }}">
+    <style>
+        body { background: #09090b; display: flex; align-items: center; min-height: 100vh; overflow: hidden; }
+        .login-card { background: #18181b; border: 1px solid #27272a; border-radius: 12px; max-width: 420px; margin: auto; padding: 2.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); position: relative; z-index: 10; }
+        .bg-element { position: absolute; border-radius: 50%; filter: blur(100px); z-index: 0; opacity: 0.15; }
+        .bg-blue { background: #3b82f6; width: 600px; height: 600px; top: -200px; right: -200px; }
+        .bg-purple { background: #8b5cf6; width: 500px; height: 500px; bottom: -100px; left: -100px; }
+    </style>
+</head>
+<body class="antialiased">
+
+<div class="bg-element bg-blue"></div>
+<div class="bg-element bg-purple"></div>
+
+<div class="container-tight py-4">
+    <div class="login-card w-100">
+        <div class="text-center mb-4">
+            <a href="#" class="smartfight-logo justify-content-center mb-3">
+                <div class="logo-icon fs-3"><i class="fa-solid fa-fist-raised"></i></div>
+            </a>
+            <h2 class="h2 text-center" style="color:#fafafa;">Create Account</h2>
+        </div>
+        
+        {% for label, msgs in app.flashes %}
+            {% for msg in msgs %}
+                <div class="alert alert-{{ label == 'error' ? 'danger' : label }}">{{ msg }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        <form action="{{ path('app_register') }}" method="post" autocomplete="off">
+            <div class="mb-3">
+                <label class="form-label">Username <span class="text-danger">*</span></label>
+                <input type="text" name="username" class="form-control" placeholder="Choose a username" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email address</label>
+                <input type="email" name="email" class="form-control" placeholder="name@example.com">
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Password <span class="text-danger">*</span></label>
+                <div class="input-group input-group-flat">
+                    <input type="password" name="password" class="form-control" placeholder="Create password" required>
+                </div>
+            </div>
+            
+            <div class="form-footer">
+                <button type="submit" class="btn btn-primary w-100 py-2 fs-5 fw-bold">Sign Up</button>
+            </div>
+        </form>
+        
+        <div class="text-center text-muted mt-4">
+            Already have account? <a href="{{ path('app_login') }}" class="text-primary text-decoration-none">Sign in</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create Champions Event — SmartFight Admin{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_events') }}" style="color:#a1a1aa;text-decoration:none;">Events</a></li>
+    <li class="breadcrumb-item active">New Champions Event</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fbbf24;"><i class="fa-solid fa-crown me-2"></i>Create Champions Event</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Automatically schedule #1 vs #2 contenders</p>
+    </div>
+    <a href="{{ path('app_events') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+</div>
+
+<form method="post">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card mb-4" style="background:#18181b;border:1px solid #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.1);">
+                <div class="card-header" style="background:#18181b;border-bottom:1px solid #3f3f46;">
+                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;">Event Details</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label" style="color:#a1a1aa;">Event Name <span style="color:#dc2626;">*</span></label>
+                        <input type="text" name="eventName" class="form-control" style="background:#27272a;border-color:#3f3f46;color:#fafafa;" placeholder="e.g. UFC Champions Night" required />
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" style="color:#a1a1aa;">Date <span style="color:#dc2626;">*</span></label>
+                            <input type="text" name="eventDate" class="form-control datepicker" style="background:#27272a;border-color:#3f3f46;color:#fafafa;" placeholder="Select date..." required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" style="color:#a1a1aa;">Location</label>
+                            <input type="text" name="location" class="form-control" style="background:#27272a;border-color:#3f3f46;color:#fafafa;" placeholder="e.g. Las Vegas, NV" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-list-ol me-2" style="color:#fbbf24;"></i>Select Weight Classes</h3>
+                    <p class="mb-0 mt-1" style="color:#a1a1aa;font-size:0.8rem;">Select 3 **different** weight classes. The engine will auto-schedule #1 vs #2 for each.</p>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        {% for i in 1..3 %}
+                        <div class="col-md-4">
+                            <label class="form-label" style="color:#a1a1aa;">Fight {{ i }} Category</label>
+                            <select name="weightClass{{ i }}" class="form-select wc-selector" data-index="{{ i }}" style="background:#27272a;border-color:#3f3f46;color:#fafafa;" required>
+                                <option value="">Choose...</option>
+                                {% for wc in weightClasses %}
+                                    <option value="{{ wc }}">{{ wc }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-body p-4">
+                    <button type="submit" class="btn w-100 py-2 fw-bold" style="background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border:none; color:white; font-size:1.1rem; box-shadow: 0 4px 14px 0 rgba(251, 191, 36, 0.39);">
+                        <i class="fa-solid fa-bolt me-2"></i>Create Event & Auto-Schedule
+                    </button>
+                    <p class="text-center mt-2 mb-0" style="color:#a1a1aa;font-size:0.8rem;">This will find the top 2 fighters mapped to these divisions and setup 3 fights immediately.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Datepicker
+    if (typeof flatpickr !== 'undefined') {
+        flatpickr(".datepicker", { dateFormat: "Y-m-d" });
+    }
+
+    const selectors = document.querySelectorAll('.wc-selector');
+    
+    function updateOptions() {
+        const selectedValues = Array.from(selectors).map(s => s.value).filter(v => v !== "");
+        
+        selectors.forEach(selector => {
+            const currentValue = selector.value;
+            const options = selector.querySelectorAll('option');
+            
+            options.forEach(option => {
+                if (option.value === "") return;
+                
+                // Hide if this value is selected in ANY OTHER selector
+                const isSelectedElsewhere = selectedValues.includes(option.value) && option.value !== currentValue;
+                
+                if (isSelectedElsewhere) {
+                    option.disabled = true;
+                    option.style.display = 'none';
+                } else {
+                    option.disabled = false;
+                    option.style.display = 'block';
+                }
+            });
+        });
+    }
+
+    selectors.forEach(s => s.addEventListener('change', updateOptions));
+});
+</script>
+{% endblock %}
