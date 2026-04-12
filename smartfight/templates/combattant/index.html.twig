@@ -1,83 +1,84 @@
 {% extends 'admin/base_admin.html.twig' %}
+{% set breadcrumb_title = 'Combattants' %}
 
 {% block title %}Combattants - SmartFight{% endblock %}
 
 {% block admin_content %}
-<div style="margin-bottom: 32px;">
-    <h1 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">
-        COMBATTANTS
-    </h1>
-    <div style="width: 50px; height: 3px; background: var(--primary); margin-bottom: 8px;"></div>
-    <p style="color: var(--text-muted); font-size: 0.85rem;">Gestion et visualisation des combattants</p>
-</div>
-
-{# Actions #}
-<div style="margin-bottom: 24px; display: flex; gap: 12px; align-items: center;">
-    <a href="{{ path('app_combattant_new') }}" class="btn btn-sf-primary">
-        <i class="fa-solid fa-plus"></i> + AJOUTER
+<div class="page-header d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h2 class="page-title mb-1" style="font-family:'Oswald',sans-serif;color:#fff;">Combattants</h2>
+        <p class="text-muted mb-0">{{ combattants|length }} combattants total</p>
+    </div>
+    <a href="{{ path('app_combattant_new') }}" class="btn" style="background:#dc2626;color:#fff;font-family:'Oswald',sans-serif;">
+        <i class="fa-solid fa-plus me-2"></i>Nouveau Combattant
     </a>
-    <span style="color: var(--text-muted); font-size: 0.85rem; margin-left: auto;">
-        TOTAL : {{ combattants|length }} COMBATTANTS
-    </span>
 </div>
 
-{# Table #}
-<div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden;">
-    <table class="table table-dark table-hover mb-0">
-        <thead style="background: var(--primary);">
+<div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+    <div class="card-body d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div style="color:#a1a1aa;">Gestion et visualisation des combattants</div>
+        <span class="badge" style="background:#27272a;color:#d4d4d8;">W-L-D et taux de victoire</span>
+    </div>
+</div>
+
+<div class="card" style="background:#18181b;border:1px solid #27272a;">
+    <div class="table-responsive">
+    <table class="table table-dark table-hover mb-0" style="--bs-table-bg:#18181b;--bs-table-striped-bg:#1f1f23;">
+        <thead>
             <tr>
-                <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em;">#</th>
-                <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em;">NICKNAME</th>
-                <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em;">NATIONALITÉ</th>
-                <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em;">WEIGHT CLASS</th>
-                <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em;">RECORD (W-L-D)</th>
-                <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em;">WIN RATE</th>
-                <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em;">COMBATS</th>
-                <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em;">ACTIONS</th>
+                <th style="color:#71717a;">#</th>
+                <th style="color:#71717a;">Nickname</th>
+                <th style="color:#71717a;">Nationalite</th>
+                <th style="color:#71717a;">Weight Class</th>
+                <th style="color:#71717a;">Record</th>
+                <th style="color:#71717a;">Win Rate</th>
+                <th style="color:#71717a;">Combats</th>
+                <th style="color:#71717a;">Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for combattant in combattants %}
             {% set total = combattant.wins + combattant.losses + combattant.draws %}
             {% set winRate = total > 0 ? ((combattant.wins / total) * 100)|round(1) : 0 %}
-            <tr style="border-color: var(--border-color);">
-                <td style="color: var(--text-muted);">{{ loop.index }}</td>
-                <td style="font-weight: 700; color: var(--text-primary);">{{ combattant.nickname }}</td>
-                <td style="color: var(--text-muted);">{{ combattant.nationalite }}</td>
-                <td style="color: var(--text-muted);">{{ combattant.weightClass }}</td>
-                <td style="color: var(--text-primary);">{{ combattant.wins }}-{{ combattant.losses }}-{{ combattant.draws }}</td>
+            <tr>
+                <td style="color:#a1a1aa;">{{ loop.index }}</td>
+                <td style="font-weight:700;color:#fff;">{{ combattant.nickname }}</td>
+                <td style="color:#a1a1aa;">{{ combattant.nationalite }}</td>
+                <td style="color:#a1a1aa;">{{ combattant.weightClass }}</td>
+                <td style="color:#d4d4d8;">{{ combattant.wins }}-{{ combattant.losses }}-{{ combattant.draws }}</td>
                 <td>
-                    <span style="color: {{ winRate >= 70 ? '#22c55e' : (winRate >= 40 ? '#f59e0b' : '#ef4444') }}; font-weight: 700;">
+                    <span style="color: {{ winRate >= 70 ? '#16a34a' : (winRate >= 40 ? '#f59e0b' : '#dc2626') }}; font-weight:700;">
                         {{ winRate }}%
                     </span>
                 </td>
-                <td style="color: var(--text-muted);">{{ total }}</td>
+                <td style="color:#a1a1aa;">{{ total }}</td>
                 <td>
-                    <a href="{{ path('app_combattant_show', {id: combattant.id}) }}" 
-                       style="color: var(--text-muted); margin-right: 8px;">
+                    <div class="d-flex gap-2">
+                    <a href="{{ path('app_combattant_show', {id: combattant.id}) }}" class="btn btn-sm btn-outline-secondary">
                         <i class="fa-solid fa-eye"></i>
                     </a>
-                    <a href="{{ path('app_combattant_edit', {id: combattant.id}) }}" 
-                       style="color: var(--gold); margin-right: 8px;">
+                    <a href="{{ path('app_combattant_edit', {id: combattant.id}) }}" class="btn btn-sm btn-outline-secondary">
                         <i class="fa-solid fa-pen"></i>
                     </a>
-                    <form method="post" action="{{ path('app_combattant_delete', {id: combattant.id}) }}" style="display:inline">
+                    <form method="post" action="{{ path('app_combattant_delete', {id: combattant.id}) }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete'~combattant.id) }}">
-                        <button type="submit" style="background: none; border: none; color: var(--primary); cursor: pointer;"
+                        <button type="submit" class="btn btn-sm btn-outline-danger"
                                 onclick="return confirm('Supprimer ce combattant ?')">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </form>
+                    </div>
                 </td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                <td colspan="8" class="text-center text-muted py-5">
                     Aucun combattant trouvé.
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    </div>
 </div>
 {% endblock %}

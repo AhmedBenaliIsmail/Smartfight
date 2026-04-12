@@ -13,7 +13,7 @@ class Combat
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'combats')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Combattant $combattant1 = null;
 

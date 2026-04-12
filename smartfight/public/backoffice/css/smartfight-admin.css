@@ -148,6 +148,32 @@ body {
   color: #fafafa;
 }
 
+/* Improve native select dropdown readability on Windows browsers */
+.form-select,
+select.sf-dark-select {
+  color-scheme: dark;
+}
+
+/* Windows/Chromium often forces a light popup menu; keep option text readable */
+select.sf-dark-select option {
+  background-color: #ffffff !important;
+  color: #111111 !important;
+}
+
+select.sf-dark-select option:checked,
+select.sf-dark-select option:hover,
+select.sf-dark-select option:focus {
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+.form-select option:hover,
+.form-select option:focus,
+.form-select option:checked {
+  background-color: #27272a !important;
+  color: #ffffff !important;
+}
+
 .input-group-text {
   background-color: #27272a !important;
   border-color: #27272a !important;
