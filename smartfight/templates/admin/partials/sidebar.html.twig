@@ -45,6 +45,28 @@
             </ul>
         </nav>
 
+            <div style="padding:.5rem 1rem;font-size:.7rem;font-weight:600;color:#52525b;text-transform:uppercase;letter-spacing:.1em;margin-top:.5rem;">Matchmaking & Rankings</div>
+            <ul class="navbar-nav flex-column px-2 gap-1">
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'combattants' %}active{% endif %}" href="{{ path('app_combattant_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-person-running fa-fw"></i></span>
+                        <span class="nav-link-title">Combattants</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'matchmaking' %}active{% endif %}" href="{{ path('app_combat_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-swords fa-fw"></i></span>
+                        <span class="nav-link-title">Matchmaking IA</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'classements' %}active{% endif %}" href="{{ path('app_classement_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span>
+                        <span class="nav-link-title">Classements</span>
+                    </a>
+                </li>
+            </ul>
+
         <div class="p-3 border-top" style="border-color:#27272a!important">
             {% if app.user %}
                 <div style="font-size:.8rem;color:#71717a;margin-bottom:.5rem;">{{ app.user.fullName }}</div>
