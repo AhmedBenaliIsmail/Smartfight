@@ -1,50 +1,110 @@
 {% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Combattant{% endblock %}
+{% block title %}{{ combattant.nickname }} - SmartFight{% endblock %}
 
 {% block admin_content %}
-    <h1>Combattant</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ combattant.id }}</td>
-            </tr>
-            <tr>
-                <th>Nickname</th>
-                <td>{{ combattant.nickname }}</td>
-            </tr>
-            <tr>
-                <th>Nationalite</th>
-                <td>{{ combattant.nationalite }}</td>
-            </tr>
-            <tr>
-                <th>WeightClass</th>
-                <td>{{ combattant.weightClass }}</td>
-            </tr>
-            <tr>
-                <th>Wins</th>
-                <td>{{ combattant.wins }}</td>
-            </tr>
-            <tr>
-                <th>Losses</th>
-                <td>{{ combattant.losses }}</td>
-            </tr>
-            <tr>
-                <th>Draws</th>
-                <td>{{ combattant.draws }}</td>
-            </tr>
-            <tr>
-                <th>Discipline</th>
-                <td>{{ combattant.discipline }}</td>
-            </tr>
-        </tbody>
-    </table>
+{% set total = combattant.wins + combattant.losses + combattant.draws %}
+{% set winRate = total > 0 ? ((combattant.wins / total) * 100)|round(1) : 0 %}
 
-    <a href="{{ path('app_combattant_index') }}">back to list</a>
+<div style="margin-bottom: 24px;">
+    <h1 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">
+        👤 {{ combattant.nickname }}
+    </h1>
+    <div style="width: 50px; height: 3px; background: var(--primary); margin-bottom: 8px;"></div>
+    <p style="color: var(--text-muted); font-size: 0.85rem;">Profil du combattant</p>
+</div>
 
-    <a href="{{ path('app_combattant_edit', {'id': combattant.id}) }}">edit</a>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 900px;">
 
-    {{ include('combattant/_delete_form.html.twig') }}
+    {# Info Card #}
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-left: 3px solid var(--primary); border-radius: var(--radius-lg); padding: 24px;">
+        <h3 style="font-family: var(--font-heading); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--primary); margin-bottom: 20px;">
+            INFORMATIONS
+        </h3>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                <span style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;">ID</span>
+                <span style="color: var(--text-primary); font-weight: 600;">#{{ combattant.id }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                <span style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;">NICKNAME</span>
+                <span style="color: var(--text-primary); font-weight: 700; font-size: 1rem;">{{ combattant.nickname }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                <span style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;">NATIONALITÉ</span>
+                <span style="color: var(--text-primary); font-weight: 600;">{{ combattant.nationalite }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                <span style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;">WEIGHT CLASS</span>
+                <span style="background: var(--bg-surface-2); border: 1px solid var(--border-color); border-radius: 20px; padding: 3px 12px; font-size: 0.8rem; color: var(--text-primary);">
+                    {{ combattant.weightClass }}
+                </span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;">DISCIPLINE</span>
+                <span style="background: var(--primary); border-radius: 20px; padding: 3px 12px; font-size: 0.8rem; color: white; font-weight: 700;">
+                    {{ combattant.discipline }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    {# Stats Card #}
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-left: 3px solid var(--gold); border-radius: var(--radius-lg); padding: 24px;">
+        <h3 style="font-family: var(--font-heading); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px;">
+            STATISTIQUES
+        </h3>
+
+        {# Record #}
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+            <div style="background: rgba(34,197,94,0.1); border: 1px solid #22c55e; border-radius: var(--radius-md); padding: 16px; text-align: center;">
+                <div style="color: #22c55e; font-size: 2rem; font-weight: 900; font-family: var(--font-heading);">{{ combattant.wins }}</div>
+                <div style="color: #22c55e; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">WINS</div>
+            </div>
+            <div style="background: rgba(220,38,38,0.1); border: 1px solid var(--primary); border-radius: var(--radius-md); padding: 16px; text-align: center;">
+                <div style="color: var(--primary); font-size: 2rem; font-weight: 900; font-family: var(--font-heading);">{{ combattant.losses }}</div>
+                <div style="color: var(--primary); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">LOSSES</div>
+            </div>
+            <div style="background: rgba(201,162,39,0.1); border: 1px solid var(--gold); border-radius: var(--radius-md); padding: 16px; text-align: center;">
+                <div style="color: var(--gold); font-size: 2rem; font-weight: 900; font-family: var(--font-heading);">{{ combattant.draws }}</div>
+                <div style="color: var(--gold); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">DRAWS</div>
+            </div>
+        </div>
+
+        {# Win Rate #}
+        <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;">WIN RATE</span>
+                <span style="color: {{ winRate >= 70 ? '#22c55e' : (winRate >= 40 ? '#f59e0b' : 'var(--primary)') }}; font-weight: 700; font-size: 0.9rem;">{{ winRate }}%</span>
+            </div>
+            <div style="background: var(--bg-dark); border-radius: 99px; height: 8px; overflow: hidden;">
+                <div style="background: {{ winRate >= 70 ? '#22c55e' : (winRate >= 40 ? '#f59e0b' : 'var(--primary)') }}; width: {{ winRate }}%; height: 100%; border-radius: 99px; transition: width 0.5s ease;"></div>
+            </div>
+        </div>
+
+        {# Total #}
+        <div style="display: flex; justify-content: space-between; background: var(--bg-surface-2); border-radius: var(--radius-md); padding: 12px 16px;">
+            <span style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;">TOTAL COMBATS</span>
+            <span style="color: var(--text-primary); font-weight: 700; font-size: 1rem;">{{ total }}</span>
+        </div>
+    </div>
+</div>
+
+{# Actions #}
+<div style="display: flex; gap: 12px; margin-top: 24px; max-width: 900px;">
+    <a href="{{ path('app_combattant_edit', {'id': combattant.id}) }}"
+       style="background: var(--gold); color: black; border-radius: var(--radius-md); padding: 12px 24px; font-weight: 700; font-size: 0.9rem; text-decoration: none;">
+        <i class="fa-solid fa-pen"></i> MODIFIER
+    </a>
+    <a href="{{ path('app_combattant_index') }}"
+       style="background: var(--bg-surface-2); color: var(--text-muted); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px 24px; font-weight: 700; font-size: 0.9rem; text-decoration: none;">
+        <i class="fa-solid fa-arrow-left"></i> RETOUR
+    </a>
+    <div style="margin-left: auto;">
+        {{ include('combattant/_delete_form.html.twig') }}
+    </div>
+</div>
+
 {% endblock %}
