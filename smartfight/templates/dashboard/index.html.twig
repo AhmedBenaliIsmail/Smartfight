@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard - SmartFight{% endblock %}
+
+{% block body %}
+<div style="margin-bottom: 32px;">
+    <h1 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">
+        DASHBOARD
+    </h1>
+    <div style="width: 50px; height: 3px; background: var(--primary); margin-bottom: 8px;"></div>
+    <p style="color: var(--text-muted); font-size: 0.85rem;">Vue générale du système SmartFight</p>
+</div>
+
+{# Stats Cards #}
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px;">
+            <p style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;">Total Combattants</p>
+            <h2 style="color: var(--primary); font-size: 2rem; font-weight: 700;">{{ totalCombattants }}</h2>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

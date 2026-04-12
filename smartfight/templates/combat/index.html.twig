@@ -1,0 +1,160 @@
+{% extends 'base.html.twig' %}
+{% block title %}Matchmaking - SmartFight{% endblock %}
+
+{% block body %}
+<div style="margin-bottom: 24px;">
+    <h1 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">
+        ⚔️ MATCHMAKING
+    </h1>
+    <div style="width: 50px; height: 3px; background: var(--primary); margin-bottom: 8px;"></div>
+    <p style="color: var(--text-muted); font-size: 0.85rem;">GÉNÉRATION AUTOMATIQUE DES COMBATS — IA</p>
+</div>
+
+{# Action Bar #}
+<form method="POST" id="generateForm">
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+        <label style="color: var(--text-muted); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;">MATCHS :</label>
+        <input type="number" name="max" value="{{ max }}" min="1" max="50"
+               style="width: 80px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 8px 12px; color: var(--text-primary); font-size: 0.9rem; font-weight: 700;">
+        <button type="submit" style="background: var(--primary); color: white; border: none; border-radius: var(--radius-md); padding: 10px 20px; font-weight: 700; cursor: pointer; font-size: 0.85rem;">
+            ⚡ GÉNÉRER TOUS LES MATCHS
+        </button>
+        <button type="button" onclick="clearMatches()" style="background: var(--bg-surface-2); color: var(--text-muted); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 10px 20px; font-weight: 700; cursor: pointer; font-size: 0.85rem;">
+            EFFACER
+        </button>
+        <span style="margin-left: auto; color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">
+            {{ matches|length }} MATCHS GÉNÉRÉS
+        </span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 320px 1fr; gap: 20px;">
+
+        {# LEFT PANEL - AI #}
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-left: 3px solid var(--primary); border-radius: var(--radius-lg); padding: 20px;">
+            <h3 style="font-family: var(--font-heading); font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">
+                TROUVER MEILLEUR ADVERSAIRE
+            </h3>
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 16px;">
+                L'IA analyse les stats pour proposer le match le plus équilibré.
+            </p>
+            <div style="height: 1px; background: var(--border-color); margin-bottom: 16px;"></div>
+
+            <label style="display: block; color: var(--text-muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">
+                SÉLECTIONNER UN COMBATTANT
+            </label>
+            <select name="combattant_id" id="combattantSelect"
+                    style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 10px 14px; color: var(--text-primary); font-size: 0.85rem; margin-bottom: 12px;">
+                <option value="">-- Choisir --</option>
+                {% for c in combattants %}
+                <option value="{{ c.id }}" {{ selectedCombattant and selectedCombattant.id == c.id ? 'selected' : '' }}>
+                    {{ c.nickname }} ({{ c.wins }}-{{ c.losses }}-{{ c.draws }})
+                </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" name="find_opponent" value="1"
+                    style="width: 100%; background: white; color: black; border: none; border-radius: var(--radius-md); padding: 12px; font-weight: 700; cursor: pointer; font-size: 0.85rem; letter-spacing: 0.05em;">
+                🔍 TROUVER LE MEILLEUR ADVERSAIRE
+            </button>
+
+            {# Best Opponent Result #}
+            {% if bestOpponent %}
+            <div style="margin-top: 16px; background: rgba(220,38,38,0.05); border: 1px solid var(--primary); border-left: 3px solid var(--primary); border-radius: var(--radius-md); padding: 16px;">
+                <p style="color: var(--primary); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px;">
+                    MEILLEUR ADVERSAIRE TROUVÉ
+                </p>
+                <p style="color: var(--text-primary); font-size: 0.85rem; line-height: 1.8;">
+                    <strong>Adversaire :</strong> {{ bestOpponent.combattant.nickname }}<br>
+                    <strong>Record :</strong> {{ bestOpponent.combattant.wins }}-{{ bestOpponent.combattant.losses }}-{{ bestOpponent.combattant.draws }}<br>
+                    <strong>Win Rate :</strong>
+                    {% set t = bestOpponent.combattant.wins + bestOpponent.combattant.losses + bestOpponent.combattant.draws %}
+                    {{ t > 0 ? ((bestOpponent.combattant.wins / t) * 100)|round(1) : 0 }}%<br>
+                    <strong>Expérience :</strong> {{ t }} combats<br><br>
+                    <strong>Score IA :</strong>
+                    <span style="color: {{ bestOpponent.score >= 85 ? '#22c55e' : (bestOpponent.score >= 70 ? '#f59e0b' : 'var(--primary)') }}; font-weight: 700;">
+                        {{ bestOpponent.score }} / 100
+                    </span><br>
+                    <strong>Qualité :</strong> {{ bestOpponent.qualite }}
+                </p>
+            </div>
+            {% endif %}
+        </div>
+
+        {# RIGHT PANEL - Table + Analyse #}
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+
+            {# Matches Table #}
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden;">
+                <table class="table table-dark table-hover mb-0">
+                    <thead style="background: var(--primary);">
+                        <tr>
+                            <th style="color: white; font-size: 0.7rem; letter-spacing: 0.1em;">COMBATTANT 1</th>
+                            <th style="color: white; font-size: 0.7rem; letter-spacing: 0.1em; text-align:center;">RECORD</th>
+                            <th style="color: white; font-size: 0.7rem; letter-spacing: 0.1em; text-align:center;">VS</th>
+                            <th style="color: white; font-size: 0.7rem; letter-spacing: 0.1em;">COMBATTANT 2</th>
+                            <th style="color: white; font-size: 0.7rem; letter-spacing: 0.1em; text-align:center;">RECORD</th>
+                            <th style="color: white; font-size: 0.7rem; letter-spacing: 0.1em; text-align:center;">SCORE IA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for match in matches %}
+                        <tr style="cursor: pointer;" onclick="showAnalyse({{ loop.index0 }})" id="row-{{ loop.index0 }}">
+                            <td style="font-weight: 700;">{{ match.combattant1.nickname }}</td>
+                            <td style="text-align:center; color: var(--text-muted);">{{ match.combattant1.wins }}-{{ match.combattant1.losses }}-{{ match.combattant1.draws }}</td>
+                            <td style="text-align:center; color: var(--primary); font-weight: 900; font-family: var(--font-heading);">VS</td>
+                            <td style="font-weight: 700;">{{ match.combattant2.nickname }}</td>
+                            <td style="text-align:center; color: var(--text-muted);">{{ match.combattant2.wins }}-{{ match.combattant2.losses }}-{{ match.combattant2.draws }}</td>
+                            <td style="text-align:center;">
+                                <span style="background: {{ match.score >= 85 ? '#22c55e' : (match.score >= 70 ? '#f59e0b' : 'var(--primary)') }}; color: {{ match.score >= 70 ? 'black' : 'white' }}; padding: 4px 12px; border-radius: 4px; font-weight: 800; font-size: 0.85rem;">
+                                    {{ match.score }}/100
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                                Cliquez sur "GÉNÉRER TOUS LES MATCHS" pour commencer.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {# Analyse Panel #}
+            <div style="background: var(--bg-dark); border: 1px solid var(--border-color); border-top: 2px solid var(--primary); border-radius: var(--radius-lg); padding: 16px; min-height: 160px;">
+                <p style="color: var(--primary); font-size: 0.75rem; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 12px;">
+                    ANALYSE DU MATCH SÉLECTIONNÉ
+                </p>
+                <pre id="analyseText" style="color: var(--text-muted); font-size: 0.8rem; font-family: 'Courier New', monospace; white-space: pre-wrap; margin: 0;">
+                    {% if bestOpponent %}{{ bestOpponent.analyse }}{% else %}Sélectionnez un match pour voir l'analyse...{% endif %}
+                </pre>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% block javascripts %}
+<script>
+const analyses = {
+    {% for match in matches %}
+    {{ loop.index0 }}: `{{ match.analyse|e('js') }}`,
+    {% endfor %}
+};
+
+function showAnalyse(index) {
+    document.querySelectorAll('tbody tr').forEach(r => r.style.background = '');
+    const row = document.getElementById('row-' + index);
+    if (row) row.style.background = 'rgba(220,38,38,0.1)';
+    document.getElementById('analyseText').textContent = analyses[index] || '';
+}
+
+function clearMatches() {
+    if (confirm('Effacer tous les matchs ?')) {
+        window.location.href = '{{ path("app_combat_index") }}';
+    }
+}
+</script>
+{% endblock %}
+
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Combattant{% endblock %}
+
+{% block body %}
+    <h1>Combattant</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ combattant.id }}</td>
+            </tr>
+            <tr>
+                <th>Nickname</th>
+                <td>{{ combattant.nickname }}</td>
+            </tr>
+            <tr>
+                <th>Nationalite</th>
+                <td>{{ combattant.nationalite }}</td>
+            </tr>
+            <tr>
+                <th>WeightClass</th>
+                <td>{{ combattant.weightClass }}</td>
+            </tr>
+            <tr>
+                <th>Wins</th>
+                <td>{{ combattant.wins }}</td>
+            </tr>
+            <tr>
+                <th>Losses</th>
+                <td>{{ combattant.losses }}</td>
+            </tr>
+            <tr>
+                <th>Draws</th>
+                <td>{{ combattant.draws }}</td>
+            </tr>
+            <tr>
+                <th>Discipline</th>
+                <td>{{ combattant.discipline }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_combattant_index') }}">back to list</a>
+
+    <a href="{{ path('app_combattant_edit', {'id': combattant.id}) }}">edit</a>
+
+    {{ include('combattant/_delete_form.html.twig') }}
+{% endblock %}

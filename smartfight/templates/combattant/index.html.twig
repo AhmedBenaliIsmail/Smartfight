@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Combattants - SmartFight{% endblock %}
+
+{% block body %}
+<div style="margin-bottom: 32px;">
+    <h1 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">
+        COMBATTANTS
+    </h1>
+    <div style="width: 50px; height: 3px; background: var(--primary); margin-bottom: 8px;"></div>
+    <p style="color: var(--text-muted); font-size: 0.85rem;">Gestion et visualisation des combattants</p>
+</div>
+
+{# Actions #}
+<div style="margin-bottom: 24px; display: flex; gap: 12px; align-items: center;">
+    <a href="{{ path('app_combattant_new') }}" class="btn btn-sf-primary">
+        <i class="fa-solid fa-plus"></i> + AJOUTER
+    </a>
+    <span style="color: var(--text-muted); font-size: 0.85rem; margin-left: auto;">
+        TOTAL : {{ combattants|length }} COMBATTANTS
+    </span>
+</div>
+
+{# Table #}
+<div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden;">
+    <table class="table table-dark table-hover mb-0">
+        <thead style="background: var(--primary);">
+            <tr>
+                <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em;">#</th>
+                <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em;">NICKNAME</th>
+                <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em;">NATIONALITÉ</th>
+                <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em;">WEIGHT CLASS</th>
+                <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em;">RECORD (W-L-D)</th>
+                <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em;">WIN RATE</th>
+                <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em;">COMBATS</th>
+                <th style="color: white; font-size: 0.75rem; letter-spacing: 0.1em;">ACTIONS</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for combattant in combattants %}
+            {% set total = combattant.wins + combattant.losses + combattant.draws %}
+            {% set winRate = total > 0 ? ((combattant.wins / total) * 100)|round(1) : 0 %}
+            <tr style="border-color: var(--border-color);">
+                <td style="color: var(--text-muted);">{{ loop.index }}</td>
+                <td style="font-weight: 700; color: var(--text-primary);">{{ combattant.nickname }}</td>
+                <td style="color: var(--text-muted);">{{ combattant.nationalite }}</td>
+                <td style="color: var(--text-muted);">{{ combattant.weightClass }}</td>
+                <td style="color: var(--text-primary);">{{ combattant.wins }}-{{ combattant.losses }}-{{ combattant.draws }}</td>
+                <td>
+                    <span style="color: {{ winRate >= 70 ? '#22c55e' : (winRate >= 40 ? '#f59e0b' : '#ef4444') }}; font-weight: 700;">
+                        {{ winRate }}%
+                    </span>
+                </td>
+                <td style="color: var(--text-muted);">{{ total }}</td>
+                <td>
+                    <a href="{{ path('app_combattant_show', {id: combattant.id}) }}" 
+                       style="color: var(--text-muted); margin-right: 8px;">
+                        <i class="fa-solid fa-eye"></i>
+                    </a>
+                    <a href="{{ path('app_combattant_edit', {id: combattant.id}) }}" 
+                       style="color: var(--gold); margin-right: 8px;">
+                        <i class="fa-solid fa-pen"></i>
+                    </a>
+                    <form method="post" action="{{ path('app_combattant_delete', {id: combattant.id}) }}" style="display:inline">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete'~combattant.id) }}">
+                        <button type="submit" style="background: none; border: none; color: var(--primary); cursor: pointer;"
+                                onclick="return confirm('Supprimer ce combattant ?')">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                    Aucun combattant trouvé.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
