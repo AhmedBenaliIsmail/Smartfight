@@ -60,5 +60,7 @@ class Event
     public function getVisibility(): string { return $this->visibility; }
     public function getCapacity(): int { return $this->capacity; }
     public function getDiscipline(): ?Discipline { return $this->discipline; }
+    public function getVenueId(): ?int { return $this->venueId; }
+    public function getOrganizerId(): ?int { return $this->organizerId; }
     public function __toString(): string { return $this->name; }
 }

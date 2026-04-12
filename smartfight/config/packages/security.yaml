@@ -27,6 +27,7 @@ security:
 
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/booking, roles: ROLE_FAN }
         - { path: ^/predictions/submit, roles: ROLE_FAN }
         - { path: ^/notifications/mark, roles: ROLE_FAN }
 

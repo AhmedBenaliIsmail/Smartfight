@@ -22,4 +22,16 @@ class EventRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findBookableEvents(): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.status = :status')
+            ->andWhere('e.visibility = :visibility')
+            ->setParameter('status', 'SCHEDULED')
+            ->setParameter('visibility', 'PUBLIC')
+            ->orderBy('e.startDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
