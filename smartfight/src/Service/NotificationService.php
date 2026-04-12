@@ -37,7 +37,7 @@ class NotificationService
 
     public function broadcast(string $audience, string $type, string $title, string $message): int
     {
-        $fans = $this->userRepo->findFans();
+        $fans = $this->userRepo->findFansByAudience($audience);
 
         $count = 0;
         foreach ($fans as $fan) {

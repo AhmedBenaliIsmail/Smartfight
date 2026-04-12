@@ -55,6 +55,20 @@ class FanNotificationRepository extends ServiceEntityRepository
             ->execute();
     }
 
+    public function markReadForFan(int $notificationId, int $fanId): int
+    {
+        return (int) $this->createQueryBuilder('n')
+            ->update()
+            ->set('n.isRead', 'true')
+            ->where('n.id = :notificationId')
+            ->andWhere('n.fan = :fanId')
+            ->andWhere('n.isRead = false')
+            ->setParameter('notificationId', $notificationId)
+            ->setParameter('fanId', $fanId)
+            ->getQuery()
+            ->execute();
+    }
+
     public function countUnreadForFan(int $fanId): int
     {
         return (int) $this->createQueryBuilder('n')
@@ -64,6 +78,17 @@ class FanNotificationRepository extends ServiceEntityRepository
             ->setParameter('fanId', $fanId)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    public function findLatestForFan(int $fanId): ?FanNotification
+    {
+        return $this->createQueryBuilder('n')
+            ->where('n.fan = :fanId')
+            ->setParameter('fanId', $fanId)
+            ->orderBy('n.createdAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     public function getAdminStats(): array

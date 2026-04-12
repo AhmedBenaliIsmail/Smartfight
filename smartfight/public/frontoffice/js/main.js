@@ -256,6 +256,129 @@ function initNotifications() {
 }
 
 /* ============================================================
+   LIVE NOTIFICATION INDICATOR (POLLING)
+   ============================================================ */
+
+function initNotificationLiveIndicator() {
+  const bellLink = document.querySelector('[data-notif-bell="true"]');
+  if (!bellLink) return;
+
+  const snapshotUrl = bellLink.getAttribute('data-notif-snapshot-url');
+  if (!snapshotUrl) return;
+
+  const badge = bellLink.querySelector('.notif-badge-count');
+  const toastWrapId = 'sfNotifToastWrap';
+  const seenKey = 'sf:last-notification-id';
+  let timerId = null;
+
+  function setBadgeCount(count) {
+    if (!badge) return;
+    const safeCount = Number.isFinite(count) ? count : 0;
+    badge.textContent = String(safeCount);
+    badge.classList.toggle('is-hidden', safeCount <= 0);
+  }
+
+  function triggerBellWave() {
+    bellLink.classList.remove('notif-bell-wave');
+    void bellLink.offsetWidth;
+    bellLink.classList.add('notif-bell-wave');
+  }
+
+  function getOrCreateToastWrap() {
+    let wrap = document.getElementById(toastWrapId);
+    if (wrap) return wrap;
+
+    wrap = document.createElement('div');
+    wrap.id = toastWrapId;
+    wrap.className = 'sf-notif-toast-wrap';
+    wrap.setAttribute('aria-live', 'polite');
+    wrap.setAttribute('aria-atomic', 'true');
+    document.body.appendChild(wrap);
+    return wrap;
+  }
+
+  function iconForType(type) {
+    if (type === 'NEW_EVENT') return 'fa-calendar-days';
+    if (type === 'PREDICTION_SCORED') return 'fa-trophy';
+    if (type === 'ADMIN_BROADCAST') return 'fa-bullhorn';
+    return 'fa-bell';
+  }
+
+  function showToast(latest) {
+    const wrap = getOrCreateToastWrap();
+    const toast = document.createElement('button');
+    toast.type = 'button';
+    toast.className = 'sf-notif-toast';
+    toast.innerHTML = `
+      <span class="sf-notif-toast-icon"><i class="fa-solid ${iconForType(latest.type)}"></i></span>
+      <span class="sf-notif-toast-body">
+        <span class="sf-notif-toast-kicker">New notification</span>
+        <span class="sf-notif-toast-title">${latest.title}</span>
+      </span>
+      <span class="sf-notif-toast-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+    `;
+
+    toast.addEventListener('click', function () {
+      window.location.href = bellLink.getAttribute('href') || '/notifications';
+    });
+
+    wrap.appendChild(toast);
+    window.setTimeout(function () {
+      toast.classList.add('is-leaving');
+      window.setTimeout(function () {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 220);
+    }, 6000);
+  }
+
+  function scheduleNextPoll() {
+    if (timerId) window.clearTimeout(timerId);
+    const interval = document.hidden ? 60000 : 15000;
+    timerId = window.setTimeout(fetchSnapshot, interval);
+  }
+
+  function applySnapshot(data) {
+    if (!data || typeof data !== 'object') return;
+
+    setBadgeCount(Number(data.unreadCount || 0));
+    if (!data.latest || !data.latest.id) return;
+
+    const latestId = String(data.latest.id);
+    const seenId = sessionStorage.getItem(seenKey);
+
+    if (!seenId) {
+      sessionStorage.setItem(seenKey, latestId);
+      return;
+    }
+
+    if (seenId !== latestId) {
+      sessionStorage.setItem(seenKey, latestId);
+      triggerBellWave();
+      showToast(data.latest);
+    }
+  }
+
+  function fetchSnapshot() {
+    fetch(snapshotUrl, {
+      method: 'GET',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error('Snapshot request failed');
+        return res.json();
+      })
+      .then(applySnapshot)
+      .catch(function () {
+        // Keep quiet to avoid noisy logs for visitors without access.
+      })
+      .finally(scheduleNextPoll);
+  }
+
+  document.addEventListener('visibilitychange', scheduleNextPoll);
+  fetchSnapshot();
+}
+
+/* ============================================================
    GALLERY LIGHTBOX (simple)
    ============================================================ */
 
@@ -419,6 +542,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initPredictions();
   initReactions();
   initNotifications();
+  initNotificationLiveIndicator();
   initGallery();
   initBooking();
   initSmoothScroll();

@@ -13,6 +13,7 @@
             </div>
             {% if unreadCount > 0 %}
             <form method="POST" action="{{ path('front_notification_mark_all_read') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('mark_all_read') }}">
                 <button type="submit" class="btn btn-outline-secondary">
                     <i class="fa-solid fa-check-double me-2"></i>Mark All Read
                 </button>
@@ -38,9 +39,19 @@
                         {{ notif.typeIcon }}
                     </div>
                     <div class="flex-grow-1">
-                        <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
                             <h6 style="color:{% if not notif.isRead %}#fff{% else %}#a1a1aa{% endif %};margin:0;">{{ notif.title }}</h6>
-                            <span style="color:#52525b;font-size:.75rem;">{{ notif.createdAt|date('d M Y, H:i') }}</span>
+                            <div class="d-flex flex-column align-items-end gap-1">
+                                <span style="color:#52525b;font-size:.75rem;">{{ notif.createdAt|date('d M Y, H:i') }}</span>
+                                {% if not notif.isRead %}
+                                    <form method="POST" action="{{ path('front_notification_mark_read', {id: notif.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('mark_read_' ~ notif.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary" style="font-size:.68rem;line-height:1;padding:4px 8px;">
+                                            Mark read
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
                         </div>
                         <p style="color:#71717a;margin:.25rem 0 0;font-size:.875rem;">{{ notif.message }}</p>
                         {% if not notif.isRead %}

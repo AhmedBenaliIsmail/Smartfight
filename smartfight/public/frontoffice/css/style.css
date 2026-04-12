@@ -1534,6 +1534,146 @@ ul {
   margin-top: 6px;
 }
 
+.notif-bell-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notif-badge-count {
+  position: absolute;
+  top: 6px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.45);
+}
+
+.notif-badge-count.is-hidden {
+  display: none;
+}
+
+@keyframes notif-bell-wave {
+  0% { transform: rotate(0deg); }
+  20% { transform: rotate(-16deg); }
+  45% { transform: rotate(14deg); }
+  70% { transform: rotate(-9deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.notif-bell-wave i {
+  transform-origin: top center;
+  animation: notif-bell-wave 620ms ease;
+}
+
+.sf-notif-toast-wrap {
+  position: fixed;
+  top: 88px;
+  right: 18px;
+  z-index: 1080;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(360px, calc(100vw - 24px));
+}
+
+.sf-notif-toast {
+  border: 1px solid var(--border-color);
+  background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-surface-2) 100%);
+  color: var(--text-primary);
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transform: translateY(-6px);
+  opacity: 0;
+  animation: sf-toast-enter 180ms ease forwards;
+}
+
+.sf-notif-toast:hover {
+  border-color: var(--primary);
+}
+
+.sf-notif-toast.is-leaving {
+  animation: sf-toast-leave 220ms ease forwards;
+}
+
+.sf-notif-toast-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sf-notif-toast-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.sf-notif-toast-kicker {
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sf-notif-toast-title {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sf-notif-toast-arrow {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+@keyframes sf-toast-enter {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes sf-toast-leave {
+  to {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notif-bell-wave i,
+  .sf-notif-toast,
+  .sf-notif-toast.is-leaving {
+    animation: none;
+  }
+}
+
 /* ============================================================
    LIVE STREAM / REACTIONS
    ============================================================ */
