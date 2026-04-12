@@ -1,0 +1,131 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}{{ is_edit ? 'Edit Fight Result' : 'New Fight Result' }} - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sf-result-form .card {
+        border-radius: 12px;
+    }
+
+    .sf-result-form .form-section {
+        border: 1px solid var(--tblr-border-color, #27272a);
+        border-radius: 10px;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.01);
+    }
+
+    .sf-result-form .form-section-title {
+        font-size: 0.8rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--tblr-muted, #a1a1aa);
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+    }
+
+    .sf-result-form .btn-toolbar {
+        border-top: 1px solid var(--tblr-border-color, #27272a);
+        padding-top: 1rem;
+    }
+
+    .sf-result-form .card-body input[type="text"],
+    .sf-result-form .card-body input[type="number"],
+    .sf-result-form .card-body input[type="date"],
+    .sf-result-form .card-body input[type="time"],
+    .sf-result-form .card-body textarea,
+    .sf-result-form .card-body select {
+        background: linear-gradient(180deg, #141824 0%, #10141e 100%) !important;
+        border: 1px solid #2d3446 !important;
+        border-radius: 10px !important;
+        color: #f3f4f6 !important;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+
+    .sf-result-form .card-body input[type="text"]::placeholder,
+    .sf-result-form .card-body input[type="number"]::placeholder,
+    .sf-result-form .card-body textarea::placeholder {
+        color: #8b95aa !important;
+        opacity: 1;
+    }
+
+    .sf-result-form .card-body input[type="text"]:focus,
+    .sf-result-form .card-body input[type="number"]:focus,
+    .sf-result-form .card-body input[type="date"]:focus,
+    .sf-result-form .card-body input[type="time"]:focus,
+    .sf-result-form .card-body textarea:focus,
+    .sf-result-form .card-body select:focus {
+        background: #131827 !important;
+        border-color: #45506a !important;
+        box-shadow: 0 0 0 0.2rem rgba(69, 80, 106, 0.2) !important;
+    }
+
+    .sf-result-form .card-body select {
+        color-scheme: dark;
+    }
+
+    .sf-result-form .card-body select option {
+        background: #0f131d;
+        color: #f3f4f6;
+    }
+
+    .sf-result-form .alert.alert-info {
+        background: #111827;
+        border-color: #2d3446;
+        color: #b9c3d8;
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="sf-result-form">
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0">{{ is_edit ? 'Edit Fight Result' : 'Fight Result Wizard - Step 1' }}</h1>
+    <a href="{{ path('admin_result_index') }}" class="btn btn-outline-secondary">Back</a>
+</div>
+
+{% if is_wizard|default(false) %}
+    <div class="alert alert-info">After saving, you will be redirected to the statistics wizard for both fighters.</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-body">
+        {{ form_start(form) }}
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="form-section">
+                    <div class="form-section-title">Fight Setup</div>
+                    <div class="row g-3">
+                        <div class="col-lg-6">{{ form_row(form.event) }}</div>
+                        <div class="col-lg-3 col-md-6">{{ form_row(form.fightNumber) }}</div>
+                        <div class="col-lg-3 col-md-6">{{ form_row(form.fightDate) }}</div>
+                        <div class="col-lg-6">{{ form_row(form.fighterRed) }}</div>
+                        <div class="col-lg-6">{{ form_row(form.fighterBlue) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-section">
+                    <div class="form-section-title">Outcome</div>
+                    <div class="row g-3">
+                        <div class="col-lg-4 col-md-6">{{ form_row(form.winner) }}</div>
+                        <div class="col-lg-4 col-md-6">{{ form_row(form.status) }}</div>
+                        <div class="col-lg-4 col-md-6">{{ form_row(form.method) }}</div>
+                        <div class="col-lg-3 col-md-6">{{ form_row(form.roundEnded) }}</div>
+                        <div class="col-lg-3 col-md-6">{{ form_row(form.timeEnded) }}</div>
+                        <div class="col-12">{{ form_row(form.notes) }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2 btn-toolbar">
+            <button class="btn btn-danger" type="submit">{{ is_edit ? 'Update Result' : 'Save & Continue' }}</button>
+            <a href="{{ path('admin_result_index') }}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+</div>
+{% endblock %}

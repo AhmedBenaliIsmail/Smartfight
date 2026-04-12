@@ -67,6 +67,46 @@
                 </li>
             </ul>
 
+            <div style="padding:.5rem 1rem;font-size:.7rem;font-weight:600;color:#52525b;text-transform:uppercase;letter-spacing:.1em;margin-top:.5rem;">ELO &amp; Analytics</div>
+            <ul class="navbar-nav flex-column px-2 gap-1">
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'events' %}active{% endif %}" href="{{ path('admin_event_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span>
+                        <span class="nav-link-title">Events</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'fighters' %}active{% endif %}" href="{{ path('admin_fighter_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-user-ninja fa-fw"></i></span>
+                        <span class="nav-link-title">Fighters</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'results' %}active{% endif %}" href="{{ path('admin_result_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-list-check fa-fw"></i></span>
+                        <span class="nav-link-title">Fight Results</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'stats' %}active{% endif %}" href="{{ path('admin_statistic_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-chart-column fa-fw"></i></span>
+                        <span class="nav-link-title">Statistics</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'performance' %}active{% endif %}" href="{{ path('admin_performance_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-gauge-high fa-fw"></i></span>
+                        <span class="nav-link-title">Performance</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'rankings' %}active{% endif %}" href="{{ path('admin_ranking_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-ranking-star fa-fw"></i></span>
+                        <span class="nav-link-title">Rankings</span>
+                    </a>
+                </li>
+            </ul>
+
         <div class="p-3 border-top" style="border-color:#27272a!important">
             {% if app.user %}
                 <div style="font-size:.8rem;color:#71717a;margin-bottom:.5rem;">{{ app.user.fullName }}</div>

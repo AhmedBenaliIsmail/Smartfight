@@ -1,0 +1,132 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}{{ is_edit ? 'Edit Event' : 'New Event' }} - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sf-event-form .card {
+        border-radius: 12px;
+    }
+
+    .sf-event-form .form-section {
+        border: 1px solid var(--tblr-border-color, #27272a);
+        border-radius: 10px;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.01);
+    }
+
+    .sf-event-form .form-section-title {
+        font-size: 0.8rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--tblr-muted, #a1a1aa);
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+    }
+
+    .sf-event-form .form-check {
+        min-height: 2.4rem;
+        display: flex;
+        align-items: center;
+        padding-left: 1.9rem;
+        margin-top: 0.25rem;
+    }
+
+    .sf-event-form .form-check-input {
+        margin-top: 0;
+    }
+
+    .sf-event-form .btn-toolbar {
+        border-top: 1px solid var(--tblr-border-color, #27272a);
+        padding-top: 1rem;
+    }
+
+    .sf-event-form .card-body input[type="text"],
+    .sf-event-form .card-body input[type="number"],
+    .sf-event-form .card-body input[type="date"],
+    .sf-event-form .card-body textarea,
+    .sf-event-form .card-body select {
+        background: linear-gradient(180deg, #141824 0%, #10141e 100%) !important;
+        border: 1px solid #2d3446 !important;
+        border-radius: 10px !important;
+        color: #f3f4f6 !important;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+
+    .sf-event-form .card-body input[type="text"]::placeholder,
+    .sf-event-form .card-body input[type="number"]::placeholder,
+    .sf-event-form .card-body textarea::placeholder {
+        color: #8b95aa !important;
+        opacity: 1;
+    }
+
+    .sf-event-form .card-body input[type="text"]:focus,
+    .sf-event-form .card-body input[type="number"]:focus,
+    .sf-event-form .card-body input[type="date"]:focus,
+    .sf-event-form .card-body textarea:focus,
+    .sf-event-form .card-body select:focus {
+        background: #131827 !important;
+        border-color: #45506a !important;
+        box-shadow: 0 0 0 0.2rem rgba(69, 80, 106, 0.2) !important;
+    }
+
+    .sf-event-form .card-body select {
+        color-scheme: dark;
+    }
+
+    .sf-event-form .card-body select option {
+        background: #0f131d;
+        color: #f3f4f6;
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="sf-event-form">
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0">{{ is_edit ? 'Edit Event' : 'Create Event' }}</h1>
+    <a href="{{ path('admin_event_index') }}" class="btn btn-outline-secondary">Back</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {{ form_start(form) }}
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="form-section">
+                    <div class="form-section-title">General</div>
+                    <div class="row g-3">
+                        <div class="col-lg-6">{{ form_row(form.name) }}</div>
+                        <div class="col-lg-3 col-md-6">{{ form_row(form.status) }}</div>
+                        <div class="col-lg-3 col-md-6">{{ form_row(form.visibility) }}</div>
+                        <div class="col-12">{{ form_row(form.description) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-section">
+                    <div class="form-section-title">Schedule And Venue</div>
+                    <div class="row g-3">
+                        <div class="col-lg-3 col-md-6">{{ form_row(form.startDate) }}</div>
+                        <div class="col-lg-3 col-md-6">{{ form_row(form.endDate) }}</div>
+                        <div class="col-lg-3 col-md-6">{{ form_row(form.capacity) }}</div>
+                        <div class="col-lg-3 col-md-6">{{ form_row(form.location) }}</div>
+                        <div class="col-lg-4 col-md-6">{{ form_row(form.discipline) }}</div>
+                        <div class="col-lg-4 col-md-6">{{ form_row(form.venueId) }}</div>
+                        <div class="col-lg-4 col-md-6">{{ form_row(form.organizerId) }}</div>
+                        <div class="col-12">{{ form_row(form.isChampionsEvent) }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2 btn-toolbar">
+            <button class="btn btn-danger" type="submit">{{ is_edit ? 'Update Event' : 'Create Event' }}</button>
+            <a href="{{ path('admin_event_index') }}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+</div>
+{% endblock %}

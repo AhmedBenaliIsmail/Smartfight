@@ -1,0 +1,40 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Rankings - Admin{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0">Rankings</h1>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-vcenter card-table">
+            <thead>
+            <tr>
+                <th>Season</th>
+                <th>Weight Class</th>
+                <th>Position</th>
+                <th>Points</th>
+                <th>Fighter</th>
+                <th>Fighter ID</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for ranking in rankings %}
+                <tr>
+                    <td>{{ ranking.season }}</td>
+                    <td>{{ ranking.weightClass }}</td>
+                    <td>#{{ ranking.rankPosition }}</td>
+                    <td>{{ ranking.points|number_format(2, '.', ',') }}</td>
+                    <td>{{ fightersById[ranking.fighterId] is defined ? fightersById[ranking.fighterId].displayName : 'Unknown' }}</td>
+                    <td>{{ ranking.fighterId }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6" class="text-muted">No ranking entries found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

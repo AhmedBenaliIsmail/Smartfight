@@ -1,0 +1,115 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}{{ is_edit ? 'Edit Statistic' : 'New Statistic' }} - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sf-stat-form .card {
+        border-radius: 12px;
+    }
+
+    .sf-stat-form .form-section {
+        border: 1px solid var(--tblr-border-color, #27272a);
+        border-radius: 10px;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.01);
+    }
+
+    .sf-stat-form .form-section-title {
+        font-size: 0.8rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--tblr-muted, #a1a1aa);
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+    }
+
+    .sf-stat-form .btn-toolbar {
+        border-top: 1px solid var(--tblr-border-color, #27272a);
+        padding-top: 1rem;
+    }
+
+    .sf-stat-form .card-body input[type="text"],
+    .sf-stat-form .card-body input[type="number"],
+    .sf-stat-form .card-body textarea,
+    .sf-stat-form .card-body select {
+        background: linear-gradient(180deg, #141824 0%, #10141e 100%) !important;
+        border: 1px solid #2d3446 !important;
+        border-radius: 10px !important;
+        color: #f3f4f6 !important;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+
+    .sf-stat-form .card-body input[type="text"]::placeholder,
+    .sf-stat-form .card-body input[type="number"]::placeholder,
+    .sf-stat-form .card-body textarea::placeholder {
+        color: #8b95aa !important;
+        opacity: 1;
+    }
+
+    .sf-stat-form .card-body input[type="text"]:focus,
+    .sf-stat-form .card-body input[type="number"]:focus,
+    .sf-stat-form .card-body textarea:focus,
+    .sf-stat-form .card-body select:focus {
+        background: #131827 !important;
+        border-color: #45506a !important;
+        box-shadow: 0 0 0 0.2rem rgba(69, 80, 106, 0.2) !important;
+    }
+
+    .sf-stat-form .card-body select {
+        color-scheme: dark;
+    }
+
+    .sf-stat-form .card-body select option {
+        background: #0f131d;
+        color: #f3f4f6;
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="sf-stat-form">
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0">{{ is_edit ? 'Edit Fight Statistic' : 'Create Fight Statistic' }}</h1>
+    <a href="{{ path('admin_statistic_index') }}" class="btn btn-outline-secondary">Back</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {{ form_start(form) }}
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="form-section">
+                    <div class="form-section-title">Selection</div>
+                    <div class="row g-3">
+                        <div class="col-lg-6">{{ form_row(form.fightResultId) }}</div>
+                        <div class="col-lg-6">{{ form_row(form.fighterId) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-section">
+                    <div class="form-section-title">Performance Metrics</div>
+                    <div class="row g-3">
+                        <div class="col-lg-3 col-md-6">{{ form_row(form.strikesLanded) }}</div>
+                        <div class="col-lg-3 col-md-6">{{ form_row(form.strikesAttempted) }}</div>
+                        <div class="col-lg-3 col-md-6">{{ form_row(form.takedownsLanded) }}</div>
+                        <div class="col-lg-3 col-md-6">{{ form_row(form.takedownsAttempted) }}</div>
+                        <div class="col-lg-3 col-md-6">{{ form_row(form.submissionAttempts) }}</div>
+                        <div class="col-lg-3 col-md-6">{{ form_row(form.knockdowns) }}</div>
+                        <div class="col-lg-3 col-md-6">{{ form_row(form.controlTimeSeconds) }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2 btn-toolbar">
+            <button class="btn btn-danger" type="submit">{{ is_edit ? 'Update Statistic' : 'Create Statistic' }}</button>
+            <a href="{{ path('admin_statistic_index') }}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+</div>
+{% endblock %}

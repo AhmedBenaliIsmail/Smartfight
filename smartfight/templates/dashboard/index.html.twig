@@ -19,6 +19,24 @@
             <h2 style="color: var(--primary); font-size: 2rem; font-weight: 700;">{{ totalCombattants }}</h2>
         </div>
     </div>
+    <div class="col-md-3">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px;">
+            <p style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;">Total Fighters</p>
+            <h2 style="color: var(--primary); font-size: 2rem; font-weight: 700;">{{ totalFighters|default(0) }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px;">
+            <p style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;">Total Events</p>
+            <h2 style="color: var(--primary); font-size: 2rem; font-weight: 700;">{{ totalEvents|default(0) }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px;">
+            <p style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;">Total Results</p>
+            <h2 style="color: var(--primary); font-size: 2rem; font-weight: 700;">{{ totalResults|default(0) }}</h2>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

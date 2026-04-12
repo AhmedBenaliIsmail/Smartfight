@@ -34,4 +34,14 @@ class EventRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findChampionsEvents(): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.isChampionsEvent = :isChampionsEvent')
+            ->setParameter('isChampionsEvent', true)
+            ->orderBy('e.startDate', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -1,0 +1,44 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Performance - Admin{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0">Performance Scores</h1>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-vcenter card-table">
+            <thead>
+            <tr>
+                <th>Season</th>
+                <th>Fighter</th>
+                <th>Fighter ID</th>
+                <th>Score</th>
+                <th>Aggression</th>
+                <th>Defense</th>
+                <th>Technique</th>
+                <th>Experience</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for score in scores %}
+                <tr>
+                    <td>{{ score.season }}</td>
+                    <td>{{ fightersById[score.fighterId] is defined ? fightersById[score.fighterId].displayName : 'Unknown' }}</td>
+                    <td>{{ score.fighterId }}</td>
+                    <td>{{ score.score|number_format(2, '.', ',') }}</td>
+                    <td>{{ score.aggression|number_format(2, '.', ',') }}</td>
+                    <td>{{ score.defense|number_format(2, '.', ',') }}</td>
+                    <td>{{ score.technique|number_format(2, '.', ',') }}</td>
+                    <td>{{ score.experience|number_format(2, '.', ',') }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="8" class="text-muted">No performance entries found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

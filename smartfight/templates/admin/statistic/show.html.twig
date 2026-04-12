@@ -1,0 +1,28 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Statistic Details - Admin{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0">Statistic #{{ statistic.id }}</h1>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-primary" href="{{ path('admin_statistic_edit', {id: statistic.id}) }}">Edit</a>
+        <a class="btn btn-outline-warning" href="{{ path('admin_statistic_wizard', {fightResult: statistic.fightResultId}) }}">Wizard</a>
+        <a class="btn btn-outline-secondary" href="{{ path('admin_statistic_index') }}">Back</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Fight Result ID</dt><dd class="col-sm-9">{{ statistic.fightResultId }}</dd>
+            <dt class="col-sm-3">Fighter</dt><dd class="col-sm-9">{{ fighter ? fighter.displayName : ('#' ~ statistic.fighterId) }}</dd>
+            <dt class="col-sm-3">Strikes</dt><dd class="col-sm-9">{{ statistic.strikesLanded }}/{{ statistic.strikesAttempted }}</dd>
+            <dt class="col-sm-3">Takedowns</dt><dd class="col-sm-9">{{ statistic.takedownsLanded }}/{{ statistic.takedownsAttempted }}</dd>
+            <dt class="col-sm-3">Submission Attempts</dt><dd class="col-sm-9">{{ statistic.submissionAttempts }}</dd>
+            <dt class="col-sm-3">Knockdowns</dt><dd class="col-sm-9">{{ statistic.knockdowns }}</dd>
+            <dt class="col-sm-3">Control Time (s)</dt><dd class="col-sm-9">{{ statistic.controlTimeSeconds }}</dd>
+        </dl>
+    </div>
+</div>
+{% endblock %}

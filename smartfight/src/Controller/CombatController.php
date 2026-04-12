@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use App\Repository\CombattantRepository;
 use App\Service\MatchmakingService;
+use App\Service\MatchmakingDataSyncService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,12 +15,18 @@ class CombatController extends AbstractController
 {
     public function __construct(
         private MatchmakingService $matchmaking,
-        private CombattantRepository $combattantRepo
+        private CombattantRepository $combattantRepo,
+        private MatchmakingDataSyncService $dataSyncService,
     ) {}
 
     #[Route('', name: 'index', methods: ['GET', 'POST'])]
     public function index(Request $request): Response
     {
+        $created = $this->dataSyncService->syncCombattantsFromFighters();
+        if ($created > 0) {
+            $this->addFlash('success', sprintf('%d combattants were imported from fighters data.', $created));
+        }
+
         $matches = [];
         $bestOpponent = null;
         $selectedCombattant = null;
@@ -46,12 +53,15 @@ class CombatController extends AbstractController
             'bestOpponent'      => $bestOpponent,
             'selectedCombattant'=> $selectedCombattant,
             'max'               => $max,
+            'active_sidebar'    => 'matchmaking',
         ]);
     }
 
     #[Route('/find-opponent', name: 'find_opponent', methods: ['POST'])]
     public function findOpponent(Request $request): JsonResponse
     {
+        $this->dataSyncService->syncCombattantsFromFighters();
+
         $id = $request->request->get('combattant_id');
         $combattant = $this->combattantRepo->find($id);
 

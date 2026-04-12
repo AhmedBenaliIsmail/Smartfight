@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use App\Repository\ClassementRepository;
 use App\Service\ClassementService;
+use App\Service\MatchmakingDataSyncService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,7 +14,8 @@ class ClassementController extends AbstractController
 {
     public function __construct(
         private ClassementRepository $classementRepo,
-        private ClassementService $classementService
+        private ClassementService $classementService,
+        private MatchmakingDataSyncService $dataSyncService,
     ) {}
 
     #[Route('', name: 'index', methods: ['GET', 'POST'])]
@@ -21,6 +23,11 @@ class ClassementController extends AbstractController
     {
         $discipline = $request->query->get('discipline', 'All');
         $search = $request->query->get('search', '');
+
+        $created = $this->dataSyncService->syncCombattantsFromFighters();
+        if ($created > 0) {
+            $this->addFlash('success', sprintf('%d combattants were imported from fighters data.', $created));
+        }
 
         // Recalculer
         if ($request->query->get('recalculer')) {
@@ -30,6 +37,10 @@ class ClassementController extends AbstractController
             return $this->redirectToRoute('app_classement_index', [
                 'discipline' => $discipline
             ]);
+        }
+
+        if ($this->dataSyncService->ensureClassementsGenerated($discipline !== 'All' ? $discipline : null)) {
+            $this->addFlash('success', 'Classements were generated from current database data.');
         }
 
         // Filtrer
@@ -56,6 +67,7 @@ class ClassementController extends AbstractController
             'discipline'  => $discipline,
             'search'      => $search,
             'total'       => count($classements),
+            'active_sidebar' => 'classements',
         ]);
     }
 }

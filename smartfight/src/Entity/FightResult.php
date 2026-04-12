@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FightResultRepository::class)]
 #[ORM\Table(name: 'fight_result')]
+#[ORM\HasLifecycleCallbacks]
 class FightResult
 {
     #[ORM\Id]
@@ -37,6 +38,12 @@ class FightResult
     #[ORM\Column(type: 'string', length: 20)]
     private string $method;
 
+    #[ORM\Column(name: 'fight_number', type: 'integer', options: ['default' => 1])]
+    private int $fightNumber = 1;
+
+    #[ORM\Column(type: 'string', length: 20, options: ['default' => 'COMPLETED'])]
+    private string $status = 'COMPLETED';
+
     #[ORM\Column(name: 'round_ended', type: 'integer', nullable: true)]
     private ?int $roundEnded = null;
 
@@ -52,17 +59,45 @@ class FightResult
     #[ORM\Column(name: 'created_at', type: 'datetime')]
     private \DateTimeInterface $createdAt;
 
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        $this->createdAt = new \DateTime();
+    }
+
     public function getId(): ?int { return $this->id; }
     public function getEvent(): Event { return $this->event; }
+    public function setEvent(Event $event): static { $this->event = $event; return $this; }
     public function getMatch(): ?MatchProposal { return $this->match; }
+    public function setMatch(?MatchProposal $match): static { $this->match = $match; return $this; }
     public function getFighterRed(): Fighter { return $this->fighterRed; }
+    public function setFighterRed(Fighter $fighterRed): static { $this->fighterRed = $fighterRed; return $this; }
     public function getFighterBlue(): Fighter { return $this->fighterBlue; }
+    public function setFighterBlue(Fighter $fighterBlue): static { $this->fighterBlue = $fighterBlue; return $this; }
     public function getWinner(): ?Fighter { return $this->winner; }
+    public function setWinner(?Fighter $winner): static { $this->winner = $winner; return $this; }
     public function getMethod(): string { return $this->method; }
+    public function setMethod(string $method): static { $this->method = $method; return $this; }
+    public function getMethodOfVictory(): string { return $this->getMethod(); }
+    public function getFightNumber(): int { return $this->fightNumber; }
+    public function setFightNumber(int $fightNumber): static { $this->fightNumber = $fightNumber; return $this; }
+    public function getStatus(): string { return $this->status; }
+    public function setStatus(string $status): static { $this->status = $status; return $this; }
     public function getRoundEnded(): ?int { return $this->roundEnded; }
+    public function setRoundEnded(?int $roundEnded): static { $this->roundEnded = $roundEnded; return $this; }
     public function getTimeEnded(): ?\DateTimeInterface { return $this->timeEnded; }
+    public function setTimeEnded(?\DateTimeInterface $timeEnded): static { $this->timeEnded = $timeEnded; return $this; }
     public function getNotes(): ?string { return $this->notes; }
+    public function setNotes(?string $notes): static { $this->notes = $notes; return $this; }
     public function getFightDate(): \DateTimeInterface { return $this->fightDate; }
+    public function setFightDate(\DateTimeInterface $fightDate): static { $this->fightDate = $fightDate; return $this; }
+    public function getCreatedAt(): \DateTimeInterface { return $this->createdAt; }
+    public function setCreatedAt(\DateTimeInterface $createdAt): static { $this->createdAt = $createdAt; return $this; }
+
+    public function isDraw(): bool
+    {
+        return strtoupper($this->method) === 'DRAW';
+    }
 
     public function getFightLabel(): string
     {

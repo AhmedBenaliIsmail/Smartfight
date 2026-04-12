@@ -1,0 +1,55 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Statistics Wizard - Admin{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0">Statistics Wizard - {{ fightResult.fightLabel }}</h1>
+    <a href="{{ path('admin_result_show', {id: fightResult.id}) }}" class="btn btn-outline-secondary">Back to Result</a>
+</div>
+
+<div class="alert alert-info">
+    Step 2: enter both fighters statistics in one submit. This will upsert existing values if they already exist.
+</div>
+
+<form method="post" class="card">
+    <div class="card-body">
+        {% for corner, fighter in {'red': fightResult.fighterRed, 'blue': fightResult.fighterBlue} %}
+            <h3 class="h4 mt-2">{{ corner|upper }} corner - {{ fighter.displayName }}</h3>
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <label class="form-label">Strikes Landed</label>
+                    <input class="form-control" type="number" name="{{ corner }}_strikesLanded" min="0" value="0">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Strikes Attempted</label>
+                    <input class="form-control" type="number" name="{{ corner }}_strikesAttempted" min="0" value="0">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Takedowns Landed</label>
+                    <input class="form-control" type="number" name="{{ corner }}_takedownsLanded" min="0" value="0">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Takedowns Attempted</label>
+                    <input class="form-control" type="number" name="{{ corner }}_takedownsAttempted" min="0" value="0">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Submission Attempts</label>
+                    <input class="form-control" type="number" name="{{ corner }}_submissionAttempts" min="0" value="0">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Knockdowns</label>
+                    <input class="form-control" type="number" name="{{ corner }}_knockdowns" min="0" value="0">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Control Time (seconds)</label>
+                    <input class="form-control" type="number" name="{{ corner }}_controlTimeSeconds" min="0" value="0">
+                </div>
+            </div>
+            {% if not loop.last %}<hr>{% endif %}
+        {% endfor %}
+
+        <button type="submit" class="btn btn-danger">Save Statistics</button>
+    </div>
+</form>
+{% endblock %}

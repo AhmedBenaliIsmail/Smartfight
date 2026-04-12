@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Combattant;
 use App\Form\CombattantType;
 use App\Repository\CombattantRepository;
+use App\Service\MatchmakingDataSyncService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,10 +16,19 @@ use Symfony\Component\Routing\Attribute\Route;
 final class CombattantController extends AbstractController
 {
     #[Route(name: 'app_combattant_index', methods: ['GET'])]
-    public function index(CombattantRepository $combattantRepository): Response
+    public function index(
+        CombattantRepository $combattantRepository,
+        MatchmakingDataSyncService $dataSyncService,
+    ): Response
     {
+        $created = $dataSyncService->syncCombattantsFromFighters();
+        if ($created > 0) {
+            $this->addFlash('success', sprintf('%d combattants were imported from fighters data.', $created));
+        }
+
         return $this->render('combattant/index.html.twig', [
             'combattants' => $combattantRepository->findAll(),
+            'active_sidebar' => 'combattants',
         ]);
     }
 

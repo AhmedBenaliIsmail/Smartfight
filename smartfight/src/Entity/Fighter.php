@@ -49,6 +49,42 @@ class Fighter
     #[ORM\Column(type: 'integer', options: ['default' => 0])]
     private int $draws = 0;
 
+    #[ORM\Column(name: 'elo_rating', type: 'float', options: ['default' => 1500.0])]
+    private float $eloRating = 1500.0;
+
+    #[ORM\Column(name: 'performance_score', type: 'float', options: ['default' => 0.0])]
+    private float $performanceScore = 0.0;
+
+    #[ORM\Column(name: 'win_streak', type: 'integer', options: ['default' => 0])]
+    private int $winStreak = 0;
+
+    #[ORM\Column(name: 'strength_of_schedule', type: 'float', options: ['default' => 1500.0])]
+    private float $strengthOfSchedule = 1500.0;
+
+    #[ORM\Column(name: 'ko_wins', type: 'integer', options: ['default' => 0])]
+    private int $koWins = 0;
+
+    #[ORM\Column(name: 'submission_wins', type: 'integer', options: ['default' => 0])]
+    private int $submissionWins = 0;
+
+    #[ORM\Column(name: 'decision_wins', type: 'integer', options: ['default' => 0])]
+    private int $decisionWins = 0;
+
+    #[ORM\Column(name: 'champions_event_win_streak', type: 'integer', options: ['default' => 0])]
+    private int $championsEventWinStreak = 0;
+
+    #[ORM\Column(name: 'title_defenses', type: 'integer', options: ['default' => 0])]
+    private int $titleDefenses = 0;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $height = null;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $reach = null;
+
+    #[ORM\Column(name: 'weight_class', type: 'string', length: 50, nullable: true)]
+    private ?string $weightClass = null;
+
     #[ORM\Column(type: 'string', length: 20)]
     private string $status = 'ACTIVE';
 
@@ -90,6 +126,30 @@ class Fighter
     public function setLosses(int $losses): static { $this->losses = $losses; return $this; }
     public function getDraws(): int { return $this->draws; }
     public function setDraws(int $draws): static { $this->draws = $draws; return $this; }
+    public function getEloRating(): float { return $this->eloRating; }
+    public function setEloRating(float $eloRating): static { $this->eloRating = $eloRating; return $this; }
+    public function getPerformanceScore(): float { return $this->performanceScore; }
+    public function setPerformanceScore(float $performanceScore): static { $this->performanceScore = $performanceScore; return $this; }
+    public function getWinStreak(): int { return $this->winStreak; }
+    public function setWinStreak(int $winStreak): static { $this->winStreak = $winStreak; return $this; }
+    public function getStrengthOfSchedule(): float { return $this->strengthOfSchedule; }
+    public function setStrengthOfSchedule(float $strengthOfSchedule): static { $this->strengthOfSchedule = $strengthOfSchedule; return $this; }
+    public function getKoWins(): int { return $this->koWins; }
+    public function setKoWins(int $koWins): static { $this->koWins = $koWins; return $this; }
+    public function getSubmissionWins(): int { return $this->submissionWins; }
+    public function setSubmissionWins(int $submissionWins): static { $this->submissionWins = $submissionWins; return $this; }
+    public function getDecisionWins(): int { return $this->decisionWins; }
+    public function setDecisionWins(int $decisionWins): static { $this->decisionWins = $decisionWins; return $this; }
+    public function getChampionsEventWinStreak(): int { return $this->championsEventWinStreak; }
+    public function setChampionsEventWinStreak(int $championsEventWinStreak): static { $this->championsEventWinStreak = $championsEventWinStreak; return $this; }
+    public function getTitleDefenses(): int { return $this->titleDefenses; }
+    public function setTitleDefenses(int $titleDefenses): static { $this->titleDefenses = $titleDefenses; return $this; }
+    public function getHeight(): ?int { return $this->height; }
+    public function setHeight(?int $height): static { $this->height = $height; return $this; }
+    public function getReach(): ?int { return $this->reach; }
+    public function setReach(?int $reach): static { $this->reach = $reach; return $this; }
+    public function getWeightClass(): ?string { return $this->weightClass; }
+    public function setWeightClass(?string $weightClass): static { $this->weightClass = $weightClass; return $this; }
     public function getStatus(): string { return $this->status; }
     public function setStatus(string $status): static { $this->status = $status; return $this; }
     public function getCreatedAt(): \DateTimeInterface { return $this->createdAt; }
@@ -106,6 +166,11 @@ class Fighter
     public function getPhotoFile(): ?File { return $this->photoFile; }
 
     public function getRecord(): string { return $this->wins . '-' . $this->losses . '-' . $this->draws; }
+
+    public function getTotalFights(): int
+    {
+        return $this->wins + $this->losses + $this->draws;
+    }
 
     public function getDisplayName(): string
     {
