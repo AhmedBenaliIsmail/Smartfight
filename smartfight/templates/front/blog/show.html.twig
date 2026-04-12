@@ -1,0 +1,81 @@
+{% extends 'front/base_front.html.twig' %}
+{% block title %}{{ article.title }} — SmartFight{% endblock %}
+
+{% block content %}
+<section class="py-5" style="background:#09090b;min-height:100vh;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                {# Article Header #}
+                <div class="mb-4">
+                    <span class="badge mb-3" style="background:#dc2626;color:#fff;">{{ article.category.name }}</span>
+                    <h1 style="font-family:'Oswald',sans-serif;color:#fff;font-size:2.5rem;">{{ article.title }}</h1>
+                    <div class="d-flex align-items-center gap-4 mt-3" style="color:#71717a;font-size:.875rem;">
+                        <span><i class="fa-solid fa-user me-1"></i>{{ article.author.fullName }}</span>
+                        <span><i class="fa-solid fa-calendar me-1"></i>{{ article.createdAt|date('d M Y') }}</span>
+                        <span><i class="fa-solid fa-eye me-1"></i>{{ article.viewCount }} views</span>
+                    </div>
+                </div>
+
+                {# Cover Image #}
+                {% if article.imagePath %}
+                    <img src="{{ vich_uploader_asset(article, 'imageFile') }}" alt="{{ article.title }}"
+                         style="width:100%;max-height:450px;object-fit:cover;border-radius:10px;margin-bottom:2rem;">
+                {% endif %}
+
+                {# Summary #}
+                {% if article.summary %}
+                    <blockquote style="border-left:4px solid #dc2626;padding:1rem 1.5rem;background:#18181b;border-radius:0 8px 8px 0;margin-bottom:2rem;">
+                        <p style="color:#a1a1aa;margin:0;font-style:italic;">{{ article.summary }}</p>
+                    </blockquote>
+                {% endif %}
+
+                {# Content #}
+                <div style="color:#d4d4d8;line-height:1.9;font-size:1rem;">
+                    {{ article.content|nl2br }}
+                </div>
+
+                {# Video #}
+                {% if article.videoPath %}
+                    <div class="mt-4">
+                        <video controls style="width:100%;border-radius:10px;max-height:400px;">
+                            <source src="{{ vich_uploader_asset(article, 'videoFile') }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                {% endif %}
+
+                <div class="mt-4 pt-4" style="border-top:1px solid #27272a;">
+                    <a href="{{ path('front_blog_index') }}" class="btn btn-outline-secondary">
+                        <i class="fa-solid fa-arrow-left me-2"></i>Back to Blog
+                    </a>
+                </div>
+            </div>
+
+            {# Sidebar #}
+            <div class="col-lg-4">
+                {% if related %}
+                <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;border-radius:10px;position:sticky;top:80px;">
+                    <div class="card-header" style="border-bottom:1px solid #27272a;">
+                        <h6 style="font-family:'Oswald',sans-serif;color:#fff;margin:0;letter-spacing:1px;">RELATED ARTICLES</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        {% for rel in related %}
+                        <a href="{{ path('front_blog_show', {id: rel.id}) }}" class="d-flex gap-3 p-3 text-decoration-none" style="border-bottom:1px solid #27272a;">
+                            {% if rel.imagePath %}
+                                <img src="{{ vich_uploader_asset(rel, 'imageFile') }}" alt="" style="width:60px;height:60px;object-fit:cover;border-radius:6px;flex-shrink:0;">
+                            {% endif %}
+                            <div>
+                                <div style="color:#fff;font-size:.9rem;font-weight:500;">{{ rel.title|length > 55 ? rel.title|slice(0,55) ~ '…' : rel.title }}</div>
+                                <div style="color:#71717a;font-size:.8rem;">{{ rel.createdAt|date('d M Y') }}</div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events – SmartFight</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="sf-navbar navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">SMART<span>FIGHT</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sfNavCollapse">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="sfNavCollapse">
+      <ul class="navbar-nav mx-auto gap-1">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="matches.html">Events</a></li>
+        <li class="nav-item"><a class="nav-link" href="team.html">Fighters</a></li>
+        <li class="nav-item"><a class="nav-link" href="blog.html">News</a></li>
+        <li class="nav-item"><a class="nav-link" href="gallery.html">Gallery</a></li>
+        <li class="nav-item"><a class="nav-link live-badge-nav" href="live-stream.html">Live</a></li>
+        <li class="nav-item"><a class="nav-link" href="predictions.html">Predictions</a></li>
+        <li class="nav-item"><a class="nav-link" href="booking.html">Bookings</a></li>
+      </ul>
+      <div class="nav-actions d-flex align-items-center gap-2 mt-2 mt-lg-0">
+        <a href="#" class="btn btn-sf-ghost">Login</a>
+        <a href="#" class="btn btn-sf-primary">Register</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== PAGE HEADER ===== -->
+<div class="page-header">
+  <div class="container">
+    <div class="breadcrumb-sf">
+      <a href="index.html">Home</a><span class="sep"><i class="fa-solid fa-chevron-right" style="font-size:0.55rem;"></i></span>
+      <span>Events</span>
+    </div>
+    <h1>Fight Events</h1>
+    <p>Full schedule of upcoming, live, and past MMA events worldwide.</p>
+  </div>
+</div>
+
+<!-- ===== FILTER BAR ===== -->
+<section style="background:var(--bg-surface); border-bottom:1px solid var(--border-color); padding:20px 0;">
+  <div class="container">
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+      <span style="font-size:0.78rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted);">Filter:</span>
+      <button class="btn btn-sf-primary" style="padding:6px 18px; font-size:0.8rem;" onclick="filterEvents('all', this)">All</button>
+      <button class="btn btn-sf-outline" style="padding:6px 18px; font-size:0.8rem;" onclick="filterEvents('upcoming', this)">Upcoming</button>
+      <button class="btn btn-sf-outline" style="padding:6px 18px; font-size:0.8rem;" onclick="filterEvents('live', this)">Live Now</button>
+      <button class="btn btn-sf-outline" style="padding:6px 18px; font-size:0.8rem;" onclick="filterEvents('completed', this)">Completed</button>
+      <div class="ms-auto" style="position:relative;">
+        <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.8rem;"></i>
+        <input type="text" class="sf-input" placeholder="Search events..." style="padding-left:34px; width:220px; font-size:0.85rem; padding-top:9px; padding-bottom:9px;" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== LIVE EVENT SPOTLIGHT ===== -->
+<section class="section-pad-sm">
+  <div class="container">
+    <div class="section-heading">
+      <span class="label">Right Now</span>
+      <h2>Live Event</h2>
+    </div>
+
+    <div class="event-card" style="border-color:var(--primary); background:linear-gradient(135deg,var(--bg-surface) 0%,rgba(220,38,38,0.06) 100%); max-width:680px;">
+      <div class="event-card-header">
+        <div>
+          <span class="badge-status badge-live mb-2" style="display:inline-flex;">Live Now</span>
+          <div class="event-name" style="font-size:1.4rem;">SmartFight 45</div>
+          <div class="event-venue"><i class="fa-solid fa-location-dot"></i> Barclays Center, Brooklyn, NY</div>
+        </div>
+        <div class="text-end">
+          <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:4px;">Fight 6 of 11</div>
+          <div style="font-size:1rem; font-weight:700; color:var(--primary);">Round 3 · 2:47</div>
+        </div>
+      </div>
+      <div class="event-card-body">
+        <div class="matchup-grid">
+          <div class="fighter-side">
+            <img src="https://placehold.co/56x56/18181b/dc2626?text=T" class="fighter-side-img" alt="Thompson" />
+            <div class="fighter-side-info">
+              <div class="name">Thompson</div>
+              <div class="record">22-5-0</div>
+            </div>
+          </div>
+          <div class="vs-divider">
+            <span class="vs-text">VS</span>
+            <span class="weight-class-pill">Welterweight</span>
+          </div>
+          <div class="fighter-side right">
+            <img src="https://placehold.co/56x56/18181b/c9a227?text=D" class="fighter-side-img" alt="Diaz" />
+            <div class="fighter-side-info">
+              <div class="name">Diaz</div>
+              <div class="record">17-8-0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="event-card-footer">
+        <a href="live-stream.html" class="btn btn-sf-primary w-100"><i class="fa-solid fa-satellite-dish"></i> Watch Live & React</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== UPCOMING EVENTS ===== -->
+<section class="section-pad-sm">
+  <div class="container">
+    <div class="section-heading">
+      <span class="label">Coming Soon</span>
+      <h2>Upcoming Events</h2>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-xl-4">
+        <div class="event-card">
+          <div class="event-card-header">
+            <div class="event-date-block">
+              <span class="day">15</span>
+              <span class="month-year">May 2026</span>
+            </div>
+            <span class="badge-status badge-upcoming">Upcoming</span>
+          </div>
+          <div class="event-card-body">
+            <div class="event-name">UFC 310: Night of Champions</div>
+            <div class="event-venue"><i class="fa-solid fa-location-dot"></i> T-Mobile Arena, Las Vegas</div>
+            <div class="event-main-bout">
+              <div class="bout-label">Main Event · Heavyweight Title</div>
+              <div class="bout-fighters">Santos <span class="vs">vs</span> Jensen</div>
+            </div>
+          </div>
+          <div class="event-card-footer d-flex gap-2">
+            <a href="match-details.html" class="btn btn-sf-primary flex-fill"><i class="fa-solid fa-eye"></i> Fight Card</a>
+            <a href="booking.html" class="btn btn-sf-outline flex-fill"><i class="fa-solid fa-ticket"></i> Book</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xl-4">
+        <div class="event-card">
+          <div class="event-card-header">
+            <div class="event-date-block">
+              <span class="day">28</span>
+              <span class="month-year">Jun 2026</span>
+            </div>
+            <span class="badge-status badge-upcoming">Upcoming</span>
+          </div>
+          <div class="event-card-body">
+            <div class="event-name">SmartFight Grand Prix</div>
+            <div class="event-venue"><i class="fa-solid fa-location-dot"></i> Madison Square Garden, NY</div>
+            <div class="event-main-bout">
+              <div class="bout-label">Main Event · Middleweight</div>
+              <div class="bout-fighters">Morales <span class="vs">vs</span> Williams</div>
+            </div>
+          </div>
+          <div class="event-card-footer d-flex gap-2">
+            <a href="match-details.html" class="btn btn-sf-primary flex-fill"><i class="fa-solid fa-eye"></i> Fight Card</a>
+            <a href="booking.html" class="btn btn-sf-outline flex-fill"><i class="fa-solid fa-ticket"></i> Book</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xl-4">
+        <div class="event-card">
+          <div class="event-card-header">
+            <div class="event-date-block">
+              <span class="day">19</span>
+              <span class="month-year">Jul 2026</span>
+            </div>
+            <span class="badge-status badge-upcoming">Upcoming</span>
+          </div>
+          <div class="event-card-body">
+            <div class="event-name">SmartFight 46: Blood & Thunder</div>
+            <div class="event-venue"><i class="fa-solid fa-location-dot"></i> Staples Center, Los Angeles</div>
+            <div class="event-main-bout">
+              <div class="bout-label">Main Event · Light Heavyweight</div>
+              <div class="bout-fighters">Castillo <span class="vs">vs</span> O'Brien</div>
+            </div>
+          </div>
+          <div class="event-card-footer d-flex gap-2">
+            <a href="match-details.html" class="btn btn-sf-primary flex-fill"><i class="fa-solid fa-eye"></i> Fight Card</a>
+            <a href="booking.html" class="btn btn-sf-outline flex-fill"><i class="fa-solid fa-ticket"></i> Book</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xl-4">
+        <div class="event-card">
+          <div class="event-card-header">
+            <div class="event-date-block">
+              <span class="day">08</span>
+              <span class="month-year">Aug 2026</span>
+            </div>
+            <span class="badge-status badge-upcoming">Upcoming</span>
+          </div>
+          <div class="event-card-body">
+            <div class="event-name">SmartFight: Clash in the Capital</div>
+            <div class="event-venue"><i class="fa-solid fa-location-dot"></i> Capital One Arena, Washington DC</div>
+            <div class="event-main-bout">
+              <div class="bout-label">Main Event · Welterweight</div>
+              <div class="bout-fighters">Rivera <span class="vs">vs</span> Nakamura</div>
+            </div>
+          </div>
+          <div class="event-card-footer d-flex gap-2">
+            <a href="match-details.html" class="btn btn-sf-primary flex-fill"><i class="fa-solid fa-eye"></i> Fight Card</a>
+            <a href="booking.html" class="btn btn-sf-outline flex-fill"><i class="fa-solid fa-ticket"></i> Book</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PAST EVENTS ===== -->
+<section class="section-pad-sm" style="background:var(--bg-surface); border-top:1px solid var(--border-color);">
+  <div class="container">
+    <div class="section-heading">
+      <span class="label">Archive</span>
+      <h2>Past Events</h2>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-xl-4">
+        <div class="event-card" style="opacity:0.8;">
+          <div class="event-card-header">
+            <div class="event-date-block">
+              <span class="day">15</span>
+              <span class="month-year">Mar 2026</span>
+            </div>
+            <span class="badge-status badge-completed">Completed</span>
+          </div>
+          <div class="event-card-body">
+            <div class="event-name">SmartFight 44: Iron Night</div>
+            <div class="event-venue"><i class="fa-solid fa-location-dot"></i> United Center, Chicago</div>
+            <div class="event-main-bout">
+              <div class="bout-label">Result · Heavyweight</div>
+              <div class="bout-fighters">Rodriguez <span class="vs">vs</span> Park · <span style="color:#22c55e; font-size:0.8rem;">KO R2</span></div>
+            </div>
+          </div>
+          <div class="event-card-footer">
+            <a href="match-details.html" class="btn btn-sf-outline w-100"><i class="fa-solid fa-clock-rotate-left"></i> View Results</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xl-4">
+        <div class="event-card" style="opacity:0.8;">
+          <div class="event-card-header">
+            <div class="event-date-block">
+              <span class="day">22</span>
+              <span class="month-year">Feb 2026</span>
+            </div>
+            <span class="badge-status badge-completed">Completed</span>
+          </div>
+          <div class="event-card-body">
+            <div class="event-name">SmartFight 43: Lights Out</div>
+            <div class="event-venue"><i class="fa-solid fa-location-dot"></i> Toyota Center, Houston</div>
+            <div class="event-main-bout">
+              <div class="bout-label">Result · Middleweight</div>
+              <div class="bout-fighters">Souza <span class="vs">vs</span> Lee · <span style="color:#22c55e; font-size:0.8rem;">Sub R3</span></div>
+            </div>
+          </div>
+          <div class="event-card-footer">
+            <a href="match-details.html" class="btn btn-sf-outline w-100"><i class="fa-solid fa-clock-rotate-left"></i> View Results</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xl-4">
+        <div class="event-card" style="opacity:0.8;">
+          <div class="event-card-header">
+            <div class="event-date-block">
+              <span class="day">11</span>
+              <span class="month-year">Jan 2026</span>
+            </div>
+            <span class="badge-status badge-completed">Completed</span>
+          </div>
+          <div class="event-card-body">
+            <div class="event-name">New Year's Combat Gala</div>
+            <div class="event-venue"><i class="fa-solid fa-location-dot"></i> T-Mobile Arena, Las Vegas</div>
+            <div class="event-main-bout">
+              <div class="bout-label">Result · Lightweight Title</div>
+              <div class="bout-fighters">Santos <span class="vs">vs</span> Pereira · <span style="color:#22c55e; font-size:0.8rem;">Dec UD</span></div>
+            </div>
+          </div>
+          <div class="event-card-footer">
+            <a href="match-details.html" class="btn btn-sf-outline w-100"><i class="fa-solid fa-clock-rotate-left"></i> View Results</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="sf-footer">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-4 col-md-6">
+        <a href="index.html" class="footer-logo">SMART<span>FIGHT</span></a>
+        <p class="footer-about">The premier destination for UFC and MMA fans. Live results, fighter profiles, event bookings, and community predictions — all in one place.</p>
+        <div class="social-links">
+          <a href="#" class="social-link"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-discord"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Home</a></li>
+          <li><a href="matches.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Events</a></li>
+          <li><a href="team.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Fighters</a></li>
+          <li><a href="blog.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> News</a></li>
+          <li><a href="contact.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Contact</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Features</div>
+        <ul class="footer-links">
+          <li><a href="live-stream.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Live Stream</a></li>
+          <li><a href="predictions.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Predictions</a></li>
+          <li><a href="leaderboard.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Leaderboard</a></li>
+          <li><a href="booking.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Book Tickets</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="footer-col-title">Newsletter</div>
+        <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:12px;">Get fight cards, results, and exclusive content delivered straight to your inbox.</p>
+        <div class="newsletter-form">
+          <input type="email" placeholder="Your email address" />
+          <button type="button"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 SmartFight. All rights reserved.</p>
+      <div style="display:flex; gap:20px;"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/main.js"></script>
+<script>
+function filterEvents(type, btn) {
+  document.querySelectorAll('[onclick^="filterEvents"]').forEach(function(b) {
+    b.className = 'btn btn-sf-outline';
+    b.style.padding = '6px 18px';
+    b.style.fontSize = '0.8rem';
+  });
+  btn.className = 'btn btn-sf-primary';
+  btn.style.padding = '6px 18px';
+  btn.style.fontSize = '0.8rem';
+}
+</script>
+</body>
+</html>

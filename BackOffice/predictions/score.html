@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Score Predictions — SmartFight Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/smartfight-admin.css" />
+</head>
+<body class="antialiased">
+<div class="wrapper">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────── -->
+  <aside class="navbar navbar-vertical navbar-expand-lg" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+    <div class="container-fluid flex-column align-items-stretch p-0">
+      <div class="p-3 border-bottom" style="border-color:#27272a!important">
+        <a href="../dashboard.html" class="smartfight-logo">
+          <div class="logo-icon"><i class="fa-solid fa-fist-raised"></i></div>
+          <div class="logo-text">Smart<span>Fight</span></div>
+        </a>
+      </div>
+      <nav class="flex-fill py-2">
+        <div class="navbar-vertical-section">Management</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../dashboard.html"><span class="nav-link-icon"><i class="fa-solid fa-chart-line fa-fw"></i></span><span class="nav-link-title">Dashboard</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../users/index.html"><span class="nav-link-icon"><i class="fa-solid fa-users fa-fw"></i></span><span class="nav-link-title">Users</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fighters/index.html"><span class="nav-link-icon"><i class="fa-solid fa-boxing-glove fa-fw"></i></span><span class="nav-link-title">Fighters</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../events/index.html"><span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span><span class="nav-link-title">Events</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fight-results/index.html"><span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span><span class="nav-link-title">Fight Results</span></a></li>
+        </ul>
+        <div class="navbar-vertical-section mt-2">Fan Experience</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../blog/index.html"><span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw"></i></span><span class="nav-link-title">Blog Articles</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../bookings/index.html"><span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw"></i></span><span class="nav-link-title">Event Bookings</span></a></li>
+          <li class="nav-item"><a class="nav-link active" href="index.html"><span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span><span class="nav-link-title">Predictions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../reactions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-comments fa-fw"></i></span><span class="nav-link-title">Reactions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../notifications/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span><span class="nav-link-title">Notifications</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- ── Main content ─────────────────────────────────────────── -->
+  <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
+
+    <!-- Topbar -->
+    <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
+      <div class="d-flex align-items-center gap-3 flex-fill">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="../dashboard.html" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+          <li class="breadcrumb-item"><a href="index.html" style="color:#a1a1aa;text-decoration:none;">Predictions</a></li>
+          <li class="breadcrumb-item active">Score Fight</li>
+        </ol>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="#" class="nav-link p-1 text-muted"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="../notifications/index.html" class="nav-link p-1 position-relative text-muted">
+          <i class="fa-solid fa-bell"></i>
+          <span class="badge bg-danger rounded-pill" style="position:absolute;top:-4px;right:-4px;font-size:.6rem;padding:2px 5px;">7</span>
+        </a>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+            <div style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">A</div>
+            <span style="font-size:.875rem;color:#fafafa;">Admin</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user fa-fw me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-fill p-4" style="background:#09090b;">
+
+      <!-- Page Header -->
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Score Predictions</h1>
+          <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Select a completed fight and mark each fan's prediction as correct or wrong</p>
+        </div>
+        <a href="index.html" class="btn" style="background:#27272a;color:#fafafa;border:none;">
+          <i class="fa-solid fa-arrow-left me-2"></i>Back to List
+        </a>
+      </div>
+
+      <!-- Step 1 — Select Fight -->
+      <div class="score-step">
+        <div class="d-flex align-items-center mb-3">
+          <span class="score-step-number">1</span>
+          <h5 class="mb-0 fw-semibold" style="color:#fafafa;">Select Fight to Score</h5>
+        </div>
+        <div class="row g-3 align-items-end">
+          <div class="col-md-5">
+            <label class="form-label">Event</label>
+            <select class="form-select" id="selectEvent">
+              <option value="">— Choose event —</option>
+              <option value="ufc310" selected>UFC 310 (Apr 5, 2026)</option>
+              <option value="bellator302">Bellator 302 (Mar 22, 2026)</option>
+              <option value="ufc311">UFC 311 (Apr 12, 2026)</option>
+            </select>
+          </div>
+          <div class="col-md-5">
+            <label class="form-label">Fight</label>
+            <select class="form-select" id="selectFight">
+              <option value="">— Choose fight —</option>
+              <option value="f1" selected>Jones vs Aspinall (Heavyweight Title)</option>
+              <option value="f2">Poirier vs McGregor (Lightweight)</option>
+              <option value="f3">Adesanya vs Du Plessis (Middleweight)</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button class="btn w-100" style="background:#dc2626;color:#fff;border:none;" onclick="loadPredictions()">
+              <i class="fa-solid fa-arrow-right me-1"></i>Load
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 — Fight Result Summary -->
+      <div class="score-step" id="fightResultPanel">
+        <div class="d-flex align-items-center mb-3">
+          <span class="score-step-number">2</span>
+          <h5 class="mb-0 fw-semibold" style="color:#fafafa;">Confirm Fight Result</h5>
+        </div>
+        <!-- Corner cards -->
+        <div class="row g-3 align-items-center mb-3">
+          <div class="col-md-5">
+            <div class="corner-card corner-red">
+              <div style="font-size:.7rem;color:#f87171;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;">Red Corner</div>
+              <div style="font-size:1.25rem;font-weight:700;color:#fafafa;">Jon Jones</div>
+              <div style="font-size:.8rem;color:#a1a1aa;margin-top:.25rem;">Heavyweight Champion · 28-1-0</div>
+            </div>
+          </div>
+          <div class="col-md-2 text-center">
+            <div class="vs-badge mx-auto">VS</div>
+          </div>
+          <div class="col-md-5">
+            <div class="corner-card corner-blue">
+              <div style="font-size:.7rem;color:#60a5fa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;">Blue Corner</div>
+              <div style="font-size:1.25rem;font-weight:700;color:#fafafa;">Tom Aspinall</div>
+              <div style="font-size:.8rem;color:#a1a1aa;margin-top:.25rem;">Interim Champion · 15-3-0</div>
+            </div>
+          </div>
+        </div>
+        <!-- Actual outcome -->
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Official Winner</label>
+            <select class="form-select">
+              <option selected>Jon Jones</option>
+              <option>Tom Aspinall</option>
+              <option>No Contest</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Method</label>
+            <select class="form-select">
+              <option selected>KO/TKO</option>
+              <option>Submission</option>
+              <option>Unanimous Decision</option>
+              <option>Split Decision</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Round</label>
+            <select class="form-select">
+              <option>Round 1</option>
+              <option selected>Round 2</option>
+              <option>Round 3</option>
+              <option>Round 4</option>
+              <option>Round 5</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Points for Correct Winner</label>
+            <select class="form-select">
+              <option>+5 pts</option>
+              <option>+8 pts</option>
+              <option selected>+10 pts</option>
+              <option>+15 pts (method bonus)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 — Prediction Rows -->
+      <div class="score-step" id="predictionRows">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div class="d-flex align-items-center">
+            <span class="score-step-number">3</span>
+            <h5 class="mb-0 fw-semibold" style="color:#fafafa;">Mark Predictions</h5>
+          </div>
+          <div class="d-flex align-items-center gap-3">
+            <span style="font-size:.8rem;color:#a1a1aa;">
+              <span style="color:#22c55e;font-weight:600;" id="correctCount">3</span> correct ·
+              <span style="color:#dc2626;font-weight:600;" id="wrongCount">2</span> wrong ·
+              <span style="color:#eab308;font-weight:600;" id="pendingCount">2</span> unmarked
+            </span>
+            <button class="btn btn-sm" style="background:#27272a;color:#fafafa;border:none;font-size:.8rem;" onclick="autoScore()">
+              <i class="fa-solid fa-wand-magic-sparkles me-1"></i>Auto-score by winner
+            </button>
+          </div>
+        </div>
+
+        <table class="table table-hover mb-0" style="border-radius:8px;overflow:hidden;">
+          <thead>
+            <tr>
+              <th style="padding:.75rem 1rem;">Fan</th>
+              <th>Predicted Winner</th>
+              <th>Method Pick</th>
+              <th style="width:180px;">Mark Result</th>
+              <th>Points</th>
+            </tr>
+          </thead>
+          <tbody id="predictionTableBody">
+            <tr>
+              <td style="padding:.75rem 1rem;">
+                <div class="d-flex align-items-center gap-2">
+                  <div style="width:30px;height:30px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:#a1a1aa;">LP</div>
+                  <div>
+                    <div style="font-size:.875rem;font-weight:600;">Lucas P.</div>
+                    <div style="font-size:.75rem;color:#a1a1aa;">fan #1024</div>
+                  </div>
+                </div>
+              </td>
+              <td style="color:#c9a227;font-size:.875rem;font-weight:500;">Jon Jones ✓</td>
+              <td><span class="badge" style="background:rgba(220,38,38,.12);color:#f87171;border:1px solid rgba(220,38,38,.2);">KO/TKO ✓</span></td>
+              <td>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-sm score-btn-correct active-correct" style="background:rgba(34,197,94,.2);color:#22c55e;border:1px solid rgba(34,197,94,.3);font-size:.75rem;padding:3px 10px;">
+                    <i class="fa-solid fa-check me-1"></i>Correct
+                  </button>
+                  <button class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;font-size:.75rem;padding:3px 10px;">
+                    <i class="fa-solid fa-xmark me-1"></i>Wrong
+                  </button>
+                </div>
+              </td>
+              <td style="font-weight:700;color:#22c55e;">+15</td>
+            </tr>
+            <tr>
+              <td style="padding:.75rem 1rem;">
+                <div class="d-flex align-items-center gap-2">
+                  <div style="width:30px;height:30px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:#a1a1aa;">EV</div>
+                  <div>
+                    <div style="font-size:.875rem;font-weight:600;">Elena V.</div>
+                    <div style="font-size:.75rem;color:#a1a1aa;">fan #0891</div>
+                  </div>
+                </div>
+              </td>
+              <td style="color:#dc2626;font-size:.875rem;font-weight:500;">Tom Aspinall ✗</td>
+              <td><span class="badge" style="background:rgba(234,179,8,.12);color:#fbbf24;border:1px solid rgba(234,179,8,.2);">Decision</span></td>
+              <td>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;font-size:.75rem;padding:3px 10px;">
+                    <i class="fa-solid fa-check me-1"></i>Correct
+                  </button>
+                  <button class="btn btn-sm active-wrong" style="background:rgba(220,38,38,.2);color:#dc2626;border:1px solid rgba(220,38,38,.3);font-size:.75rem;padding:3px 10px;">
+                    <i class="fa-solid fa-xmark me-1"></i>Wrong
+                  </button>
+                </div>
+              </td>
+              <td style="font-weight:700;color:#a1a1aa;">+0</td>
+            </tr>
+            <tr>
+              <td style="padding:.75rem 1rem;">
+                <div class="d-flex align-items-center gap-2">
+                  <div style="width:30px;height:30px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:#a1a1aa;">MK</div>
+                  <div>
+                    <div style="font-size:.875rem;font-weight:600;">Mohammed K.</div>
+                    <div style="font-size:.75rem;color:#a1a1aa;">fan #0342</div>
+                  </div>
+                </div>
+              </td>
+              <td style="color:#c9a227;font-size:.875rem;font-weight:500;">Jon Jones ✓</td>
+              <td><span class="badge" style="background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.2);">Submission</span></td>
+              <td>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-sm active-correct" style="background:rgba(34,197,94,.2);color:#22c55e;border:1px solid rgba(34,197,94,.3);font-size:.75rem;padding:3px 10px;">
+                    <i class="fa-solid fa-check me-1"></i>Correct
+                  </button>
+                  <button class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;font-size:.75rem;padding:3px 10px;">
+                    <i class="fa-solid fa-xmark me-1"></i>Wrong
+                  </button>
+                </div>
+              </td>
+              <td style="font-weight:700;color:#22c55e;">+10</td>
+            </tr>
+            <tr>
+              <td style="padding:.75rem 1rem;">
+                <div class="d-flex align-items-center gap-2">
+                  <div style="width:30px;height:30px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:#a1a1aa;">ST</div>
+                  <div>
+                    <div style="font-size:.875rem;font-weight:600;">Sara T.</div>
+                    <div style="font-size:.75rem;color:#a1a1aa;">fan #2011</div>
+                  </div>
+                </div>
+              </td>
+              <td style="color:#a1a1aa;font-size:.875rem;font-weight:500;">Jon Jones</td>
+              <td><span class="badge" style="background:rgba(234,179,8,.12);color:#fbbf24;border:1px solid rgba(234,179,8,.2);">Decision</span></td>
+              <td>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;font-size:.75rem;padding:3px 10px;">
+                    <i class="fa-solid fa-check me-1"></i>Correct
+                  </button>
+                  <button class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;font-size:.75rem;padding:3px 10px;">
+                    <i class="fa-solid fa-xmark me-1"></i>Wrong
+                  </button>
+                </div>
+              </td>
+              <td style="color:#a1a1aa;">—</td>
+            </tr>
+            <tr>
+              <td style="padding:.75rem 1rem;">
+                <div class="d-flex align-items-center gap-2">
+                  <div style="width:30px;height:30px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:#a1a1aa;">RB</div>
+                  <div>
+                    <div style="font-size:.875rem;font-weight:600;">Ravi B.</div>
+                    <div style="font-size:.75rem;color:#a1a1aa;">fan #1773</div>
+                  </div>
+                </div>
+              </td>
+              <td style="color:#a1a1aa;font-size:.875rem;font-weight:500;">Tom Aspinall</td>
+              <td><span class="badge" style="background:rgba(220,38,38,.12);color:#f87171;border:1px solid rgba(220,38,38,.2);">KO/TKO</span></td>
+              <td>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;font-size:.75rem;padding:3px 10px;">
+                    <i class="fa-solid fa-check me-1"></i>Correct
+                  </button>
+                  <button class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;font-size:.75rem;padding:3px 10px;">
+                    <i class="fa-solid fa-xmark me-1"></i>Wrong
+                  </button>
+                </div>
+              </td>
+              <td style="color:#a1a1aa;">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Step 4 — Confirm & Save -->
+      <div class="score-step">
+        <div class="d-flex align-items-center mb-3">
+          <span class="score-step-number">4</span>
+          <h5 class="mb-0 fw-semibold" style="color:#fafafa;">Confirm & Publish Scores</h5>
+        </div>
+        <div class="d-flex align-items-center gap-3 p-3 mb-3" style="background:#09090b;border:1px solid #27272a;border-radius:8px;">
+          <i class="fa-solid fa-circle-info" style="color:#3b82f6;font-size:1.1rem;"></i>
+          <p class="mb-0" style="font-size:.875rem;color:#a1a1aa;">
+            Confirming will assign points to <strong style="color:#fafafa;">5 fans</strong>, update the global leaderboard, and send a notification to each fan with their result.
+            <strong style="color:#eab308;">2 predictions are still unmarked</strong> — they will receive 0 points.
+          </p>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-danger px-4" data-bs-toggle="modal" data-bs-target="#confirmModal">
+            <i class="fa-solid fa-check me-2"></i>Confirm Scores
+          </button>
+          <a href="index.html" class="btn" style="background:#27272a;color:#fafafa;border:none;">Cancel</a>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="border-bottom:1px solid #27272a;">
+        <h5 class="modal-title" style="color:#fafafa;"><i class="fa-solid fa-star me-2" style="color:#c9a227;"></i>Publish Scores</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="color:#a1a1aa;font-size:.9rem;">
+        <p>You are about to publish scores for:</p>
+        <ul style="color:#fafafa;">
+          <li><strong>Fight:</strong> Jones vs Aspinall</li>
+          <li><strong>Event:</strong> UFC 310</li>
+          <li><strong>Fans scored:</strong> 5</li>
+          <li><strong>Points distributed:</strong> 50 pts</li>
+        </ul>
+        <p class="mb-0" style="color:#eab308;"><i class="fa-solid fa-triangle-exclamation me-1"></i>This action cannot be undone. Fans will be notified immediately.</p>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid #27272a;">
+        <button type="button" class="btn" style="background:#27272a;color:#fafafa;border:none;" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger">
+          <i class="fa-solid fa-check me-1"></i>Yes, Publish Scores
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+<script>
+  function loadPredictions() { /* wired by Symfony in real app */ }
+  function autoScore() {
+    document.querySelectorAll('#predictionTableBody tr').forEach(row => {
+      const winner = row.querySelector('td:nth-child(2)');
+      if (!winner) return;
+      const correct = winner.textContent.includes('✓');
+      const btns = row.querySelectorAll('button');
+      if (btns.length < 2) return;
+      if (correct) {
+        btns[0].style.background = 'rgba(34,197,94,.2)';
+        btns[0].style.color = '#22c55e';
+        btns[0].style.border = '1px solid rgba(34,197,94,.3)';
+        btns[1].style.background = '#27272a';
+        btns[1].style.color = '#a1a1aa';
+        btns[1].style.border = 'none';
+      } else {
+        btns[1].style.background = 'rgba(220,38,38,.2)';
+        btns[1].style.color = '#dc2626';
+        btns[1].style.border = '1px solid rgba(220,38,38,.3)';
+        btns[0].style.background = '#27272a';
+        btns[0].style.color = '#a1a1aa';
+        btns[0].style.border = 'none';
+      }
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+{% extends 'admin/base_admin.html.twig' %}
+{% set breadcrumb_title = 'Score Predictions' %}
+
+{% block admin_content %}
+<div class="page-header mb-4">
+    <h2 class="page-title" style="font-family:'Oswald',sans-serif;color:#fff;">Score Fight Predictions</h2>
+    <p class="text-muted">Select a completed fight result to score and distribute points to fans.</p>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="border-bottom:1px solid #27272a;">
+                <h5 class="mb-0" style="color:#fff;font-family:'Oswald',sans-serif;">Select Fight Result</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <label class="form-label" style="color:#a1a1aa;">Fight Result</label>
+                    <select id="fightResultSelect" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;">
+                        <option value="">Choose a fight result...</option>
+                        {% for result in fightResults %}
+                            <option value="{{ result.id }}"
+                                    data-match="{{ result.match ? result.match.id : '' }}"
+                                    data-winner="{{ result.winner ? result.winner.displayName : 'No contest' }}"
+                                    data-method="{{ result.method }}">
+                                {{ result.fightLabel }} — {{ result.winner ? result.winner.displayName : 'NC' }} ({{ result.method }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {# Preview table #}
+                <div id="predictionsPreview" class="d-none">
+                    <h6 style="color:#fff;font-family:'Oswald',sans-serif;" class="mb-3">Fan Predictions for this fight:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-dark mb-3" style="--bs-table-bg:#09090b;">
+                            <thead>
+                                <tr>
+                                    <th style="color:#71717a;">Fan</th>
+                                    <th style="color:#71717a;">Predicted Winner</th>
+                                    <th style="color:#71717a;">Method</th>
+                                    <th style="color:#71717a;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="predictionsTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-warning" style="background:#451a03;border-color:#92400e;color:#fbbf24;">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                        <strong>Warning:</strong> Scoring is irreversible. Fans will be notified of their results.
+                    </div>
+
+                    <form method="POST" action="{{ path('admin_prediction_score_confirm') }}" id="scoreForm">
+                        <input type="hidden" name="fight_result_id" id="hiddenFightResultId">
+                        <button type="submit" class="btn" style="background:#dc2626;color:#fff;font-family:'Oswald',sans-serif;">
+                            <i class="fa-solid fa-check me-2"></i>Confirm & Publish Scores
+                        </button>
+                        <a href="{{ path('admin_prediction_index') }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+                    </form>
+                </div>
+
+                <div id="loadingState" class="text-center py-4 d-none">
+                    <div class="spinner-border text-danger" role="status"></div>
+                    <p class="text-muted mt-2">Loading predictions...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('fightResultSelect').addEventListener('change', function() {
+    const resultId = this.value;
+    const matchId = this.options[this.selectedIndex].dataset.match;
+    if (!resultId || !matchId) {
+        document.getElementById('predictionsPreview').classList.add('d-none');
+        return;
+    }
+
+    document.getElementById('loadingState').classList.remove('d-none');
+    document.getElementById('predictionsPreview').classList.add('d-none');
+    document.getElementById('hiddenFightResultId').value = resultId;
+
+    fetch('{{ path('admin_prediction_score_load') }}', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'match_proposal_id=' + matchId
+    })
+    .then(r => r.json())
+    .then(predictions => {
+        const tbody = document.getElementById('predictionsTableBody');
+        tbody.innerHTML = '';
+        if (predictions.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No predictions for this fight.</td></tr>';
+        } else {
+            predictions.forEach(p => {
+                const status = p.is_scored
+                    ? `<span class="badge bg-secondary">Already scored (${p.points_earned ?? 0} pts)</span>`
+                    : '<span class="badge" style="background:#374151;">Pending</span>';
+                tbody.innerHTML += `<tr>
+                    <td style="color:#fff;">${p.fan_name}</td>
+                    <td style="color:#d4d4d8;">${p.predicted_winner}</td>
+                    <td><span class="badge bg-secondary">${p.predicted_method}</span></td>
+                    <td>${status}</td>
+                </tr>`;
+            });
+        }
+        document.getElementById('loadingState').classList.add('d-none');
+        document.getElementById('predictionsPreview').classList.remove('d-none');
+    });
+});
+</script>
+{% endblock %}

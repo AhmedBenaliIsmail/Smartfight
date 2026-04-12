@@ -1,0 +1,104 @@
+{% extends 'admin/base_admin.html.twig' %}
+{% set breadcrumb_title = 'Notifications' %}
+
+{% block admin_content %}
+<div class="page-header d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h2 class="page-title mb-1" style="font-family:'Oswald',sans-serif;color:#fff;">Notification History</h2>
+        <p class="text-muted mb-0">{{ pagination.getTotalItemCount() }} notifications sent</p>
+    </div>
+    <a href="{{ path('admin_notification_broadcast') }}" class="btn" style="background:#dc2626;color:#fff;font-family:'Oswald',sans-serif;">
+        <i class="fa-solid fa-bullhorn me-2"></i>Broadcast
+    </a>
+</div>
+
+{# Stats #}
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-body text-center">
+                <div style="font-size:1.8rem;font-weight:700;color:#fff;">{{ stats.total_sent|default(0) }}</div>
+                <div style="color:#71717a;font-size:.8rem;text-transform:uppercase;">Total Sent</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-body text-center">
+                <div style="font-size:1.8rem;font-weight:700;color:#16a34a;">{{ stats.read_count|default(0) }}</div>
+                <div style="color:#71717a;font-size:.8rem;text-transform:uppercase;">Read</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-body text-center">
+                <div style="font-size:1.8rem;font-weight:700;color:#c9a227;">{{ stats.unread_count|default(0) }}</div>
+                <div style="color:#71717a;font-size:.8rem;text-transform:uppercase;">Unread</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-body text-center">
+                <div style="font-size:1.8rem;font-weight:700;color:#dc2626;">{{ stats.broadcast_count|default(0) }}</div>
+                <div style="color:#71717a;font-size:.8rem;text-transform:uppercase;">Broadcasts</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Tab filters #}
+<div class="mb-4 d-flex gap-2 flex-wrap">
+    {% for tab, label in {'all': 'All', 'ADMIN_BROADCAST': 'Broadcasts', 'NEW_EVENT': 'Events', 'PREDICTION_SCORED': 'Predictions'} %}
+        <a href="?type={{ tab == 'all' ? '' : tab }}"
+           class="btn btn-sm {% if activeTab == tab %}btn-danger{% else %}btn-outline-secondary{% endif %}">
+            {{ label }}
+        </a>
+    {% endfor %}
+</div>
+
+<div class="card" style="background:#18181b;border:1px solid #27272a;">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0" style="--bs-table-bg:#18181b;">
+            <thead>
+                <tr style="border-bottom:1px solid #27272a;">
+                    <th style="color:#71717a;">Fan</th>
+                    <th style="color:#71717a;">Type</th>
+                    <th style="color:#71717a;">Title</th>
+                    <th style="color:#71717a;">Message</th>
+                    <th style="color:#71717a;">Status</th>
+                    <th style="color:#71717a;">Sent</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for notif in pagination %}
+                <tr>
+                    <td style="color:#fff;">{{ notif.fan.fullName }}</td>
+                    <td><span class="badge bg-secondary">{{ notif.type }}</span></td>
+                    <td style="color:#d4d4d8;">{{ notif.title }}</td>
+                    <td style="color:#a1a1aa;font-size:.85rem;">{{ notif.message|length > 80 ? notif.message|slice(0,80) ~ '…' : notif.message }}</td>
+                    <td>
+                        {% if notif.isRead %}
+                            <span class="badge" style="background:#16a34a;">Read</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Unread</span>
+                        {% endif %}
+                    </td>
+                    <td style="color:#71717a;font-size:.8rem;">{{ notif.createdAt|date('d M Y, H:i') }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-5">No notifications found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if pagination.pageCount > 1 %}
+    <div class="card-footer d-flex justify-content-center" style="border-top:1px solid #27272a;background:#18181b;">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

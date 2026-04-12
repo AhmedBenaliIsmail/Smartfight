@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Event Detail — SmartFight Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/smartfight-admin.css" />
+</head>
+<body class="antialiased">
+<div class="wrapper">
+  <aside class="navbar navbar-vertical navbar-expand-lg" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+    <div class="container-fluid flex-column align-items-stretch p-0">
+      <div class="p-3 border-bottom" style="border-color:#27272a!important">
+        <a href="../dashboard.html" class="smartfight-logo"><div class="logo-icon"><i class="fa-solid fa-fist-raised"></i></div><div class="logo-text">Smart<span>Fight</span></div></a>
+      </div>
+      <nav class="flex-fill py-2">
+        <div class="navbar-vertical-section">Management</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../dashboard.html"><span class="nav-link-icon"><i class="fa-solid fa-chart-line fa-fw"></i></span><span class="nav-link-title">Dashboard</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../users/index.html"><span class="nav-link-icon"><i class="fa-solid fa-users fa-fw"></i></span><span class="nav-link-title">Users</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fighters/index.html"><span class="nav-link-icon"><i class="fa-solid fa-boxing-glove fa-fw"></i></span><span class="nav-link-title">Fighters</span></a></li>
+          <li class="nav-item"><a class="nav-link active" href="index.html"><span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span><span class="nav-link-title">Events</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fight-results/index.html"><span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span><span class="nav-link-title">Fight Results</span></a></li>
+        </ul>
+        <div class="navbar-vertical-section mt-2">Fan Experience</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../blog/index.html"><span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw"></i></span><span class="nav-link-title">Blog Articles</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../bookings/index.html"><span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw"></i></span><span class="nav-link-title">Event Bookings</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../predictions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span><span class="nav-link-title">Predictions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../reactions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-comments fa-fw"></i></span><span class="nav-link-title">Reactions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../notifications/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span><span class="nav-link-title">Notifications</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
+    <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
+      <div class="d-flex align-items-center gap-3 flex-fill">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="../dashboard.html" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+          <li class="breadcrumb-item"><a href="index.html" style="color:#a1a1aa;text-decoration:none;">Events</a></li>
+          <li class="breadcrumb-item active">UFC 312</li>
+        </ol>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="#" class="nav-link p-1 text-muted"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="../notifications/index.html" class="nav-link p-1 position-relative text-muted"><i class="fa-solid fa-bell"></i><span class="badge bg-danger rounded-pill" style="position:absolute;top:-4px;right:-4px;font-size:.6rem;padding:2px 5px;">7</span></a>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+            <div style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">A</div>
+            <span style="font-size:.875rem;color:#fafafa;">Admin</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user fa-fw me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-fill p-4" style="background:#09090b;">
+      <!-- Event Header -->
+      <div class="card mb-4" style="background:linear-gradient(135deg,#1a0a0a,#18181b);border:1px solid #7f1d1d;">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-start justify-content-between">
+            <div>
+              <div class="d-flex align-items-center gap-3 mb-2">
+                <span class="badge badge-live" style="animation:pulse-live 1.5s infinite;font-size:.75rem;"><i class="fa-solid fa-circle fa-xs me-1"></i>LIVE NOW</span>
+                <span class="badge" style="background:rgba(220,38,38,.1);color:#f87171;border:1px solid rgba(220,38,38,.2);">MMA</span>
+              </div>
+              <h1 class="fw-bold mb-1" style="color:#fafafa;font-size:1.625rem;">UFC 312 — Championship Night</h1>
+              <div style="color:#a1a1aa;font-size:.875rem;"><i class="fa-solid fa-location-dot me-1"></i>T-Mobile Arena, Las Vegas, NV &nbsp;·&nbsp; <i class="fa-solid fa-calendar me-1"></i>April 19, 2026</div>
+            </div>
+            <div class="d-flex gap-2">
+              <a href="form.html" class="btn btn-sm" style="background:#27272a;color:#fafafa;border:none;"><i class="fa-solid fa-pen me-1"></i>Edit</a>
+              <a href="index.html" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+          <div class="stat-card">
+            <div class="stat-icon mb-2" style="background:rgba(220,38,38,.15);color:#dc2626;width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-fist-raised"></i></div>
+            <div class="stat-value" style="font-size:1.5rem;">12</div>
+            <div class="stat-label">Total Fights</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card">
+            <div class="stat-icon mb-2" style="background:rgba(59,130,246,.15);color:#3b82f6;width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-people-group"></i></div>
+            <div class="stat-value" style="font-size:1.5rem;">20,000</div>
+            <div class="stat-label">Capacity</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card">
+            <div class="stat-icon mb-2" style="background:rgba(34,197,94,.15);color:#22c55e;width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-ticket"></i></div>
+            <div class="stat-value" style="font-size:1.5rem;">14,872</div>
+            <div class="stat-label">Bookings</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card">
+            <div class="stat-icon mb-2" style="background:rgba(201,162,39,.15);color:#c9a227;width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-dollar-sign"></i></div>
+            <div class="stat-value" style="font-size:1.5rem;">$2.4M</div>
+            <div class="stat-label">Revenue</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <!-- Fight Card -->
+        <div class="col-lg-8">
+          <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+              <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-list me-2" style="color:#dc2626;"></i>Fight Card</h3>
+            </div>
+            <div class="card-body p-0">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th style="padding:.75rem 1.25rem;width:50px;">#</th>
+                    <th>Red Corner</th>
+                    <th class="text-center">vs</th>
+                    <th>Blue Corner</th>
+                    <th>Division</th>
+                    <th>Result</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding:.75rem 1.25rem;"><span class="badge" style="background:#c9a227;color:#000;font-size:.7rem;">MAIN</span></td>
+                    <td style="font-size:.875rem;"><span style="color:#dc2626;font-weight:600;">Jones</span></td>
+                    <td class="text-center" style="color:#52525b;font-weight:700;">vs</td>
+                    <td style="font-size:.875rem;"><span style="color:#3b82f6;font-weight:600;">Aspinall</span></td>
+                    <td style="font-size:.8rem;color:#a1a1aa;">HW</td>
+                    <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Jones W</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:.75rem 1.25rem;"><span class="badge" style="background:#27272a;color:#a1a1aa;font-size:.7rem;">CO-MAIN</span></td>
+                    <td style="font-size:.875rem;"><span style="color:#dc2626;font-weight:600;">Adesanya</span></td>
+                    <td class="text-center" style="color:#52525b;font-weight:700;">vs</td>
+                    <td style="font-size:.875rem;"><span style="color:#3b82f6;font-weight:600;">Du Plessis</span></td>
+                    <td style="font-size:.8rem;color:#a1a1aa;">MW</td>
+                    <td><span class="badge" style="background:rgba(234,179,8,.15);color:#eab308;">Upcoming</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:.75rem 1.25rem;color:#52525b;font-size:.8rem;">3</td>
+                    <td style="font-size:.875rem;"><span style="color:#dc2626;font-weight:600;">Poirier</span></td>
+                    <td class="text-center" style="color:#52525b;font-weight:700;">vs</td>
+                    <td style="font-size:.875rem;"><span style="color:#3b82f6;font-weight:600;">Oliveira</span></td>
+                    <td style="font-size:.8rem;color:#a1a1aa;">LW</td>
+                    <td><span class="badge" style="background:rgba(234,179,8,.15);color:#eab308;">Upcoming</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:.75rem 1.25rem;color:#52525b;font-size:.8rem;">4</td>
+                    <td style="font-size:.875rem;"><span style="color:#dc2626;font-weight:600;">Nunes</span></td>
+                    <td class="text-center" style="color:#52525b;font-weight:700;">vs</td>
+                    <td style="font-size:.875rem;"><span style="color:#3b82f6;font-weight:600;">Pena</span></td>
+                    <td style="font-size:.8rem;color:#a1a1aa;">BW</td>
+                    <td><span class="badge" style="background:rgba(234,179,8,.15);color:#eab308;">Upcoming</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Booking Breakdown -->
+        <div class="col-lg-4">
+          <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+              <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-ticket me-2" style="color:#22c55e;"></i>Ticket Breakdown</h3>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                  <span style="font-size:.8125rem;">Ringside</span>
+                  <span style="font-size:.8125rem;color:#c9a227;font-weight:600;">$650</span>
+                </div>
+                <div class="progress" style="height:6px;">
+                  <div class="progress-bar bg-danger" style="width:32%;"></div>
+                </div>
+                <div style="font-size:.75rem;color:#a1a1aa;margin-top:.25rem;">640 sold / 2,000</div>
+              </div>
+              <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                  <span style="font-size:.8125rem;">VIP</span>
+                  <span style="font-size:.8125rem;color:#c9a227;font-weight:600;">$250</span>
+                </div>
+                <div class="progress" style="height:6px;">
+                  <div class="progress-bar" style="width:68%;background:#c9a227;"></div>
+                </div>
+                <div style="font-size:.75rem;color:#a1a1aa;margin-top:.25rem;">3,400 sold / 5,000</div>
+              </div>
+              <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                  <span style="font-size:.8125rem;">General</span>
+                  <span style="font-size:.8125rem;color:#c9a227;font-weight:600;">$95</span>
+                </div>
+                <div class="progress" style="height:6px;">
+                  <div class="progress-bar bg-primary" style="width:80%;"></div>
+                </div>
+                <div style="font-size:.75rem;color:#a1a1aa;margin-top:.25rem;">10,832 sold / 13,000</div>
+              </div>
+              <hr style="border-color:#27272a;opacity:1;" />
+              <div class="d-flex justify-content-between">
+                <span style="font-size:.875rem;color:#a1a1aa;">Total sold</span>
+                <span style="font-size:.875rem;font-weight:700;color:#22c55e;">14,872 / 20,000</span>
+              </div>
+              <div class="progress mt-2" style="height:8px;">
+                <div class="progress-bar" style="width:74%;background:#22c55e;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+</body>
+</html>

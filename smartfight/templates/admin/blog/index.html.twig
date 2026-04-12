@@ -1,0 +1,111 @@
+{% extends 'admin/base_admin.html.twig' %}
+{% set breadcrumb_title = 'Blog / News' %}
+
+{% block admin_content %}
+<div class="page-header d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h2 class="page-title mb-1" style="font-family:'Oswald',sans-serif;color:#fff;">Blog Articles</h2>
+        <p class="text-muted mb-0">{{ pagination.getTotalItemCount() }} articles total</p>
+    </div>
+    <a href="{{ path('admin_blog_new') }}" class="btn" style="background:#dc2626;color:#fff;font-family:'Oswald',sans-serif;">
+        <i class="fa-solid fa-plus me-2"></i>New Article
+    </a>
+</div>
+
+{# Filters #}
+<div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" placeholder="Search title or author..."
+                       value="{{ filters.search|default('') }}" style="background:#09090b;border-color:#27272a;color:#fff;">
+            </div>
+            <div class="col-md-3">
+                <select name="category" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if filters.category|default('') == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;">
+                    <option value="">All Statuses</option>
+                    <option value="DRAFT" {% if filters.status|default('') == 'DRAFT' %}selected{% endif %}>Draft</option>
+                    <option value="PUBLISHED" {% if filters.status|default('') == 'PUBLISHED' %}selected{% endif %}>Published</option>
+                    <option value="ARCHIVED" {% if filters.status|default('') == 'ARCHIVED' %}selected{% endif %}>Archived</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-secondary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Table #}
+<div class="card" style="background:#18181b;border:1px solid #27272a;">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0" style="--bs-table-bg:#18181b;--bs-table-striped-bg:#1f1f23;">
+            <thead>
+                <tr style="border-bottom:1px solid #27272a;">
+                    <th style="color:#71717a;">Title</th>
+                    <th style="color:#71717a;">Category</th>
+                    <th style="color:#71717a;">Author</th>
+                    <th style="color:#71717a;">Status</th>
+                    <th style="color:#71717a;">Views</th>
+                    <th style="color:#71717a;">Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for article in pagination %}
+                <tr>
+                    <td>
+                        <a href="{{ path('admin_blog_show', {id: article.id}) }}" style="color:#fff;text-decoration:none;">
+                            {{ article.title|length > 60 ? article.title|slice(0,60) ~ '…' : article.title }}
+                        </a>
+                    </td>
+                    <td><span class="badge bg-secondary">{{ article.category.name }}</span></td>
+                    <td style="color:#a1a1aa;">{{ article.author.fullName }}</td>
+                    <td>
+                        {% if article.status == 'PUBLISHED' %}
+                            <span class="badge" style="background:#16a34a;">Published</span>
+                        {% elseif article.status == 'DRAFT' %}
+                            <span class="badge bg-secondary">Draft</span>
+                        {% else %}
+                            <span class="badge" style="background:#374151;">Archived</span>
+                        {% endif %}
+                    </td>
+                    <td style="color:#a1a1aa;">{{ article.viewCount }}</td>
+                    <td style="color:#71717a;font-size:.8rem;">{{ article.createdAt|date('d M Y') }}</td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a href="{{ path('admin_blog_edit', {id: article.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+                            <form method="POST" action="{{ path('admin_blog_delete', {id: article.id}) }}"
+                                  onsubmit="return confirm('Delete this article?')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-5">No articles found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if pagination.pageCount > 1 %}
+    <div class="card-footer d-flex justify-content-center" style="border-top:1px solid #27272a;background:#18181b;">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

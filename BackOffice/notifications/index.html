@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Notifications — SmartFight Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/smartfight-admin.css" />
+</head>
+<body class="antialiased">
+<div class="wrapper">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────── -->
+  <aside class="navbar navbar-vertical navbar-expand-lg" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+    <div class="container-fluid flex-column align-items-stretch p-0">
+      <div class="p-3 border-bottom" style="border-color:#27272a!important">
+        <a href="../dashboard.html" class="smartfight-logo">
+          <div class="logo-icon"><i class="fa-solid fa-fist-raised"></i></div>
+          <div class="logo-text">Smart<span>Fight</span></div>
+        </a>
+      </div>
+      <nav class="flex-fill py-2">
+        <div class="navbar-vertical-section">Management</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../dashboard.html"><span class="nav-link-icon"><i class="fa-solid fa-chart-line fa-fw"></i></span><span class="nav-link-title">Dashboard</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../users/index.html"><span class="nav-link-icon"><i class="fa-solid fa-users fa-fw"></i></span><span class="nav-link-title">Users</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fighters/index.html"><span class="nav-link-icon"><i class="fa-solid fa-boxing-glove fa-fw"></i></span><span class="nav-link-title">Fighters</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../events/index.html"><span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span><span class="nav-link-title">Events</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fight-results/index.html"><span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span><span class="nav-link-title">Fight Results</span></a></li>
+        </ul>
+        <div class="navbar-vertical-section mt-2">Fan Experience</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../blog/index.html"><span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw"></i></span><span class="nav-link-title">Blog Articles</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../bookings/index.html"><span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw"></i></span><span class="nav-link-title">Event Bookings</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../predictions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span><span class="nav-link-title">Predictions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../reactions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-comments fa-fw"></i></span><span class="nav-link-title">Reactions</span></a></li>
+          <li class="nav-item"><a class="nav-link active" href="index.html"><span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span><span class="nav-link-title">Notifications</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- ── Main content ─────────────────────────────────────────── -->
+  <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
+
+    <!-- Topbar -->
+    <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
+      <div class="d-flex align-items-center gap-3 flex-fill">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="../dashboard.html" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+          <li class="breadcrumb-item active">Notifications</li>
+        </ol>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="#" class="nav-link p-1 text-muted"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="index.html" class="nav-link p-1 position-relative text-muted">
+          <i class="fa-solid fa-bell"></i>
+          <span class="badge bg-danger rounded-pill" style="position:absolute;top:-4px;right:-4px;font-size:.6rem;padding:2px 5px;">7</span>
+        </a>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+            <div style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">A</div>
+            <span style="font-size:.875rem;color:#fafafa;">Admin</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user fa-fw me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-fill p-4" style="background:#09090b;">
+
+      <!-- Page Header -->
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Notifications</h1>
+          <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">System and broadcast notification history</p>
+        </div>
+        <a href="broadcast.html" class="btn btn-danger">
+          <i class="fa-solid fa-bullhorn me-2"></i>New Broadcast
+        </a>
+      </div>
+
+      <!-- Stats row -->
+      <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between mb-3">
+              <div class="stat-icon" style="background:rgba(59,130,246,.15);color:#3b82f6;"><i class="fa-solid fa-bell"></i></div>
+            </div>
+            <div class="stat-value">12,840</div>
+            <div class="stat-label">Total Sent</div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between mb-3">
+              <div class="stat-icon" style="background:rgba(34,197,94,.15);color:#22c55e;"><i class="fa-solid fa-envelope-open"></i></div>
+              <span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;font-size:.7rem;">78%</span>
+            </div>
+            <div class="stat-value">10,015</div>
+            <div class="stat-label">Opened / Read</div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between mb-3">
+              <div class="stat-icon" style="background:rgba(220,38,38,.15);color:#dc2626;"><i class="fa-solid fa-bullhorn"></i></div>
+            </div>
+            <div class="stat-value">23</div>
+            <div class="stat-label">Broadcasts Sent</div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between mb-3">
+              <div class="stat-icon" style="background:rgba(234,179,8,.15);color:#eab308;"><i class="fa-solid fa-circle-dot"></i></div>
+              <span class="badge badge-live px-2 py-1" style="font-size:.7rem;">Unread</span>
+            </div>
+            <div class="stat-value">7</div>
+            <div class="stat-label">Unread (Admin)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters + Tabs -->
+      <div class="card" style="background:#18181b;border:1px solid #27272a;">
+        <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+          <div class="d-flex align-items-center justify-content-between">
+            <!-- Tabs -->
+            <ul class="nav nav-tabs card-header-tabs">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">All <span class="badge ms-1" style="background:rgba(161,161,170,.15);color:#a1a1aa;font-size:.7rem;">12,840</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Broadcasts <span class="badge ms-1" style="background:rgba(220,38,38,.15);color:#dc2626;font-size:.7rem;">23</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Prediction Results <span class="badge ms-1" style="background:rgba(201,162,39,.15);color:#c9a227;font-size:.7rem;">4,521</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Booking Confirms <span class="badge ms-1" style="background:rgba(34,197,94,.15);color:#22c55e;font-size:.7rem;">847</span></a>
+              </li>
+            </ul>
+            <!-- Filter -->
+            <div class="d-flex gap-2">
+              <select class="form-select form-select-sm" style="width:auto;">
+                <option>All fans</option>
+                <option>VIP fans</option>
+                <option>Specific fan</option>
+              </select>
+              <select class="form-select form-select-sm" style="width:auto;">
+                <option>All time</option>
+                <option>Today</option>
+                <option>This week</option>
+                <option>This month</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th style="padding:.75rem 1.25rem;width:36px;"></th>
+                <th>Type</th>
+                <th>Recipient</th>
+                <th>Title</th>
+                <th>Message</th>
+                <th>Status</th>
+                <th>Sent</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Unread -->
+              <tr style="border-left:2px solid #dc2626;">
+                <td style="padding:.75rem 1.25rem;"><i class="fa-solid fa-circle" style="color:#dc2626;font-size:.45rem;vertical-align:middle;"></i></td>
+                <td><span class="badge" style="background:rgba(220,38,38,.15);color:#dc2626;font-size:.72rem;"><i class="fa-solid fa-bullhorn me-1"></i>Broadcast</span></td>
+                <td style="font-size:.875rem;">All fans <span style="color:#a1a1aa;font-size:.78rem;">(1,284)</span></td>
+                <td style="font-size:.875rem;font-weight:600;">UFC 311 Card Announced</td>
+                <td style="font-size:.8rem;color:#a1a1aa;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">The full card for UFC 311 is now live. Check the events page for matchups and book your tickets!</td>
+                <td><span class="badge" style="background:rgba(234,179,8,.15);color:#eab308;">Unread</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 7, 10:30</td>
+              </tr>
+              <!-- Unread -->
+              <tr style="border-left:2px solid #dc2626;">
+                <td style="padding:.75rem 1.25rem;"><i class="fa-solid fa-circle" style="color:#dc2626;font-size:.45rem;vertical-align:middle;"></i></td>
+                <td><span class="badge" style="background:rgba(201,162,39,.15);color:#c9a227;font-size:.72rem;"><i class="fa-solid fa-bullseye me-1"></i>Prediction</span></td>
+                <td style="font-size:.875rem;">Lucas P.</td>
+                <td style="font-size:.875rem;font-weight:600;">You scored +15 points!</td>
+                <td style="font-size:.8rem;color:#a1a1aa;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Your prediction for Jones vs Aspinall was correct (KO/TKO bonus). Great pick!</td>
+                <td><span class="badge" style="background:rgba(234,179,8,.15);color:#eab308;">Unread</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 5, 23:45</td>
+              </tr>
+              <!-- Read -->
+              <tr>
+                <td style="padding:.75rem 1.25rem;"><i class="fa-solid fa-circle" style="color:#3f3f46;font-size:.45rem;vertical-align:middle;"></i></td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;font-size:.72rem;"><i class="fa-solid fa-ticket me-1"></i>Booking</span></td>
+                <td style="font-size:.875rem;">Marcus J.</td>
+                <td style="font-size:.875rem;">Booking Confirmed — UFC 310</td>
+                <td style="font-size:.8rem;color:#a1a1aa;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Your 2x VIP tickets for UFC 310 have been confirmed. See you there!</td>
+                <td><span class="badge" style="background:rgba(161,161,170,.1);color:#a1a1aa;">Read</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 5, 14:22</td>
+              </tr>
+              <!-- Read -->
+              <tr>
+                <td style="padding:.75rem 1.25rem;"><i class="fa-solid fa-circle" style="color:#3f3f46;font-size:.45rem;vertical-align:middle;"></i></td>
+                <td><span class="badge" style="background:rgba(220,38,38,.15);color:#dc2626;font-size:.72rem;"><i class="fa-solid fa-bullhorn me-1"></i>Broadcast</span></td>
+                <td style="font-size:.875rem;">VIP fans <span style="color:#a1a1aa;font-size:.78rem;">(312)</span></td>
+                <td style="font-size:.875rem;">Early Access: UFC 311 Tickets</td>
+                <td style="font-size:.8rem;color:#a1a1aa;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">As a VIP member, you get 24h early access to UFC 311 ticket sales. Use code VIPFIGHT.</td>
+                <td><span class="badge" style="background:rgba(161,161,170,.1);color:#a1a1aa;">Read</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 4, 09:00</td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;"><i class="fa-solid fa-circle" style="color:#3f3f46;font-size:.45rem;vertical-align:middle;"></i></td>
+                <td><span class="badge" style="background:rgba(201,162,39,.15);color:#c9a227;font-size:.72rem;"><i class="fa-solid fa-bullseye me-1"></i>Prediction</span></td>
+                <td style="font-size:.875rem;">Elena V.</td>
+                <td style="font-size:.875rem;">Your prediction result</td>
+                <td style="font-size:.8rem;color:#a1a1aa;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Your prediction for Poirier vs McGregor was incorrect. Better luck next fight!</td>
+                <td><span class="badge" style="background:rgba(161,161,170,.1);color:#a1a1aa;">Read</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 5, 23:46</td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;"><i class="fa-solid fa-circle" style="color:#3f3f46;font-size:.45rem;vertical-align:middle;"></i></td>
+                <td><span class="badge" style="background:rgba(59,130,246,.15);color:#3b82f6;font-size:.72rem;"><i class="fa-solid fa-calendar-days me-1"></i>Event</span></td>
+                <td style="font-size:.875rem;">All fans <span style="color:#a1a1aa;font-size:.78rem;">(1,284)</span></td>
+                <td style="font-size:.875rem;">Event Starting Soon: UFC 310</td>
+                <td style="font-size:.8rem;color:#a1a1aa;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">UFC 310 starts in 1 hour! Make your predictions now before the prelims begin.</td>
+                <td><span class="badge" style="background:rgba(161,161,170,.1);color:#a1a1aa;">Read</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 5, 18:00</td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;"><i class="fa-solid fa-circle" style="color:#3f3f46;font-size:.45rem;vertical-align:middle;"></i></td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;font-size:.72rem;"><i class="fa-solid fa-ticket me-1"></i>Booking</span></td>
+                <td style="font-size:.875rem;">Sandra B.</td>
+                <td style="font-size:.875rem;">Booking Pending — Bellator 302</td>
+                <td style="font-size:.8rem;color:#a1a1aa;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Your booking for Bellator 302 is pending payment confirmation. Complete within 24h.</td>
+                <td><span class="badge" style="background:rgba(161,161,170,.1);color:#a1a1aa;">Read</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 5, 11:10</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card-footer" style="background:#18181b;border-top:1px solid #27272a;">
+          <div class="d-flex align-items-center justify-content-between">
+            <span style="font-size:.8125rem;color:#a1a1aa;">Showing 1–7 of 12,840 notifications</span>
+            <nav><ul class="pagination pagination-sm mb-0 gap-1">
+              <li class="page-item disabled"><a class="page-link" href="#">‹</a></li>
+              <li class="page-item active"><a class="page-link" href="#">1</a></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item"><a class="page-link" href="#">›</a></li>
+            </ul></nav>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+</body>
+</html>
