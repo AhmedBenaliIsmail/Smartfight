@@ -1,6 +1,57 @@
 {% extends 'front/base_front.html.twig' %}
 {% block title %}Predictions — SmartFight{% endblock %}
 
+{% block extra_css %}
+<style>
+    #predTabs {
+        border-bottom: 1px solid #27272a;
+        padding-bottom: .55rem;
+        gap: .55rem !important;
+    }
+
+    #predTabs .nav-link {
+        background: #18181b;
+        border: 1px solid #27272a;
+        border-radius: .55rem;
+        color: #a1a1aa;
+        font-size: .8rem;
+        font-weight: 700;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        padding: .58rem 1rem;
+        transition: all .18s ease;
+    }
+
+    #predTabs .nav-link:hover,
+    #predTabs .nav-link:focus {
+        background: #1f1f23;
+        border-color: #dc2626;
+        color: #fafafa;
+    }
+
+    #predTabs .nav-link.active,
+    #predTabs .show > .nav-link {
+        background: #dc2626;
+        border-color: #dc2626;
+        color: #fff;
+        box-shadow: 0 0 0 1px rgba(220, 38, 38, .2);
+    }
+    
+    @media (max-width: 575.98px) {
+        #predTabs .nav-item {
+            flex: 1 1 calc(50% - .35rem);
+        }
+
+        #predTabs .nav-link {
+            text-align: center;
+            width: 100%;
+            font-size: .76rem;
+            padding: .52rem .6rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <section class="py-5" style="background:#09090b;min-height:100vh;">
     <div class="container">

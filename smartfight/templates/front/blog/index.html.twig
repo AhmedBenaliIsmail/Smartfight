@@ -1,6 +1,54 @@
 {% extends 'front/base_front.html.twig' %}
 {% block title %}Blog & News — SmartFight{% endblock %}
 
+{% block extra_css %}
+<style>
+    #blog-pagination .pagination {
+        gap: .35rem;
+        margin-bottom: 0;
+    }
+
+    #blog-pagination .page-link {
+        background: #18181b;
+        border: 1px solid #27272a;
+        color: #a1a1aa;
+        border-radius: .45rem;
+        min-width: 2.4rem;
+        text-align: center;
+        font-size: .82rem;
+        font-weight: 600;
+        transition: all .18s ease;
+    }
+
+    #blog-pagination .page-link:hover {
+        background: #1f1f23;
+        border-color: #dc2626;
+        color: #fafafa;
+    }
+
+    #blog-pagination .page-item.active .page-link {
+        background: #dc2626;
+        border-color: #dc2626;
+        color: #fff;
+        box-shadow: 0 0 0 1px rgba(220, 38, 38, .2);
+    }
+
+    #blog-pagination .page-item.disabled .page-link {
+        background: #131316;
+        border-color: #27272a;
+        color: #52525b;
+    }
+
+    #blog-pagination .page-item.previous .page-link,
+    #blog-pagination .page-item.next .page-link {
+        padding-left: .9rem;
+        padding-right: .9rem;
+        letter-spacing: .03em;
+        text-transform: uppercase;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <section class="py-5" style="background:#09090b;min-height:100vh;">
     <div class="container">
@@ -75,7 +123,7 @@
                 </div>
 
                 {% if pagination.pageCount > 1 %}
-                <div class="d-flex justify-content-center mt-4">
+                <div id="blog-pagination" class="d-flex justify-content-center mt-4">
                     {{ knp_pagination_render(pagination) }}
                 </div>
                 {% endif %}
