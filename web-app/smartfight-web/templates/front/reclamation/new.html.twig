@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Submit a Reclamation — SmartFight{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <div class="mb-3">
+                    <span style="display:inline-flex;align-items:center;justify-content:center;width:80px;height:80px;background:rgba(229,9,20,0.1);border-radius:50%;border:2px solid rgba(229,9,20,0.3);">
+                        <i class="fas fa-envelope fa-2x text-danger"></i>
+                    </span>
+                </div>
+                <h1 class="section-title text-center border-0 ps-0 mb-2">
+                    Submit a <span>Reclamation</span>
+                </h1>
+                <p class="text-secondary">Describe your issue in detail. Our team will get back to you as soon as possible.</p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="card" style="border-top: 3px solid #e50914;">
+                <div class="card-body p-4">
+
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'reclamation-form'}}) }}
+
+                    <div class="mb-4">
+                        {{ form_label(form.subject, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.subject) }}
+                        {% if form_errors(form.subject) is not empty %}
+                            <div class="text-danger small mt-1">
+                                <i class="fas fa-exclamation-circle me-1"></i>{{ form_errors(form.subject) }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form_label(form.description, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.description) }}
+                        {% if form_errors(form.description) is not empty %}
+                            <div class="text-danger small mt-1">
+                                <i class="fas fa-exclamation-circle me-1"></i>{{ form_errors(form.description) }}
+                            </div>
+                        {% endif %}
+                        <div class="text-secondary small mt-1">Minimum 10 characters, maximum 2000.</div>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-danger flex-grow-1 py-3">
+                            <i class="fas fa-paper-plane me-2"></i>Submit Reclamation
+                        </button>
+                        <a href="{{ path('app_reclamation_index') }}" class="btn btn-outline-secondary py-3 px-4">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+
+            <!-- Info -->
+            <div class="row g-3 mt-4">
+                <div class="col-md-4 text-center">
+                    <div class="p-3" style="background:#12122a;border-radius:12px;border:1px solid #2a2a4e;">
+                        <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                        <div class="small text-secondary">Processing Time</div>
+                        <div class="fw-bold text-white">24–48h</div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="p-3" style="background:#12122a;border-radius:12px;border:1px solid #2a2a4e;">
+                        <i class="fas fa-shield-alt fa-2x text-success mb-2"></i>
+                        <div class="small text-secondary">Confidentiality</div>
+                        <div class="fw-bold text-white">Guaranteed</div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="p-3" style="background:#12122a;border-radius:12px;border:1px solid #2a2a4e;">
+                        <i class="fas fa-reply fa-2x text-info mb-2"></i>
+                        <div class="small text-secondary">Response</div>
+                        <div class="fw-bold text-white">Via email</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

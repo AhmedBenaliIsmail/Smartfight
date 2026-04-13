@@ -1,0 +1,46 @@
+{% extends 'admin/base_admin.html.twig' %}
+{% block title %}{{ discipline.name }} — SmartFight Admin{% endblock %}
+{% block page_title %}<i class="fas fa-running mr-2" style="color:#e50914;"></i>{{ discipline.name }}{% endblock %}
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_admin_discipline_index') }}">Disciplines</a></li>
+    <li class="breadcrumb-item active">{{ discipline.name }}</li>
+{% endblock %}
+{% block body %}
+<div class="mb-3">
+    <a href="{{ path('app_admin_discipline_edit', {'id': discipline.id}) }}" class="btn btn-warning mr-2"><i class="fas fa-edit mr-1"></i>Edit</a>
+    <button class="btn btn-danger" data-toggle="modal" data-target="#deleteModal"><i class="fas fa-trash mr-1"></i>Delete</button>
+    <a href="{{ path('app_admin_discipline_index') }}" class="btn btn-secondary ml-2"><i class="fas fa-arrow-left mr-1"></i>Back</a>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Details</h3></div>
+            <div class="card-body">
+                <dl>
+                    <dt>Name</dt><dd><strong>{{ discipline.name }}</strong></dd>
+                    <dt>Description</dt><dd>{{ discipline.description ?? '—' }}</dd>
+                    <dt>Associated Events</dt><dd><span class="badge badge-info">{{ discipline.events|length }}</span></dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Delete</h5>
+                <button class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">Delete <strong>"{{ discipline.name }}"</strong>?</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <form method="POST" action="{{ path('app_admin_discipline_delete', {'id': discipline.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ discipline.id) }}">
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-trash mr-1"></i>Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ event.name }} — SmartFight{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb" style="background:transparent;padding:0;">
+            <li class="breadcrumb-item"><a href="{{ path('app_home') }}" class="text-danger">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('app_front_event_index') }}" class="text-danger">Events</a></li>
+            <li class="breadcrumb-item text-secondary">{{ event.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+
+        <!-- Main Info -->
+        <div class="col-lg-8">
+            <div class="card mb-4" style="border-top: 3px solid #e50914;">
+                <div class="card-body p-4">
+
+                    <!-- Badges -->
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="badge badge-{{ event.status|lower }} px-3 py-2 fs-6">
+                            {% if event.status == 'SCHEDULED' %}<i class="fas fa-clock me-1"></i>Scheduled
+                            {% elseif event.status == 'ONGOING' %}<i class="fas fa-play me-1"></i>Ongoing
+                            {% elseif event.status == 'COMPLETED' %}<i class="fas fa-check-circle me-1"></i>Completed
+                            {% else %}<i class="fas fa-ban me-1"></i>Cancelled{% endif %}
+                        </span>
+                        <span class="badge bg-secondary px-3 py-2 fs-6">
+                            {% if event.visibility == 'PUBLIC' %}
+                                <i class="fas fa-globe me-1"></i>Public Event
+                            {% else %}
+                                <i class="fas fa-lock me-1"></i>Private Event
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <h1 style="font-family:'Rajdhani',sans-serif;font-size:2.5rem;font-weight:700;color:#fff;">
+                        {{ event.name }}
+                    </h1>
+
+                    {% if event.description %}
+                        <hr style="border-color:#2a2a4e;">
+                        <p class="text-secondary" style="line-height:1.8;">{{ event.description }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Details Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle text-danger me-2"></i>Event Details</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="p-3 rounded" style="background:#0d0d22;border:1px solid #2a2a4e;">
+                                <div class="text-secondary small mb-1"><i class="fas fa-play text-danger me-1"></i>START DATE</div>
+                                <div class="fw-bold fs-5">{{ event.startDate|date('d/m/Y') }}</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 rounded" style="background:#0d0d22;border:1px solid #2a2a4e;">
+                                <div class="text-secondary small mb-1"><i class="fas fa-stop text-danger me-1"></i>END DATE</div>
+                                <div class="fw-bold fs-5">{{ event.endDate|date('d/m/Y') }}</div>
+                            </div>
+                        </div>
+                        {% if event.discipline %}
+                            <div class="col-sm-6">
+                                <div class="p-3 rounded" style="background:#0d0d22;border:1px solid #2a2a4e;">
+                                    <div class="text-secondary small mb-1"><i class="fas fa-running text-danger me-1"></i>DISCIPLINE</div>
+                                    <div class="fw-bold">{{ event.discipline.name }}</div>
+                                    {% if event.discipline.description %}
+                                        <div class="text-secondary small mt-1">{{ event.discipline.description }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="col-sm-6">
+                            <div class="p-3 rounded" style="background:#0d0d22;border:1px solid #2a2a4e;">
+                                <div class="text-secondary small mb-1"><i class="fas fa-users text-danger me-1"></i>CAPACITY</div>
+                                <div class="fw-bold fs-5">{{ event.capacity }} <span class="text-secondary fs-6">seats</span></div>
+                                <div class="text-secondary small">Registered fighters: {{ registeredCount }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+
+            {% if event.venue %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-map-marker-alt text-danger me-2"></i>Venue</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="text-white fw-bold">{{ event.venue.name }}</h6>
+                        {% if event.venue.address %}<p class="text-secondary small mb-1"><i class="fas fa-road me-1"></i>{{ event.venue.address }}</p>{% endif %}
+                        {% if event.venue.city %}<p class="text-secondary small mb-1"><i class="fas fa-city me-1"></i>{{ event.venue.city }}</p>{% endif %}
+                        {% if event.venue.country %}<p class="text-secondary small mb-1"><i class="fas fa-flag me-1"></i>{{ event.venue.country }}</p>{% endif %}
+                        {% if event.venue.capacity %}<p class="text-secondary small mb-0"><i class="fas fa-chair me-1"></i>Venue Capacity: {{ event.venue.capacity }}</p>{% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Capacity Progress -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar text-danger me-2"></i>Occupancy</h5>
+                </div>
+                <div class="card-body">
+                    {% set pct = event.capacity > 0 ? ((registeredCount / event.capacity) * 100)|round : 0 %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="small text-secondary">Registered Fighters</span>
+                        <span class="fw-bold text-white">{{ registeredCount }} / {{ event.capacity }}</span>
+                    </div>
+                    <div class="progress" style="height:10px;background:#2a2a4e;">
+                        <div class="progress-bar bg-danger" style="width: {{ pct > 100 ? 100 : pct }}%;" role="progressbar"></div>
+                    </div>
+                    <div class="text-end small text-secondary mt-1">{{ pct }}% full</div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <a href="{{ path('app_front_event_index') }}" class="btn btn-outline-secondary w-100 mb-2">
+                <i class="fas fa-arrow-left me-2"></i>Back to Events
+            </a>
+            <a href="{{ path('app_admin_event_show', {'id': event.id}) }}" class="btn btn-outline-danger w-100">
+                <i class="fas fa-cog me-2"></i>Manage (Admin)
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

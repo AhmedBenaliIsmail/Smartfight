@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Reclamations — SmartFight{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="section-title mb-0">
+            <i class="fas fa-list-alt me-2"></i>My <span>Reclamations</span>
+        </h1>
+        <a href="{{ path('app_reclamation_new') }}" class="btn btn-danger">
+            <i class="fas fa-plus me-1"></i>New Reclamation
+        </a>
+    </div>
+
+    {% if reclamations is empty %}
+        <div class="text-center py-5">
+            <i class="fas fa-inbox fa-5x text-secondary mb-4"></i>
+            <h4 class="text-secondary">No reclamations yet</h4>
+            <p class="text-secondary">You can submit a reclamation if you have an issue to report.</p>
+            <a href="{{ path('app_reclamation_new') }}" class="btn btn-danger mt-3">
+                <i class="fas fa-paper-plane me-1"></i>Submit a reclamation
+            </a>
+        </div>
+    {% else %}
+        <div class="table-dark-custom">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Subject</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Admin Response</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reclamation in reclamations %}
+                        <tr>
+                            <td>{{ reclamation.id }}</td>
+                            <td>
+                                <strong class="text-white">{{ reclamation.subject }}</strong>
+                                <div class="text-secondary small mt-1">
+                                    {{ reclamation.description|slice(0, 80) }}{% if reclamation.description|length > 80 %}...{% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                {% if reclamation.status == 'PENDING' %}
+                                    <span class="badge badge-pending px-3 py-2"><i class="fas fa-clock me-1"></i>Pending</span>
+                                {% elseif reclamation.status == 'IN_REVIEW' %}
+                                    <span class="badge badge-in_review px-3 py-2"><i class="fas fa-search me-1"></i>In Review</span>
+                                {% elseif reclamation.status == 'RESOLVED' %}
+                                    <span class="badge badge-resolved px-3 py-2"><i class="fas fa-check me-1"></i>Resolved</span>
+                                {% else %}
+                                    <span class="badge badge-rejected px-3 py-2"><i class="fas fa-times me-1"></i>Rejected</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-secondary small">
+                                {{ reclamation.createdAt ? reclamation.createdAt|date('d/m/Y') : '—' }}
+                            </td>
+                            <td>
+                                {% if reclamation.adminResponse %}
+                                    <div class="p-2 rounded" style="background:#0d1a0d;border:1px solid #27ae60;font-size:.85rem;">
+                                        <i class="fas fa-reply text-success me-1"></i>
+                                        {{ reclamation.adminResponse|slice(0, 100) }}{% if reclamation.adminResponse|length > 100 %}...{% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="text-secondary small">
+                                        <i class="fas fa-hourglass-half me-1"></i>Awaiting response
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="text-center mt-3 text-secondary small">
+            {{ reclamations|length }} total reclamation(s)
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

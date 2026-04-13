@@ -1,0 +1,27 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Edit: {{ event.name }} — SmartFight Admin{% endblock %}
+{% block page_title %}<i class="fas fa-edit mr-2" style="color:#e50914;"></i>Edit: {{ event.name }}{% endblock %}
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_admin_event_index') }}">Events</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_admin_event_show', {'id': event.id}) }}">{{ event.name }}</a></li>
+    <li class="breadcrumb-item active">Edit</li>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-lg-10 col-xl-8">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h3 class="card-title"><i class="fas fa-edit mr-2"></i>Edit Event</h3>
+            </div>
+            <div class="card-body">
+                {% include 'admin/event/_form.html.twig' with {
+                    'submitLabel': "Save Changes",
+                    'cancelUrl': path('app_admin_event_show', {'id': event.id})
+                } %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

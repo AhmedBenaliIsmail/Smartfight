@@ -1,0 +1,151 @@
+{% extends 'admin/base_admin.html.twig' %}
+{% block title %}Reclamations Management — SmartFight Admin{% endblock %}
+{% block page_title %}<i class="fas fa-exclamation-triangle mr-2" style="color:#e50914;"></i>Reclamations Management{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item active">Reclamations</li>{% endblock %}
+
+{% block body %}
+
+<!-- Status Filter Tabs -->
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <a class="nav-link {{ statusFilter is null ? 'active' : '' }}"
+           href="{{ path('app_admin_reclamation_index') }}">
+            <i class="fas fa-list mr-1"></i>All
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {{ statusFilter == 'PENDING' ? 'active' : '' }}"
+           href="{{ path('app_admin_reclamation_index', {'status': 'PENDING'}) }}">
+            <i class="fas fa-clock mr-1"></i>Pending
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {{ statusFilter == 'IN_REVIEW' ? 'active' : '' }}"
+           href="{{ path('app_admin_reclamation_index', {'status': 'IN_REVIEW'}) }}">
+            <i class="fas fa-search mr-1"></i>In Review
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {{ statusFilter == 'RESOLVED' ? 'active' : '' }}"
+           href="{{ path('app_admin_reclamation_index', {'status': 'RESOLVED'}) }}">
+            <i class="fas fa-check mr-1"></i>Resolved
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {{ statusFilter == 'REJECTED' ? 'active' : '' }}"
+           href="{{ path('app_admin_reclamation_index', {'status': 'REJECTED'}) }}">
+            <i class="fas fa-times mr-1"></i>Rejected
+        </a>
+    </li>
+</ul>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-table mr-2"></i>Reclamations List</h3>
+        <span class="badge badge-danger ml-2">{{ reclamations|length }}</span>
+    </div>
+    <div class="card-body p-0">
+        {% if reclamations is empty %}
+            <div class="text-center py-5 text-muted">
+                <i class="fas fa-inbox fa-4x mb-3"></i>
+                <p>No reclamation {% if statusFilter %}with this status{% endif %}.</p>
+            </div>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered mb-0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>User</th>
+                            <th>Subject</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Response</th>
+                            <th width="140">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reclamation in reclamations %}
+                            <tr>
+                                <td>{{ reclamation.id }}</td>
+                                <td>
+                                    {% if reclamation.user %}
+                                        <strong>{{ reclamation.user }}</strong>
+                                        <div class="small text-muted">{{ reclamation.user.email }}</div>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong>{{ reclamation.subject }}</strong>
+                                    <div class="small text-muted">
+                                        {{ reclamation.description|slice(0, 60) }}{% if reclamation.description|length > 60 %}...{% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if reclamation.status == 'PENDING' %}
+                                        <span class="badge badge-pending">Pending</span>
+                                    {% elseif reclamation.status == 'IN_REVIEW' %}
+                                        <span class="badge badge-in-review">In Review</span>
+                                    {% elseif reclamation.status == 'RESOLVED' %}
+                                        <span class="badge badge-resolved">Resolved</span>
+                                    {% else %}
+                                        <span class="badge badge-rejected">Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td class="small">{{ reclamation.createdAt ? reclamation.createdAt|date('d/m/Y') : '—' }}</td>
+                                <td>
+                                    {% if reclamation.adminResponse %}
+                                        <i class="fas fa-check-circle text-success mr-1"></i>
+                                        <span class="small">{{ reclamation.adminResponse|slice(0, 40) }}...</span>
+                                    {% else %}
+                                        <span class="text-muted small"><i class="fas fa-minus mr-1"></i>None</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ path('app_admin_reclamation_edit', {'id': reclamation.id}) }}"
+                                           class="btn btn-warning">
+                                            <i class="fas fa-reply"></i> Process
+                                        </a>
+                                        <button type="button" class="btn btn-danger"
+                                                data-toggle="modal"
+                                                data-target="#deleteModal{{ reclamation.id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Modals -->
+{% for reclamation in reclamations %}
+    <div class="modal fade" id="deleteModal{{ reclamation.id }}" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle mr-2"></i>Delete</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    Delete reclamation <strong>"{{ reclamation.subject }}"</strong>?
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <form method="POST" action="{{ path('app_admin_reclamation_delete', {'id': reclamation.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
+                        <button type="submit" class="btn btn-danger"><i class="fas fa-trash mr-1"></i>Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+{% endblock %}
