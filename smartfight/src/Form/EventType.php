@@ -83,6 +83,7 @@ class EventType extends AbstractType
                 'label' => 'Organizer ID',
                 'required' => false,
                 'attr' => [
+                    'min' => 1,
                     'placeholder' => 'Optional',
                 ],
             ])

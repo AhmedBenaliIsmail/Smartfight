@@ -48,6 +48,7 @@ class FightStatisticController extends AbstractController
         Request $request,
         FightResultRepository $fightResultRepository,
         FighterRepository $fighterRepository,
+        FightStatisticRepository $fightStatisticRepository,
         EntityManagerInterface $entityManager,
     ): Response {
         $statistic = new FightStatistic();
