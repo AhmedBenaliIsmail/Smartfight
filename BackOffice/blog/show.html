@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>View Article — SmartFight Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/smartfight-admin.css" />
+</head>
+<body class="antialiased">
+<div class="wrapper">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────── -->
+  <aside class="navbar navbar-vertical navbar-expand-lg" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+    <div class="container-fluid flex-column align-items-stretch p-0">
+      <div class="p-3 border-bottom" style="border-color:#27272a!important">
+        <a href="../dashboard.html" class="smartfight-logo">
+          <div class="logo-icon"><i class="fa-solid fa-fist-raised"></i></div>
+          <div class="logo-text">Smart<span>Fight</span></div>
+        </a>
+      </div>
+      <nav class="flex-fill py-2">
+        <div class="navbar-vertical-section">Management</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../dashboard.html"><span class="nav-link-icon"><i class="fa-solid fa-chart-line fa-fw"></i></span><span class="nav-link-title">Dashboard</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../users/index.html"><span class="nav-link-icon"><i class="fa-solid fa-users fa-fw"></i></span><span class="nav-link-title">Users</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fighters/index.html"><span class="nav-link-icon"><i class="fa-solid fa-boxing-glove fa-fw"></i></span><span class="nav-link-title">Fighters</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../events/index.html"><span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span><span class="nav-link-title">Events</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fight-results/index.html"><span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span><span class="nav-link-title">Fight Results</span></a></li>
+        </ul>
+        <div class="navbar-vertical-section mt-2">Fan Experience</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link active" href="index.html"><span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw"></i></span><span class="nav-link-title">Blog Articles</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../bookings/index.html"><span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw"></i></span><span class="nav-link-title">Event Bookings</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../predictions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span><span class="nav-link-title">Predictions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../reactions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-comments fa-fw"></i></span><span class="nav-link-title">Reactions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../notifications/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span><span class="nav-link-title">Notifications</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- ── Main ─────────────────────────────────────────────────── -->
+  <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
+    <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
+      <div class="d-flex align-items-center gap-3 flex-fill">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="../dashboard.html" style="color:#a1a1aa;text-decoration:none;">Dashboard</a></li>
+          <li class="breadcrumb-item"><a href="index.html" style="color:#a1a1aa;text-decoration:none;">Blog Articles</a></li>
+          <li class="breadcrumb-item active">View Article</li>
+        </ol>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="../notifications/index.html" class="nav-link p-1 position-relative text-muted">
+          <i class="fa-solid fa-bell"></i>
+          <span class="badge bg-danger rounded-pill" style="position:absolute;top:-4px;right:-4px;font-size:.6rem;padding:2px 5px;">7</span>
+        </a>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+            <div class="avatar avatar-sm" style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">A</div>
+            <span style="font-size:.875rem;color:#fafafa;">Admin</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user fa-fw me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-fill p-4" style="background:#09090b;">
+      <!-- Page Header -->
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Article Preview</h1>
+          <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Article #101</p>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="index.html" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left me-2"></i>Back</a>
+          <a href="form.html" class="btn btn-danger"><i class="fa-solid fa-pen me-2"></i>Edit Article</a>
+        </div>
+      </div>
+
+      <!-- Meta Card -->
+      <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+        <div class="card-body">
+          <div class="row g-4 align-items-start">
+            <div class="col-md-8">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge" style="background:rgba(220,38,38,.15);color:#dc2626;">Event Preview</span>
+                <span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Published</span>
+              </div>
+              <h2 class="fw-bold mb-3" style="color:#fafafa;font-size:1.5rem;line-height:1.3;">UFC 310: Everything You Need to Know Before Fight Night</h2>
+              <div class="d-flex align-items-center gap-4 flex-wrap mb-3">
+                <span style="color:#a1a1aa;font-size:.85rem;"><i class="fa-solid fa-user me-1"></i>Jake Morrison</span>
+                <span style="color:#a1a1aa;font-size:.85rem;"><i class="fa-regular fa-calendar me-1"></i>April 5, 2026</span>
+                <span style="color:#a1a1aa;font-size:.85rem;"><i class="fa-solid fa-eye me-1"></i>4,821 views</span>
+              </div>
+              <p style="color:#a1a1aa;font-size:.9rem;line-height:1.65;margin:0;">
+                Marcus Santos enters the octagon as a heavy favorite, but Kyle Jensen's unorthodox striking style could be the great equalizer on fight night. This preview breaks down everything you need to know before the main card begins.
+              </p>
+            </div>
+            <div class="col-md-4">
+              <img src="https://placehold.co/400x240/18181b/dc2626?text=UFC+310+Preview" alt="Cover" class="img-fluid" style="border-radius:8px;border:1px solid #27272a;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Full Content -->
+      <div class="card" style="background:#18181b;border:1px solid #27272a;">
+        <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+          <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;">
+            <i class="fa-solid fa-align-left me-2" style="color:#dc2626;"></i>Full Article Content
+          </h3>
+        </div>
+        <div class="card-body" style="padding:1.75rem;">
+          <div style="color:#d4d4d8;font-size:.9375rem;line-height:1.85;max-width:72ch;">
+            <p>The biggest fight of the year is almost here, and the MMA world is buzzing. UFC 310: Night of Champions promises to deliver a night of elite competition from top to bottom, but all eyes will be on the main event as Marcus "The Lion" Santos defends his heavyweight championship against the surging Kyle "Ice Cold" Jensen.</p>
+
+            <h4 style="color:#fafafa;font-weight:700;margin-top:1.5rem;margin-bottom:.75rem;">The Main Event Breakdown</h4>
+            <p>Santos (24-3-1) enters this fight off the back of three consecutive title defenses, each more dominant than the last. His combination of elite wrestling and heavy hands has made him virtually impossible to finish, and his chin has never been seriously tested. Oddsmakers have him installed as a -340 favorite.</p>
+            <p>But Jensen (19-2) has been a revelation. The Swedish knockout artist has won his last six fights inside the distance, and his unpredictable southpaw stance and long-range power have given every opponent trouble. His boxing coach, two-time world champion Pierre Moreau, believes this fight is his to win.</p>
+
+            <h4 style="color:#fafafa;font-weight:700;margin-top:1.5rem;margin-bottom:.75rem;">The Co-Main Event</h4>
+            <p>Supporting the headliner is a stacked card including the welterweight clash between Thompson and Diaz, a rematch four years in the making. The lightweight contender fight between Oliveira and Tsarukyan is expected to steal the show with its grappling-heavy action.</p>
+
+            <h4 style="color:#fafafa;font-weight:700;margin-top:1.5rem;margin-bottom:.75rem;">Prediction Corner</h4>
+            <p>Our analysts are split down the middle. Three favour Santos by late stoppage, citing his durability and championship pedigree. Two believe Jensen's power is the X-factor and that one clean right hand could end the night early. Make your predictions on SmartFight before the opening bell rings at T-Mobile Arena.</p>
+
+            <p style="color:#52525b;font-style:italic;margin-top:1.5rem;font-size:.85rem;">UFC 310 takes place Saturday, May 15, 2026 at T-Mobile Arena in Las Vegas, Nevada. Main card begins at 10:00 PM ET.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+</body>
+</html>

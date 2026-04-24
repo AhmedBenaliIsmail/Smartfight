@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Broadcast — SmartFight Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/smartfight-admin.css" />
+</head>
+<body class="antialiased">
+<div class="wrapper">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────── -->
+  <aside class="navbar navbar-vertical navbar-expand-lg" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+    <div class="container-fluid flex-column align-items-stretch p-0">
+      <div class="p-3 border-bottom" style="border-color:#27272a!important">
+        <a href="../dashboard.html" class="smartfight-logo">
+          <div class="logo-icon"><i class="fa-solid fa-fist-raised"></i></div>
+          <div class="logo-text">Smart<span>Fight</span></div>
+        </a>
+      </div>
+      <nav class="flex-fill py-2">
+        <div class="navbar-vertical-section">Management</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../dashboard.html"><span class="nav-link-icon"><i class="fa-solid fa-chart-line fa-fw"></i></span><span class="nav-link-title">Dashboard</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../users/index.html"><span class="nav-link-icon"><i class="fa-solid fa-users fa-fw"></i></span><span class="nav-link-title">Users</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fighters/index.html"><span class="nav-link-icon"><i class="fa-solid fa-boxing-glove fa-fw"></i></span><span class="nav-link-title">Fighters</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../events/index.html"><span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span><span class="nav-link-title">Events</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fight-results/index.html"><span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span><span class="nav-link-title">Fight Results</span></a></li>
+        </ul>
+        <div class="navbar-vertical-section mt-2">Fan Experience</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../blog/index.html"><span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw"></i></span><span class="nav-link-title">Blog Articles</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../bookings/index.html"><span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw"></i></span><span class="nav-link-title">Event Bookings</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../predictions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span><span class="nav-link-title">Predictions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../reactions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-comments fa-fw"></i></span><span class="nav-link-title">Reactions</span></a></li>
+          <li class="nav-item"><a class="nav-link active" href="index.html"><span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span><span class="nav-link-title">Notifications</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- ── Main content ─────────────────────────────────────────── -->
+  <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
+
+    <!-- Topbar -->
+    <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
+      <div class="d-flex align-items-center gap-3 flex-fill">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="../dashboard.html" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+          <li class="breadcrumb-item"><a href="index.html" style="color:#a1a1aa;text-decoration:none;">Notifications</a></li>
+          <li class="breadcrumb-item active">Broadcast</li>
+        </ol>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="#" class="nav-link p-1 text-muted"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="index.html" class="nav-link p-1 position-relative text-muted">
+          <i class="fa-solid fa-bell"></i>
+          <span class="badge bg-danger rounded-pill" style="position:absolute;top:-4px;right:-4px;font-size:.6rem;padding:2px 5px;">7</span>
+        </a>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+            <div style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">A</div>
+            <span style="font-size:.875rem;color:#fafafa;">Admin</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user fa-fw me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-fill p-4" style="background:#09090b;">
+
+      <!-- Page Header -->
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Broadcast Composer</h1>
+          <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Send a notification to all fans or a targeted audience segment</p>
+        </div>
+        <a href="index.html" class="btn" style="background:#27272a;color:#fafafa;border:none;">
+          <i class="fa-solid fa-arrow-left me-2"></i>Back to Notifications
+        </a>
+      </div>
+
+      <div class="row g-4">
+
+        <!-- Left: Composer -->
+        <div class="col-lg-7">
+
+          <!-- Audience -->
+          <div class="card mb-3" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+              <h5 class="card-title mb-0" style="font-size:.9375rem;font-weight:600;color:#fafafa;">
+                <i class="fa-solid fa-users me-2" style="color:#dc2626;"></i>Audience
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-2">
+                <div class="col-sm-6">
+                  <label class="form-check p-3 mb-0" style="background:#09090b;border:1px solid #27272a;border-radius:8px;cursor:pointer;" for="audAll">
+                    <input class="form-check-input" type="radio" name="audience" id="audAll" value="all" checked onchange="updatePreview()" />
+                    <span class="form-check-label">
+                      <div style="font-weight:600;color:#fafafa;font-size:.875rem;">All Fans</div>
+                      <div style="font-size:.78rem;color:#a1a1aa;">1,284 recipients</div>
+                    </span>
+                  </label>
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-check p-3 mb-0" style="background:#09090b;border:1px solid #27272a;border-radius:8px;cursor:pointer;" for="audVip">
+                    <input class="form-check-input" type="radio" name="audience" id="audVip" value="vip" onchange="updatePreview()" />
+                    <span class="form-check-label">
+                      <div style="font-weight:600;color:#fafafa;font-size:.875rem;">VIP Fans Only</div>
+                      <div style="font-size:.78rem;color:#a1a1aa;">312 recipients</div>
+                    </span>
+                  </label>
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-check p-3 mb-0" style="background:#09090b;border:1px solid #27272a;border-radius:8px;cursor:pointer;" for="audActive">
+                    <input class="form-check-input" type="radio" name="audience" id="audActive" value="active" onchange="updatePreview()" />
+                    <span class="form-check-label">
+                      <div style="font-weight:600;color:#fafafa;font-size:.875rem;">Active This Month</div>
+                      <div style="font-size:.78rem;color:#a1a1aa;">847 recipients</div>
+                    </span>
+                  </label>
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-check p-3 mb-0" style="background:#09090b;border:1px solid #27272a;border-radius:8px;cursor:pointer;" for="audPredict">
+                    <input class="form-check-input" type="radio" name="audience" id="audPredict" value="predictors" onchange="updatePreview()" />
+                    <span class="form-check-label">
+                      <div style="font-weight:600;color:#fafafa;font-size:.875rem;">Prediction Players</div>
+                      <div style="font-size:.78rem;color:#a1a1aa;">841 recipients</div>
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notification Type -->
+          <div class="card mb-3" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+              <h5 class="card-title mb-0" style="font-size:.9375rem;font-weight:600;color:#fafafa;">
+                <i class="fa-solid fa-tag me-2" style="color:#3b82f6;"></i>Notification Type
+              </h5>
+            </div>
+            <div class="card-body">
+              <select class="form-select" id="notifType" onchange="updatePreview()">
+                <option value="announcement">📢 Announcement</option>
+                <option value="event">📅 Event Update</option>
+                <option value="promo">🎟️ Promotion / Offer</option>
+                <option value="result">🏆 Fight Result</option>
+                <option value="reminder">⏰ Reminder</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Message -->
+          <div class="card mb-3" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+              <h5 class="card-title mb-0" style="font-size:.9375rem;font-weight:600;color:#fafafa;">
+                <i class="fa-solid fa-pen me-2" style="color:#c9a227;"></i>Message
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label class="form-label">Title <span style="color:#dc2626;">*</span></label>
+                <input type="text" class="form-control" id="msgTitle" placeholder="e.g. UFC 311 Card Announced" oninput="updatePreview()" value="UFC 311 Full Card Is Live!" />
+                <div style="font-size:.75rem;color:#a1a1aa;margin-top:.375rem;"><span id="titleCount">28</span> / 80 characters</div>
+              </div>
+              <div>
+                <label class="form-label">Message Body <span style="color:#dc2626;">*</span></label>
+                <textarea class="form-control" id="msgBody" rows="4" placeholder="Write your notification message here..." oninput="updatePreview()">The full card for UFC 311 is now live! Head to the Events page to see all matchups, fighters, and book your tickets before they sell out. 🥊</textarea>
+                <div style="font-size:.75rem;color:#a1a1aa;margin-top:.375rem;"><span id="bodyCount">146</span> / 300 characters</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="d-flex gap-2">
+            <button class="btn btn-danger px-4" data-bs-toggle="modal" data-bs-target="#sendModal">
+              <i class="fa-solid fa-paper-plane me-2"></i>Send Broadcast
+            </button>
+            <button class="btn" style="background:#27272a;color:#fafafa;border:none;">
+              <i class="fa-solid fa-floppy-disk me-2"></i>Save Draft
+            </button>
+            <a href="index.html" class="btn" style="background:transparent;color:#a1a1aa;border:1px solid #27272a;">Cancel</a>
+          </div>
+        </div>
+
+        <!-- Right: Preview + History -->
+        <div class="col-lg-5">
+
+          <!-- Preview Card -->
+          <div class="card mb-3" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+              <h5 class="card-title mb-0" style="font-size:.9375rem;font-weight:600;color:#fafafa;">
+                <i class="fa-solid fa-eye me-2" style="color:#a1a1aa;"></i>Live Preview
+              </h5>
+            </div>
+            <div class="card-body">
+              <!-- Notification preview mockup -->
+              <div style="background:#09090b;border:1px solid #27272a;border-radius:10px;padding:1rem;position:relative;">
+                <div class="d-flex align-items-start gap-3">
+                  <div style="width:42px;height:42px;border-radius:10px;background:#dc2626;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">📢</div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-weight:600;color:#fafafa;font-size:.9rem;margin-bottom:.25rem;" id="previewTitle">UFC 311 Full Card Is Live!</div>
+                    <div style="font-size:.8rem;color:#a1a1aa;line-height:1.4;" id="previewBody">The full card for UFC 311 is now live! Head to the Events page to see all matchups, fighters, and book your tickets before they sell out. 🥊</div>
+                    <div style="font-size:.72rem;color:#52525b;margin-top:.5rem;">SmartFight · Just now</div>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-3 p-2" style="background:#09090b;border:1px solid #27272a;border-radius:8px;">
+                <div class="d-flex justify-content-between" style="font-size:.8rem;">
+                  <span style="color:#a1a1aa;">Audience:</span>
+                  <strong style="color:#fafafa;" id="previewAudience">All Fans (1,284)</strong>
+                </div>
+                <div class="d-flex justify-content-between mt-1" style="font-size:.8rem;">
+                  <span style="color:#a1a1aa;">Type:</span>
+                  <strong style="color:#fafafa;" id="previewType">📢 Announcement</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Broadcast History -->
+          <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;display:flex;align-items:center;justify-content:space-between;">
+              <h5 class="card-title mb-0" style="font-size:.9375rem;font-weight:600;color:#fafafa;">
+                <i class="fa-solid fa-clock-rotate-left me-2" style="color:#a1a1aa;"></i>Recent Broadcasts
+              </h5>
+              <a href="index.html" style="font-size:.75rem;color:#dc2626;text-decoration:none;">View all →</a>
+            </div>
+            <div class="card-body p-0">
+              <table class="table table-hover mb-0 broadcast-history-table">
+                <thead>
+                  <tr>
+                    <th style="padding:.6rem 1rem;">Title</th>
+                    <th>Audience</th>
+                    <th>Sent</th>
+                    <th>Read%</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding:.6rem 1rem;font-size:.8rem;font-weight:500;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">UFC 310 Card Announced</td>
+                    <td style="font-size:.78rem;color:#a1a1aa;">All (1,284)</td>
+                    <td style="font-size:.75rem;color:#a1a1aa;">Apr 7</td>
+                    <td><span style="color:#22c55e;font-size:.8rem;font-weight:600;">82%</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:.6rem 1rem;font-size:.8rem;font-weight:500;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">VIP Early Ticket Access</td>
+                    <td style="font-size:.78rem;color:#a1a1aa;">VIP (312)</td>
+                    <td style="font-size:.75rem;color:#a1a1aa;">Apr 4</td>
+                    <td><span style="color:#22c55e;font-size:.8rem;font-weight:600;">91%</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:.6rem 1rem;font-size:.8rem;font-weight:500;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Event Starts in 1hr</td>
+                    <td style="font-size:.78rem;color:#a1a1aa;">All (1,284)</td>
+                    <td style="font-size:.75rem;color:#a1a1aa;">Apr 5</td>
+                    <td><span style="color:#22c55e;font-size:.8rem;font-weight:600;">76%</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:.6rem 1rem;font-size:.8rem;font-weight:500;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Prediction Results Out</td>
+                    <td style="font-size:.78rem;color:#a1a1aa;">Predictors (841)</td>
+                    <td style="font-size:.75rem;color:#a1a1aa;">Apr 5</td>
+                    <td><span style="color:#c9a227;font-size:.8rem;font-weight:600;">68%</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:.6rem 1rem;font-size:.8rem;font-weight:500;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">New Fighters Signed</td>
+                    <td style="font-size:.78rem;color:#a1a1aa;">All (1,284)</td>
+                    <td style="font-size:.75rem;color:#a1a1aa;">Mar 28</td>
+                    <td><span style="color:#22c55e;font-size:.8rem;font-weight:600;">79%</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Send Confirmation Modal -->
+<div class="modal fade" id="sendModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="border-bottom:1px solid #27272a;">
+        <h5 class="modal-title" style="color:#fafafa;"><i class="fa-solid fa-paper-plane me-2" style="color:#dc2626;"></i>Send Broadcast</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p style="color:#a1a1aa;font-size:.9rem;">You are about to send the following broadcast:</p>
+        <div class="p-3 mb-3" style="background:#09090b;border:1px solid #27272a;border-radius:8px;">
+          <div style="font-weight:600;color:#fafafa;margin-bottom:.25rem;" id="modalTitle">UFC 311 Full Card Is Live!</div>
+          <div style="font-size:.8rem;color:#a1a1aa;" id="modalBody">The full card for UFC 311 is now live! Head to the Events page...</div>
+          <hr style="border-color:#27272a;margin:.75rem 0;" />
+          <div class="d-flex justify-content-between" style="font-size:.8rem;">
+            <span style="color:#a1a1aa;">Recipients:</span>
+            <strong style="color:#fafafa;" id="modalAudience">All Fans — 1,284</strong>
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-2 p-2" style="background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);border-radius:6px;">
+          <i class="fa-solid fa-triangle-exclamation" style="color:#dc2626;"></i>
+          <span style="font-size:.8rem;color:#a1a1aa;">This will send <strong style="color:#fafafa;">1,284 notifications</strong> immediately and cannot be recalled.</span>
+        </div>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid #27272a;">
+        <button type="button" class="btn" style="background:#27272a;color:#fafafa;border:none;" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger">
+          <i class="fa-solid fa-paper-plane me-1"></i>Send Now
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+<script>
+  const audienceLabels = {
+    all: 'All Fans (1,284)',
+    vip: 'VIP Fans (312)',
+    active: 'Active This Month (847)',
+    predictors: 'Prediction Players (841)',
+  };
+  const typeLabels = {
+    announcement: '📢 Announcement',
+    event: '📅 Event Update',
+    promo: '🎟️ Promotion / Offer',
+    result: '🏆 Fight Result',
+    reminder: '⏰ Reminder',
+  };
+
+  function updatePreview() {
+    const title = document.getElementById('msgTitle').value || 'Notification Title';
+    const body = document.getElementById('msgBody').value || 'Notification message will appear here.';
+    const audience = document.querySelector('input[name="audience"]:checked')?.value || 'all';
+    const type = document.getElementById('notifType').value;
+
+    document.getElementById('previewTitle').textContent = title;
+    document.getElementById('previewBody').textContent = body;
+    document.getElementById('previewAudience').textContent = audienceLabels[audience];
+    document.getElementById('previewType').textContent = typeLabels[type];
+
+    document.getElementById('titleCount').textContent = title.length;
+    document.getElementById('bodyCount').textContent = body.length;
+
+    // Update modal
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalBody').textContent = body.substring(0, 80) + (body.length > 80 ? '...' : '');
+    document.getElementById('modalAudience').textContent = audienceLabels[audience];
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+vich_uploader:
+    db_driver: orm
+
+    mappings:
+        blog_image:
+            uri_prefix: /uploads/blog
+            upload_destination: '%kernel.project_dir%/public/uploads/blog'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            delete_on_update: true
+            delete_on_remove: true
+
+        blog_video:
+            uri_prefix: /uploads/blog
+            upload_destination: '%kernel.project_dir%/public/uploads/blog'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            delete_on_update: true
+            delete_on_remove: true
+
+        fighter_photo:
+            uri_prefix: /uploads/fighters
+            upload_destination: '%kernel.project_dir%/public/uploads/fighters'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            delete_on_update: true
+            delete_on_remove: true
+
+        category_image:
+            uri_prefix: /uploads/categories
+            upload_destination: '%kernel.project_dir%/public/uploads/categories'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            delete_on_update: true
+            delete_on_remove: true

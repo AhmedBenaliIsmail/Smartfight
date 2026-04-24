@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard — SmartFight Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/smartfight-admin.css" />
+</head>
+<body class="antialiased">
+<div class="wrapper">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────── -->
+  <aside class="navbar navbar-vertical navbar-expand-lg" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+    <div class="container-fluid flex-column align-items-stretch p-0">
+
+      <!-- Logo -->
+      <div class="p-3 border-bottom" style="border-color:#27272a!important">
+        <a href="../dashboard.html" class="smartfight-logo">
+          <div class="logo-icon"><i class="fa-solid fa-fist-raised"></i></div>
+          <div class="logo-text">Smart<span>Fight</span></div>
+        </a>
+      </div>
+
+      <!-- Nav -->
+      <nav class="flex-fill py-2">
+        <div class="navbar-vertical-section">Management</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item">
+            <a class="nav-link active" href="dashboard.html">
+              <span class="nav-link-icon"><i class="fa-solid fa-chart-line fa-fw"></i></span>
+              <span class="nav-link-title">Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="users/index.html">
+              <span class="nav-link-icon"><i class="fa-solid fa-users fa-fw"></i></span>
+              <span class="nav-link-title">Users</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="fighters/index.html">
+              <span class="nav-link-icon"><i class="fa-solid fa-boxing-glove fa-fw"></i></span>
+              <span class="nav-link-title">Fighters</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="events/index.html">
+              <span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span>
+              <span class="nav-link-title">Events</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="fight-results/index.html">
+              <span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span>
+              <span class="nav-link-title">Fight Results</span>
+            </a>
+          </li>
+        </ul>
+
+        <div class="navbar-vertical-section mt-2">Fan Experience</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item">
+            <a class="nav-link" href="blog/index.html">
+              <span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw"></i></span>
+              <span class="nav-link-title">Blog Articles</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="bookings/index.html">
+              <span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw"></i></span>
+              <span class="nav-link-title">Event Bookings</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="predictions/index.html">
+              <span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span>
+              <span class="nav-link-title">Predictions</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="reactions/index.html">
+              <span class="nav-link-icon"><i class="fa-solid fa-comments fa-fw"></i></span>
+              <span class="nav-link-title">Reactions</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="notifications/index.html">
+              <span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span>
+              <span class="nav-link-title">Notifications</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- ── Main content ─────────────────────────────────────────── -->
+  <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
+
+    <!-- Topbar -->
+    <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
+      <div class="d-flex align-items-center gap-3 flex-fill">
+        <!-- Breadcrumb -->
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item active">Dashboard</li>
+        </ol>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="#" class="nav-link p-1 text-muted"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="notifications/index.html" class="nav-link p-1 position-relative text-muted">
+          <i class="fa-solid fa-bell"></i>
+          <span class="badge bg-danger rounded-pill" style="position:absolute;top:-4px;right:-4px;font-size:.6rem;padding:2px 5px;">7</span>
+        </a>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+            <div class="avatar avatar-sm" style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">A</div>
+            <span style="font-size:.875rem;color:#fafafa;">Admin</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user fa-fw me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="flex-fill p-4" style="background:#09090b;">
+
+      <!-- Page header -->
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Dashboard</h1>
+          <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Welcome back, Admin. Here's what's happening.</p>
+        </div>
+        <div>
+          <span style="font-size:.8rem;color:#a1a1aa;"><i class="fa-solid fa-clock me-1"></i>Last updated: Apr 7, 2026</span>
+        </div>
+      </div>
+
+      <!-- Stat Cards Row -->
+      <div class="row g-3 mb-4">
+        <!-- Total Users -->
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between mb-3">
+              <div class="stat-icon" style="background:rgba(59,130,246,.15);color:#3b82f6;">
+                <i class="fa-solid fa-users"></i>
+              </div>
+              <span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;font-size:.7rem;">+12%</span>
+            </div>
+            <div class="stat-value">1,284</div>
+            <div class="stat-label">Total Users</div>
+            <div class="stat-change mt-2" style="color:#22c55e;"><i class="fa-solid fa-arrow-up fa-xs me-1"></i>154 this month</div>
+          </div>
+        </div>
+
+        <!-- Active Events -->
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between mb-3">
+              <div class="stat-icon" style="background:rgba(220,38,38,.15);color:#dc2626;">
+                <i class="fa-solid fa-calendar-days"></i>
+              </div>
+              <span class="badge badge-live px-2 py-1" style="font-size:.7rem;">LIVE</span>
+            </div>
+            <div class="stat-value">3</div>
+            <div class="stat-label">Active Events</div>
+            <div class="stat-change mt-2" style="color:#a1a1aa;">8 events upcoming</div>
+          </div>
+        </div>
+
+        <!-- Total Bookings -->
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between mb-3">
+              <div class="stat-icon" style="background:rgba(34,197,94,.15);color:#22c55e;">
+                <i class="fa-solid fa-ticket"></i>
+              </div>
+              <span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;font-size:.7rem;">+5%</span>
+            </div>
+            <div class="stat-value">847</div>
+            <div class="stat-label">Total Bookings</div>
+            <div class="stat-change mt-2" style="color:#22c55e;"><i class="fa-solid fa-arrow-up fa-xs me-1"></i>40 this month</div>
+          </div>
+        </div>
+
+        <!-- Predictions Made -->
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between mb-3">
+              <div class="stat-icon" style="background:rgba(201,162,39,.15);color:#c9a227;">
+                <i class="fa-solid fa-bullseye"></i>
+              </div>
+              <span class="badge" style="background:rgba(201,162,39,.15);color:#c9a227;font-size:.7rem;">New</span>
+            </div>
+            <div class="stat-value">4,521</div>
+            <div class="stat-label">Predictions Made</div>
+            <div class="stat-change mt-2" style="color:#a1a1aa;">62% accuracy avg</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="row g-3 mb-4">
+        <!-- Bar Chart: Bookings per Month -->
+        <div class="col-lg-6">
+          <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+              <h3 class="card-title" style="color:#fafafa;font-size:.9375rem;font-weight:600;margin:0;">
+                <i class="fa-solid fa-chart-bar me-2" style="color:#dc2626;"></i>Bookings per Month
+              </h3>
+              <div class="card-options">
+                <span style="font-size:.75rem;color:#a1a1aa;">Last 6 months</span>
+              </div>
+            </div>
+            <div class="card-body" style="padding:1.25rem;">
+              <div id="chart-bookings"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Line Chart: Prediction Accuracy -->
+        <div class="col-lg-6">
+          <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+              <h3 class="card-title" style="color:#fafafa;font-size:.9375rem;font-weight:600;margin:0;">
+                <i class="fa-solid fa-chart-line me-2" style="color:#c9a227;"></i>Prediction Accuracy Trend
+              </h3>
+              <div class="card-options">
+                <span style="font-size:.75rem;color:#a1a1aa;">Last 6 months</span>
+              </div>
+            </div>
+            <div class="card-body" style="padding:1.25rem;">
+              <div id="chart-accuracy"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity Row -->
+      <div class="row g-3">
+        <!-- Recent Bookings -->
+        <div class="col-lg-6">
+          <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;display:flex;align-items:center;justify-content:space-between;">
+              <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;">
+                <i class="fa-solid fa-ticket me-2" style="color:#22c55e;"></i>Recent Bookings
+              </h3>
+              <a href="bookings/index.html" style="font-size:.75rem;color:#dc2626;text-decoration:none;">View all →</a>
+            </div>
+            <div class="card-body p-0">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th style="padding:.75rem 1.25rem;">Fan</th>
+                    <th>Event</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding:.75rem 1.25rem;font-size:.875rem;">Marcus J.</td>
+                    <td style="font-size:.875rem;">UFC 310</td>
+                    <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Confirmed</span></td>
+                    <td style="font-size:.8rem;color:#a1a1aa;">Apr 5</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:.75rem 1.25rem;font-size:.875rem;">Sandra B.</td>
+                    <td style="font-size:.875rem;">Bellator 302</td>
+                    <td><span class="badge" style="background:rgba(234,179,8,.15);color:#eab308;">Pending</span></td>
+                    <td style="font-size:.8rem;color:#a1a1aa;">Apr 5</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:.75rem 1.25rem;font-size:.875rem;">Kevin T.</td>
+                    <td style="font-size:.875rem;">UFC 311</td>
+                    <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Confirmed</span></td>
+                    <td style="font-size:.8rem;color:#a1a1aa;">Apr 4</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:.75rem 1.25rem;font-size:.875rem;">Aisha M.</td>
+                    <td style="font-size:.875rem;">PFL 2026</td>
+                    <td><span class="badge" style="background:rgba(220,38,38,.15);color:#dc2626;">Cancelled</span></td>
+                    <td style="font-size:.8rem;color:#a1a1aa;">Apr 4</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:.75rem 1.25rem;font-size:.875rem;">Ryan F.</td>
+                    <td style="font-size:.875rem;">ONE FC</td>
+                    <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Confirmed</span></td>
+                    <td style="font-size:.8rem;color:#a1a1aa;">Apr 3</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Predictions -->
+        <div class="col-lg-6">
+          <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;display:flex;align-items:center;justify-content:space-between;">
+              <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;">
+                <i class="fa-solid fa-bullseye me-2" style="color:#c9a227;"></i>Recent Predictions
+              </h3>
+              <a href="predictions/index.html" style="font-size:.75rem;color:#dc2626;text-decoration:none;">View all →</a>
+            </div>
+            <div class="card-body p-0">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th style="padding:.75rem 1.25rem;">Fan</th>
+                    <th>Fight</th>
+                    <th>Pick</th>
+                    <th>Result</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding:.75rem 1.25rem;font-size:.875rem;">Lucas P.</td>
+                    <td style="font-size:.875rem;">Jones vs Aspinall</td>
+                    <td style="font-size:.875rem;color:#c9a227;">Jones</td>
+                    <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">✓ +10pts</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:.75rem 1.25rem;font-size:.875rem;">Elena V.</td>
+                    <td style="font-size:.875rem;">Poirier vs McG</td>
+                    <td style="font-size:.875rem;color:#c9a227;">McGregor</td>
+                    <td><span class="badge" style="background:rgba(220,38,38,.15);color:#dc2626;">✗ 0pts</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:.75rem 1.25rem;font-size:.875rem;">Tom H.</td>
+                    <td style="font-size:.875rem;">Nunes vs Pena III</td>
+                    <td style="font-size:.875rem;color:#c9a227;">Nunes</td>
+                    <td><span class="badge" style="background:rgba(234,179,8,.15);color:#eab308;">Pending</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:.75rem 1.25rem;font-size:.875rem;">Priya S.</td>
+                    <td style="font-size:.875rem;">Adesanya vs Du</td>
+                    <td style="font-size:.875rem;color:#c9a227;">Adesanya</td>
+                    <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">✓ +15pts</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:.75rem 1.25rem;font-size:.875rem;">Carlos N.</td>
+                    <td style="font-size:.875rem;">Oliveira vs Tsarukyan</td>
+                    <td style="font-size:.875rem;color:#c9a227;">Oliveira</td>
+                    <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">✓ +10pts</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+  const chartDefaults = {
+    chart: { background: 'transparent', foreColor: '#a1a1aa', fontFamily: 'inherit', toolbar: { show: false } },
+    grid: { borderColor: '#27272a', strokeDashArray: 4 },
+    tooltip: { theme: 'dark' },
+  };
+
+  // Bookings Bar Chart
+  new ApexCharts(document.getElementById('chart-bookings'), {
+    ...chartDefaults,
+    chart: { ...chartDefaults.chart, type: 'bar', height: 240 },
+    series: [{ name: 'Bookings', data: [102, 88, 145, 167, 134, 211] }],
+    xaxis: { categories: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'], labels: { style: { colors: '#a1a1aa' } } },
+    yaxis: { labels: { style: { colors: '#a1a1aa' } } },
+    colors: ['#dc2626'],
+    plotOptions: { bar: { borderRadius: 4, columnWidth: '55%' } },
+    dataLabels: { enabled: false },
+  }).render();
+
+  // Accuracy Line Chart
+  new ApexCharts(document.getElementById('chart-accuracy'), {
+    ...chartDefaults,
+    chart: { ...chartDefaults.chart, type: 'line', height: 240 },
+    series: [{ name: 'Accuracy %', data: [54, 58, 61, 57, 65, 62] }],
+    xaxis: { categories: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'], labels: { style: { colors: '#a1a1aa' } } },
+    yaxis: { min: 40, max: 80, labels: { style: { colors: '#a1a1aa' }, formatter: v => v + '%' } },
+    colors: ['#c9a227'],
+    stroke: { curve: 'smooth', width: 3 },
+    markers: { size: 5, colors: ['#c9a227'], strokeColors: '#09090b', strokeWidth: 2 },
+    fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0, stops: [0, 100] } },
+    dataLabels: { enabled: false },
+  }).render();
+</script>
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UFC 310: Night of Champions – SmartFight</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="sf-navbar navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">SMART<span>FIGHT</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sfNavCollapse">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="sfNavCollapse">
+      <ul class="navbar-nav mx-auto gap-1">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="matches.html">Events</a></li>
+        <li class="nav-item"><a class="nav-link" href="team.html">Fighters</a></li>
+        <li class="nav-item"><a class="nav-link" href="blog.html">News</a></li>
+        <li class="nav-item"><a class="nav-link" href="gallery.html">Gallery</a></li>
+        <li class="nav-item"><a class="nav-link live-badge-nav" href="live-stream.html">Live</a></li>
+        <li class="nav-item"><a class="nav-link" href="predictions.html">Predictions</a></li>
+        <li class="nav-item"><a class="nav-link" href="booking.html">Bookings</a></li>
+      </ul>
+      <div class="nav-actions d-flex align-items-center gap-2 mt-2 mt-lg-0">
+        <a href="#" class="btn btn-sf-ghost">Login</a>
+        <a href="#" class="btn btn-sf-primary">Register</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== EVENT HEADER ===== -->
+<div style="background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-surface) 50%, rgba(220,38,38,0.08) 100%); border-bottom:1px solid var(--border-color); padding: 56px 0 48px; position:relative; overflow:hidden;">
+  <div style="position:absolute; right:-80px; top:-80px; width:500px; height:500px; background:radial-gradient(circle,rgba(220,38,38,0.07) 0%,transparent 70%); pointer-events:none;"></div>
+  <div class="container" style="position:relative; z-index:1;">
+    <div class="breadcrumb-sf mb-4" style="display:flex; align-items:center; gap:8px; font-size:0.78rem; color:var(--text-muted);">
+      <a href="index.html" style="color:var(--text-muted);">Home</a>
+      <i class="fa-solid fa-chevron-right" style="font-size:0.55rem;"></i>
+      <a href="matches.html" style="color:var(--text-muted);">Events</a>
+      <i class="fa-solid fa-chevron-right" style="font-size:0.55rem;"></i>
+      <span>UFC 310</span>
+    </div>
+
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        <span class="badge-status badge-upcoming mb-3" style="display:inline-flex;">Upcoming Event</span>
+        <h1 style="font-size:clamp(1.8rem,4vw,3.2rem); margin-bottom:8px;">UFC 310:<br />Night of Champions</h1>
+        <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:16px; margin-bottom:32px;">
+          <div style="display:flex; align-items:center; gap:8px; font-size:0.875rem; color:var(--text-muted);">
+            <i class="fa-solid fa-calendar" style="color:var(--primary);"></i>
+            <span>May 15, 2026 · 8:00 PM ET</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; font-size:0.875rem; color:var(--text-muted);">
+            <i class="fa-solid fa-location-dot" style="color:var(--primary);"></i>
+            <span>T-Mobile Arena, Las Vegas, NV</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; font-size:0.875rem; color:var(--text-muted);">
+            <i class="fa-solid fa-list-ol" style="color:var(--primary);"></i>
+            <span>11 Bouts Scheduled</span>
+          </div>
+        </div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <a href="booking.html" class="btn btn-sf-primary"><i class="fa-solid fa-ticket"></i> Book Tickets</a>
+          <a href="predictions.html" class="btn btn-sf-outline"><i class="fa-solid fa-trophy"></i> Make Prediction</a>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:var(--radius-xl); padding:28px;">
+          <div style="font-size:0.72rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); margin-bottom:16px; text-align:center;">Countdown to Event</div>
+          <div class="countdown-block justify-content-center" data-event-date="2026-05-15">
+            <div class="countdown-item">
+              <span class="count-num" data-unit="days">00</span>
+              <span class="count-label">Days</span>
+            </div>
+            <div class="countdown-item">
+              <span class="count-num" data-unit="hours">00</span>
+              <span class="count-label">Hours</span>
+            </div>
+            <div class="countdown-item">
+              <span class="count-num" data-unit="minutes">00</span>
+              <span class="count-label">Mins</span>
+            </div>
+            <div class="countdown-item">
+              <span class="count-num" data-unit="seconds">00</span>
+              <span class="count-label">Secs</span>
+            </div>
+          </div>
+          <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border-color); display:flex; justify-content:space-between; font-size:0.82rem;">
+            <span style="color:var(--text-muted);">Venue Capacity</span>
+            <span style="color:var(--gold); font-weight:700;">20,000 seats</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-top:10px;">
+            <span style="color:var(--text-muted);">Tickets Remaining</span>
+            <span style="color:var(--primary); font-weight:700;">~3,400</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FIGHT CARD ===== -->
+<section class="section-pad">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-8">
+        <div class="section-heading mb-5">
+          <span class="label">Card</span>
+          <h2>Fight Card</h2>
+        </div>
+
+        <!-- Main Event -->
+        <div class="fight-row main-event">
+          <div class="fight-label main"><i class="fa-solid fa-star me-1"></i> Main Event · Heavyweight Championship · 5 Rounds</div>
+          <div class="matchup-grid">
+            <div class="fighter-side">
+              <img src="https://placehold.co/56x56/18181b/dc2626?text=MS" class="fighter-side-img" alt="Marcus Santos" />
+              <div class="fighter-side-info">
+                <div class="name">Marcus "The Lion" Santos</div>
+                <div class="record">24-3-1 · Champion</div>
+              </div>
+            </div>
+            <div class="vs-divider">
+              <span class="vs-text">VS</span>
+              <span class="weight-class-pill">265 lbs</span>
+            </div>
+            <div class="fighter-side right">
+              <img src="https://placehold.co/56x56/18181b/c9a227?text=KJ" class="fighter-side-img" alt="Kyle Jensen" />
+              <div class="fighter-side-info">
+                <div class="name">Kyle "Ice Cold" Jensen</div>
+                <div class="record">19-2-0 · #1 Contender</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Co-Main -->
+        <div class="fight-row co-main">
+          <div class="fight-label co"><i class="fa-solid fa-bolt me-1"></i> Co-Main Event · Middleweight · 5 Rounds</div>
+          <div class="matchup-grid">
+            <div class="fighter-side">
+              <img src="https://placehold.co/56x56/18181b/dc2626?text=RM" class="fighter-side-img" alt="Rafa Morales" />
+              <div class="fighter-side-info">
+                <div class="name">Rafa "El Toro" Morales</div>
+                <div class="record">21-4-0 · #3</div>
+              </div>
+            </div>
+            <div class="vs-divider">
+              <span class="vs-text">VS</span>
+              <span class="weight-class-pill">185 lbs</span>
+            </div>
+            <div class="fighter-side right">
+              <img src="https://placehold.co/56x56/18181b/c9a227?text=JW" class="fighter-side-img" alt="Jake Williams" />
+              <div class="fighter-side-info">
+                <div class="name">Jake "The Tank" Williams</div>
+                <div class="record">17-5-2 · #7</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prelim Fights -->
+        <div style="font-size:0.8rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); margin:28px 0 16px; padding-top:16px; border-top:1px solid var(--border-color);">
+          <i class="fa-solid fa-circle me-2" style="font-size:0.5rem;"></i>Main Card
+        </div>
+
+        <div class="fight-row">
+          <div class="fight-label prelim">Welterweight · 3 Rounds</div>
+          <div class="matchup-grid">
+            <div class="fighter-side">
+              <img src="https://placehold.co/56x56/18181b/dc2626?text=AR" class="fighter-side-img" alt="Fighter" />
+              <div class="fighter-side-info"><div class="name">Alex Rivera</div><div class="record">14-3-0 · #8</div></div>
+            </div>
+            <div class="vs-divider"><span class="vs-text">VS</span><span class="weight-class-pill">170 lbs</span></div>
+            <div class="fighter-side right">
+              <img src="https://placehold.co/56x56/18181b/c9a227?text=SN" class="fighter-side-img" alt="Fighter" />
+              <div class="fighter-side-info"><div class="name">Shin Nakamura</div><div class="record">11-2-0 · #12</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fight-row">
+          <div class="fight-label prelim">Lightweight · 3 Rounds</div>
+          <div class="matchup-grid">
+            <div class="fighter-side">
+              <img src="https://placehold.co/56x56/18181b/dc2626?text=TC" class="fighter-side-img" alt="Fighter" />
+              <div class="fighter-side-info"><div class="name">Tyler Cruz</div><div class="record">10-1-0</div></div>
+            </div>
+            <div class="vs-divider"><span class="vs-text">VS</span><span class="weight-class-pill">155 lbs</span></div>
+            <div class="fighter-side right">
+              <img src="https://placehold.co/56x56/18181b/c9a227?text=MO" class="fighter-side-img" alt="Fighter" />
+              <div class="fighter-side-info"><div class="name">Marco Ortiz</div><div class="record">9-2-0</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fight-row">
+          <div class="fight-label prelim">Featherweight · 3 Rounds</div>
+          <div class="matchup-grid">
+            <div class="fighter-side">
+              <img src="https://placehold.co/56x56/18181b/dc2626?text=DB" class="fighter-side-img" alt="Fighter" />
+              <div class="fighter-side-info"><div class="name">Darius Brooks</div><div class="record">8-1-0</div></div>
+            </div>
+            <div class="vs-divider"><span class="vs-text">VS</span><span class="weight-class-pill">145 lbs</span></div>
+            <div class="fighter-side right">
+              <img src="https://placehold.co/56x56/18181b/c9a227?text=LK" class="fighter-side-img" alt="Fighter" />
+              <div class="fighter-side-info"><div class="name">Leon Kim</div><div class="record">7-2-0</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size:0.8rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); margin:28px 0 16px; padding-top:16px; border-top:1px solid var(--border-color);">
+          <i class="fa-solid fa-circle me-2" style="font-size:0.5rem;"></i>Preliminary Card
+        </div>
+
+        <div class="fight-row">
+          <div class="fight-label prelim">Bantamweight · 3 Rounds</div>
+          <div class="matchup-grid">
+            <div class="fighter-side">
+              <img src="https://placehold.co/56x56/18181b/dc2626?text=CP" class="fighter-side-img" alt="Fighter" />
+              <div class="fighter-side-info"><div class="name">Carlos Pena</div><div class="record">6-1-0</div></div>
+            </div>
+            <div class="vs-divider"><span class="vs-text">VS</span><span class="weight-class-pill">135 lbs</span></div>
+            <div class="fighter-side right">
+              <img src="https://placehold.co/56x56/18181b/c9a227?text=RV" class="fighter-side-img" alt="Fighter" />
+              <div class="fighter-side-info"><div class="name">Rick Voss</div><div class="record">5-2-0</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fight-row">
+          <div class="fight-label prelim">Heavyweight · 3 Rounds</div>
+          <div class="matchup-grid">
+            <div class="fighter-side">
+              <img src="https://placehold.co/56x56/18181b/dc2626?text=SM" class="fighter-side-img" alt="Fighter" />
+              <div class="fighter-side-info"><div class="name">Steve Malone</div><div class="record">4-0-0</div></div>
+            </div>
+            <div class="vs-divider"><span class="vs-text">VS</span><span class="weight-class-pill">265 lbs</span></div>
+            <div class="fighter-side right">
+              <img src="https://placehold.co/56x56/18181b/c9a227?text=BH" class="fighter-side-img" alt="Fighter" />
+              <div class="fighter-side-info"><div class="name">Brad Harper</div><div class="record">5-1-0</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Quick Actions -->
+        <div class="sidebar-widget mb-4">
+          <div class="sidebar-widget-title">Quick Actions</div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <a href="booking.html" class="btn btn-sf-primary w-100"><i class="fa-solid fa-ticket"></i> Book Tickets from $49</a>
+            <a href="predictions.html" class="btn btn-sf-outline w-100"><i class="fa-solid fa-trophy"></i> Predict the Fights</a>
+            <a href="live-stream.html" class="btn btn-sf-ghost w-100"><i class="fa-solid fa-satellite-dish"></i> Get Live Alerts</a>
+          </div>
+        </div>
+
+        <!-- Event Info -->
+        <div class="sidebar-widget mb-4">
+          <div class="sidebar-widget-title">Event Information</div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; justify-content:space-between; font-size:0.875rem; padding-bottom:12px; border-bottom:1px solid var(--border-color);">
+              <span style="color:var(--text-muted);">Date</span>
+              <span style="color:var(--text-primary); font-weight:600;">May 15, 2026</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.875rem; padding-bottom:12px; border-bottom:1px solid var(--border-color);">
+              <span style="color:var(--text-muted);">Doors Open</span>
+              <span style="color:var(--text-primary); font-weight:600;">5:00 PM ET</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.875rem; padding-bottom:12px; border-bottom:1px solid var(--border-color);">
+              <span style="color:var(--text-muted);">Prelims Start</span>
+              <span style="color:var(--text-primary); font-weight:600;">6:00 PM ET</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.875rem; padding-bottom:12px; border-bottom:1px solid var(--border-color);">
+              <span style="color:var(--text-muted);">Main Card</span>
+              <span style="color:var(--text-primary); font-weight:600;">8:00 PM ET</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.875rem; padding-bottom:12px; border-bottom:1px solid var(--border-color);">
+              <span style="color:var(--text-muted);">Venue</span>
+              <span style="color:var(--text-primary); font-weight:600; text-align:right;">T-Mobile Arena</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.875rem;">
+              <span style="color:var(--text-muted);">Location</span>
+              <span style="color:var(--text-primary); font-weight:600; text-align:right;">Las Vegas, NV</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fighter Odds Snapshot -->
+        <div class="sidebar-widget">
+          <div class="sidebar-widget-title">Main Event Odds</div>
+          <div style="margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-size:0.9rem; font-weight:700; color:var(--text-primary);">Marcus Santos</span>
+              <span style="font-size:1rem; font-weight:700; color:#22c55e;">-175</span>
+            </div>
+            <div style="height:6px; background:var(--border-color); border-radius:99px; overflow:hidden;">
+              <div style="height:100%; width:64%; background:var(--primary); border-radius:99px;"></div>
+            </div>
+            <div style="font-size:0.72rem; color:var(--text-muted); margin-top:4px;">64% implied probability</div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-size:0.9rem; font-weight:700; color:var(--text-primary);">Kyle Jensen</span>
+              <span style="font-size:1rem; font-weight:700; color:var(--gold);">+145</span>
+            </div>
+            <div style="height:6px; background:var(--border-color); border-radius:99px; overflow:hidden;">
+              <div style="height:100%; width:36%; background:var(--gold); border-radius:99px;"></div>
+            </div>
+            <div style="font-size:0.72rem; color:var(--text-muted); margin-top:4px;">36% implied probability</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="sf-footer">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-4 col-md-6">
+        <a href="index.html" class="footer-logo">SMART<span>FIGHT</span></a>
+        <p class="footer-about">The premier destination for UFC and MMA fans. Live results, fighter profiles, event bookings, and community predictions.</p>
+        <div class="social-links">
+          <a href="#" class="social-link"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-discord"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Home</a></li>
+          <li><a href="matches.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Events</a></li>
+          <li><a href="team.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Fighters</a></li>
+          <li><a href="blog.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> News</a></li>
+          <li><a href="contact.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Contact</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Features</div>
+        <ul class="footer-links">
+          <li><a href="live-stream.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Live Stream</a></li>
+          <li><a href="predictions.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Predictions</a></li>
+          <li><a href="leaderboard.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Leaderboard</a></li>
+          <li><a href="booking.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Book Tickets</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="footer-col-title">Newsletter</div>
+        <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:12px;">Get fight cards, results, and exclusive content delivered straight to your inbox.</p>
+        <div class="newsletter-form">
+          <input type="email" placeholder="Your email address" />
+          <button type="button"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 SmartFight. All rights reserved.</p>
+      <div style="display:flex; gap:20px;"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
