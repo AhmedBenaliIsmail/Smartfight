@@ -282,6 +282,7 @@ class SeedDataCommand extends Command
             ['ali_fan', 'ali@example.com', 'ali123'],
             ['boxerfan1', 'fan1@smartfight.com', 'fan123'],
             ['boxerfan2', 'fan2@smartfight.com', 'fan123'],
+            ['mahdi', 'mahdi@smartfight.com', 'mahdi'],
         ];
 
         // Add Admin
@@ -297,7 +298,14 @@ class SeedDataCommand extends Command
             $user = new User();
             $user->setUsername($data[0]);
             $user->setEmail($data[1]);
-            $user->addRole($userRole);
+            
+            // Special case: make mahdi an admin too
+            if ($data[0] === 'mahdi') {
+                $user->addRole($adminRole);
+            } else {
+                $user->addRole($userRole);
+            }
+            
             $user->setPassword($this->hasher->hashPassword($user, $data[2]));
             $this->em->persist($user);
             $fans[] = $user;
