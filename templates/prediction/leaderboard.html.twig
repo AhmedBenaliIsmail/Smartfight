@@ -29,6 +29,9 @@
                             <th>User</th>
                             <th class="text-center">Total Points</th>
                             <th class="pe-4 text-end">Tier</th>
+                            {% if is_granted('ROLE_ADMIN') %}
+                            <th class="text-end pe-4">Actions</th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -67,9 +70,16 @@
                                         <span class="badge bg-secondary-lt">CONTENDER</span>
                                     {% endif %}
                                 </td>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                <td class="pe-4 text-end">
+                                    <a href="{{ path('app_users', {q: user.username}) }}" class="btn btn-sm btn-outline-info" style="border-radius: 4px; font-size: 0.75rem;">
+                                        <i class="fa-solid fa-eye me-1"></i>Monitor
+                                    </a>
+                                </td>
+                                {% endif %}
                             </tr>
                         {% else %}
-                            <tr><td colspan="4" class="text-center p-5">No prediction data available yet.</td></tr>
+                            <tr><td colspan="{% if is_granted('ROLE_ADMIN') %}5{% else %}4{% endif %}" class="text-center p-5">No prediction data available yet.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>

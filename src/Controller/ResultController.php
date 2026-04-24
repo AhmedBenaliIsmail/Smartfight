@@ -102,14 +102,14 @@ class ResultController extends AbstractController
         $fr = $resultRepo->find($id);
         if (!$fr) throw $this->createNotFoundException();
 
-        $fighter1 = $fighterRepo->find($fr->getFighter1Id());
-        $fighter2 = $fighterRepo->find($fr->getFighter2Id());
+        $fighter1 = $fr->getFighter1();
+        $fighter2 = $fr->getFighter2();
 
         if ($request->isMethod('POST')) {
             $winnerChoice = $request->request->get('winner');
             $winnerId = null;
-            if ($winnerChoice === 'fighter1') $winnerId = $fr->getFighter1Id();
-            elseif ($winnerChoice === 'fighter2') $winnerId = $fr->getFighter2Id();
+            if ($winnerChoice === 'fighter1') $winnerId = $fighter1->getFighterId();
+            elseif ($winnerChoice === 'fighter2') $winnerId = $fighter2->getFighterId();
 
             $dateStr = $request->request->get('fightDate');
             $fightDate = $dateStr ? new \DateTime($dateStr) : new \DateTime();
@@ -144,10 +144,17 @@ class ResultController extends AbstractController
             $statService->addFightStatistic($s2);
 
             // 3. Complete the Result (This triggers ELO and ranking updates)
+            $decisionType = $request->request->get('decisionType');
+            if ($request->request->get('method', 'DECISION') !== 'DECISION') {
+                $decisionType = null;
+            }
+
             $ok = $service->enterResult(
                 $id, $winnerId,
                 $request->request->get('method', 'DECISION'),
                 (int)$request->request->get('round', 1),
+                $decisionType,
+                null,
                 $fightDate
             );
             if ($ok) {

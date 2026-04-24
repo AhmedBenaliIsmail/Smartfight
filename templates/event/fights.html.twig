@@ -78,8 +78,15 @@
         <!-- Add Fight Form -->
         {% if availableNumbers|length > 0 %}
         <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
-            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+            <div class="card-header d-flex align-items-center justify-content-between" style="background:#18181b;border-bottom:1px solid #27272a;">
                 <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-plus me-2" style="color:#3b82f6;"></i>Schedule Bout</h3>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" id="aiMatchmakeBtn" class="btn btn-xs" style="background:rgba(139,92,246,.15);color:#8b5cf6;border:none;font-size:.75rem;">
+                        <i class="fa-solid fa-robot me-1"></i>AI Match
+                    </button>
+                    <i class="fa-solid fa-circle-info text-muted" style="font-size:.75rem;" 
+                       title="AI logic: Groups by weight class, then calculates a similarity score based on Win/Loss parity, Height/Reach compatibility, and KO percentage."></i>
+                </div>
             </div>
             <div class="card-body p-4">
                 <form action="{{ path('app_event_fight_add', {'id': event.eventId}) }}" method="post">
@@ -164,6 +171,47 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             f2Select.options[0].textContent = "Select Opponent (" + selectedF1.text.split('(')[1];
+        });
+    }
+
+    const aiBtn = document.getElementById('aiMatchmakeBtn');
+    if (aiBtn) {
+        aiBtn.addEventListener('click', async function() {
+            aiBtn.disabled = true;
+            aiBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i>AI thinking...';
+            
+            try {
+                const response = await fetch("{{ path('app_event_fight_ai', {id: event.eventId}) }}");
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    // Set Fighter 1
+                    f1Select.value = data.fighter1.id;
+                    f1Select.dispatchEvent(new Event('change'));
+                    
+                    // Set Fighter 2 after a tiny delay for the event listener to enable the field
+                    setTimeout(() => {
+                        f2Select.value = data.fighter2.id;
+                        const s1 = data.fighter1.stats;
+                        const s2 = data.fighter2.stats;
+                        
+                        alert('AI SUGGESTION: ' + data.fighter1.name + ' vs ' + data.fighter2.name + 
+                              '\n------------------------------------------------\n' +
+                              data.fighter1.name + ': ' + s1.record + ', ' + s1.height + ', ' + s1.accuracy + ' accuracy\n' +
+                              data.fighter2.name + ': ' + s2.record + ', ' + s2.height + ', ' + s2.accuracy + ' accuracy\n' +
+                              '------------------------------------------------\n' +
+                              'MATCH QUALITY: ' + data.matchQuality + 
+                              '\n\nAI METHODOLOGY:\nOur multi-vector engine now includes the "Skill Intensity Vector," analyzing the ratio of strikes thrown vs landed (accuracy). This ensures that technical volume strikers are matched against opponents with similar precision, maintaining the highest standard of professional competitive parity.');
+                    }, 50);
+                }
+            } catch (e) {
+                alert('Matchmaking failed. Please try manually.');
+            } finally {
+                aiBtn.disabled = false;
+                aiBtn.innerHTML = '<i class="fa-solid fa-robot me-1"></i>AI Match';
+            }
         });
     }
 });

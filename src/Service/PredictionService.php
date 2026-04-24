@@ -11,7 +11,8 @@ class PredictionService
 {
     public function __construct(
         private EntityManagerInterface $em,
-        private PredictionRepository $predictionRepo
+        private PredictionRepository $predictionRepo,
+        private NotificationService $notificationService
     ) {}
 
     public function processPredictionsForFight(FightResult $fight): void
@@ -44,7 +45,9 @@ class PredictionService
                 $this->em->persist($user);
                 
                 if ($points > 0) {
-                    $this->notify($user, "🎯 You earned {$points} pts for your prediction on {$fight->getFighter1()->getLastName()} vs {$fight->getFighter2()->getLastName()}!", 'PREDICTION');
+                    $this->notificationService->notifyUser($user, "🎯 Awesome! You earned {$points} pts for your prediction on {$fight->getFighter1()->getLastName()} vs {$fight->getFighter2()->getLastName()}!", 'PREDICTION');
+                } else {
+                    $this->notificationService->notifyUser($user, "❌ Tough luck! You earned 0 pts for your prediction on {$fight->getFighter1()->getLastName()} vs {$fight->getFighter2()->getLastName()}.", 'PREDICTION');
                 }
             }
             $this->em->persist($p);
@@ -58,9 +61,9 @@ class PredictionService
             $oldRank = $data['oldRank'];
 
             if ($newRank < $oldRank) {
-                $this->notify($user, "📈 Great job! Your fantasy rank moved up from #{$oldRank} to #{$newRank}!", 'RANKING');
+                $this->notificationService->notifyUser($user, "📈 Great job! Your fantasy rank moved up from #{$oldRank} to #{$newRank}!", 'RANKING');
             } elseif ($newRank > $oldRank) {
-                $this->notify($user, "📉 Watch out! Your fantasy rank dropped from #{$oldRank} to #{$newRank}.", 'RANKING');
+                $this->notificationService->notifyUser($user, "📉 Watch out! Your fantasy rank dropped from #{$oldRank} to #{$newRank}.", 'RANKING');
             }
         }
         $this->em->flush();
@@ -78,14 +81,7 @@ class PredictionService
             ->getSingleScalarResult() + 1;
     }
 
-    private function notify(User $user, string $message, string $type): void
-    {
-        $n = new \App\Entity\Notification();
-        $n->setUser($user);
-        $n->setMessage($message);
-        $n->setType($type);
-        $this->em->persist($n);
-    }
+
 
     private function calculatePoints(Prediction $p, FightResult $r): int
     {

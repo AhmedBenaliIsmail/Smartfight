@@ -152,10 +152,10 @@ class FightResultService
 
     public function getAvailableFightNumbers(int $eventId): array
     {
-        // No hard limit of 3 fights anymore for boxing
+        // Only 3 fight slots exist per event (enforced in addScheduledFight)
         $used = $this->resultRepo->createQueryBuilder('r')
             ->select('r.fightNumber')
-            ->where('r.event = :eid') // mapped to Event relation
+            ->where('r.event = :eid')
             ->setParameter('eid', $eventId)
             ->getQuery()->getSingleColumnResult();
 

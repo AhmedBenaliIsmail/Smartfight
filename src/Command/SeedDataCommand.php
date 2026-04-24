@@ -114,18 +114,42 @@ class SeedDataCommand extends Command
 
     private function createFighters(array $divisions): array
     {
-        // [First, Last, Nick, WC, Nat, W, L, D, ELO, Ht, Reach]
+        // [First, Last, Nick, WC, Nat, W, L, D, KO, Ht, Reach, Thrown, Landed]
         $data = [
-            ['Tyson', 'Fury', 'The Gypsy King', 'Heavyweight', 'GB', 34, 1, 1, 1950, 206, 216],
-            ['Oleksandr', 'Usyk', 'The Cat', 'Heavyweight', 'UA', 22, 0, 0, 2000, 191, 198],
-            ['Anthony', 'Joshua', 'AJ', 'Heavyweight', 'GB', 28, 3, 0, 1880, 198, 208],
-            ['Canelo', 'Alvarez', 'Canelo', 'Super Middleweight', 'MX', 60, 2, 2, 1980, 173, 179],
-            ['David', 'Benavidez', 'The Mexican Monster', 'Super Middleweight', 'US', 28, 0, 0, 1850, 188, 189],
-            ['Terence', 'Crawford', 'Bud', 'Welterweight', 'US', 40, 0, 0, 2050, 173, 188],
-            ['Errol', 'Spence Jr.', 'The Truth', 'Welterweight', 'US', 28, 1, 0, 1860, 177, 183],
-            ['Gervonta', 'Davis', 'Tank', 'Lightweight', 'US', 29, 0, 0, 1900, 166, 171],
-            ['Devin', 'Haney', 'The Dream', 'Super Lightweight', 'US', 31, 0, 0, 1850, 173, 180],
-            ['Naoya', 'Inoue', 'The Monster', 'Super Bantamweight', 'JP', 26, 0, 0, 2020, 165, 171],
+            // Heavyweights
+            ['Tyson', 'Fury', 'The Gypsy King', 'Heavyweight', 'GB', 34, 1, 1, 24, 206, 216, 5000, 2100],
+            ['Oleksandr', 'Usyk', 'The Cat', 'Heavyweight', 'UA', 22, 0, 0, 14, 191, 198, 4800, 2300],
+            ['Anthony', 'Joshua', 'AJ', 'Heavyweight', 'GB', 28, 3, 0, 25, 198, 208, 4200, 1900],
+            ['Deontay', 'Wilder', 'The Bronze Bomber', 'Heavyweight', 'US', 43, 3, 1, 42, 201, 211, 3500, 1100],
+            ['Zhilei', 'Zhang', 'Big Bang', 'Heavyweight', 'CN', 27, 2, 1, 22, 198, 198, 3800, 1600],
+            ['Joseph', 'Parker', 'Joe', 'Heavyweight', 'NZ', 35, 3, 0, 23, 193, 193, 4100, 1800],
+
+            // Middleweights
+            ['Canelo', 'Alvarez', 'Canelo', 'Middleweight', 'MX', 61, 2, 2, 39, 173, 179, 7000, 3200],
+            ['Gennadiy', 'Golovkin', 'GGG', 'Middleweight', 'KZ', 42, 2, 1, 37, 179, 178, 6500, 3000],
+            ['Jermall', 'Charlo', 'Hitman', 'Middleweight', 'US', 33, 0, 0, 22, 183, 185, 4200, 1700],
+            ['Janibek', 'Alimkhanuly', 'Qazaq Style', 'Middleweight', 'KZ', 15, 0, 0, 10, 182, 182, 2800, 1100],
+            ['Carlos', 'Adames', 'The Caballo', 'Middleweight', 'DO', 23, 1, 0, 18, 180, 180, 3100, 1300],
+
+            // Lightweights
+            ['Gervonta', 'Davis', 'Tank', 'Lightweight', 'US', 30, 0, 0, 28, 166, 171, 3800, 1600],
+            ['Vasiliy', 'Lomachenko', 'The Matrix', 'Lightweight', 'UA', 18, 3, 0, 12, 170, 166, 5500, 2600],
+            ['Shakur', 'Stevenson', 'Sugar', 'Lightweight', 'US', 21, 0, 0, 10, 173, 173, 4200, 1800],
+            ['William', 'Zepeda', 'Camaron', 'Lightweight', 'MX', 30, 0, 0, 26, 175, 175, 4500, 1900],
+            ['Isaac', 'Cruz', 'Pitbull', 'Lightweight', 'MX', 26, 2, 1, 18, 163, 160, 3200, 1400],
+            ['Ryan', 'Garcia', 'KingRy', 'Lightweight', 'US', 24, 1, 0, 20, 174, 178, 3800, 1500],
+
+            // Welterweights
+            ['Terence', 'Crawford', 'Bud', 'Welterweight', 'US', 40, 0, 0, 31, 173, 188, 5200, 2400],
+            ['Errol', 'Spence Jr.', 'The Truth', 'Welterweight', 'US', 28, 1, 0, 22, 177, 183, 4500, 1900],
+            ['Jaron', 'Ennis', 'Boots', 'Welterweight', 'US', 31, 0, 0, 28, 178, 188, 3900, 1800],
+            ['Eimantas', 'Stanionis', 'Stanionis', 'Welterweight', 'LT', 15, 0, 0, 9, 173, 173, 2500, 1100],
+
+            // Featherweights
+            ['Naoya', 'Inoue', 'The Monster', 'Super Bantamweight', 'JP', 27, 0, 0, 24, 165, 171, 3500, 1700],
+            ['Luis', 'Nery', 'Pantera', 'Super Bantamweight', 'MX', 35, 2, 0, 27, 165, 169, 3200, 1500],
+            ['Stephen', 'Fulton', 'Cool Boy Steph', 'Super Bantamweight', 'US', 21, 1, 0, 8, 169, 179, 2900, 1200],
+            ['Murodjon', 'Akhmadaliev', 'MJ', 'Super Bantamweight', 'UZ', 12, 1, 0, 9, 166, 173, 2100, 900],
         ];
 
         $fighters = [];
@@ -139,10 +163,13 @@ class SeedDataCommand extends Command
             $entity->setWins($f[5]);
             $entity->setLosses($f[6]);
             $entity->setDraws($f[7]);
-            $entity->setEloRating($f[8]);
+            $entity->setKoWins($f[8]);
             $entity->setHeight($f[9]);
             $entity->setReach($f[10]);
-            $entity->setLastFightDate(new \DateTime('-2 months'));
+            $entity->setStrikesThrown($f[11]);
+            $entity->setStrikesLanded($f[12]);
+            $entity->setEloRating(1500 + ($f[5] * 20) - ($f[6] * 30));
+            $entity->setLastFightDate(new \DateTime('-' . rand(1, 6) . ' months'));
             $this->em->persist($entity);
             $fighters[$f[0] . ' ' . $f[1]] = $entity;
         }
@@ -153,64 +180,95 @@ class SeedDataCommand extends Command
     private function createEvents(): array
     {
         $events = [];
-        // Name, Org, Date, Venue, City, Country, Seats
+        // Naming pattern: SmartFight #XXXX
+        // Date, Venue, City, Country, Seats, Status, Organization
         $data = [
-            ['Fury vs Usyk', 'UNDISPUTED', '-1 month', 'Kingdom Arena', 'Riyadh', 'SA', 20000],
-            ['Canelo vs Benavidez', 'WBC', '-3 months', 'T-Mobile Arena', 'Las Vegas', 'US', 20000],
-            ['Crawford vs Spence', 'UNDISPUTED', '-8 months', 'T-Mobile Arena', 'Las Vegas', 'US', 20000],
-            ['Joshua vs Ngannou', 'INDEPENDENT', '-2 months', 'Kingdom Arena', 'Riyadh', 'SA', 20000],
-            ['Inoue vs Nery', 'UNDISPUTED', '-15 days', 'Tokyo Dome', 'Tokyo', 'JP', 55000],
+            ['-1 month', 'Kingdom Arena', 'Riyadh', 'SA', 22000, 'COMPLETED', 'WBC'],
+            ['-20 days', 'T-Mobile Arena', 'Las Vegas', 'US', 20000, 'COMPLETED', 'WBA'],
+            ['+2 months', 'BMO Stadium', 'Los Angeles', 'US', 22000, 'SCHEDULED', 'IBF'],
+            ['+4 months', 'Wembley Stadium', 'London', 'GB', 90000, 'SCHEDULED', 'WBO'],
+            ['-10 days', 'Tokyo Dome', 'Tokyo', 'JP', 55000, 'COMPLETED', 'WBC'],
+            ['+1 month', 'MGM Grand', 'Las Vegas', 'US', 16000, 'SCHEDULED', 'INDEPENDENT'],
+            ['-15 days', 'RAC Arena', 'Perth', 'AU', 15000, 'COMPLETED', 'IBF'],
+            ['-1 year', 'T-Mobile Arena', 'Las Vegas', 'US', 20000, 'COMPLETED', 'WBA'],
         ];
 
         foreach ($data as $i => $d) {
             $e = new Event();
-            $e->setEventName($d[0]);
-            $e->setOrganization($d[1]);
-            $e->setEventDate(new \DateTime($d[2]));
-            $e->setVenue($d[3]);
-            $e->setCity($d[4]);
-            $e->setCountry($d[5]);
-            $e->setSeatCapacity($d[6]);
-            $e->setStatus('COMPLETED');
+            $e->setEventName('Event #' . rand(1000, 9999));
+            $e->setEventDate(new \DateTime($d[0]));
+            $e->setVenue($d[1]);
+            $e->setCity($d[2]);
+            $e->setCountry($d[3]);
+            $e->setSeatCapacity($d[4]);
+            $e->setStatus($d[5]);
+            $e->setOrganization($d[6]);
             $this->em->persist($e);
-            $events[$d[0]] = $e;
+            $events[] = $e;
         }
 
         $this->em->flush();
         return $events;
     }
 
-    private function createFights(array $f, array $e): void
+    private function createFights(array $f, array $events): void
     {
-        // Usyk beats Fury by Split Decision
-        $this->addResolvedFight(
-            $e['Fury vs Usyk'], 1, $f['Tyson Fury'], $f['Oleksandr Usyk'], $f['Oleksandr Usyk'], 
-            FightResult::METHOD_DECISION, 12, 'SD', 9, 12, true, 'UNDISPUTED',
-            [
-                'f1' => ['pl' => 157, 'pt' => 496, 'bpl' => 30, 'jl' => 45, 'jt' => 200, 'ppl' => 112, 'ppt' => 296, 'kd' => 0],
-                'f2' => ['pl' => 170, 'pt' => 407, 'bpl' => 42, 'jl' => 48, 'jt' => 210, 'ppl' => 122, 'ppt' => 197, 'kd' => 1]
-            ]
-        );
-
-        // Crawford beats Spence by TKO
-        $this->addResolvedFight(
-            $e['Crawford vs Spence'], 1, $f['Terence Crawford'], $f['Errol Spence Jr.'], $f['Terence Crawford'], 
-            FightResult::METHOD_KO, 9, null, 9, 12, true, 'UNDISPUTED',
-            [
-                'f1' => ['pl' => 185, 'pt' => 369, 'bpl' => 20, 'jl' => 87, 'jt' => 200, 'ppl' => 98, 'ppt' => 169, 'kd' => 3],
-                'f2' => ['pl' => 96, 'pt' => 480, 'bpl' => 25, 'jl' => 33, 'jt' => 200, 'ppl' => 63, 'ppt' => 280, 'kd' => 0]
-            ]
-        );
+        $fighters = array_values($f);
         
-        // Canelo beats Benavidez by UD
-        $this->addResolvedFight(
-            $e['Canelo vs Benavidez'], 1, $f['Canelo Alvarez'], $f['David Benavidez'], $f['Canelo Alvarez'], 
-            FightResult::METHOD_DECISION, 12, 'UD', null, 12, true, 'WBC',
-            [
-                'f1' => ['pl' => 234, 'pt' => 500, 'bpl' => 60, 'jl' => 50, 'jt' => 150, 'ppl' => 184, 'ppt' => 350, 'kd' => 0],
-                'f2' => ['pl' => 190, 'pt' => 600, 'bpl' => 40, 'jl' => 80, 'jt' => 300, 'ppl' => 110, 'ppt' => 300, 'kd' => 0]
-            ]
-        );
+        foreach ($events as $e) {
+            $org = $e->getOrganization();
+            $numFights = ($e->getStatus() === 'COMPLETED') ? 3 : 1; // Seed at least 1-3 fights
+            
+            $usedInEvent = [];
+            for ($i = 1; $i <= $numFights; $i++) {
+                // Find 2 random fighters not already in this event
+                shuffle($fighters);
+                $f1 = null;
+                $f2 = null;
+                foreach ($fighters as $fighter) {
+                    if (!in_array($fighter->getFighterId(), $usedInEvent)) {
+                        if (!$f1) $f1 = $fighter;
+                        elseif (!$f2) $f2 = $fighter;
+                    }
+                    if ($f1 && $f2) break;
+                }
+
+                if (!$f1 || !$f2) continue;
+                $usedInEvent[] = $f1->getFighterId();
+                $usedInEvent[] = $f2->getFighterId();
+
+                if ($e->getStatus() === 'COMPLETED') {
+                    $winner = (rand(0, 1) === 0) ? $f1 : $f2;
+                    $method = (rand(0, 5) > 1) ? FightResult::METHOD_KO : FightResult::METHOD_DECISION;
+                    
+                    $this->addResolvedFight(
+                        $e, $i, $f1, $f2, $winner, 
+                        $method, rand(1, 12), ($method === FightResult::METHOD_DECISION ? 'UD' : null), 
+                        null, 12, true, $org,
+                        [
+                            'f1' => ['pl' => rand(50, 150), 'pt' => rand(200, 500), 'bpl' => rand(10, 40), 'jl' => rand(10, 50), 'jt' => rand(50, 150), 'ppl' => rand(40, 100), 'ppt' => rand(150, 350), 'kd' => rand(0, 2)],
+                            'f2' => ['pl' => rand(50, 150), 'pt' => rand(200, 500), 'bpl' => rand(10, 40), 'jl' => rand(10, 50), 'jt' => rand(50, 150), 'ppl' => rand(40, 100), 'ppt' => rand(150, 350), 'kd' => rand(0, 2)]
+                        ]
+                    );
+                } else {
+                    $this->addScheduledFight($e, $i, $f1, $f2);
+                }
+            }
+        }
+    }
+
+    private function addScheduledFight(Event $event, int $num, Fighter $f1, Fighter $f2): void
+    {
+        $fr = new FightResult();
+        $fr->setEvent($event);
+        $fr->setFightNumber($num);
+        $fr->setFighter1($f1);
+        $fr->setFighter2($f2);
+        $fr->setFightDate($event->getEventDate());
+        $fr->setStatus('SCHEDULED');
+        $fr->setScheduledRounds(12);
+        $this->em->persist($fr);
+        $this->em->flush();
     }
 
     private function addResolvedFight(

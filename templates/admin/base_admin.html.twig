@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% block extra_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid py-4">
+        {% block admin_content %}{% endblock %}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% block extra_js %}{% endblock %}
+{% endblock %}

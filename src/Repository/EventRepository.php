@@ -51,4 +51,12 @@ class EventRepository extends ServiceEntityRepository
         return $qb->orderBy('e.eventDate', 'DESC')
             ->getQuery()->getResult();
     }
+    public function findBookableEvents(): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.status = :status')
+            ->setParameter('status', 'SCHEDULED')
+            ->orderBy('e.eventDate', 'ASC')
+            ->getQuery()->getResult();
+    }
 }

@@ -1,0 +1,22 @@
+<header class="navbar navbar-expand-md" style="background:#18181b;border-bottom:1px solid #27272a;position:sticky;top:0;z-index:50;">
+    <div class="container-xl">
+        <div class="navbar-nav flex-row">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{{ path('admin_blog_index') }}" style="color:#71717a;">Admin</a></li>
+                    {% if breadcrumb_title is defined %}
+                        <li class="breadcrumb-item active" style="color:#a1a1aa;">{{ breadcrumb_title }}</li>
+                    {% endif %}
+                </ol>
+            </nav>
+        </div>
+        <div class="navbar-nav flex-row ms-auto align-items-center gap-3">
+            {% if app.user %}
+                <span style="color:#71717a;font-size:.875rem;">{{ app.user.fullName }}</span>
+            {% endif %}
+            <a href="{{ path('front_blog_index') }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                <i class="fa-solid fa-arrow-up-right-from-square fa-fw"></i> View Site
+            </a>
+        </div>
+    </div>
+</header>

@@ -10,6 +10,8 @@
         "doctrine/doctrine-bundle": "^2.18",
         "doctrine/doctrine-migrations-bundle": "^3.7",
         "doctrine/orm": "^3.6",
+        "endroid/qr-code": "^6.0",
+        "knplabs/knp-paginator-bundle": "^6.3",
         "symfony/asset": "7.1.*",
         "symfony/console": "7.1.*",
         "symfony/dotenv": "7.1.*",
@@ -21,7 +23,11 @@
         "symfony/security-bundle": "7.1.*",
         "symfony/twig-bundle": "7.1.*",
         "symfony/validator": "7.1.*",
-        "symfony/yaml": "7.1.*"
+        "symfony/yaml": "7.1.*",
+        "vich/uploader-bundle": "^2.3"
+    },
+    "require-dev": {
+        "symfony/maker-bundle": "^1.50"
     },
     "config": {
         "allow-plugins": {

@@ -22,6 +22,7 @@ class RankingService
         private RankingRepository $rankingRepo,
         private AnalyticsEngine $analyticsEngine,
         private PredictionService $predictionService,
+        private NotificationService $notificationService,
     ) {}
 
     private function round2(float $v): float { return round($v, 2); }
@@ -192,6 +193,12 @@ class RankingService
 
         $this->predictionService->processPredictionsForFight($fight);
         $this->updateGlobalRankings();
+        
+        // Notify fans about ranking updates
+        $this->notificationService->notifyAllFans(
+            "🥊 World Rankings have been updated following {$fight->getFighter1()->getLastName()} vs {$fight->getFighter2()->getLastName()}!",
+            'RANKING'
+        );
     }
 
     public function recomputeAllRankings(): void

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+    <link rel="stylesheet" href="{{ asset('backoffice/css/smartfight-admin.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/smartfight-admin.css') }}" />
     {% endblock %}
 </head>
@@ -21,9 +22,11 @@
 
             <!-- Logo -->
             <div class="p-3 border-bottom" style="border-color:#27272a!important">
-                <a href="{{ path('app_dashboard') }}" class="smartfight-logo">
-                    <div class="logo-icon"><i class="fa-solid fa-mitten"></i></div>
-                    <div class="logo-text">Smart<span>Fight</span></div>
+                <a href="{{ path('app_dashboard') }}" style="text-decoration:none;display:flex;align-items:center;gap:.75rem;">
+                    <div style="width:36px;height:36px;background:#dc2626;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;">
+                        <i class="fa-solid fa-fist-raised"></i>
+                    </div>
+                    <span style="font-family:'Oswald',sans-serif;font-weight:700;font-size:1.2rem;color:#fff;letter-spacing:1px;">SMART<span style="color:#dc2626;">FIGHT</span></span>
                 </a>
             </div>
 
@@ -87,6 +90,30 @@
                             <span class="nav-link-title">World Rankings</span>
                         </a>
                     </li>
+
+                    <div class="navbar-vertical-section">Fan Experience</div>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'admin_blog' or app.request.attributes.get('_route') starts with 'front_blog' %}active{% endif %}" 
+                           href="{{ is_granted('ROLE_ADMIN') ? path('admin_blog_index') : path('front_blog_index') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw text-orange"></i></span>
+                            <span class="nav-link-title">Blog / News</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'admin_booking' or app.request.attributes.get('_route') starts with 'front_booking' %}active{% endif %}" 
+                           href="{{ is_granted('ROLE_ADMIN') ? path('admin_booking_index') : path('front_booking_index') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw text-purple"></i></span>
+                            <span class="nav-link-title">{% if is_granted('ROLE_ADMIN') %}Event Bookings{% else %}Book Tickets{% endif %}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'admin_reaction' or app.request.attributes.get('_route') starts with 'front_reaction' %}active{% endif %}" 
+                           href="{{ is_granted('ROLE_ADMIN') ? path('admin_reaction_index') : path('front_reaction_index') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-fire fa-fw text-red"></i></span>
+                            <span class="nav-link-title">Fan Reactions</span>
+                        </a>
+                    </li>
+
                     {% if is_granted('ROLE_USER') and not is_granted('ROLE_ADMIN') %}
                     <li class="navbar-vertical-section">Fantasy League</li>
                     <li class="nav-item">

@@ -18,10 +18,6 @@ class PredictionController extends AbstractController
     public function index(FightResultRepository $resultRepo, PredictionRepository $predictionRepo): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
-        if ($this->isGranted('ROLE_ADMIN')) {
-            $this->addFlash('error', 'Admins are not eligible for the prediction system.');
-            return $this->redirectToRoute('app_dashboard');
-        }
         $user = $this->getUser();
         
         $upcomingFights = $resultRepo->findBy(['status' => 'SCHEDULED'], ['fightDate' => 'ASC']);

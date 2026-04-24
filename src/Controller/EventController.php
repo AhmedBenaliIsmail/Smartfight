@@ -194,5 +194,97 @@ class EventController extends AbstractController
         $this->addFlash('success', 'Fight removed.');
         return $this->redirectToRoute('app_event_fights', ['id' => $eventId]);
     }
+    #[Route('/{id}/fights/ai-matchmake', name: 'app_event_fight_ai', methods: ['GET'])]
+    public function aiMatchmake(int $id, EventRepository $eventRepo, FightResultRepository $resultRepo, FighterRepository $fighterRepo): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $event = $eventRepo->find($id);
+        if (!$event) return $this->json(['error' => 'Event not found'], 404);
+
+        $usedIds = $resultRepo->getFighterIdsInEvent($id);
+        $available = array_filter($fighterRepo->findAll(), fn($f) => !in_array($f->getFighterId(), $usedIds));
+        
+        if (count($available) < 2) {
+            return $this->json(['error' => 'Not enough available fighters'], 400);
+        }
+
+        // Group by weight division
+        $byWeight = [];
+        foreach ($available as $f) {
+            $wdId = $f->getWeightDivision() ? $f->getWeightDivision()->getId() : 0;
+            if ($wdId > 0) $byWeight[$wdId][] = $f;
+        }
+
+        $bestPair = null;
+        $bestScore = PHP_FLOAT_MAX;
+
+        foreach ($byWeight as $wdId => $fighters) {
+            if (count($fighters) < 2) continue;
+
+            for ($i = 0; $i < count($fighters); $i++) {
+                for ($j = $i + 1; $j < count($fighters); $j++) {
+                    $f1 = $fighters[$i];
+                    $f2 = $fighters[$j];
+
+                    // Heuristic scoring: Smaller difference is better match
+                    // We look at Win/Loss parity, physical parity, and "Experience"
+                    $diffWins = abs($f1->getWins() - $f2->getWins());
+                    $diffLosses = abs($f1->getLosses() - $f2->getLosses());
+                    $diffHeight = abs(($f1->getHeight() ?? 175) - ($f2->getHeight() ?? 175));
+                    $diffReach = abs(($f1->getReach() ?? 180) - ($f2->getReach() ?? 180));
+                    
+                    // KO Rate difference
+                    $ko1 = $f1->getWins() > 0 ? $f1->getKoWins() / $f1->getWins() : 0;
+                    $ko2 = $f2->getWins() > 0 ? $f2->getKoWins() / $f2->getWins() : 0;
+                    $diffKO = abs($ko1 - $ko2) * 10; 
+
+                    // Strike Accuracy difference (New Vector)
+                    $acc1 = $f1->getStrikeAccuracy();
+                    $acc2 = $f2->getStrikeAccuracy();
+                    $diffAcc = abs($acc1 - $acc2) / 10; // Scale it down as accuracy % can be large
+
+                    $score = ($diffWins * 1.0) + ($diffLosses * 1.0) + ($diffHeight * 0.5) + ($diffReach * 0.5) + ($diffKO * 2.0) + ($diffAcc * 1.5);
+
+                    if ($score < $bestScore) {
+                        $bestScore = $score;
+                        $bestPair = [$f1, $f2];
+                    }
+                }
+            }
+        }
+
+        if (!$bestPair) {
+            return $this->json(['error' => 'No appropriate matches found in same weight classes'], 400);
+        }
+
+        return $this->json([
+            'fighter1' => [
+                'id' => $bestPair[0]->getFighterId(),
+                'name' => $bestPair[0]->getFullName(),
+                'weight' => $bestPair[0]->getWeightDivision()->getName(),
+                'stats' => [
+                    'record' => sprintf('%d-%d', $bestPair[0]->getWins(), $bestPair[0]->getLosses()),
+                    'koWins' => $bestPair[0]->getKoWins(),
+                    'height' => ($bestPair[0]->getHeight() ?? 'N/A') . 'cm',
+                    'reach' => ($bestPair[0]->getReach() ?? 'N/A') . 'cm',
+                    'accuracy' => number_format($bestPair[0]->getStrikeAccuracy(), 1) . '%'
+                ]
+            ],
+            'fighter2' => [
+                'id' => $bestPair[1]->getFighterId(),
+                'name' => $bestPair[1]->getFullName(),
+                'weight' => $bestPair[1]->getWeightDivision()->getName(),
+                'stats' => [
+                    'record' => sprintf('%d-%d', $bestPair[1]->getWins(), $bestPair[1]->getLosses()),
+                    'koWins' => $bestPair[1]->getKoWins(),
+                    'height' => ($bestPair[1]->getHeight() ?? 'N/A') . 'cm',
+                    'reach' => ($bestPair[1]->getReach() ?? 'N/A') . 'cm',
+                    'accuracy' => number_format($bestPair[1]->getStrikeAccuracy(), 1) . '%'
+                ]
+            ],
+            'score' => $bestScore,
+            'matchQuality' => $bestScore < 3 ? 'EXCELLENT' : ($bestScore < 7 ? 'GOOD' : 'FAIR')
+        ]);
+    }
 }
 

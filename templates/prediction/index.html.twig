@@ -15,9 +15,21 @@
     </div>
     <div class="text-end">
         <div class="text-muted small mb-1">Your Season Score</div>
-        <div class="h2 mb-0 fw-bold text-blue">{{ app.user.predictionPoints }} <span style="font-size: .8rem; font-weight: normal; color: #a1a1aa;">PTS</span></div>
+        <div class="h2 mb-0 fw-bold text-blue">{{ app.user.predictionPoints|default(0) }} <span style="font-size: .8rem; font-weight: normal; color: #a1a1aa;">PTS</span></div>
     </div>
 </div>
+
+{% if is_granted('ROLE_ADMIN') %}
+<div class="alert alert-info border-0 mb-4" style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6 !important;">
+    <div class="d-flex align-items-center">
+        <i class="fa-solid fa-eye fa-2x me-3 text-blue"></i>
+        <div>
+            <h4 class="alert-title mb-1 text-blue">Read-Only Mode</h4>
+            <div class="text-muted">You are viewing the Prediction Center as an Administrator. You can see upcoming fights and community predictions, but you cannot submit predictions yourself.</div>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <div class="row g-4">
     <div class="col-lg-7">
@@ -36,6 +48,7 @@
                 </div>
                 <div class="card-body p-4">
                     <form action="{{ path('app_prediction_submit', {fightId: fight.resultId}) }}" method="post">
+                        <fieldset {% if is_granted('ROLE_ADMIN') %}disabled{% endif %}>
                         <div class="row align-items-center text-center">
                             <!-- Fighter 1 -->
                             <div class="col-5">
@@ -102,11 +115,18 @@
                         </div>
 
                         <div class="mt-4">
-                            <button type="submit" class="btn btn-primary w-100 py-2">
-                                <i class="fa-solid fa-paper-plane me-2"></i>
-                                {{ myPred ? 'Update Prediction' : 'Lock in Prediction' }}
-                            </button>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <div class="btn btn-secondary w-100 py-2 disabled">
+                                    <i class="fa-solid fa-eye me-2"></i>Admin Read-Only Mode
+                                </div>
+                            {% else %}
+                                <button type="submit" class="btn btn-primary w-100 py-2">
+                                    <i class="fa-solid fa-paper-plane me-2"></i>
+                                    {{ myPred ? 'Update Prediction' : 'Lock in Prediction' }}
+                                </button>
+                            {% endif %}
                         </div>
+                        </fieldset>
                     </form>
                 </div>
             </div>

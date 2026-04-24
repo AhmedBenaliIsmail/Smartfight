@@ -14,12 +14,22 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class UserController extends AbstractController
 {
     #[Route('', name: 'app_users')]
-    public function index(UserRepository $repo): Response
+    public function index(Request $request, UserRepository $repo): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
         if ($this->isGranted('ROLE_ADMIN')) {
+            $q = trim($request->query->get('q', ''));
+            $users = $q
+                ? $repo->createQueryBuilder('u')
+                    ->where('u.username LIKE :q')
+                    ->setParameter('q', '%' . $q . '%')
+                    ->orderBy('u.userId', 'ASC')
+                    ->getQuery()->getResult()
+                : $repo->findAll();
+
             return $this->render('user/index.html.twig', [
-                'users' => $repo->findAll(),
+                'users' => $users,
+                'q'     => $q,
             ]);
         }
         return $this->render('user/profile.html.twig', [

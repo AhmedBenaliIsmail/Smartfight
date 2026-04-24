@@ -76,6 +76,11 @@ class Event
     public function getStatus(): string { return $this->status; }
     public function setStatus(string $v): self { $this->status = $v; return $this; }
 
+    public function getId(): ?int { return $this->eventId; }
+    public function getCapacity(): ?int { return $this->seatCapacity; }
+    public function getName(): ?string { return $this->eventName; }
+    public function getStartDate(): ?\DateTimeInterface { return $this->eventDate; }
+
     public function isUpcoming(): bool
     {
         return $this->eventDate !== null && $this->eventDate >= new \DateTime('today');

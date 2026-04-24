@@ -79,6 +79,12 @@ class Fighter
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $reach = null;
 
+    #[ORM\Column(name: 'strikes_thrown', type: 'integer', options: ['default' => 0])]
+    private int $strikesThrown = 0;
+
+    #[ORM\Column(name: 'strikes_landed', type: 'integer', options: ['default' => 0])]
+    private int $strikesLanded = 0;
+
     // Getters and Setters
     public function getFighterId(): ?int { return $this->fighterId; }
     public function setFighterId(int $id): self { $this->fighterId = $id; return $this; }
@@ -142,6 +148,18 @@ class Fighter
 
     public function getReach(): ?int { return $this->reach; }
     public function setReach(?int $v): self { $this->reach = $v; return $this; }
+
+    public function getStrikesThrown(): int { return $this->strikesThrown; }
+    public function setStrikesThrown(int $v): self { $this->strikesThrown = $v; return $this; }
+
+    public function getStrikesLanded(): int { return $this->strikesLanded; }
+    public function setStrikesLanded(int $v): self { $this->strikesLanded = $v; return $this; }
+
+    public function getStrikeAccuracy(): float
+    {
+        if ($this->strikesThrown <= 0) return 0.0;
+        return ($this->strikesLanded / $this->strikesThrown) * 100;
+    }
 
     public function getFullName(): string { return $this->firstName . ' ' . $this->lastName; }
     public function getTotalFights(): int { return $this->wins + $this->losses + $this->draws; }

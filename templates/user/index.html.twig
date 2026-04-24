@@ -18,6 +18,38 @@
     {% endif %}
 </div>
 
+{% if is_granted('ROLE_ADMIN') %}
+<div class="card mb-3" style="background:#18181b;border:1px solid #27272a;">
+    <div class="card-body py-3">
+        <form method="get" action="{{ path('app_users') }}" id="user-search-form">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" name="q" id="user-search-input" class="form-control" placeholder="Search by username..." value="{{ q|default('') }}" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">Filter</button>
+                    {% if q is defined and q %}
+                    <a href="{{ path('app_users') }}" class="btn btn-sm btn-outline-danger ms-1"><i class="fa-solid fa-xmark me-1"></i>Clear</a>
+                    {% endif %}
+                </div>
+                <div class="col-md-3 text-end">
+                    {% if q is defined and q %}
+                    <span class="badge" style="background:rgba(59,130,246,.15);color:#3b82f6;">
+                        <i class="fa-solid fa-eye me-1"></i>Monitoring: {{ q }}
+                    </span>
+                    {% else %}
+                    <span class="badge bg-secondary-lt">All Users</span>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
 <div class="card" style="background:#18181b;border:1px solid #27272a;">
     <div class="card-body p-0 table-responsive">
         <table class="table table-hover mb-0">
@@ -26,6 +58,7 @@
                 <th style="padding:.75rem 1.25rem;">ID</th>
                 <th>Username</th>
                 <th>Email</th>
+                <th>Prediction Pts</th>
                 <th>Role</th>
                 <th>Created At</th>
                 {% if is_granted('ROLE_ADMIN') %}
@@ -35,13 +68,22 @@
             </thead>
             <tbody>
             {% for u in users %}
-                <tr>
+                {% set isMonitored = q is defined and q and u.username|lower == q|lower %}
+                <tr style="{{ isMonitored ? 'background: rgba(59,130,246,.08); border-left: 3px solid #3b82f6;' : '' }}">
                     <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#{{ u.userId }}</td>
                     <td style="font-size:.875rem;font-weight:600;">
                         {% if u.username == app.user.username %}<span class="badge bg-success me-1">You</span>{% endif %}
+                        {% if isMonitored %}<i class="fa-solid fa-eye me-1 text-blue"></i>{% endif %}
                         {{ u.username }}
                     </td>
                     <td>{{ u.email|default('-') }}</td>
+                    <td>
+                        {% if 'ROLE_USER' in u.roles and 'ROLE_ADMIN' not in u.roles %}
+                            <span class="badge bg-blue-lt px-2">{{ u.predictionPoints|default(0) }} pts</span>
+                        {% else %}
+                            <span class="text-muted" style="font-size:.8rem;">N/A</span>
+                        {% endif %}
+                    </td>
                     <td>
                         {% if 'ROLE_ADMIN' in u.roles %}
                             <span class="badge" style="background:rgba(220,38,38,.15);color:#dc2626;">ADMIN</span>
@@ -50,7 +92,7 @@
                         {% endif %}
                     </td>
                     <td style="font-size:.8rem;color:#a1a1aa;">{{ u.createdDate ? u.createdDate|date('Y-m-d H:i') : '-' }}</td>
-                    
+
                     {% if is_granted('ROLE_ADMIN') %}
                     <td class="text-end" style="padding-right:1.25rem;">
                         {% if u.userId != app.user.userId %}
@@ -63,7 +105,13 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="6" class="text-center" style="padding: 2rem;">No users found.</td>
+                    <td colspan="7" class="text-center" style="padding: 2rem;">
+                        {% if q is defined and q %}
+                            <i class="fa-solid fa-user-slash me-2 text-muted"></i>No user matching "<strong>{{ q }}</strong>" found.
+                        {% else %}
+                            No users found.
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
