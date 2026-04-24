@@ -33,7 +33,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 200, nullable: true)]
     #[Assert\NotBlank(message: 'Email is required.')]
-    #[Assert\Email(mode: 'strict', checkMX: true, checkHost: true, message: 'This email address does not appear to exist (invalid domain).')]
+    #[Assert\Email(mode: 'html5', message: 'Please enter a valid email address.')]
     private ?string $email = null;
 
     #[ORM\Column(name: 'createdDate', type: 'datetime', nullable: true)]
