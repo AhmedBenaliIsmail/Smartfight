@@ -12,27 +12,9 @@ class RankingRepository extends ServiceEntityRepository
         parent::__construct($registry, Ranking::class);
     }
 
-    public function findByFighterAndSeason(int $fighterId, string $season): ?Ranking
-    {
-        return $this->findOneBy(['fighterId' => $fighterId, 'season' => $season]);
-    }
-
-    public function findAllBySeason(string $season): array
-    {
-        return $this->findBy(['season' => $season], ['rankPosition' => 'ASC']);
-    }
-
     public function findByFighter(int $fighterId): ?Ranking
     {
-        return $this->findOneBy(['fighterId' => $fighterId], ['updatedAt' => 'DESC']);
-    }
-
-    public function deleteAllBySeason(string $season): void
-    {
-        $this->createQueryBuilder('r')
-            ->delete()
-            ->where('r.season = :s')
-            ->setParameter('s', $season)
-            ->getQuery()->execute();
+        return $this->findOneBy(['fighter' => $fighterId], ['updatedAt' => 'DESC']);
     }
 }
+

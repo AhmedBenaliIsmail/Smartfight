@@ -2,12 +2,13 @@
 namespace App\Service;
 
 use App\Entity\FightResult;
+use App\Entity\Event;
 use App\Repository\FightResultRepository;
 use App\Repository\FighterRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * FightResultService — port of Java FightResultservice.java
+ * FightResultService — Remodeled for Boxing
  */
 class FightResultService
 {
@@ -34,13 +35,23 @@ class FightResultService
     }
 
     /**
-     * Schedule a new fight (max 3 per event, no duplicate fighters).
+     * Schedule a new fight.
      */
-    public function addScheduledFight(int $eventId, int $fightNumber, int $fighter1Id, int $fighter2Id): bool
-    {
-        // Validate max 3 fights
-        if ($this->resultRepo->countByEvent($eventId) >= 3) {
-            throw new \RuntimeException('Event already has 3 fights (maximum).');
+    public function addScheduledFight(
+        int $eventId, 
+        int $fightNumber, 
+        int $fighter1Id, 
+        int $fighter2Id,
+        int $scheduledRounds = 12,
+        bool $isBeltFight = false,
+        ?string $beltOrganization = null,
+        ?float $fighter1Odds = null,
+        ?float $fighter2Odds = null
+    ): bool {
+        // Enforce 3-fight limit
+        $existingCount = $this->resultRepo->countByEvent($eventId);
+        if ($existingCount >= 3) {
+            throw new \RuntimeException('This event has reached the maximum capacity of 3 bouts.');
         }
 
         // Validate fighters not already in event
@@ -55,20 +66,26 @@ class FightResultService
 
         $f1 = $this->fighterRepo->find($fighter1Id);
         $f2 = $this->fighterRepo->find($fighter2Id);
+        $event = $this->em->getRepository(Event::class)->find($eventId);
 
-        if (!$f1 || !$f2) {
-            throw new \RuntimeException('One or both fighters not found.');
+        if (!$f1 || !$f2 || !$event) {
+            throw new \RuntimeException('One or both fighters or event not found.');
         }
 
-        if ($f1->getWeightClass() !== $f2->getWeightClass()) {
-            throw new \RuntimeException('Fighters must be in the same weight class to be scheduled.');
+        if ($f1->getWeightDivision() && $f2->getWeightDivision() && $f1->getWeightDivision()->getId() !== $f2->getWeightDivision()->getId()) {
+            throw new \RuntimeException('Fighters must be in the same weight division to be scheduled.');
         }
 
         $fr = new FightResult();
-        $fr->setEventId($eventId);
+        $fr->setEvent($event);
         $fr->setFightNumber($fightNumber);
-        $fr->setFighter1Id($fighter1Id);
-        $fr->setFighter2Id($fighter2Id);
+        $fr->setFighter1($f1);
+        $fr->setFighter2($f2);
+        $fr->setScheduledRounds($scheduledRounds);
+        $fr->setIsBeltFight($isBeltFight);
+        $fr->setBeltOrganization($beltOrganization);
+        $fr->setFighter1Odds($fighter1Odds);
+        $fr->setFighter2Odds($fighter2Odds);
         $fr->setStatus('SCHEDULED');
 
         $this->em->persist($fr);
@@ -79,14 +96,29 @@ class FightResultService
     /**
      * Enter result for a scheduled fight.
      */
-    public function enterResult(int $resultId, ?int $winnerId, string $method, int $round, ?\DateTimeInterface $fightDate = null): bool
-    {
+    public function enterResult(
+        int $resultId, 
+        ?int $winnerId, 
+        string $method, 
+        int $round, 
+        ?string $decisionType = null,
+        ?int $knockdownRound = null,
+        ?\DateTimeInterface $fightDate = null
+    ): bool {
         $fr = $this->resultRepo->find($resultId);
         if (!$fr || $fr->getStatus() !== 'SCHEDULED') return false;
 
-        $fr->setWinnerId($winnerId);
+        if ($winnerId !== null) {
+            $winner = $this->fighterRepo->find($winnerId);
+            $fr->setWinner($winner);
+        } else {
+            $fr->setWinner(null);
+        }
+
         $fr->setMethodOfVictory($method);
         $fr->setRoundNumber($round);
+        $fr->setDecisionType($decisionType);
+        $fr->setKnockdownRound($knockdownRound);
         $fr->setFightDate($fightDate ?? new \DateTime());
         $fr->setStatus('COMPLETED');
 
@@ -120,6 +152,17 @@ class FightResultService
 
     public function getAvailableFightNumbers(int $eventId): array
     {
-        return $this->resultRepo->getAvailableFightNumbers($eventId);
+        // No hard limit of 3 fights anymore for boxing
+        $used = $this->resultRepo->createQueryBuilder('r')
+            ->select('r.fightNumber')
+            ->where('r.event = :eid') // mapped to Event relation
+            ->setParameter('eid', $eventId)
+            ->getQuery()->getSingleColumnResult();
+
+        $available = [];
+        for ($i = 1; $i <= 3; $i++) {
+            if (!in_array($i, $used)) $available[] = $i;
+        }
+        return $available;
     }
 }

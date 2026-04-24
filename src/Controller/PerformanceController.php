@@ -59,7 +59,7 @@ class PerformanceController extends AbstractController
         $fightData = [];
         foreach ($fights as $fight) {
             $stats = $statRepo->findByFighterAndFightResult($id, $fight->getResultId());
-            $event = $eventRepo->find($fight->getEventId());
+            $event = $fight->getEvent();
             $fightData[] = [
                 'fight' => $fight,
                 'stats' => $stats,

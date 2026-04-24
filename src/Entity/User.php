@@ -29,6 +29,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: 'createdDate', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $createdDate = null;
 
+    #[ORM\Column(name: 'predictionPoints', type: 'integer', options: ['default' => 0])]
+    private int $predictionPoints = 0;
+
     #[ORM\ManyToMany(targetEntity: Role::class)]
     #[ORM\JoinTable(
         name: 'user_roles',
@@ -52,6 +55,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(?string $v): self { $this->email = $v; return $this; }
     public function getCreatedDate(): ?\DateTimeInterface { return $this->createdDate; }
     public function setCreatedDate(?\DateTimeInterface $v): self { $this->createdDate = $v; return $this; }
+    public function getPredictionPoints(): int { return $this->predictionPoints; }
+    public function setPredictionPoints(int $v): self { $this->predictionPoints = $v; return $this; }
 
     public function getEntityRoles(): Collection { return $this->roles; }
 

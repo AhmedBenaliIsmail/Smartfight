@@ -17,36 +17,41 @@ use Symfony\Component\Routing\Annotation\Route;
 class FightStatisticController extends AbstractController
 {
     #[Route('', name: 'app_stats')]
-    public function index(Request $request, FightStatisticRepository $statRepo, FighterRepository $fighterRepo, FightResultRepository $resultRepo, EventRepository $eventRepo): Response
+    public function index(Request $request, FightStatisticRepository $statRepo, FighterRepository $fighterRepo, FightResultRepository $resultRepo, EventRepository $eventRepo, \App\Service\BoutAnalysisService $analysisService): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
         
         $allStats = $statRepo->findAll();
-        $fighterMap = []; foreach ($fighterRepo->findAll() as $f) $fighterMap[$f->getFighterId()] = $f->getFullName();
-        $eventMap = []; foreach ($eventRepo->findAll() as $e) $eventMap[$e->getEventId()] = $e;
-        $resultMap = []; foreach ($resultRepo->findAll() as $r) $resultMap[$r->getResultId()] = $r;
-
+        
         // Group stats by fight result
         $groupedStats = [];
         foreach ($allStats as $s) {
-            $rid = $s->getFightResultId();
+            $fight = $s->getFightResult();
+            if (!$fight) continue;
+            
+            $rid = $fight->getResultId();
             if (!isset($groupedStats[$rid])) {
                 $groupedStats[$rid] = [
-                    'result' => $resultMap[$rid] ?? null,
-                    'event' => $resultMap[$rid] ? ($eventMap[$resultMap[$rid]->getEventId()] ?? null) : null,
+                    'result' => $fight,
+                    'event' => $fight->getEvent(),
                     'stats' => []
                 ];
             }
             $groupedStats[$rid]['stats'][] = $s;
         }
 
+        // Generate AI analysis for each group
+        foreach ($groupedStats as $rid => &$group) {
+            $group['analysis'] = $analysisService->analyzeBout($group['result'], $group['stats']);
+        }
+
         // Apply search if needed
         $q = strtolower(trim($request->query->get('q', '')));
         if ($q) {
-            $groupedStats = array_filter($groupedStats, function($group) use ($q, $fighterMap) {
+            $groupedStats = array_filter($groupedStats, function($group) use ($q) {
                 if ($group['event'] && str_contains(strtolower($group['event']->getEventName()), $q)) return true;
                 foreach ($group['stats'] as $s) {
-                    if (str_contains(strtolower($fighterMap[$s->getFighterId()] ?? ''), $q)) return true;
+                    if ($s->getFighter() && str_contains(strtolower($s->getFighter()->getFullName()), $q)) return true;
                 }
                 return false;
             });
@@ -54,7 +59,6 @@ class FightStatisticController extends AbstractController
 
         return $this->render('statistic/index.html.twig', [
             'groupedStats' => $groupedStats,
-            'fighterMap' => $fighterMap,
             'q' => $q,
         ]);
     }
@@ -80,20 +84,19 @@ class FightStatisticController extends AbstractController
             if (!$event) throw $this->createNotFoundException();
             return $this->render('statistic/form_select_fight.html.twig', [
                 'event' => $event,
-                'fights' => $resultRepo->findCompletedFightsByEvent($eventId),
-                'fighterMap' => $this->getFighterMap($fighterRepo)
+                'fights' => $resultRepo->findCompletedFightsByEvent($eventId)
             ]);
         }
 
-        // Phase 3: Bulk Statistics Entry
+        // Phase 3: CompuBox Statistics Entry
         $fight = $resultRepo->find($fightId);
         if (!$fight) throw $this->createNotFoundException();
 
-        $fighter1Id = $fight->getFighter1Id();
-        $fighter2Id = $fight->getFighter2Id();
+        $boxer1 = $fight->getFighter1();
+        $boxer2 = $fight->getFighter2();
         
-        $stat1 = $statRepo->findByFighterAndFightResult($fighter1Id, $fightId) ?: new FightStatistic();
-        $stat2 = $statRepo->findByFighterAndFightResult($fighter2Id, $fightId) ?: new FightStatistic();
+        $stat1 = $statRepo->findByFighterAndFightResult($boxer1->getFighterId(), $fight->getResultId()) ?: new FightStatistic();
+        $stat2 = $statRepo->findByFighterAndFightResult($boxer2->getFighterId(), $fight->getResultId()) ?: new FightStatistic();
 
         if ($request->isMethod('POST')) {
             try {
@@ -103,40 +106,33 @@ class FightStatisticController extends AbstractController
                 $em->persist($stat2);
                 $em->flush();
 
-                // Trigger recalculations
-                $service->recalculateForFighter($fighter1Id);
-                $service->recalculateForFighter($fighter2Id);
+                // Trigger AI recalculations
+                $service->recalculateForFighter($boxer1->getFighterId());
+                $service->recalculateForFighter($boxer2->getFighterId());
 
-                $this->addFlash('success', 'Statistics saved and performance scores updated for both fighters.');
+                $this->addFlash('success', 'CompuBox statistics saved and AI performance scores updated.');
                 return $this->redirectToRoute('app_stats');
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
             }
         }
 
-        $event = $eventRepo->find($fight->getEventId());
-        if (!$event) {
-            $this->addFlash('error', 'The event for this fight could not be found.');
-            return $this->redirectToRoute('app_stats');
-        }
-
         return $this->render('statistic/form.html.twig', [
             'fight' => $fight,
-            'event' => $event,
+            'event' => $fight->getEvent(),
             'stat1' => $stat1,
             'stat2' => $stat2,
-            'fighter1' => $fighterRepo->find($fighter1Id),
-            'fighter2' => $fighterRepo->find($fighter2Id),
+            'fighter1' => $boxer1,
+            'fighter2' => $boxer2,
         ]);
     }
 
     #[Route('/{id}/edit', name: 'app_stat_edit')]
     public function edit(int $id, FightStatisticRepository $repo): Response
     {
-        // We redirect to the new dual-entry mode using the fight ID
         $stat = $repo->find($id);
-        if (!$stat) throw $this->createNotFoundException();
-        return $this->redirectToRoute('app_stat_new', ['fightId' => $stat->getFightResultId()]);
+        if (!$stat || !$stat->getFightResult()) throw $this->createNotFoundException();
+        return $this->redirectToRoute('app_stat_new', ['fightId' => $stat->getFightResult()->getResultId()]);
     }
 
     #[Route('/{id}/delete', name: 'app_stat_delete', methods: ['POST'])]
@@ -145,11 +141,11 @@ class FightStatisticController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $stat = $repo->find($id);
         if ($stat) {
-            $fid = $stat->getFighterId();
+            $fid = $stat->getFighter() ? $stat->getFighter()->getFighterId() : null;
             $em->remove($stat);
             $em->flush();
-            $service->recalculateForFighter($fid);
-            $this->addFlash('success', 'Statistic removed.');
+            if ($fid) $service->recalculateForFighter($fid);
+            $this->addFlash('success', 'Statistic record removed.');
         }
         return $this->redirectToRoute('app_stats');
     }
@@ -160,57 +156,57 @@ class FightStatisticController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $stats = $repo->findByFightResult($fightId);
         foreach ($stats as $s) {
-            $fid = $s->getFighterId();
+            $fid = $s->getFighter() ? $s->getFighter()->getFighterId() : null;
             $em->remove($s);
-            $service->recalculateForFighter($fid);
+            if ($fid) $service->recalculateForFighter($fid);
         }
         $em->flush();
-        $this->addFlash('success', 'All statistics for this fight have been removed.');
+        $this->addFlash('success', 'All CompuBox records for this bout removed.');
         return $this->redirectToRoute('app_stats');
-    }
-
-    private function getFighterMap(FighterRepository $repo): array
-    {
-        $map = []; foreach ($repo->findAll() as $f) $map[$f->getFighterId()] = $f->getFullName();
-        return $map;
     }
 
     private function bindPairedStats(FightStatistic $s1, FightStatistic $s2, \App\Entity\FightResult $fight, Request $r): void
     {
-        $s1->setFightResultId($fight->getResultId());
-        $s1->setFighterId($fight->getFighter1Id());
-        $s1->setStrikesThrown((int)$r->request->get('s1_strikesThrown', 0));
-        $s1->setStrikesLanded((int)$r->request->get('s1_strikesLanded', 0));
-        $s1->setTakedownAttempts((int)$r->request->get('s1_takedownAttempts', 0));
-        $s1->setTakedowns((int)$r->request->get('s1_takedowns', 0));
-        $s1->setSubmissions((int)$r->request->get('s1_submissions', 0));
+        $s1->setFightResult($fight);
+        $s1->setFighter($fight->getFighter1());
+        $s1->setPunchesThrown((int)$r->request->get('s1_punchesThrown', 0));
+        $s1->setPunchesLanded((int)$r->request->get('s1_punchesLanded', 0));
+        $s1->setPowerPunchesThrown((int)$r->request->get('s1_powerPunchesThrown', 0));
+        $s1->setPowerPunchesLanded((int)$r->request->get('s1_powerPunchesLanded', 0));
+        $s1->setJabsThrown((int)$r->request->get('s1_jabsThrown', 0));
+        $s1->setJabsLanded((int)$r->request->get('s1_jabsLanded', 0));
+        $s1->setBodyShotsLanded((int)$r->request->get('s1_bodyShotsLanded', 0));
         $s1->setKnockdowns((int)$r->request->get('s1_knockdowns', 0));
-        $s1->setControlTimeSeconds((int)$r->request->get('s1_controlTime', 0));
 
-        $s2->setFightResultId($fight->getResultId());
-        $s2->setFighterId($fight->getFighter2Id());
-        $s2->setStrikesThrown((int)$r->request->get('s2_strikesThrown', 0));
-        $s2->setStrikesLanded((int)$r->request->get('s2_strikesLanded', 0));
-        $s2->setTakedownAttempts((int)$r->request->get('s2_takedownAttempts', 0));
-        $s2->setTakedowns((int)$r->request->get('s2_takedowns', 0));
-        $s2->setSubmissions((int)$r->request->get('s2_submissions', 0));
+        $s2->setFightResult($fight);
+        $s2->setFighter($fight->getFighter2());
+        $s2->setPunchesThrown((int)$r->request->get('s2_punchesThrown', 0));
+        $s2->setPunchesLanded((int)$r->request->get('s2_punchesLanded', 0));
+        $s2->setPowerPunchesThrown((int)$r->request->get('s2_powerPunchesThrown', 0));
+        $s2->setPowerPunchesLanded((int)$r->request->get('s2_powerPunchesLanded', 0));
+        $s2->setJabsThrown((int)$r->request->get('s2_jabsThrown', 0));
+        $s2->setJabsLanded((int)$r->request->get('s2_jabsLanded', 0));
+        $s2->setBodyShotsLanded((int)$r->request->get('s2_bodyShotsLanded', 0));
         $s2->setKnockdowns((int)$r->request->get('s2_knockdowns', 0));
-        $s2->setControlTimeSeconds((int)$r->request->get('s2_controlTime', 0));
 
         // Rigid validation
         $validate = function(FightStatistic $s, string $label) {
-            if ($s->getStrikesLanded() > $s->getStrikesThrown()) {
-                throw new \RuntimeException("$label: Landed strikes cannot exceed thrown strikes.");
+            if ($s->getPunchesLanded() > $s->getPunchesThrown()) {
+                throw new \RuntimeException("$label: Landed punches cannot exceed thrown punches.");
             }
-            if ($s->getTakedowns() > $s->getTakedownAttempts()) {
-                throw new \RuntimeException("$label: Successful takedowns cannot exceed attempts.");
+            if ($s->getPowerPunchesLanded() > $s->getPowerPunchesThrown()) {
+                throw new \RuntimeException("$label: Landed power punches cannot exceed thrown.");
             }
-            if ($s->getStrikesThrown() < 0 || $s->getTakedownAttempts() < 0 || $s->getControlTimeSeconds() < 0) {
+            if ($s->getJabsLanded() > $s->getJabsThrown()) {
+                throw new \RuntimeException("$label: Landed jabs cannot exceed thrown.");
+            }
+            if ($s->getPunchesThrown() < 0) {
                 throw new \RuntimeException("$label: Values cannot be negative.");
             }
         };
 
-        $validate($s1, $fight->getFighter1Id() == $fight->getFighter1Id() ? 'Fighter 1' : 'Fighter 1');
-        $validate($s2, 'Fighter 2');
+        $validate($s1, 'Boxer 1');
+        $validate($s2, 'Boxer 2');
     }
 }
+

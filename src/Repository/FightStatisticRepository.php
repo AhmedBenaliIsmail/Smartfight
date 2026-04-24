@@ -14,16 +14,17 @@ class FightStatisticRepository extends ServiceEntityRepository
 
     public function findByFighter(int $fighterId): array
     {
-        return $this->findBy(['fighterId' => $fighterId]);
+        return $this->findBy(['fighter' => $fighterId]);
     }
 
     public function findByFightResult(int $fightResultId): array
     {
-        return $this->findBy(['fightResultId' => $fightResultId]);
+        return $this->findBy(['fightResult' => $fightResultId]);
     }
 
     public function findByFighterAndFightResult(int $fighterId, int $fightResultId): ?FightStatistic
     {
-        return $this->findOneBy(['fighterId' => $fighterId, 'fightResultId' => $fightResultId]);
+        return $this->findOneBy(['fighter' => $fighterId, 'fightResult' => $fightResultId]);
     }
 }
+

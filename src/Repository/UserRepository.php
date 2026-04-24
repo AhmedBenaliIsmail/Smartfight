@@ -31,4 +31,20 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
     }
+    public function findFansOrderedByPoints(int $limit = 50): array
+    {
+        $qb = $this->createQueryBuilder('u');
+        $adminSubquery = $this->getEntityManager()->createQueryBuilder()
+            ->select('u2.userId')
+            ->from('App\Entity\User', 'u2')
+            ->join('u2.roles', 'r2')
+            ->where('r2.roleName = :adminRole');
+
+        return $qb->where($qb->expr()->notIn('u.userId', $adminSubquery->getDQL()))
+            ->setParameter('adminRole', 'ADMIN')
+            ->orderBy('u.predictionPoints', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

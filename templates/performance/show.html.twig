@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Performance Detail — {{ fighter.fullName }}{% endblock %}
+{% block title %}Boxing Analytics — {{ fighter.fullName }}{% endblock %}
 
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
@@ -12,7 +12,7 @@
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
         <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">{{ fighter.fullName }} Performance Analysis</h1>
-        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Deep dive into the SmartFight Formula™ factors</p>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">CompuBox Analytics & AI Engine Factors</p>
     </div>
     <a href="{{ path('app_performance') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
 </div>
@@ -21,14 +21,18 @@
     <div class="col-lg-4">
         <div class="card h-100" style="background:#18181b;border:1px solid #27272a;">
             <div class="card-body p-4 text-center">
-                <div class="mb-3">
-                    {% if fighter.championsEventWinStreak >= 2 %}
-                        <div class="badge-rank-gold rounded-pill px-3 py-1 mb-2 d-inline-block fw-bold" style="box-shadow: 0 0 15px rgba(251, 191, 36, 0.4); border: 1px solid #fbbf24;">
-                            <i class="fa-solid fa-crown me-1"></i> ELITE CHAMPION (1.5x Boost)
+                <div class="mb-4">
+                    {% if fighter.photoFilename %}
+                        <img src="{{ asset('uploads/boxers/' ~ fighter.photoFilename) }}" class="rounded shadow-sm" style="width:120px; height:120px; object-fit:cover; border:3px solid #27272a;" alt="Boxer Photo" />
+                    {% else %}
+                        <div class="rounded d-inline-flex align-items-center justify-content-center shadow-sm" style="width:120px; height:120px; background:#27272a; color:#52525b;">
+                            <i class="fa-solid fa-user fa-3x"></i>
                         </div>
                     {% endif %}
+                </div>
+                <div class="mb-3">
                     <h2 class="h1 fw-bold mb-0" style="color:#fbbf24;">{{ fighter.performanceScore|round(1) }}</h2>
-                    <div class="text-muted small">OVERALL SCORE</div>
+                    <div class="text-muted small">OVERALL AI SCORE</div>
                 </div>
                 
                 <div class="row g-2 mt-4">
@@ -52,36 +56,36 @@
     <div class="col-lg-8">
         <div class="card h-100" style="background:#18181b;border:1px solid #27272a;">
             <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
-                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-calculator me-2" style="color:#3b82f6;"></i>SmartFight Performance Formula</h3>
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-calculator me-2" style="color:#3b82f6;"></i>Hybrid Boxing Ranking Engine</h3>
             </div>
             <div class="card-body p-4">
                 <div class="mb-4">
                     <div class="d-flex justify-content-between mb-1">
-                        <span style="color:#fafafa;">Aggression (25%)</span>
-                        <span class="fw-bold" style="color:#3b82f6;">{{ (fighter.performanceScore * 0.25)|round(1) }} pts</span>
+                        <span style="color:#fafafa;">BoxRec Computerized Rating (40%)</span>
+                        <span class="fw-bold" style="color:#3b82f6;">{{ ((fighter.eloRating / 20 + fighter.performanceScore * 2) * 0.40)|round(1) }} pts</span>
                     </div>
-                    <p class="text-muted small mb-0">Factor: 60% Strike Accuracy + 40% KO Rate. Rewards finishers and precision strikers.</p>
+                    <p class="text-muted small mb-0">Factor: Combined ELO and CompuBox performance metrics. Official computerized logic.</p>
                 </div>
                 <div class="mb-4">
                     <div class="d-flex justify-content-between mb-1">
-                        <span style="color:#fafafa;">Defense (25%)</span>
-                        <span class="fw-bold" style="color:#10b981;">{{ (fighter.performanceScore * 0.25)|round(1) }} pts</span>
+                        <span style="color:#fafafa;">PageRank Strength of Schedule (30%)</span>
+                        <span class="fw-bold" style="color:#10b981;">{{ (fighter.strengthOfSchedule / 1500 * 100 * 0.30)|round(1) }} pts</span>
                     </div>
-                    <p class="text-muted small mb-0">Factor: Win percentage relative to competition. Rewards consistent winners.</p>
+                    <p class="text-muted small mb-0">Factor: Every win is a "vote" weighted by opponent caliber. Rewards era-defining challenges.</p>
                 </div>
                 <div class="mb-4">
                     <div class="d-flex justify-content-between mb-1">
-                        <span style="color:#fafafa;">Technique (25%)</span>
-                        <span class="fw-bold" style="color:#a855f7;">{{ (fighter.performanceScore * 0.25)|round(1) }} pts</span>
+                        <span style="color:#fafafa;">FightFax Title Pedigree (20%)</span>
+                        <span class="fw-bold" style="color:#a855f7;">{{ (fighter.titleDefenses * 15 * 0.20)|round(1) }} pts</span>
                     </div>
-                    <p class="text-muted small mb-0">Factor: 40% Sub Rate + 40% TD Accuracy + 20% Control Time. Rewards grappling mastery.</p>
+                    <p class="text-muted small mb-0">Factor: World Title defenses and Match Type multipliers. Rewards championship dominance.</p>
                 </div>
                 <div class="mb-0">
                     <div class="d-flex justify-content-between mb-1">
-                        <span style="color:#fafafa;">Experience (25%)</span>
-                        <span class="fw-bold" style="color:#f59e0b;">{{ (fighter.performanceScore * 0.25)|round(1) }} pts</span>
+                        <span style="color:#fafafa;">Activity & Recency (10%)</span>
+                        <span class="fw-bold" style="color:#f59e0b;">{{ (max(0, (18 - (fighter.lastFightDate ? date().diff(fighter.lastFightDate).m + date().diff(fighter.lastFightDate).y*12 : 18)) * 5) * 0.10)|round(1) }} pts</span>
                     </div>
-                    <p class="text-muted small mb-0">Factor: Total Fights + Win Rate. Rewards seasoned veterans.</p>
+                    <p class="text-muted small mb-0">Factor: Time since last bout. 18-month inactivity triggers complete ranking removal.</p>
                 </div>
             </div>
         </div>
@@ -92,30 +96,20 @@
     <div class="col-12">
         <div class="card" style="background:#18181b;border:1px solid #27272a; border-left: 4px solid #3b82f6;">
             <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
-                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-code me-2" style="color:#3b82f6;"></i>ELO Points Exact Formula</h3>
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-code me-2" style="color:#3b82f6;"></i>ELO Rating Algorithm</h3>
             </div>
             <div class="card-body p-4">
                 <div class="row align-items-center">
-                    <div class="col-md-7">
+                    <div class="col-md-12">
                         <div class="p-3 rounded mb-3" style="background:#09090b; font-family: monospace; border: 1px dashed #3f3f46; color: #60a5fa;">
-                            R_new = R_old + K * (S - E) + (PerfScore / 10)
+                            R_new = (R_old + K * (S - E)) * MethodMult * MatchMult + RoundBonus
                         </div>
                         <ul class="list-unstyled small" style="color:#a1a1aa;">
-                            <li class="mb-2"><strong style="color: #fafafa;">K (Growth Factor):</strong> 32 if <10 fights, 16 if established. Controls how fast rating changes.</li>
-                            <li class="mb-2"><strong style="color: #fafafa;">S (Score):</strong> 1.0 for a Win, 0.5 for a Draw, 0.0 for a Loss.</li>
-                            <li class="mb-2"><strong style="color: #fafafa;">E (Expected Result):</strong> 1 / (1 + 10^((Opponent_ELO - Your_ELO) / 400)). Higher if you are the favorite.</li>
-                            <li class="mb-0"><strong style="color: #fafafa;">Performance Bonus:</strong> +{{ (fighter.performanceScore / 10)|round(1) }} pts added from current analysis metrics.</li>
+                            <li class="mb-2"><strong style="color: #fafafa;">MatchMult:</strong> 1.3x for World Title bouts (FightFax).</li>
+                            <li class="mb-2"><strong style="color: #fafafa;">MethodMult:</strong> 1.5x for KO, 1.2x for Unanimous Decision.</li>
+                            <li class="mb-2"><strong style="color: #fafafa;">RoundBonus:</strong> Up to +24 pts for early round stoppages (Decision Round Factor).</li>
+                            <li class="mb-0"><strong style="color: #fafafa;">PageRank SOS:</strong> Wins over higher-rated opponents carry 20% more weight.</li>
                         </ul>
-                    </div>
-                    <div class="col-md-5">
-                        <div class="bg-primary-subtle p-3 rounded" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2);">
-                            <h4 class="h6 fw-bold mb-2" style="color:#60a5fa;">Your Current Multiplier</h4>
-                            <p class="small text-muted mb-0">
-                                Based on your <strong>{{ fighter.championsEventWinStreak }}</strong> Champions Event streak, 
-                                your final ranking points are boosted by 
-                                <span class="fw-bold text-white">{{ fighter.championsEventWinStreak >= 2 ? '50%' : '0%' }}</span>.
-                            </p>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -123,61 +117,62 @@
     </div>
 </div>
 
-<h3 class="h4 mb-3 fw-bold" style="color:#fafafa;"><i class="fa-solid fa-history me-2"></i>Career Fight History & Statistics</h3>
+<h3 class="h4 mb-3 fw-bold" style="color:#fafafa;"><i class="fa-solid fa-history me-2"></i>Career Bout History & CompuBox Stats</h3>
 <div class="card" style="background:#18181b;border:1px solid #27272a;">
     <div class="card-body p-0 table-responsive">
         <table class="table table-hover mb-0 text-center">
             <thead>
             <tr>
-                <th class="text-start" style="padding:.75rem 1.25rem;">Event & Fight</th>
+                <th class="text-start" style="padding:.75rem 1.25rem;">Event & Bout</th>
                 <th>Result</th>
-                <th>Strikes (L/T)</th>
-                <th>Takedowns (L/A)</th>
-                <th>Control Time</th>
-                <th>KDs/Subs</th>
+                <th>Punches (L/T)</th>
+                <th>Power (L/T)</th>
+                <th>Jabs (L/T)</th>
+                <th>Knockdowns</th>
             </tr>
             </thead>
             <tbody>
             {% for item in fightData %}
-                <tr {% if item.event and item.event.isChampionsEvent %}style="background: rgba(201, 139, 39, 0.08); border-left: 3px solid #fbbf24;" title="Champions Event Fight — High Stakes Stats"{% endif %}>
+                <tr {% if item.event and item.event.organization != 'INDEPENDENT' %}style="background: rgba(201, 139, 39, 0.08); border-left: 3px solid #fbbf24;" title="World Title Bout"{% endif %}>
                     <td class="text-start" style="padding:.75rem 1.25rem;">
                         <div class="fw-bold" style="color:#fafafa;">
                             {{ item.event ? item.event.eventName : 'Unknown Event' }}
-                            {% if item.event and item.event.isChampionsEvent %}
+                            {% if item.event and item.event.organization != 'INDEPENDENT' %}
                                 <i class="fa-solid fa-crown ms-1" style="color:#fbbf24; font-size: 0.7rem;"></i>
                             {% endif %}
                         </div>
-                        <div class="text-muted small">Fight #{{ item.fight.fightNumber }} ({{ item.fight.fightDate ? item.fight.fightDate|date('Y-m-d') : 'N/A' }})</div>
+                        <div class="text-muted small">Bout #{{ item.fight.fightNumber }} ({{ item.fight.fightDate ? item.fight.fightDate|date('Y-m-d') : 'N/A' }})</div>
                     </td>
                     <td>
-                        {% if item.fight.winnerId == fighter.fighterId %}
+                        {% if item.fight.winner and item.fight.winner.fighterId == fighter.fighterId %}
                             <span class="badge bg-success">WIN</span>
                         {% elseif item.fight.isDraw %}
                             <span class="badge bg-secondary">DRAW</span>
                         {% else %}
                             <span class="badge bg-danger">LOSS</span>
                         {% endif %}
-                        <div class="text-muted small mt-1">{{ item.fight.methodOfVictory }}</div>
+                        <div class="text-muted small mt-1">{{ item.fight.methodOfVictory }}{{ item.fight.decisionType ? ' (' ~ item.fight.decisionType ~ ')' : '' }}</div>
                     </td>
                     <td>
                         {% if item.stats %}
-                            <div class="fw-bold" style="color:#fafafa;">{{ item.stats.strikesLanded }}/{{ item.stats.strikesThrown }}</div>
-                            <div class="small text-muted">{{ item.stats.strikesThrown > 0 ? ((item.stats.strikesLanded / item.stats.strikesThrown) * 100)|round : 0 }}% Acc</div>
+                            <div class="fw-bold" style="color:#fafafa;">{{ item.stats.punchesLanded }}/{{ item.stats.punchesThrown }}</div>
+                            <div class="small text-muted">{{ item.stats.punchAccuracy|round }}% Acc</div>
                         {% else %}
                             <span class="text-muted">N/A</span>
                         {% endif %}
                     </td>
                     <td>
                         {% if item.stats %}
-                            <div class="fw-bold" style="color:#fafafa;">{{ item.stats.takedowns }}/{{ item.stats.takedownAttempts }}</div>
-                            <div class="small text-muted">{{ item.stats.takedownAttempts > 0 ? ((item.stats.takedowns / item.stats.takedownAttempts) * 100)|round : 0 }}% Acc</div>
+                            <div class="fw-bold" style="color:#fafafa;">{{ item.stats.powerPunchesLanded }}/{{ item.stats.powerPunchesThrown }}</div>
+                            <div class="small text-muted">{{ item.stats.powerAccuracy|round }}% Acc</div>
                         {% else %}
                             <span class="text-muted">N/A</span>
                         {% endif %}
                     </td>
                     <td>
                         {% if item.stats %}
-                            <div class="fw-bold" style="color:#fafafa;">{{ (item.stats.controlTimeSeconds / 60)|round(0, 'floor') }}:{{ (item.stats.controlTimeSeconds % 60)|format('%02d') }}</div>
+                            <div class="fw-bold" style="color:#fafafa;">{{ item.stats.jabsLanded }}/{{ item.stats.jabsThrown }}</div>
+                            <div class="small text-muted">{{ item.stats.jabAccuracy|round }}% Acc</div>
                         {% else %}
                             <span class="text-muted">N/A</span>
                         {% endif %}
@@ -185,7 +180,6 @@
                     <td>
                         {% if item.stats %}
                             <span class="badge bg-primary me-1">{{ item.stats.knockdowns }} KD</span>
-                            <span class="badge bg-info">{{ item.stats.submissions }} Sub</span>
                         {% else %}
                             <span class="text-muted">N/A</span>
                         {% endif %}
@@ -193,7 +187,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="6" class="text-center py-4 text-muted">No completed fight statistics found for this fighter.</td>
+                    <td colspan="6" class="text-center py-4 text-muted">No completed bout statistics found.</td>
                 </tr>
             {% endfor %}
             </tbody>

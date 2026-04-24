@@ -49,19 +49,29 @@
 
                         <div class="col-md-6">
                             <label class="form-label text-danger fw-bold">Red Corner (Fighter 1) <span style="color:#dc2626;">*</span></label>
-                            <select name="fighter1Id" class="form-select" required style="border-left: 4px solid #ef4444;">
+                            <div class="text-center mb-2">
+                                <div id="f1-photo-preview" class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width:80px; height:80px; background:#27272a; border:2px solid #ef4444; overflow:hidden;">
+                                    <i class="fa-solid fa-user fa-2x text-muted"></i>
+                                </div>
+                            </div>
+                            <select name="fighter1Id" class="form-select f-selector" data-preview="#f1-photo-preview" required style="border-left: 4px solid #ef4444;">
                                 <option value="">Select Fighter...</option>
                                 {% for fighter in fighters %}
-                                    <option value="{{ fighter.fighterId }}">{{ fighter.fullName }} ({{ fighter.weightClass }})</option>
+                                    <option value="{{ fighter.fighterId }}" data-photo="{{ fighter.photoFilename ? asset('uploads/boxers/' ~ fighter.photoFilename) : '' }}">{{ fighter.fullName }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-primary fw-bold">Blue Corner (Fighter 2) <span style="color:#dc2626;">*</span></label>
-                            <select name="fighter2Id" class="form-select" required style="border-left: 4px solid #3b82f6;">
+                            <div class="text-center mb-2">
+                                <div id="f2-photo-preview" class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width:80px; height:80px; background:#27272a; border:2px solid #3b82f6; overflow:hidden;">
+                                    <i class="fa-solid fa-user fa-2x text-muted"></i>
+                                </div>
+                            </div>
+                            <select name="fighter2Id" class="form-select f-selector" data-preview="#f2-photo-preview" required style="border-left: 4px solid #3b82f6;">
                                 <option value="">Select Fighter...</option>
                                 {% for fighter in fighters %}
-                                    <option value="{{ fighter.fighterId }}">{{ fighter.fullName }} ({{ fighter.weightClass }})</option>
+                                    <option value="{{ fighter.fighterId }}" data-photo="{{ fighter.photoFilename ? asset('uploads/boxers/' ~ fighter.photoFilename) : '' }}">{{ fighter.fullName }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -77,4 +87,25 @@
         </div>
     </div>
 </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectors = document.querySelectorAll('.f-selector');
+    
+    selectors.forEach(select => {
+        select.addEventListener('change', function() {
+            const previewId = this.getAttribute('data-preview');
+            const preview = document.querySelector(previewId);
+            const selectedOption = this.options[this.selectedIndex];
+            const photoUrl = selectedOption.getAttribute('data-photo');
+            
+            if (photoUrl) {
+                preview.innerHTML = `<img src="${photoUrl}" style="width:100%; height:100%; object-fit:cover;" />`;
+            } else {
+                preview.innerHTML = `<i class="fa-solid fa-user fa-2x text-muted"></i>`;
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

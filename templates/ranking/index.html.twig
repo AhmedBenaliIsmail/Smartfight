@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Rankings — SmartFight Admin{% endblock %}
+{% block title %}Boxing Rankings — SmartFight Admin{% endblock %}
 
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
@@ -10,24 +10,24 @@
 {% block content %}
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
-        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Global Rankings</h1>
-        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Overall standings based on ELO + Performance Points</p>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">World Boxing Standings</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Official divisional rankings based on ELO and CompuBox Performance</p>
     </div>
     <div class="d-flex gap-2">
         {% if is_granted('ROLE_ADMIN') %}
         <form action="{{ path('app_ranking_recalc') }}" method="post" style="display:inline-block;">
-            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-arrows-rotate me-2"></i>Recalculate All Rankings</button>
+            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-arrows-rotate me-2"></i>Recalculate Standings</button>
         </form>
         {% endif %}
-        <a href="{{ path('app_ranking_export') }}" class="btn btn-outline-success"><i class="fa-solid fa-file-export me-2"></i>CSV</a>
+        <a href="{{ path('app_ranking_export') }}" class="btn btn-outline-success"><i class="fa-solid fa-file-export me-2"></i>Export CSV</a>
     </div>
 </div>
 
 {% if groupedRankings|length > 0 %}
-    {% for wc, fighters in groupedRankings %}
+    {% for wd, fighters in groupedRankings %}
         <div class="mb-5">
             <h2 class="h4 mb-3 fw-bold" style="color:#fbbf24; border-bottom: 2px solid #fbbf24; display: inline-block; padding-bottom: 5px;">
-                <i class="fa-solid fa-layer-group me-2"></i>{{ wc }} Division
+                <i class="fa-solid fa-layer-group me-2"></i>{{ wd }} Division
             </h2>
             <div class="card" style="background:#18181b;border:1px solid #27272a;">
                 <div class="card-body p-0 table-responsive">
@@ -35,9 +35,9 @@
                         <thead>
                         <tr>
                             <th class="text-start" style="padding:.75rem 1.25rem;">Rank</th>
-                            <th class="text-start">Fighter</th>
+                            <th class="text-start">Boxer</th>
                             <th>Record (W-L-D)</th>
-                            <th>Total Points</th>
+                            <th>Rating Points</th>
                             <th>ELO</th>
                             <th>Perf Score</th>
                             <th>Streak</th>
@@ -54,8 +54,19 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-start" style="padding:.75rem 1.25rem;">
-                                    <div class="fw-bold" style="color:#fafafa;">{{ f.fullName }}</div>
-                                    <div class="text-muted small">{{ f.nickname ? '"' ~ f.nickname ~ '"' : '' }}</div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar avatar-md me-3" style="background:#27272a; border: 1px solid #3f3f46; overflow:hidden;">
+                                            {% if f.photoFilename %}
+                                                <img src="{{ asset('uploads/boxers/' ~ f.photoFilename) }}" style="width:100%; height:100%; object-fit:cover;">
+                                            {% else %}
+                                                <i class="fa-solid fa-user text-muted"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold" style="color:#fafafa;">{{ f.fullName }}</div>
+                                            <div class="text-muted small">{{ f.nickname ? '"' ~ f.nickname ~ '"' : '' }}</div>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>
                                     <span style="color:#22c55e;font-weight:700">{{ f.wins }}W</span> - 
@@ -80,7 +91,8 @@
 {% else %}
     <div class="text-center py-5">
         <i class="fa-solid fa-user-slash fa-3x mb-3 text-muted"></i>
-        <h3 class="text-muted">No fighters found for this division/search.</h3>
+        <h3 class="text-muted">No boxers found in divisional records.</h3>
     </div>
 {% endif %}
 {% endblock %}
+

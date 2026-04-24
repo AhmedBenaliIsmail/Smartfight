@@ -116,27 +116,29 @@ class ResultController extends AbstractController
 
             // 1. Save Statistics for Fighter 1
             $s1 = new FightStatistic();
-            $s1->setFightResultId($id);
-            $s1->setFighterId($fr->getFighter1Id());
-            $s1->setStrikesThrown((int)$request->request->get('f1_strikes_thrown', 0));
-            $s1->setStrikesLanded((int)$request->request->get('f1_strikes_landed', 0));
-            $s1->setTakedownAttempts((int)$request->request->get('f1_td_attempts', 0));
-            $s1->setTakedowns((int)$request->request->get('f1_td_landed', 0));
-            $s1->setSubmissions((int)$request->request->get('f1_subs', 0));
+            $s1->setFightResult($fr);
+            $s1->setFighter($fighter1);
+            $s1->setPunchesThrown((int)$request->request->get('f1_punches_thrown', 0));
+            $s1->setPunchesLanded((int)$request->request->get('f1_punches_landed', 0));
+            $s1->setJabsThrown((int)$request->request->get('f1_jabs_thrown', 0));
+            $s1->setJabsLanded((int)$request->request->get('f1_jabs_landed', 0));
+            $s1->setPowerPunchesThrown((int)$request->request->get('f1_power_thrown', 0));
+            $s1->setPowerPunchesLanded((int)$request->request->get('f1_power_landed', 0));
+            $s1->setBodyShotsLanded((int)$request->request->get('f1_body_shots', 0));
             $s1->setKnockdowns((int)$request->request->get('f1_kds', 0));
-            $s1->setControlTimeSeconds((int)$request->request->get('f1_control_time', 0));
             
             // 2. Save Statistics for Fighter 2
             $s2 = new FightStatistic();
-            $s2->setFightResultId($id);
-            $s2->setFighterId($fr->getFighter2Id());
-            $s2->setStrikesThrown((int)$request->request->get('f2_strikes_thrown', 0));
-            $s2->setStrikesLanded((int)$request->request->get('f2_strikes_landed', 0));
-            $s2->setTakedownAttempts((int)$request->request->get('f2_td_attempts', 0));
-            $s2->setTakedowns((int)$request->request->get('f2_td_landed', 0));
-            $s2->setSubmissions((int)$request->request->get('f2_subs', 0));
+            $s2->setFightResult($fr);
+            $s2->setFighter($fighter2);
+            $s2->setPunchesThrown((int)$request->request->get('f2_punches_thrown', 0));
+            $s2->setPunchesLanded((int)$request->request->get('f2_punches_landed', 0));
+            $s2->setJabsThrown((int)$request->request->get('f2_jabs_thrown', 0));
+            $s2->setJabsLanded((int)$request->request->get('f2_jabs_landed', 0));
+            $s2->setPowerPunchesThrown((int)$request->request->get('f2_power_thrown', 0));
+            $s2->setPowerPunchesLanded((int)$request->request->get('f2_power_landed', 0));
+            $s2->setBodyShotsLanded((int)$request->request->get('f2_body_shots', 0));
             $s2->setKnockdowns((int)$request->request->get('f2_kds', 0));
-            $s2->setControlTimeSeconds((int)$request->request->get('f2_control_time', 0));
 
             $statService->addFightStatistic($s1);
             $statService->addFightStatistic($s2);
@@ -198,11 +200,11 @@ class ResultController extends AbstractController
             foreach ($results as $r) {
                 fputcsv($out, [
                     $r->getResultId(),
-                    $eventMap[$r->getEventId()] ?? '',
+                    $r->getEvent()->getEventName() ?? '',
                     $r->getFightNumber(),
-                    $fighterMap[$r->getFighter1Id()] ?? '',
-                    $fighterMap[$r->getFighter2Id()] ?? '',
-                    $r->getWinnerId() ? ($fighterMap[$r->getWinnerId()] ?? '') : '',
+                    $r->getFighter1()->getFullName() ?? '',
+                    $r->getFighter2()->getFullName() ?? '',
+                    $r->getWinner() ? $r->getWinner()->getFullName() : '',
                     $r->getMethodOfVictory() ?? '',
                     $r->getRoundNumber() ?? '',
                     $r->getFightDate() ? $r->getFightDate()->format('d/m/Y H:i') : '',

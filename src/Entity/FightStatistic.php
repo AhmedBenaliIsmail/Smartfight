@@ -3,6 +3,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\FightStatisticRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FightStatisticRepository::class)]
 #[ORM\Table(name: 'fight_statistic')]
@@ -13,71 +14,109 @@ class FightStatistic
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'fight_result_id')]
-    private ?int $fightResultId = null;
+    #[ORM\ManyToOne(targetEntity: FightResult::class)]
+    #[ORM\JoinColumn(name: "fight_result_id", referencedColumnName: "resultId", nullable: false)]
+    private ?FightResult $fightResult = null;
 
-    #[ORM\Column(name: 'fighter_id')]
-    private ?int $fighterId = null;
+    #[ORM\ManyToOne(targetEntity: Fighter::class)]
+    #[ORM\JoinColumn(name: "fighter_id", referencedColumnName: "fighterId", nullable: false)]
+    private ?Fighter $fighter = null;
 
-    #[ORM\Column(name: 'strikes_landed', type: 'integer', options: ['default' => 0])]
-    private int $strikesLanded = 0;
+    #[ORM\Column(name: 'round', type: 'integer', nullable: true)]
+    #[Assert\Range(min: 1, max: 12)]
+    private ?int $round = null;
 
-    #[ORM\Column(name: 'strikes_thrown', type: 'integer', options: ['default' => 0])]
-    private int $strikesThrown = 0;
+    #[ORM\Column(name: 'punches_landed', type: 'integer', options: ['default' => 0])]
+    #[Assert\PositiveOrZero]
+    private int $punchesLanded = 0;
+
+    #[ORM\Column(name: 'punches_thrown', type: 'integer', options: ['default' => 0])]
+    #[Assert\PositiveOrZero]
+    private int $punchesThrown = 0;
+
+    #[ORM\Column(name: 'body_shots_landed', type: 'integer', options: ['default' => 0])]
+    #[Assert\PositiveOrZero]
+    private int $bodyShotsLanded = 0;
+
+    #[ORM\Column(name: 'jabs_landed', type: 'integer', options: ['default' => 0])]
+    #[Assert\PositiveOrZero]
+    private int $jabsLanded = 0;
+
+    #[ORM\Column(name: 'jabs_thrown', type: 'integer', options: ['default' => 0])]
+    #[Assert\PositiveOrZero]
+    private int $jabsThrown = 0;
+
+    #[ORM\Column(name: 'power_punches_landed', type: 'integer', options: ['default' => 0])]
+    #[Assert\PositiveOrZero]
+    private int $powerPunchesLanded = 0;
+
+    #[ORM\Column(name: 'power_punches_thrown', type: 'integer', options: ['default' => 0])]
+    #[Assert\PositiveOrZero]
+    private int $powerPunchesThrown = 0;
 
     #[ORM\Column(type: 'integer', options: ['default' => 0])]
-    private int $takedowns = 0;
-
-    #[ORM\Column(name: 'takedownAttempts', type: 'integer', options: ['default' => 0])]
-    private int $takedownAttempts = 0;
-
-    #[ORM\Column(type: 'integer', options: ['default' => 0])]
-    private int $submissions = 0;
-
-    #[ORM\Column(type: 'integer', options: ['default' => 0])]
+    #[Assert\PositiveOrZero]
     private int $knockdowns = 0;
 
-    #[ORM\Column(name: 'controlTimeSeconds', type: 'integer', options: ['default' => 0])]
-    private int $controlTimeSeconds = 0;
-
     public function getId(): ?int { return $this->id; }
-    public function getFightResultId(): ?int { return $this->fightResultId; }
-    public function setFightResultId(int $v): self { $this->fightResultId = $v; return $this; }
-    public function getFighterId(): ?int { return $this->fighterId; }
-    public function setFighterId(int $v): self { $this->fighterId = $v; return $this; }
-    public function getStrikesLanded(): int { return $this->strikesLanded; }
-    public function setStrikesLanded(int $v): self { $this->strikesLanded = $v; return $this; }
-    public function getStrikesThrown(): int { return $this->strikesThrown; }
-    public function setStrikesThrown(int $v): self { $this->strikesThrown = $v; return $this; }
-    public function getTakedowns(): int { return $this->takedowns; }
-    public function setTakedowns(int $v): self { $this->takedowns = $v; return $this; }
-    public function getTakedownAttempts(): int { return $this->takedownAttempts; }
-    public function setTakedownAttempts(int $v): self { $this->takedownAttempts = $v; return $this; }
-    public function getSubmissions(): int { return $this->submissions; }
-    public function setSubmissions(int $v): self { $this->submissions = $v; return $this; }
+
+    public function getFightResult(): ?FightResult { return $this->fightResult; }
+    public function setFightResult(?FightResult $v): self { $this->fightResult = $v; return $this; }
+
+    public function getFighter(): ?Fighter { return $this->fighter; }
+    public function setFighter(?Fighter $v): self { $this->fighter = $v; return $this; }
+
+    public function getRound(): ?int { return $this->round; }
+    public function setRound(?int $v): self { $this->round = $v; return $this; }
+
+    public function getPunchesLanded(): int { return $this->punchesLanded; }
+    public function setPunchesLanded(int $v): self { $this->punchesLanded = $v; return $this; }
+
+    public function getPunchesThrown(): int { return $this->punchesThrown; }
+    public function setPunchesThrown(int $v): self { $this->punchesThrown = $v; return $this; }
+
+    public function getBodyShotsLanded(): int { return $this->bodyShotsLanded; }
+    public function setBodyShotsLanded(int $v): self { $this->bodyShotsLanded = $v; return $this; }
+
+    public function getJabsLanded(): int { return $this->jabsLanded; }
+    public function setJabsLanded(int $v): self { $this->jabsLanded = $v; return $this; }
+
+    public function getJabsThrown(): int { return $this->jabsThrown; }
+    public function setJabsThrown(int $v): self { $this->jabsThrown = $v; return $this; }
+
+    public function getPowerPunchesLanded(): int { return $this->powerPunchesLanded; }
+    public function setPowerPunchesLanded(int $v): self { $this->powerPunchesLanded = $v; return $this; }
+
+    public function getPowerPunchesThrown(): int { return $this->powerPunchesThrown; }
+    public function setPowerPunchesThrown(int $v): self { $this->powerPunchesThrown = $v; return $this; }
+
     public function getKnockdowns(): int { return $this->knockdowns; }
     public function setKnockdowns(int $v): self { $this->knockdowns = $v; return $this; }
-    public function getControlTimeSeconds(): int { return $this->controlTimeSeconds; }
-    public function setControlTimeSeconds(int $v): self { $this->controlTimeSeconds = $v; return $this; }
 
-    public function getStrikeAccuracy(): float
+    public function getPunchAccuracy(): float
     {
-        if ($this->strikesThrown == 0) return 0.0;
-        return ($this->strikesLanded * 100.0) / $this->strikesThrown;
+        if ($this->punchesThrown == 0) return 0.0;
+        return ($this->punchesLanded * 100.0) / $this->punchesThrown;
     }
 
-    public function getTakedownAccuracy(): float
+    public function getJabAccuracy(): float
     {
-        if ($this->takedownAttempts == 0) return 0.0;
-        return ($this->takedowns * 100.0) / $this->takedownAttempts;
+        if ($this->jabsThrown == 0) return 0.0;
+        return ($this->jabsLanded * 100.0) / $this->jabsThrown;
     }
 
-    public function getFightPerformanceContribution(): float
+    public function getPowerAccuracy(): float
     {
-        $strikeScore = $this->getStrikeAccuracy();
-        $takedownScore = $this->getTakedownAccuracy();
-        $subScore = min($this->submissions * 10, 30);
-        $kdScore = min($this->knockdowns * 10, 30);
-        return ($strikeScore * 0.3) + ($takedownScore * 0.25) + ($subScore * 0.25) + ($kdScore * 0.2);
+        if ($this->powerPunchesThrown == 0) return 0.0;
+        return ($this->powerPunchesLanded * 100.0) / $this->powerPunchesThrown;
+    }
+
+    #[Assert\IsTrue(message: 'Landed punches cannot exceed thrown punches')]
+    public function isLandedValid(): bool
+    {
+        return $this->punchesLanded <= $this->punchesThrown
+            && $this->jabsLanded <= $this->jabsThrown
+            && $this->powerPunchesLanded <= $this->powerPunchesThrown;
     }
 }
+

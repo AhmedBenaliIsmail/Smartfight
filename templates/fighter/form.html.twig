@@ -1,30 +1,30 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ fighter ? 'Edit' : 'Add' }} Fighter — SmartFight Admin{% endblock %}
+{% block title %}SmartFight Admin — {{ fighter ? 'Edit' : 'Add' }} Boxer{% endblock %}
 
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
-    <li class="breadcrumb-item"><a href="{{ path('app_fighters') }}" style="color:#a1a1aa;text-decoration:none;">Fighters</a></li>
-    <li class="breadcrumb-item active">{{ fighter ? 'Edit' : 'Add' }} Fighter</li>
+    <li class="breadcrumb-item"><a href="{{ path('app_fighters') }}" style="color:#a1a1aa;text-decoration:none;">Roster</a></li>
+    <li class="breadcrumb-item active">{{ fighter ? 'Edit' : 'Add' }} Boxer</li>
 {% endblock %}
 
 {% block content %}
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
-        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">{{ fighter ? 'Edit' : 'Add' }} Fighter</h1>
-        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Modify fighter record and metrics in the roster</p>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">{{ fighter ? 'Edit' : 'Add' }} Professional Boxer</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Modify boxer record and physiological data</p>
     </div>
     <a href="{{ path('app_fighters') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
 </div>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     <div class="row g-4">
         <!-- Left Column -->
         <div class="col-lg-8">
             <!-- Personal Info -->
             <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
                 <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
-                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-id-badge me-2" style="color:#dc2626;"></i>Personal Information</h3>
+                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-id-badge me-2" style="color:#dc2626;"></i>Profile Information</h3>
                 </div>
                 <div class="card-body p-4">
                     <div class="row g-3">
@@ -41,8 +41,8 @@
                             <input type="text" name="nickname" class="form-control" value="{{ fighter ? fighter.nickname : '' }}" />
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Nationality</label>
-                            <input type="text" name="country" class="form-control" value="{{ fighter ? fighter.country : '' }}" />
+                            <label class="form-label">Nationality (2-char code)</label>
+                            <input type="text" name="nationality" class="form-control" value="{{ fighter ? fighter.nationality : '' }}" maxlength="2" placeholder="e.g. US, GB, MX" />
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Height (cm)</label>
@@ -53,22 +53,12 @@
                             <input type="number" name="reach" class="form-control" value="{{ fighter ? fighter.reach : '' }}" />
                         </div>
                         <div class="col-md-12">
-                            <label class="form-label">Weight Class <span style="color:#dc2626;">*</span></label>
-                            <select name="weightClass" class="form-select" required>
-                                <option value="" {{ fighter and not fighter.weightClass ? 'selected' : '' }} disabled>Select weight class...</option>
-                                {% set wc_distribution = [
-                                    {'name': 'Flyweight', 'weight': '125 lbs'},
-                                    {'name': 'Bantamweight', 'weight': '135 lbs'},
-                                    {'name': 'Featherweight', 'weight': '145 lbs'},
-                                    {'name': 'Lightweight', 'weight': '155 lbs'},
-                                    {'name': 'Welterweight', 'weight': '170 lbs'},
-                                    {'name': 'Middleweight', 'weight': '185 lbs'},
-                                    {'name': 'Light Heavyweight', 'weight': '205 lbs'},
-                                    {'name': 'Heavyweight', 'weight': '265 lbs'}
-                                ] %}
-                                {% for wc in wc_distribution %}
-                                    <option value="{{ wc.name }}" {{ fighter and fighter.weightClass == wc.name ? 'selected' : '' }}>
-                                        {{ wc.name }} ({{ wc.weight }})
+                            <label class="form-label">Weight Division <span style="color:#dc2626;">*</span></label>
+                            <select name="weightDivision" class="form-select" required>
+                                <option value="" {{ fighter and not fighter.weightDivision ? 'selected' : '' }} disabled>Select division...</option>
+                                {% for wd in weightDivisions %}
+                                    <option value="{{ wd.id }}" {{ fighter and fighter.weightDivision and fighter.weightDivision.id == wd.id ? 'selected' : '' }}>
+                                        {{ wd.name }} (Up to {{ wd.maxWeightLbs }} lbs)
                                     </option>
                                 {% endfor %}
                             </select>
@@ -98,15 +88,15 @@
                         </div>
                         
                         <div class="col-md-12 mt-3 mb-1"><hr class="my-0" style="border-color:#27272a;" /></div>
-                        <div class="col-12"><label class="form-label mb-0" style="color:#c9a227!important;">Win Method Breakdown</label></div>
+                        <div class="col-12"><label class="form-label mb-0" style="color:#c9a227!important;">Victory Breakdown</label></div>
                         
                         <div class="col-md-4">
-                            <label class="form-label">KO/TKO Wins</label>
+                            <label class="form-label">KO Wins</label>
                             <input type="number" name="koWins" class="form-control" value="{{ fighter ? fighter.koWins : 0 }}" min="0" required />
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Submission Wins</label>
-                            <input type="number" name="submissionWins" class="form-control" value="{{ fighter ? fighter.submissionWins : 0 }}" min="0" required />
+                            <label class="form-label">Technical Wins</label>
+                            <input type="number" name="technicalWins" class="form-control" value="{{ fighter ? fighter.technicalWins : 0 }}" min="0" required />
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Decision Wins</label>
@@ -120,7 +110,24 @@
 
         <!-- Right Column -->
         <div class="col-lg-4">
-            <!-- Advanced Info (View Only from here normally, but lets show it) -->
+            <!-- Photo Upload -->
+            <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-camera me-2" style="color:#dc2626;"></i>Boxer Photo</h3>
+                </div>
+                <div class="card-body p-4 text-center">
+                    {% if fighter and fighter.photoFilename %}
+                        <img src="{{ asset('uploads/boxers/' ~ fighter.photoFilename) }}" class="img-fluid rounded mb-3" style="max-height:200px; border:2px solid #27272a;" alt="Boxer Photo" />
+                    {% else %}
+                        <div class="rounded mb-3 d-flex align-items-center justify-content-center" style="height:200px; background:#27272a; color:#52525b;">
+                            <i class="fa-solid fa-user fa-4x"></i>
+                        </div>
+                    {% endif %}
+                    <input type="file" name="photo" class="form-control form-control-sm" accept="image/*" />
+                    <p class="text-muted small mt-2 mb-0">JPEG or PNG recommended</p>
+                </div>
+            </div>
+            <!-- Advanced Info -->
             {% if fighter %}
             <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
                 <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
@@ -150,7 +157,7 @@
             <!-- Save Actions -->
             <div class="card" style="background:#18181b;border:1px solid #27272a;">
                 <div class="card-body p-4">
-                    <button type="submit" class="btn btn-danger w-100 py-2"><i class="fa-solid fa-floppy-disk me-2"></i>Save Fighter Data</button>
+                    <button type="submit" class="btn btn-danger w-100 py-2"><i class="fa-solid fa-floppy-disk me-2"></i>Save Boxer Data</button>
                     <a href="{{ path('app_fighters') }}" class="btn w-100 py-2 mt-2" style="background:#27272a;color:#a1a1aa;border:none;">Cancel</a>
                 </div>
             </div>

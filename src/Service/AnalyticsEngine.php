@@ -12,8 +12,8 @@ use App\Repository\PerformanceScoreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * AnalyticsEngine — exact port of Java AnalyticsEngine.java
- * Calculates performance scores and ranking points.
+ * AnalyticsEngine — Remodeled for Boxing
+ * Calculates performance scores based on punch accuracy and power stats.
  */
 class AnalyticsEngine
 {
@@ -30,7 +30,7 @@ class AnalyticsEngine
 
     /**
      * Calculate performance score for a fighter.
-     * Incorporates Champions Event streak multipliers.
+     * Uses CompuBox punch metrics.
      */
     public function calculatePerformanceScore(int $fighterId): float
     {
@@ -40,30 +40,40 @@ class AnalyticsEngine
         $fights = $this->resultRepo->findCompletedByFighter($fighterId);
         if (empty($fights)) return 0.0;
 
-        // Champions Event Bonus Logic
-        // Base multipliers: Winner 1.5x, Loser 1.25x
-        // Streak bonus: +0.25 (winner) / +0.15 (loser) per consecutive appearance
         $finalScore = 0.0;
         foreach ($fights as $fight) {
-            $stats = $this->statRepo->findByFighterAndFightResult($fighterId, $fight->getResultId());
-            if (!$stats) continue;
+            // Find total stats row (round = NULL usually indicates the total)
+            // Or just sum the rounds. The implementation plan assumes round=NULL is total.
+            // But just in case, findBy() might return multiple if they have per-round stats.
+            $allStats = $this->statRepo->findByFighterAndFightResult($fighterId, $fight->getResultId());
+            if (empty($allStats)) continue;
 
-            $fightScore = $this->calculateIndividualFightScore($stats, $fighterId);
+            // Take the total row (round is null) or just the first one if we haven't implemented totals properly yet
+            $totalStats = null;
+            if (is_array($allStats)) {
+                foreach ($allStats as $s) {
+                    if ($s->getRound() === null) {
+                        $totalStats = $s;
+                        break;
+                    }
+                }
+                if (!$totalStats) $totalStats = $allStats[0]; // Fallback
+            } else {
+                $totalStats = $allStats;
+            }
+
+            $fightScore = $this->calculateIndividualFightScore($totalStats);
 
             // DQ Penalty Logic: Heavy deduction for losing by Disqualification
-            $isWinner = ($fight->getWinnerId() === $fighterId);
+            $isWinner = ($fight->getWinner() && $fight->getWinner()->getFighterId() === $fighterId);
             $method = strtoupper($fight->getMethodOfVictory() ?? '');
-            if (!$isWinner && (str_contains($method, 'DISQUALIFICATION') || str_contains($method, 'DQ'))) {
+            if (!$isWinner && $method === FightResult::METHOD_DQ) {
                 $fightScore -= 50.0;
             }
             
-            // Check if this was a Champions Event
-            $event = $this->em->getRepository(\App\Entity\Event::class)->find($fight->getEventId());
-            if ($event && $event->isChampionsEvent()) {
-                $isWinner = ($fight->getWinnerId() === $fighterId);
-                $streak = $this->calculateParticipationStreak($fighterId, $event->getEventDate());
-                
-                $multiplier = $isWinner ? (1.5 + (0.25 * $streak)) : (1.25 + (0.15 * $streak));
+            // Belt fight multipliers (Winner 1.5x, Loser 1.25x)
+            if ($fight->isBeltFight()) {
+                $multiplier = $isWinner ? 1.5 : 1.25;
                 $fightScore *= $multiplier;
             }
             
@@ -72,16 +82,12 @@ class AnalyticsEngine
 
         // Career Average normalized by fight count
         $baseScore = count($fights) > 0 ? ($finalScore / count($fights)) : 0.0;
-
-        // Final normalization and save
         $score = $this->round2($baseScore);
 
-        // Update fighter entity
         $fighter->setPerformanceScore($score);
         
-        // Save history
         $ps = new PerformanceScore();
-        $ps->setFighterId($fighterId);
+        $ps->setFighter($fighter);
         $ps->setScore($score);
         $ps->setCalculatedAt(new \DateTime());
         $this->em->persist($ps);
@@ -94,80 +100,23 @@ class AnalyticsEngine
     /**
      * Helper to calculate a raw score for a single fight's stats.
      */
-    private function calculateIndividualFightScore(FightStatistic $s, int $fid): float
+    private function calculateIndividualFightScore(FightStatistic $s): float
     {
-        $strikeAcc = $s->getStrikesThrown() > 0 ? ($s->getStrikesLanded() / $s->getStrikesThrown()) * 100 : 0;
-        $tdAcc = $s->getTakedownAttempts() > 0 ? ($s->getTakedowns() / $s->getTakedownAttempts()) * 100 : 0;
+        $punchAcc = $s->getPunchAccuracy(); // already handles /0
+        $powerAcc = $s->getPowerAccuracy(); // already handles /0
         
-        // Basic contribution components
-        $strikesPart = $s->getStrikesLanded() * 0.5;
-        $tdPart = $s->getTakedowns() * 5.0;
-        $subPart = $s->getSubmissions() * 15.0;
-        $kdPart = $s->getKnockdowns() * 10.0;
-        $controlPart = ($s->getControlTimeSeconds() / 60) * 2.0;
+        $kdBonus = $this->clamp($s->getKnockdowns() * 15.0, 0, 45.0);
 
-        return ($strikesPart + $tdPart + $subPart + $kdPart + $controlPart);
-    }
-
-    /**
-     * Calculate how many CONSECUTIVE Champions Events the fighter has been in UP TO a certain date.
-     */
-    private function calculateParticipationStreak(int $fighterId, \DateTimeInterface $upToDate): int
-    {
-        $eventRepo = $this->em->getRepository(\App\Entity\Event::class);
-        $resultRepo = $this->em->getRepository(\App\Entity\FightResult::class);
-        
-        // Get all Champions Events before (and including) this fight date, ordered by date DESC
-        $qb = $eventRepo->createQueryBuilder('e')
-            ->where('e.isChampionsEvent = :isCE')
-            ->andWhere('e.eventDate <= :date')
-            ->setParameter('isCE', true)
-            ->setParameter('date', $upToDate)
-            ->orderBy('e.eventDate', 'DESC');
-        
-        $ceEvents = $qb->getQuery()->getResult();
-        
-        $streak = 0;
-        foreach ($ceEvents as $index => $event) {
-            // Participation check (we don't count the current one as "streak bonus" for the first appearance,
-            // so C-1 logic effectively starts from 0 for the first one).
-            if ($index === 0) continue; // Current event
-            
-            if ($resultRepo->didFighterParticipateInEvent($fighterId, $event->getEventId())) {
-                $streak++;
-            } else {
-                break; // Streak broken
-            }
-        }
-        
-        return $streak;
+        return ($punchAcc * 0.5) + ($powerAcc * 0.3) + ($kdBonus * 0.2);
     }
 
     /**
      * Calculate ranking points for a fighter.
-     * Base points per win type with recency decay (0.9^N).
+     * Legacy method, points are now calculated in RankingService directly.
      */
     public function calculateRankingPoints(int $fighterId): float
     {
-        $fights = $this->resultRepo->findCompletedByFighter($fighterId);
-        $totalPoints = 0.0;
-
-        foreach ($fights as $index => $fight) {
-            if ($fight->getWinnerId() === $fighterId) {
-                // Method bonus calculation logic (standard ELO style)
-                $method = strtoupper($fight->getMethodOfVictory() ?? '');
-                $basePoints = match($method) {
-                    'KO', 'TKO', 'KO/TKO' => 10,
-                    'SUBMISSION' => 8,
-                    'DECISION' => 5,
-                    default => 3
-                };
-                $decay = pow(0.9, $index); // Recency decay
-                $totalPoints += $basePoints * $decay;
-            }
-        }
-
-        return $this->round2($totalPoints);
+        return 0.0;
     }
 
     /**

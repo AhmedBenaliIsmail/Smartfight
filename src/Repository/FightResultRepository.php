@@ -21,15 +21,15 @@ class FightResultRepository extends ServiceEntityRepository
 
     public function findByEvent(int $eventId): array
     {
-        return $this->findBy(['eventId' => $eventId], ['fightNumber' => 'ASC']);
+        return $this->findBy(['event' => $eventId], ['fightNumber' => 'ASC']);
     }
 
     public function didFighterParticipateInEvent(int $fighterId, int $eventId): bool
     {
         $count = $this->createQueryBuilder('fr')
             ->select('COUNT(fr.resultId)')
-            ->where('fr.eventId = :eid')
-            ->andWhere('(fr.fighter1Id = :fid OR fr.fighter2Id = :fid)')
+            ->where('fr.event = :eid')
+            ->andWhere('(fr.fighter1 = :fid OR fr.fighter2 = :fid)')
             ->setParameter('eid', $eventId)
             ->setParameter('fid', $fighterId)
             ->getQuery()->getSingleScalarResult();
@@ -39,18 +39,18 @@ class FightResultRepository extends ServiceEntityRepository
 
     public function findCompletedFightsByEvent(int $eventId): array
     {
-        return $this->findBy(['eventId' => $eventId, 'status' => 'COMPLETED'], ['fightNumber' => 'ASC']);
+        return $this->findBy(['event' => $eventId, 'status' => 'COMPLETED'], ['fightNumber' => 'ASC']);
     }
 
     public function countByEvent(int $eventId): int
     {
-        return $this->count(['eventId' => $eventId]);
+        return $this->count(['event' => $eventId]);
     }
 
     public function findCompletedByFighter(int $fighterId): array
     {
         return $this->createQueryBuilder('r')
-            ->where('(r.fighter1Id = :fid OR r.fighter2Id = :fid) AND r.status = :s')
+            ->where('(r.fighter1 = :fid OR r.fighter2 = :fid) AND r.status = :s')
             ->setParameter('fid', $fighterId)
             ->setParameter('s', 'COMPLETED')
             ->orderBy('r.fightDate', 'DESC')
@@ -69,7 +69,7 @@ class FightResultRepository extends ServiceEntityRepository
     public function findLastFightsByFighter(int $fighterId, int $limit = 5): array
     {
         return $this->createQueryBuilder('r')
-            ->where('(r.fighter1Id = :fid OR r.fighter2Id = :fid) AND r.status = :s')
+            ->where('(r.fighter1 = :fid OR r.fighter2 = :fid) AND r.status = :s')
             ->setParameter('fid', $fighterId)
             ->setParameter('s', 'COMPLETED')
             ->orderBy('r.fightDate', 'DESC')
@@ -81,7 +81,7 @@ class FightResultRepository extends ServiceEntityRepository
     {
         $used = $this->createQueryBuilder('r')
             ->select('r.fightNumber')
-            ->where('r.eventId = :eid')
+            ->where('r.event = :eid')
             ->setParameter('eid', $eventId)
             ->getQuery()->getSingleColumnResult();
 
@@ -97,9 +97,10 @@ class FightResultRepository extends ServiceEntityRepository
         $results = $this->findByEvent($eventId);
         $ids = [];
         foreach ($results as $r) {
-            $ids[] = $r->getFighter1Id();
-            $ids[] = $r->getFighter2Id();
+            if ($r->getFighter1()) $ids[] = $r->getFighter1()->getFighterId();
+            if ($r->getFighter2()) $ids[] = $r->getFighter2()->getFighterId();
         }
         return array_unique($ids);
     }
 }
+

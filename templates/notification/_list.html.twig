@@ -1,0 +1,54 @@
+<div class="dropdown">
+    <a href="#" class="nav-link px-0" data-bs-toggle="dropdown" tabindex="-1" aria-label="Show notifications">
+        <i class="fa-solid fa-bell" style="color: #a1a1aa;"></i>
+        {% if notifications|length > 0 %}
+            <span class="badge bg-red" style="position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; padding: 0; border: 2px solid #09090b; border-radius: 50%;"></span>
+        {% endif %}
+    </a>
+    <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card" style="width: 320px; background: #18181b; border: 1px solid #27272a;">
+        <div class="card" style="background: transparent; border: none;">
+            <div class="card-header d-flex justify-content-between align-items-center py-2" style="background: rgba(39,39,42,0.5); border-bottom: 1px solid #27272a;">
+                <h3 class="card-title text-white small fw-bold">Notifications</h3>
+                {% if notifications|length > 0 %}
+                    <a href="javascript:void(0)" onclick="markNotificationsRead()" class="text-blue small">Mark all read</a>
+                {% endif %}
+            </div>
+            <div class="list-group list-group-flush list-group-hoverable overflow-auto" style="max-height: 350px;">
+                {% for n in notifications %}
+                    <div class="list-group-item bg-transparent border-secondary p-3">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                {% if n.type == 'PREDICTION' %}
+                                    <span class="status-indicator status-green status-indicator-animated">
+                                        <i class="fa-solid fa-circle text-success" style="font-size: 8px;"></i>
+                                    </span>
+                                {% else %}
+                                    <span class="status-indicator status-blue">
+                                        <i class="fa-solid fa-circle text-blue" style="font-size: 8px;"></i>
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <div class="col text-truncate">
+                                <div class="text-white small mb-1">{{ n.message }}</div>
+                                <div class="text-muted x-small">{{ n.createdAt|date('M d, H:i') }}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="p-4 text-center text-muted small">No new notifications.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function markNotificationsRead() {
+    fetch('{{ path('app_notifications_read_all') }}', { method: 'POST' })
+        .then(() => location.reload());
+}
+</script>
+
+<style>
+.x-small { font-size: 0.7rem; }
+</style>

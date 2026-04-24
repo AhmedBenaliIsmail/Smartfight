@@ -1,20 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Fighters — SmartFight Admin{% endblock %}
+{% block title %}Boxer Roster — SmartFight Admin{% endblock %}
 
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
-    <li class="breadcrumb-item active">Fighters</li>
+    <li class="breadcrumb-item active">Boxers</li>
 {% endblock %}
 
 {% block content %}
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
-        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Fighters</h1>
-        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Manage fighter roster and profiles</p>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Boxer Roster</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Manage professional boxer profiles and records</p>
     </div>
     {% if is_granted('ROLE_ADMIN') %}
-    <a href="{{ path('app_fighter_new') }}" class="btn btn-danger"><i class="fa-solid fa-plus me-2"></i>Add Fighter</a>
+    <a href="{{ path('app_fighter_new') }}" class="btn btn-danger"><i class="fa-solid fa-plus me-2"></i>Add Boxer</a>
     {% endif %}
 </div>
 
@@ -26,7 +26,7 @@
                 <div class="col-md-5">
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
-                        <input type="text" name="q" class="form-control" placeholder="Type to search fighters..." value="{{ q }}" data-live-search="#fighter-table" />
+                        <input type="text" name="q" class="form-control" placeholder="Type to search boxers..." value="{{ q }}" data-live-search="#fighter-table" />
                     </div>
                 </div>
                 <div class="col-md-2 offset-md-5">
@@ -42,10 +42,10 @@
         <table class="table table-hover mb-0" id="fighter-table">
             <thead>
             <tr>
-                <th style="padding:.75rem 1.25rem;width:50px;">ID</th>
+                <th style="padding:.75rem 1.25rem;width:50px;">Photo</th>
                 <th>Name</th>
                 <th>Nickname</th>
-                <th>Weight Class</th>
+                <th>Division</th>
                 <th>Ht (cm)</th>
                 <th>Reach (cm)</th>
                 <th>Record (W-L-D)</th>
@@ -59,12 +59,20 @@
             <tbody>
             {% for fighter in fighters %}
                 <tr>
-                    <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#{{ fighter.fighterId }}</td>
+                    <td style="padding:.75rem 1.25rem;">
+                        {% if fighter.photoFilename %}
+                            <img src="{{ asset('uploads/boxers/' ~ fighter.photoFilename) }}" class="rounded" style="width:40px; height:40px; object-fit:cover; border:1px solid #27272a;" alt="Boxer" />
+                        {% else %}
+                            <div class="rounded d-flex align-items-center justify-content-center" style="width:40px; height:40px; background:#27272a; color:#52525b;">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                        {% endif %}
+                    </td>
                     <td style="font-size:.875rem;font-weight:600;">{{ fighter.fullName }}</td>
                     <td style="color:#c9a227;font-size:.8rem;font-style:italic;">{{ fighter.nickname ? '"' ~ fighter.nickname ~ '"' : '-' }}</td>
                     <td>
-                        {% if fighter.weightClass %}
-                            <span class="badge" style="background:rgba(59,130,246,.1);color:#60a5fa;border:1px solid rgba(59,130,246,.2);font-size:.75rem;">{{ fighter.weightClass }}</span>
+                        {% if fighter.weightDivision %}
+                            <span class="badge" style="background:rgba(59,130,246,.1);color:#60a5fa;border:1px solid rgba(59,130,246,.2);font-size:.75rem;">{{ fighter.weightDivision.name }}</span>
                         {% else %}
                             -
                         {% endif %}
@@ -76,14 +84,14 @@
                         <span style="color:#dc2626;font-weight:700;font-size:.875rem;margin-left:4px;">{{ fighter.losses }}</span><span style="color:#a1a1aa;font-size:.75rem;">L</span>
                         <span style="color:#a1a1aa;font-weight:700;font-size:.875rem;margin-left:4px;">{{ fighter.draws }}</span><span style="color:#a1a1aa;font-size:.75rem;">D</span>
                     </td>
-                    <td style="font-size:.8rem;color:#a1a1aa;">{{ fighter.country|default('-') }}</td>
+                    <td style="font-size:.8rem;color:#a1a1aa;">{{ fighter.nationality|default('-') }}</td>
                     <td>{{ fighter.eloRating|round }}</td>
                     
                     {% if is_granted('ROLE_ADMIN') %}
                     <td class="text-end" style="padding-right:1.25rem;">
                         <div class="d-flex justify-content-end gap-1">
                             <a href="{{ path('app_fighter_edit', {'id': fighter.fighterId}) }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-pen"></i></a>
-                            <form action="{{ path('app_fighter_delete', {'id': fighter.fighterId}) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this fighter?');">
+                            <form action="{{ path('app_fighter_delete', {'id': fighter.fighterId}) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this boxer?');">
                                 <button type="submit" class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i></button>
                             </form>
                         </div>
@@ -92,7 +100,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="8" class="text-center" style="padding: 2rem;">No fighters found.</td>
+                    <td colspan="10" class="text-center" style="padding: 2rem;">No boxers found.</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -100,7 +108,7 @@
     </div>
     <div class="card-footer" style="background:#18181b;border-top:1px solid #27272a;">
         <div class="d-flex align-items-center justify-content-between">
-            <span style="font-size:.8125rem;color:#a1a1aa;">Total {{ fighters|length }} fighters</span>
+            <span style="font-size:.8125rem;color:#a1a1aa;">Total {{ fighters|length }} boxers</span>
             {% if is_granted('ROLE_ADMIN') %}
             <form action="{{ path('app_fighter_recalc') }}" method="post">
                 <button type="submit" class="btn btn-sm btn-outline-warning">

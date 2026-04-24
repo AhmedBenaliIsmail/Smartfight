@@ -2,7 +2,9 @@
 namespace App\Controller;
 
 use App\Entity\Fighter;
+use App\Entity\WeightDivision;
 use App\Repository\FighterRepository;
+use App\Repository\WeightDivisionRepository;
 use App\Service\RankingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,33 +27,39 @@ class FighterController extends AbstractController
     }
 
     #[Route('/new', name: 'app_fighter_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    public function new(Request $request, EntityManagerInterface $em, WeightDivisionRepository $wdRepo): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         if ($request->isMethod('POST')) {
             $f = new Fighter();
-            $this->bindFighter($f, $request);
+            $this->bindFighter($f, $request, $em);
             $em->persist($f);
             $em->flush();
             $this->addFlash('success', 'Fighter added.');
             return $this->redirectToRoute('app_fighters');
         }
-        return $this->render('fighter/form.html.twig', ['fighter' => null]);
+        return $this->render('fighter/form.html.twig', [
+            'fighter' => null,
+            'weightDivisions' => $wdRepo->findAll()
+        ]);
     }
 
     #[Route('/{id}/edit', name: 'app_fighter_edit', methods: ['GET', 'POST'])]
-    public function edit(int $id, Request $request, FighterRepository $repo, EntityManagerInterface $em): Response
+    public function edit(int $id, Request $request, FighterRepository $repo, EntityManagerInterface $em, WeightDivisionRepository $wdRepo): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $f = $repo->find($id);
         if (!$f) throw $this->createNotFoundException();
         if ($request->isMethod('POST')) {
-            $this->bindFighter($f, $request);
+            $this->bindFighter($f, $request, $em);
             $em->flush();
             $this->addFlash('success', 'Fighter updated.');
             return $this->redirectToRoute('app_fighters');
         }
-        return $this->render('fighter/form.html.twig', ['fighter' => $f]);
+        return $this->render('fighter/form.html.twig', [
+            'fighter' => $f,
+            'weightDivisions' => $wdRepo->findAll()
+        ]);
     }
 
     #[Route('/{id}/delete', name: 'app_fighter_delete', methods: ['POST'])]
@@ -72,20 +80,37 @@ class FighterController extends AbstractController
         return $this->redirectToRoute('app_fighters');
     }
 
-    private function bindFighter(Fighter $f, Request $r): void
+    private function bindFighter(Fighter $f, Request $r, EntityManagerInterface $em): void
     {
         $f->setFirstName(trim($r->request->get('firstName', '')));
         $f->setLastName(trim($r->request->get('lastName', '')));
         $f->setNickname(trim($r->request->get('nickname', '')) ?: null);
-        $f->setWeightClass(trim($r->request->get('weightClass', '')));
-        $f->setCountry(trim($r->request->get('country', '')) ?: null);
+        
+        $wdId = (int)$r->request->get('weightDivision');
+        if ($wdId) {
+            $wd = $em->getRepository(WeightDivision::class)->find($wdId);
+            $f->setWeightDivision($wd);
+        }
+
+        $f->setNationality(trim($r->request->get('nationality', '')) ?: null);
         $f->setWins((int)$r->request->get('wins', 0));
         $f->setLosses((int)$r->request->get('losses', 0));
         $f->setDraws((int)$r->request->get('draws', 0));
         $f->setKoWins((int)$r->request->get('koWins', 0));
-        $f->setSubmissionWins((int)$r->request->get('submissionWins', 0));
+        $f->setTechnicalWins((int)$r->request->get('technicalWins', 0));
         $f->setDecisionWins((int)$r->request->get('decisionWins', 0));
         $f->setHeight((int)$r->request->get('height', 0) ?: null);
         $f->setReach((int)$r->request->get('reach', 0) ?: null);
+
+        // Photo Upload Handling
+        $photoFile = $r->files->get('photo');
+        if ($photoFile) {
+            $destination = $this->getParameter('kernel.project_dir') . '/public/uploads/boxers';
+            $newFilename = uniqid() . '.' . $photoFile->guessExtension();
+            $photoFile->move($destination, $newFilename);
+            $f->setPhotoFilename($newFilename);
+        }
     }
+
 }
+

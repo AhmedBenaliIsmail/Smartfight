@@ -12,12 +12,12 @@
 <div class="mb-5">
     <div class="d-flex align-items-center justify-content-between mb-2">
         <div>
-            <span class="badge {{ event.isChampionsEvent ? 'bg-yellow-lt' : 'bg-primary-lt' }} mb-2">
-                <i class="fa-solid {{ event.isChampionsEvent ? 'fa-crown text-yellow' : 'fa-calendar' }} me-1"></i>
-                {{ event.isChampionsEvent ? 'CHAMPIONS EVENT' : 'STANDARD EVENT' }}
+            <span class="badge {{ event.organization != 'INDEPENDENT' ? 'bg-yellow-lt' : 'bg-primary-lt' }} mb-2">
+                <i class="fa-solid {{ event.organization != 'INDEPENDENT' ? 'fa-crown text-yellow' : 'fa-calendar' }} me-1"></i>
+                {{ event.organization != 'INDEPENDENT' ? event.organization ~ ' EVENT' : 'STANDARD EVENT' }}
             </span>
             <h1 class="h2 mb-1 fw-bold" style="color:#fafafa;">{{ event.eventName }}</h1>
-            <p class="mb-0" style="color:#a1a1aa;"><i class="fa-solid fa-location-dot me-1"></i>{{ event.location }} — {{ event.eventDate|date('l, F d, Y') }}</p>
+            <p class="mb-0" style="color:#a1a1aa;"><i class="fa-solid fa-location-dot me-1"></i>{{ event.venue }}, {{ event.city }} — {{ event.eventDate|date('l, F d, Y') }}</p>
         </div>
         <a href="{{ path('app_results') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Back to All Events</a>
     </div>
@@ -25,8 +25,9 @@
 
 <div class="row g-4">
     {% for fight in fights %}
-        {% set f1 = fighterMap[fight.fighter1Id] ?? null %}
-        {% set f2 = fighterMap[fight.fighter2Id] ?? null %}
+        {% set f1 = fight.fighter1 %}
+        {% set f2 = fight.fighter2 %}
+        {% set winner = fight.winner %}
         
         <div class="col-xl-4 col-md-6">
             <div class="card h-100" style="background:#18181b; border: 1px solid {{ fight.status == 'COMPLETED' ? '#22c55e' : '#27272a' }}; position: relative; overflow: hidden;">
@@ -50,13 +51,13 @@
                             <div class="mb-2">
                                 <span class="badge bg-danger-lt px-2" style="font-size: 10px;">RED CORNER</span>
                             </div>
-                            <h4 class="mb-1 fw-bold" style="color: {{ fight.winnerId == fight.fighter1Id ? '#22c55e' : '#fafafa' }};">
+                            <h4 class="mb-1 fw-bold" style="color: {{ winner and winner.fighterId == f1.fighterId ? '#22c55e' : '#fafafa' }};">
                                 {{ f1 ? f1.fullName : 'Unknown' }}
-                                {% if fight.winnerId == fight.fighter1Id %}<i class="fa-solid fa-circle-check ms-1"></i>{% endif %}
+                                {% if winner and winner.fighterId == f1.fighterId %}<i class="fa-solid fa-circle-check ms-1"></i>{% endif %}
                             </h4>
                             <small class="text-muted d-block">{{ f1 ? f1.nickname|default('No Nickname') : '-' }}</small>
                             <div class="mt-1">
-                                <span class="text-muted small">{{ f1 ? f1.weightClass : '-' }}</span>
+                                <span class="text-muted small">{{ f1 and f1.weightDivision ? f1.weightDivision.name : '-' }}</span>
                             </div>
                         </div>
 
@@ -70,13 +71,13 @@
                             <div class="mb-2">
                                 <span class="badge bg-blue-lt px-2" style="font-size: 10px;">BLUE CORNER</span>
                             </div>
-                            <h4 class="mb-1 fw-bold" style="color: {{ fight.winnerId == fight.fighter2Id ? '#22c55e' : '#fafafa' }};">
+                            <h4 class="mb-1 fw-bold" style="color: {{ winner and winner.fighterId == f2.fighterId ? '#22c55e' : '#fafafa' }};">
                                 {{ f2 ? f2.fullName : 'Unknown' }}
-                                {% if fight.winnerId == fight.fighter2Id %}<i class="fa-solid fa-circle-check ms-1"></i>{% endif %}
+                                {% if winner and winner.fighterId == f2.fighterId %}<i class="fa-solid fa-circle-check ms-1"></i>{% endif %}
                             </h4>
                             <small class="text-muted d-block">{{ f2 ? f2.nickname|default('No Nickname') : '-' }}</small>
                             <div class="mt-1">
-                                <span class="text-muted small">{{ f2 ? f2.weightClass : '-' }}</span>
+                                <span class="text-muted small">{{ f2 and f2.weightDivision ? f2.weightDivision.name : '-' }}</span>
                             </div>
                         </div>
                     </div>
@@ -84,7 +85,7 @@
                     {% if fight.status == 'COMPLETED' %}
                         <div class="p-3 rounded mt-3" style="background: rgba(34, 197, 94, 0.05); border: 1px dashed rgba(34,197,94,0.3);">
                             <div class="small text-muted mb-1 text-uppercase fw-bold">Result</div>
-                            <div class="h5 mb-0" style="color:#22c55e;">{{ fight.methodOfVictory }} — R{{ fight.roundNumber }}</div>
+                            <div class="h5 mb-0" style="color:#22c55e;">{{ fight.methodOfVictory }}{{ fight.decisionType ? ' (' ~ fight.decisionType ~ ')' : '' }} — R{{ fight.roundNumber }}</div>
                         </div>
                     {% endif %}
                 </div>
@@ -99,8 +100,8 @@
                             <button type="submit" class="btn btn-outline-warning"><i class="fa-solid fa-ban"></i></button>
                         </form>
                     {% else %}
-                        <a href="{{ path('app_performance_show', {id: fight.fighter1Id}) }}" class="btn btn-sm btn-outline-secondary flex-fill">View Red Stats</a>
-                        <a href="{{ path('app_performance_show', {id: fight.fighter2Id}) }}" class="btn btn-sm btn-outline-secondary flex-fill">View Blue Stats</a>
+                        <a href="{{ path('app_performance_show', {id: f1.fighterId}) }}" class="btn btn-sm btn-outline-secondary flex-fill">View Red Stats</a>
+                        <a href="{{ path('app_performance_show', {id: f2.fighterId}) }}" class="btn btn-sm btn-outline-secondary flex-fill">View Blue Stats</a>
                     {% endif %}
                 </div>
             </div>
@@ -114,3 +115,4 @@
     {% endfor %}
 </div>
 {% endblock %}
+

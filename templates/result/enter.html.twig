@@ -12,26 +12,42 @@
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
         <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Enter Fight Result</h1>
-        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Completing a fight will recalculate ELO and rankings automatically.</p>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Completing a boxing match will recalculate global rankings and CompuBox analytics.</p>
     </div>
     <a href="{{ path('app_results') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
 </div>
 
 <form method="post">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
+        <div class="col-lg-10">
             <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
                 <div class="card-body text-center p-4">
-                    <h2 class="mb-3">Fight FR-{{ result.resultId }}</h2>
-                    <div class="d-flex justify-content-center align-items-center gap-4">
-                        <div class="text-end">
-                            <div class="fs-3 fw-bold text-danger">{{ fighter1 ? fighter1.fullName : 'Unknown' }}</div>
-                            <div class="text-muted">{{ fighter1 ? fighter1.weightClass : '' }}</div>
+                    <h2 class="mb-3">Fight #{{ result.fightNumber }} ({{ result.event.eventName }})</h2>
+                    <div class="d-flex justify-content-center align-items-center gap-5">
+                        <div class="text-center">
+                            {% if fighter1 and fighter1.photoFilename %}
+                                <img src="{{ asset('uploads/boxers/' ~ fighter1.photoFilename) }}" class="rounded-circle mb-2" style="width:100px; height:100px; object-fit:cover; border:3px solid #dc2626;" alt="Photo" />
+                            {% else %}
+                                <div class="rounded-circle mb-2 d-inline-flex align-items-center justify-content-center" style="width:100px; height:100px; background:#27272a; color:#a1a1aa; border:3px solid #dc2626;">
+                                    <i class="fa-solid fa-user fa-3x"></i>
+                                </div>
+                            {% endif %}
+                            <div class="fs-4 fw-bold text-danger">{{ fighter1 ? fighter1.fullName : 'Unknown' }}</div>
+                            <div class="text-muted small">{{ fighter1 and fighter1.weightDivision ? fighter1.weightDivision.name : '' }}</div>
                         </div>
-                        <div class="vs-badge mx-2">VS</div>
-                        <div class="text-start">
-                            <div class="fs-3 fw-bold text-primary">{{ fighter2 ? fighter2.fullName : 'Unknown' }}</div>
-                            <div class="text-muted">{{ fighter2 ? fighter2.weightClass : '' }}</div>
+                        
+                        <div class="vs-badge fs-3 fw-bold" style="background:#27272a; padding:15px; border-radius:50%; border:1px solid #3f3f46;">VS</div>
+                        
+                        <div class="text-center">
+                            {% if fighter2 and fighter2.photoFilename %}
+                                <img src="{{ asset('uploads/boxers/' ~ fighter2.photoFilename) }}" class="rounded-circle mb-2" style="width:100px; height:100px; object-fit:cover; border:3px solid #3b82f6;" alt="Photo" />
+                            {% else %}
+                                <div class="rounded-circle mb-2 d-inline-flex align-items-center justify-content-center" style="width:100px; height:100px; background:#27272a; color:#a1a1aa; border:3px solid #3b82f6;">
+                                    <i class="fa-solid fa-user fa-3x"></i>
+                                </div>
+                            {% endif %}
+                            <div class="fs-4 fw-bold text-primary">{{ fighter2 ? fighter2.fullName : 'Unknown' }}</div>
+                            <div class="text-muted small">{{ fighter2 and fighter2.weightDivision ? fighter2.weightDivision.name : '' }}</div>
                         </div>
                     </div>
                 </div>
@@ -52,7 +68,7 @@
                                 </div>
                                 <div class="form-check form-check-inline form-check-custom">
                                     <input class="form-check-input" type="radio" name="winner" id="winDraw" value="draw" required>
-                                    <label class="form-check-label ms-2" for="winDraw">DRAW</label>
+                                    <label class="form-check-label ms-2" for="winDraw">DRAW / NC</label>
                                 </div>
                                 <div class="form-check form-check-inline form-check-custom">
                                     <input class="form-check-input" type="radio" name="winner" id="win2" value="fighter2" required>
@@ -61,23 +77,42 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4">
-                            <label class="form-label">Method of Victory <span style="color:#dc2626;">*</span></label>
-                            <select name="method" class="form-select" required>
+                        <div class="col-md-3">
+                            <label class="form-label">Method <span style="color:#dc2626;">*</span></label>
+                            <select name="method" class="form-select" required id="method-select">
+                                <option value="KO">KO / TKO</option>
                                 <option value="DECISION">Decision</option>
-                                <option value="KO/TKO">KO/TKO</option>
-                                <option value="SUBMISSION">Submission</option>
-                                <option value="DISQUALIFICATION">Disqualification</option>
+                                <option value="DQ">Disqualification</option>
                                 <option value="DRAW">Draw</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Ended In Round</label>
-                            <input type="number" name="round" class="form-control" value="3" min="1" max="5" />
+                        <div class="col-md-3" id="decision-type-col" style="display:none;">
+                            <label class="form-label">Decision Type</label>
+                            <select name="decisionType" class="form-select">
+                                <option value="UD">Unanimous (UD)</option>
+                                <option value="SD">Split (SD)</option>
+                                <option value="MD">Majority (MD)</option>
+                            </select>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Fight Date / Time</label>
-                            <input type="datetime-local" name="fightDate" class="form-control" value="{{ 'now'|date('Y-m-d\\TH:i') }}" />
+                        <div class="col-md-2">
+                            <label class="form-label">End Round</label>
+                            <input type="number" name="round" class="form-control" value="12" min="1" max="12" />
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Belt Fight?</label>
+                            <div class="form-check form-switch pt-2">
+                                <input class="form-check-input" type="checkbox" name="isBeltFight" value="1">
+                            </div>
+                        </div>
+                        <div class="col-md-2" id="belt-org-col" style="display:none;">
+                            <label class="form-label">Sanction</label>
+                            <select name="beltOrganization" class="form-select">
+                                <option value="WBC">WBC</option>
+                                <option value="WBA">WBA</option>
+                                <option value="IBF">IBF</option>
+                                <option value="WBO">WBO</option>
+                                <option value="UNDISPUTED">UNDISPUTED</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -85,76 +120,84 @@
             
             <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
                 <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
-                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-chart-simple me-2" style="color:#22c55e;"></i>Performance Statistics</h3>
+                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-chart-simple me-2" style="color:#22c55e;"></i>CompuBox Boxing Statistics</h3>
                 </div>
                 <div class="card-body p-4">
                     <div class="row g-4">
                         {# Red Corner Stats #}
                         <div class="col-md-6 border-end" style="border-right-color:#27272a !important;">
-                            <h4 class="text-danger mb-3 fw-bold small text-uppercase">Red Corner: {{ fighter1.fullName }}</h4>
+                            <h4 class="text-danger mb-3 fw-bold small text-uppercase">Red: {{ fighter1.fullName }}</h4>
                             <div class="row g-2">
                                 <div class="col-6">
-                                    <label class="form-label small">Strikes Landed</label>
-                                    <input type="number" name="f1_strikes_landed" class="form-control" placeholder="0" min="0" required data-limit="f1_strikes_thrown">
+                                    <label class="form-label small">Punches Landed</label>
+                                    <input type="number" name="f1_punches_landed" class="form-control" placeholder="0" min="0" required data-limit="f1_punches_thrown">
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small">Strikes Thrown</label>
-                                    <input type="number" name="f1_strikes_thrown" class="form-control" placeholder="0" min="0" required>
+                                    <label class="form-label small">Punches Thrown</label>
+                                    <input type="number" name="f1_punches_thrown" class="form-control" placeholder="0" min="0" required>
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small">TD Successful</label>
-                                    <input type="number" name="f1_td_landed" class="form-control" placeholder="0" min="0" required data-limit="f1_td_attempts">
+                                    <label class="form-label small">Power Landed</label>
+                                    <input type="number" name="f1_power_landed" class="form-control" placeholder="0" min="0" required data-limit="f1_power_thrown">
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small">TD Attempts</label>
-                                    <input type="number" name="f1_td_attempts" class="form-control" placeholder="0" min="0" required>
+                                    <label class="form-label small">Power Thrown</label>
+                                    <input type="number" name="f1_power_thrown" class="form-control" placeholder="0" min="0" required>
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small">Submissions</label>
-                                    <input type="number" name="f1_subs" class="form-control bg-dark-subtle" placeholder="0" value="0" readonly>
+                                    <label class="form-label small">Jabs Landed</label>
+                                    <input type="number" name="f1_jabs_landed" class="form-control" placeholder="0" min="0" required data-limit="f1_jabs_thrown">
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small">Knockdowns/KO</label>
-                                    <input type="number" name="f1_kds" class="form-control bg-dark-subtle" placeholder="0" value="0" readonly>
+                                    <label class="form-label small">Jabs Thrown</label>
+                                    <input type="number" name="f1_jabs_thrown" class="form-control" placeholder="0" min="0" required>
                                 </div>
-                                <div class="col-12">
-                                    <label class="form-label small">Control Time (Seconds)</label>
-                                    <input type="number" name="f1_control_time" class="form-control" placeholder="Total seconds (e.g. 180)" min="0" value="0">
+                                <div class="col-6">
+                                    <label class="form-label small">Body Shots</label>
+                                    <input type="number" name="f1_body_shots" class="form-control" placeholder="0" min="0" value="0">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small">Knockdowns</label>
+                                    <input type="number" name="f1_kds" class="form-control" placeholder="0" value="0" min="0">
                                 </div>
                             </div>
                         </div>
 
                         {# Blue Corner Stats #}
                         <div class="col-md-6">
-                            <h4 class="text-primary mb-3 fw-bold small text-uppercase">Blue Corner: {{ fighter2.fullName }}</h4>
+                            <h4 class="text-primary mb-3 fw-bold small text-uppercase">Blue: {{ fighter2.fullName }}</h4>
                             <div class="row g-2">
                                 <div class="col-6">
-                                    <label class="form-label small">Strikes Landed</label>
-                                    <input type="number" name="f2_strikes_landed" class="form-control" placeholder="0" min="0" required data-limit="f2_strikes_thrown">
+                                    <label class="form-label small">Punches Landed</label>
+                                    <input type="number" name="f2_punches_landed" class="form-control" placeholder="0" min="0" required data-limit="f2_punches_thrown">
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small">Strikes Thrown</label>
-                                    <input type="number" name="f2_strikes_thrown" class="form-control" placeholder="0" min="0" required>
+                                    <label class="form-label small">Punches Thrown</label>
+                                    <input type="number" name="f2_punches_thrown" class="form-control" placeholder="0" min="0" required>
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small">TD Successful</label>
-                                    <input type="number" name="f2_td_landed" class="form-control" placeholder="0" min="0" required data-limit="f2_td_attempts">
+                                    <label class="form-label small">Power Landed</label>
+                                    <input type="number" name="f2_power_landed" class="form-control" placeholder="0" min="0" required data-limit="f2_power_thrown">
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small">TD Attempts</label>
-                                    <input type="number" name="f2_td_attempts" class="form-control" placeholder="0" min="0" required>
+                                    <label class="form-label small">Power Thrown</label>
+                                    <input type="number" name="f2_power_thrown" class="form-control" placeholder="0" min="0" required>
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small">Submissions</label>
-                                    <input type="number" name="f2_subs" class="form-control bg-dark-subtle" placeholder="0" value="0" readonly>
+                                    <label class="form-label small">Jabs Landed</label>
+                                    <input type="number" name="f2_jabs_landed" class="form-control" placeholder="0" min="0" required data-limit="f2_jabs_thrown">
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label small">Knockdowns/KO</label>
-                                    <input type="number" name="f2_kds" class="form-control bg-dark-subtle" placeholder="0" value="0" readonly>
+                                    <label class="form-label small">Jabs Thrown</label>
+                                    <input type="number" name="f2_jabs_thrown" class="form-control" placeholder="0" min="0" required>
                                 </div>
-                                <div class="col-12">
-                                    <label class="form-label small">Control Time (Seconds)</label>
-                                    <input type="number" name="f2_control_time" class="form-control" placeholder="Total seconds (e.g. 180)" min="0" value="0">
+                                <div class="col-6">
+                                    <label class="form-label small">Body Shots</label>
+                                    <input type="number" name="f2_body_shots" class="form-control" placeholder="0" min="0" value="0">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small">Knockdowns</label>
+                                    <input type="number" name="f2_kds" class="form-control" placeholder="0" value="0" min="0">
                                 </div>
                             </div>
                         </div>
@@ -164,8 +207,7 @@
             
             <div class="card" style="background:#18181b;border:1px solid #27272a;">
                 <div class="card-body p-3">
-                    <button type="submit" class="btn btn-success w-100 py-2 fs-5"><i class="fa-solid fa-check-double me-2"></i>Save Result & Stats</button>
-                    <p class="text-center text-muted small mt-2 mb-0">Record updates automatically across Elo, Performance, and Rankings.</p>
+                    <button type="submit" class="btn btn-success w-100 py-2 fs-5"><i class="fa-solid fa-check-double me-2"></i>Finalize Boxing Match</button>
                 </div>
             </div>
         </div>
@@ -174,34 +216,19 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const methodSelect = document.getElementById('method-select');
+    const decisionCol = document.getElementById('decision-type-col');
+    const beltSwitch = document.querySelector('input[name="isBeltFight"]');
+    const beltCol = document.getElementById('belt-org-col');
     const inputs = document.querySelectorAll('input[data-limit]');
-    const winnerRadios = document.querySelectorAll('input[name="winner"]');
-    const methodSelect = document.querySelector('select[name="method"]');
-    
-    // Auto-update KO/SUB based on result
-    const updateAutoStats = () => {
-        const winner = document.querySelector('input[name="winner"]:checked')?.value;
-        const method = methodSelect.value;
-        
-        // Reset all
-        document.querySelector('input[name="f1_subs"]').value = 0;
-        document.querySelector('input[name="f1_kds"]').value = 0;
-        document.querySelector('input[name="f2_subs"]').value = 0;
-        document.querySelector('input[name="f2_kds"]').value = 0;
-        
-        if (winner === 'draw') return;
-        
-        if (method === 'KO/TKO') {
-            const target = (winner === 'fighter1') ? 'f1_kds' : 'f2_kds';
-            document.querySelector(`input[name="${target}"]`).value = 1;
-        } else if (method === 'SUBMISSION') {
-            const target = (winner === 'fighter1') ? 'f1_subs' : 'f2_subs';
-            document.querySelector(`input[name="${target}"]`).value = 1;
-        }
-    };
-    
-    winnerRadios.forEach(r => r.addEventListener('change', updateAutoStats));
-    methodSelect.addEventListener('change', updateAutoStats);
+
+    methodSelect.addEventListener('change', function() {
+        decisionCol.style.display = (this.value === 'DECISION') ? 'block' : 'none';
+    });
+
+    beltSwitch.addEventListener('change', function() {
+        beltCol.style.display = this.checked ? 'block' : 'none';
+    });
 
     // Consistency Validation
     inputs.forEach(input => {
@@ -214,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (landed > thrown) {
                 input.classList.add('is-invalid');
-                input.setCustomValidity('Landed cannot exceed thrown/attempted.');
+                input.setCustomValidity('Landed cannot exceed thrown.');
             } else {
                 input.classList.remove('is-invalid');
                 input.setCustomValidity('');
@@ -227,3 +254,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+

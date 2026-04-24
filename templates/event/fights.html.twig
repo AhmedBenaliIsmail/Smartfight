@@ -1,20 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Manage Fights - {{ event.eventName }} — SmartFight Admin{% endblock %}
+{% block title %}Manage Boxing Card - {{ event.eventName }} — SmartFight Admin{% endblock %}
 
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
-    <li class="breadcrumb-item"><a href="{{ path('app_events') }}" style="color:#a1a1aa;text-decoration:none;">Events</a></li>
-    <li class="breadcrumb-item active">Manage Fights</li>
+    <li class="breadcrumb-item"><a href="{{ path('app_events') }}" style="color:#a1a1aa;text-decoration:none;">Schedule</a></li>
+    <li class="breadcrumb-item active">Manage Card</li>
 {% endblock %}
 
 {% block content %}
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
-        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Manage Fights for {{ event.eventName }}</h1>
-        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Build the match card (Max 3 fights per event)</p>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Manage Card: {{ event.eventName }}</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Building the professional boxing card (Max 3 bouts)</p>
     </div>
-    <a href="{{ path('app_events') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back Events</a>
+    <a href="{{ path('app_events') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back Schedule</a>
 </div>
 
 <div class="row g-4">
@@ -22,15 +22,15 @@
         <!-- Scheduled Fights -->
         <div class="card" style="background:#18181b;border:1px solid #27272a;">
             <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
-                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-list me-2" style="color:#dc2626;"></i>Scheduled Fights ({{ fights|length }}/3)</h3>
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-list me-2" style="color:#dc2626;"></i>Scheduled Bouts ({{ fights|length }}/3)</h3>
             </div>
             <div class="card-body p-0">
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <th style="padding:.75rem 1.25rem;">Fight #</th>
-                            <th>Fighter 1</th>
-                            <th>Fighter 2</th>
+                            <th style="padding:.75rem 1.25rem;">Bout #</th>
+                            <th>Boxer 1 (Red)</th>
+                            <th>Boxer 2 (Blue)</th>
                             <th>Status</th>
                             {% if is_granted('ROLE_ADMIN') %}
                             <th class="text-end" style="padding-right:1.25rem;">Actions</th>
@@ -41,8 +41,8 @@
                         {% for fight in fights %}
                             <tr>
                                 <td style="padding:.75rem 1.25rem;">Fight {{ fight.fightNumber }}</td>
-                                <td>{{ fighterMap[fight.fighter1Id]|default('Unknown') }}</td>
-                                <td>{{ fighterMap[fight.fighter2Id]|default('Unknown') }}</td>
+                                <td>{{ fight.fighter1.fullName }}</td>
+                                <td>{{ fight.fighter2.fullName }}</td>
                                 <td>
                                     {% if fight.status == 'COMPLETED' %}
                                         <span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">COMPLETED</span>
@@ -55,7 +55,7 @@
                                 {% if is_granted('ROLE_ADMIN') %}
                                 <td class="text-end" style="padding-right:1.25rem;">
                                     {% if fight.status == 'SCHEDULED' %}
-                                    <form action="{{ path('app_event_fight_delete', {'fightId': fight.resultId}) }}" method="post" onsubmit="return confirm('Remove scheduled fight?');">
+                                    <form action="{{ path('app_event_fight_delete', {'fightId': fight.resultId}) }}" method="post" onsubmit="return confirm('Remove scheduled bout from card?');">
                                         <input type="hidden" name="eventId" value="{{ event.eventId }}">
                                         <button type="submit" class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i> Remove</button>
                                     </form>
@@ -66,7 +66,7 @@
                                 {% endif %}
                             </tr>
                         {% else %}
-                            <tr><td colspan="5" class="text-center" style="padding:2rem;">No fights scheduled yet for this event.</td></tr>
+                            <tr><td colspan="5" class="text-center" style="padding:2rem;">No bouts scheduled for this card.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -79,12 +79,12 @@
         {% if availableNumbers|length > 0 %}
         <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
             <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
-                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-plus me-2" style="color:#3b82f6;"></i>Add Fight</h3>
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-plus me-2" style="color:#3b82f6;"></i>Schedule Bout</h3>
             </div>
             <div class="card-body p-4">
                 <form action="{{ path('app_event_fight_add', {'id': event.eventId}) }}" method="post">
                     <div class="mb-3">
-                        <label class="form-label">Fight Number</label>
+                        <label class="form-label">Position on Card</label>
                         <select name="fightNumber" class="form-select" required>
                             {% for num in availableNumbers %}
                                 <option value="{{ num }}">Fight {{ num }}</option>
@@ -92,33 +92,80 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Fighter 1 (Red Corner)</label>
-                        <select name="fighter1Id" class="form-select" required>
-                            <option value="">Select Fighter...</option>
+                        <label class="form-label">Boxer 1 (Red Corner)</label>
+                        <select name="fighter1Id" id="fighter1Id" class="form-select" required>
+                            <option value="">Select Boxer...</option>
                             {% for f in availableFighters %}
-                                <option value="{{ f.fighterId }}">{{ f.fullName }} ({{ f.weightClass }})</option>
+                                <option value="{{ f.fighterId }}" data-weight-id="{{ f.weightDivision.id|default(0) }}">
+                                    {{ f.fullName }} ({{ f.weightDivision ? f.weightDivision.name : 'Unknown' }})
+                                </option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="mb-4">
-                        <label class="form-label">Fighter 2 (Blue Corner)</label>
-                        <select name="fighter2Id" class="form-select" required>
-                            <option value="">Select Fighter...</option>
+                        <label class="form-label">Boxer 2 (Blue Corner)</label>
+                        <select name="fighter2Id" id="fighter2Id" class="form-select" required disabled>
+                            <option value="">First select Red Corner...</option>
                             {% for f in availableFighters %}
-                                <option value="{{ f.fighterId }}">{{ f.fullName }} ({{ f.weightClass }})</option>
+                                <option value="{{ f.fighterId }}" data-weight-id="{{ f.weightDivision.id|default(0) }}" class="d-none">
+                                    {{ f.fullName }} ({{ f.weightDivision ? f.weightDivision.name : 'Unknown' }})
+                                </option>
                             {% endfor %}
                         </select>
+                        <small class="text-muted">Only boxers in the same weight class will be shown.</small>
                     </div>
-                    <button type="submit" class="btn w-100" style="background:#dc2626;color:#fff;border:none;"><i class="fa-solid fa-calendar-plus me-2"></i>Schedule Match</button>
+                    <button type="submit" class="btn w-100" style="background:#dc2626;color:#fff;border:none;"><i class="fa-solid fa-calendar-plus me-2"></i>Schedule Bout</button>
                 </form>
             </div>
         </div>
         {% else %}
-        <div class="alert alert-info">
-            <i class="fa-solid fa-info-circle me-2"></i> This event has reached the maximum of 3 scheduled fights.
+        <div class="alert alert-info" style="background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.2);color:#60a5fa;">
+            <i class="fa-solid fa-info-circle me-2"></i> This event card is full (Max 3 bouts).
         </div>
         {% endif %}
     </div>
     {% endif %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const f1Select = document.getElementById('fighter1Id');
+    const f2Select = document.getElementById('fighter2Id');
+    
+    if (f1Select && f2Select) {
+        f1Select.addEventListener('change', function() {
+            const selectedF1 = f1Select.options[f1Select.selectedIndex];
+            const weightId = selectedF1.getAttribute('data-weight-id');
+            const f1Id = f1Select.value;
+            
+            if (!f1Id) {
+                f2Select.disabled = true;
+                f2Select.value = "";
+                return;
+            }
+            
+            f2Select.disabled = false;
+            f2Select.value = "";
+            
+            Array.from(f2Select.options).forEach(opt => {
+                if (opt.value === "") return;
+                
+                const optWeightId = opt.getAttribute('data-weight-id');
+                const isSameWeight = (optWeightId === weightId);
+                const isDifferentFighter = (opt.value !== f1Id);
+                
+                if (isSameWeight && isDifferentFighter) {
+                    opt.classList.remove('d-none');
+                    opt.disabled = false;
+                } else {
+                    opt.classList.add('d-none');
+                    opt.disabled = true;
+                }
+            });
+            
+            f2Select.options[0].textContent = "Select Opponent (" + selectedF1.text.split('(')[1];
+        });
+    }
+});
+</script>
 {% endblock %}

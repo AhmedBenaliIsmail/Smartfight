@@ -3,6 +3,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\FighterRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FighterRepository::class)]
 #[ORM\Table(name: 'fighters')]
@@ -22,11 +23,17 @@ class Fighter
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $nickname = null;
 
-    #[ORM\Column(name: 'weightClass', length: 50, nullable: true)]
-    private ?string $weightClass = null;
+    #[ORM\ManyToOne(targetEntity: WeightDivision::class)]
+    #[ORM\JoinColumn(name: 'weight_division_id', referencedColumnName: 'id', nullable: true)]
+    #[Assert\NotNull(message: 'Weight division is required.')]
+    private ?WeightDivision $weightDivision = null;
 
-    #[ORM\Column(length: 50, nullable: true)]
-    private ?string $country = null;
+    #[ORM\Column(length: 2, nullable: true)]
+    #[Assert\Country(message: 'Invalid country code.')]
+    private ?string $nationality = null;
+
+    #[ORM\Column(name: 'photo_filename', length: 255, nullable: true)]
+    private ?string $photoFilename = null;
 
     #[ORM\Column(type: 'integer', options: ['default' => 0])]
     private int $wins = 0;
@@ -40,8 +47,9 @@ class Fighter
     #[ORM\Column(name: 'koWins', type: 'integer', options: ['default' => 0])]
     private int $koWins = 0;
 
-    #[ORM\Column(name: 'submissionWins', type: 'integer', options: ['default' => 0])]
-    private int $submissionWins = 0;
+    #[ORM\Column(name: 'technical_wins', type: 'integer', options: ['default' => 0])]
+    #[Assert\PositiveOrZero]
+    private int $technicalWins = 0;
 
     #[ORM\Column(name: 'decisionWins', type: 'integer', options: ['default' => 0])]
     private int $decisionWins = 0;
@@ -58,8 +66,9 @@ class Fighter
     #[ORM\Column(name: 'strengthOfSchedule', type: 'float', options: ['default' => 1500.0])]
     private float $strengthOfSchedule = 1500.0;
 
-    #[ORM\Column(name: 'championsEventWinStreak', type: 'integer', options: ['default' => 0])]
-    private int $championsEventWinStreak = 0;
+    #[ORM\Column(name: 'last_fight_date', type: 'date', nullable: true)]
+    #[Assert\LessThanOrEqual('today', message: 'Last fight date cannot be in the future.')]
+    private ?\DateTimeInterface $lastFightDate = null;
 
     #[ORM\Column(name: 'titleDefenses', type: 'integer', options: ['default' => 0])]
     private int $titleDefenses = 0;
@@ -83,11 +92,14 @@ class Fighter
     public function getNickname(): ?string { return $this->nickname; }
     public function setNickname(?string $v): self { $this->nickname = $v; return $this; }
 
-    public function getWeightClass(): ?string { return $this->weightClass; }
-    public function setWeightClass(?string $v): self { $this->weightClass = $v; return $this; }
+    public function getWeightDivision(): ?WeightDivision { return $this->weightDivision; }
+    public function setWeightDivision(?WeightDivision $v): self { $this->weightDivision = $v; return $this; }
 
-    public function getCountry(): ?string { return $this->country; }
-    public function setCountry(?string $v): self { $this->country = $v; return $this; }
+    public function getNationality(): ?string { return $this->nationality; }
+    public function setNationality(?string $v): self { $this->nationality = $v; return $this; }
+
+    public function getPhotoFilename(): ?string { return $this->photoFilename; }
+    public function setPhotoFilename(?string $v): self { $this->photoFilename = $v; return $this; }
 
     public function getWins(): int { return $this->wins; }
     public function setWins(int $v): self { $this->wins = $v; return $this; }
@@ -101,8 +113,8 @@ class Fighter
     public function getKoWins(): int { return $this->koWins; }
     public function setKoWins(int $v): self { $this->koWins = $v; return $this; }
 
-    public function getSubmissionWins(): int { return $this->submissionWins; }
-    public function setSubmissionWins(int $v): self { $this->submissionWins = $v; return $this; }
+    public function getTechnicalWins(): int { return $this->technicalWins; }
+    public function setTechnicalWins(int $v): self { $this->technicalWins = $v; return $this; }
 
     public function getDecisionWins(): int { return $this->decisionWins; }
     public function setDecisionWins(int $v): self { $this->decisionWins = $v; return $this; }
@@ -119,8 +131,8 @@ class Fighter
     public function getStrengthOfSchedule(): float { return $this->strengthOfSchedule; }
     public function setStrengthOfSchedule(float $v): self { $this->strengthOfSchedule = $v; return $this; }
 
-    public function getChampionsEventWinStreak(): int { return $this->championsEventWinStreak; }
-    public function setChampionsEventWinStreak(int $v): self { $this->championsEventWinStreak = $v; return $this; }
+    public function getLastFightDate(): ?\DateTimeInterface { return $this->lastFightDate; }
+    public function setLastFightDate(?\DateTimeInterface $v): self { $this->lastFightDate = $v; return $this; }
 
     public function getTitleDefenses(): int { return $this->titleDefenses; }
     public function setTitleDefenses(int $v): self { $this->titleDefenses = $v; return $this; }
@@ -136,6 +148,6 @@ class Fighter
 
     public function __toString(): string
     {
-        return $this->getFullName() . ' (' . $this->weightClass . ') | ELO: ' . (int)$this->eloRating;
+        return $this->getFullName() . ' (' . ($this->weightDivision ? $this->weightDivision->getName() : 'Unclassified') . ') | ELO: ' . (int)$this->eloRating;
     }
 }

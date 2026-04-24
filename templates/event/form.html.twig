@@ -1,18 +1,18 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ event ? 'Edit' : 'Create' }} Event — SmartFight Admin{% endblock %}
+{% block title %}SmartFight Admin — {{ event ? 'Edit' : 'Create' }} Boxing Event{% endblock %}
 
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
-    <li class="breadcrumb-item"><a href="{{ path('app_events') }}" style="color:#a1a1aa;text-decoration:none;">Events</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_events') }}" style="color:#a1a1aa;text-decoration:none;">Schedule</a></li>
     <li class="breadcrumb-item active">{{ event ? 'Edit' : 'Create' }} Event</li>
 {% endblock %}
 
 {% block content %}
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
-        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">{{ event ? 'Edit' : 'Create' }} Event</h1>
-        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Set up event details</p>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">{{ event ? 'Edit' : 'Create' }} Boxing Event</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Set up card details and sanctioning body</p>
     </div>
     <a href="{{ path('app_events') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
 </div>
@@ -28,15 +28,69 @@
                     <div class="row g-3">
                         <div class="col-md-12">
                             <label class="form-label">Event Name <span style="color:#dc2626;">*</span></label>
-                            <input type="text" name="eventName" class="form-control" placeholder="e.g. UFC 300" value="{{ event ? event.eventName : '' }}" required />
+                            <input type="text" name="eventName" class="form-control" placeholder="e.g. Fury vs Usyk: Ring of Fire" value="{{ event ? event.eventName : '' }}" required />
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Event Date <span style="color:#dc2626;">*</span></label>
-                            <input type="text" name="eventDate" class="form-control datepicker" placeholder="Select date..." value="{{ event and event.eventDate ? event.eventDate|date('Y-m-d') : '' }}" required />
+                            <input type="date" name="eventDate" class="form-control" value="{{ event and event.eventDate ? event.eventDate|date('Y-m-d') : '' }}" required />
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Location</label>
-                            <input type="text" name="location" class="form-control" placeholder="e.g. T-Mobile Arena, Las Vegas" value="{{ event ? event.location : '' }}" />
+                            <label class="form-label">Sanctioning Organization</label>
+                            <select name="organization" class="form-select">
+                                <option value="INDEPENDENT" {{ event and event.organization == 'INDEPENDENT' ? 'selected' : '' }}>Independent / Non-Title</option>
+                                <option value="WBC" {{ event and event.organization == 'WBC' ? 'selected' : '' }}>WBC</option>
+                                <option value="WBA" {{ event and event.organization == 'WBA' ? 'selected' : '' }}>WBA</option>
+                                <option value="IBF" {{ event and event.organization == 'IBF' ? 'selected' : '' }}>IBF</option>
+                                <option value="WBO" {{ event and event.organization == 'WBO' ? 'selected' : '' }}>WBO</option>
+                                <option value="UNDISPUTED" {{ event and event.organization == 'UNDISPUTED' ? 'selected' : '' }}>UNDISPUTED</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">City <span style="color:#dc2626;">*</span></label>
+                            <select id="city-selector" name="city" class="form-select" required>
+                                <option value="">Select City...</option>
+                                <option value="Anaheim, USA" {{ event and event.city == 'Anaheim, USA' ? 'selected' : '' }}>Anaheim, USA</option>
+                                <option value="Antalya, Turkey" {{ event and event.city == 'Antalya, Turkey' ? 'selected' : '' }}>Antalya, Turkey</option>
+                                <option value="Arlington, USA" {{ event and event.city == 'Arlington, USA' ? 'selected' : '' }}>Arlington, USA</option>
+                                <option value="Astana, Kazakhstan" {{ event and event.city == 'Astana, Kazakhstan' ? 'selected' : '' }}>Astana, Kazakhstan</option>
+                                <option value="Atlanta, USA" {{ event and event.city == 'Atlanta, USA' ? 'selected' : '' }}>Atlanta, USA</option>
+                                <option value="Atlantic City, USA" {{ event and event.city == 'Atlantic City, USA' ? 'selected' : '' }}>Atlantic City, USA</option>
+                                <option value="Baku, Azerbaijan" {{ event and event.city == 'Baku, Azerbaijan' ? 'selected' : '' }}>Baku, Azerbaijan</option>
+                                <option value="Bangkok, Thailand" {{ event and event.city == 'Bangkok, Thailand' ? 'selected' : '' }}>Bangkok, Thailand</option>
+                                <option value="Belfast, UK" {{ event and event.city == 'Belfast, UK' ? 'selected' : '' }}>Belfast, UK</option>
+                                <option value="Belgrade, Serbia" {{ event and event.city == 'Belgrade, Serbia' ? 'selected' : '' }}>Belgrade, Serbia</option>
+                                <option value="Berlin, Germany" {{ event and event.city == 'Berlin, Germany' ? 'selected' : '' }}>Berlin, Germany</option>
+                                <option value="Brooklyn, USA" {{ event and event.city == 'Brooklyn, USA' ? 'selected' : '' }}>Brooklyn, USA</option>
+                                <option value="Cardiff, Wales" {{ event and event.city == 'Cardiff, Wales' ? 'selected' : '' }}>Cardiff, Wales</option>
+                                <option value="Chicago, USA" {{ event and event.city == 'Chicago, USA' ? 'selected' : '' }}>Chicago, USA</option>
+                                <option value="Cleveland, USA" {{ event and event.city == 'Cleveland, USA' ? 'selected' : '' }}>Cleveland, USA</option>
+                                <option value="Dallas, USA" {{ event and event.city == 'Dallas, USA' ? 'selected' : '' }}>Dallas, USA</option>
+                                <option value="Doha, Qatar" {{ event and event.city == 'Doha, Qatar' ? 'selected' : '' }}>Doha, Qatar</option>
+                                <option value="London, UK" {{ event and event.city == 'London, UK' ? 'selected' : '' }}>London, UK</option>
+                                <option value="Manchester, UK" {{ event and event.city == 'Manchester, UK' ? 'selected' : '' }}>Manchester, UK</option>
+                                <option value="Glasgow, Scotland" {{ event and event.city == 'Glasgow, Scotland' ? 'selected' : '' }}>Glasgow, Scotland</option>
+                                <option value="Hamburg, Germany" {{ event and event.city == 'Hamburg, Germany' ? 'selected' : '' }}>Hamburg, Germany</option>
+                                <option value="Houston, USA" {{ event and event.city == 'Houston, USA' ? 'selected' : '' }}>Houston, USA</option>
+                                <option value="Istanbul, Turkey" {{ event and event.city == 'Istanbul, Turkey' ? 'selected' : '' }}>Istanbul, Turkey</option>
+                                <option value="Las Vegas, USA" {{ event and event.city == 'Las Vegas, USA' ? 'selected' : '' }}>Las Vegas, USA</option>
+                                <option value="Los Angeles, USA" {{ event and event.city == 'Los Angeles, USA' ? 'selected' : '' }}>Los Angeles, USA</option>
+                                <option value="Miami Gardens, USA" {{ event and event.city == 'Miami Gardens, USA' ? 'selected' : '' }}>Miami Gardens, USA</option>
+                                <option value="Milan, Italy" {{ event and event.city == 'Milan, Italy' ? 'selected' : '' }}>Milan, Italy</option>
+                                <option value="New Delhi, India" {{ event and event.city == 'New Delhi, India' ? 'selected' : '' }}>New Delhi, India</option>
+                                <option value="New York, USA" {{ event and event.city == 'New York, USA' ? 'selected' : '' }}>New York, USA</option>
+                                <option value="Riyadh, Saudi Arabia" {{ event and event.city == 'Riyadh, Saudi Arabia' ? 'selected' : '' }}>Riyadh, Saudi Arabia</option>
+                                <option value="Tokyo, Japan" {{ event and event.city == 'Tokyo, Japan' ? 'selected' : '' }}>Tokyo, Japan</option>
+                                <option value="Tashkent, Uzbekistan" {{ event and event.city == 'Tashkent, Uzbekistan' ? 'selected' : '' }}>Tashkent, Uzbekistan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Venue <span style="color:#dc2626;">*</span></label>
+                            <select id="venue-selector" name="venue" class="form-select" required>
+                                <option value="">Select Venue...</option>
+                                {% if event and event.venue %}
+                                    <option value="{{ event.venue }}" selected>{{ event.venue }}</option>
+                                {% endif %}
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -44,11 +98,73 @@
             
             <div class="card" style="background:#18181b;border:1px solid #27272a;">
                 <div class="card-body p-4">
-                    <button type="submit" class="btn btn-danger w-100 py-2"><i class="fa-solid fa-floppy-disk me-2"></i>Save Event Data</button>
+                    <button type="submit" class="btn btn-danger w-100 py-2"><i class="fa-solid fa-floppy-disk me-2"></i>Save Boxing Event</button>
                     <a href="{{ path('app_events') }}" class="btn w-100 py-2 mt-2" style="background:#27272a;color:#a1a1aa;border:none;">Cancel</a>
                 </div>
             </div>
         </div>
     </div>
 </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const venueData = {
+        "Anaheim, USA": ["Honda Center"],
+        "Antalya, Turkey": ["Antalya Expo Center"],
+        "Arlington, USA": ["AT&T Stadium"],
+        "Astana, Kazakhstan": ["Barys Arena", "Saryarka Velodrome"],
+        "Atlanta, USA": ["Mercedes-Benz Stadium", "State Farm Arena"],
+        "Atlantic City, USA": ["Boardwalk Hall"],
+        "Baku, Azerbaijan": ["Baku Crystal Hall"],
+        "Bangkok, Thailand": ["Rajadamnern Stadium", "Lumpinee Stadium"],
+        "Belfast, UK": ["SSE Arena", "Odyssey Complex"],
+        "Belgrade, Serbia": ["Stark Arena"],
+        "Berlin, Germany": ["Max-Schmeling-Halle"],
+        "Brooklyn, USA": ["Barclays Center"],
+        "Cardiff, Wales": ["Principality Stadium", "Motorpoint Arena"],
+        "Chicago, USA": ["United Center", "UIC Pavilion"],
+        "Cleveland, USA": ["Rocket Mortgage FieldHouse"],
+        "Dallas, USA": ["American Airlines Center"],
+        "Doha, Qatar": ["Lusail Sports Arena"],
+        "London, UK": ["Madison Square Garden", "Wembley Stadium", "O2 Arena", "Copper Box Arena", "York Hall"],
+        "Manchester, UK": ["AO Arena", "Manchester Arena"],
+        "Glasgow, Scotland": ["SSE Hydro"],
+        "Hamburg, Germany": ["Barclaycard Arena"],
+        "Houston, USA": ["Toyota Center", "NRG Stadium"],
+        "Istanbul, Turkey": ["Sinan Erdem Dome"],
+        "Las Vegas, USA": ["MGM Grand Garden Arena", "Mandalay Bay Events Center", "T-Mobile Arena", "Caesars Palace"],
+        "Los Angeles, USA": ["Crypto.com Arena", "Kia Forum", "Staples Center"],
+        "Miami Gardens, USA": ["Hard Rock Stadium"],
+        "Milan, Italy": ["Mediolanum Forum"],
+        "New Delhi, India": ["Indira Gandhi Arena"],
+        "New York, USA": ["Madison Square Garden", "Barclays Center", "Radio City Music Hall"],
+        "Riyadh, Saudi Arabia": ["Kingdom Arena", "Boulevard Hall", "Riyadh International Convention & Exhibition Center"],
+        "Tokyo, Japan": ["Tokyo Dome", "Ariake Arena", "Saitama Super Arena"],
+        "Tashkent, Uzbekistan": ["Humo Arena"]
+    };
+
+    const citySelector = document.getElementById('city-selector');
+    const venueSelector = document.getElementById('venue-selector');
+    const currentVenue = "{{ event ? event.venue : '' }}";
+
+    function updateVenues() {
+        const city = citySelector.value;
+        const venues = venueData[city] || [];
+        
+        venueSelector.innerHTML = '<option value="">Select Venue...</option>';
+        venues.forEach(v => {
+            const opt = document.createElement('option');
+            opt.value = v;
+            opt.textContent = v;
+            if (v === currentVenue) opt.selected = true;
+            venueSelector.appendChild(opt);
+        });
+    }
+
+    citySelector.addEventListener('change', updateVenues);
+    if (citySelector.value) updateVenues();
+});
+</script>
 {% endblock %}
+
+

@@ -12,11 +12,7 @@
     <div>
         <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">{{ title|default('Fight Results') }}</h1>
         <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">
-            {% if isChampionsOnly|default(false) %}
-                Viewing high-stakes outcomes from Elite Champions Events
-            {% else %}
                 Pick an event to manage its fight card and results
-            {% endif %}
         </p>
     </div>
     <div class="d-flex gap-2">
@@ -43,7 +39,7 @@
                         <option value="">All Categories</option>
                         <option value="0">Event Name</option>
                         <option value="1">Date</option>
-                        <option value="2">Location</option>
+                        <option value="2">Venue</option>
                     </select>
                 </div>
                 <div class="col-md-4 text-end">
@@ -61,7 +57,7 @@
             <tr>
                 <th style="padding:.75rem 1.25rem;">Event Name</th>
                 <th style="padding:.75rem 1.25rem;">Date</th>
-                <th style="padding:.75rem 1.25rem;">Location</th>
+                <th style="padding:.75rem 1.25rem;">Venue</th>
                 <th style="padding:.75rem 1.25rem;">Card Status</th>
                 <th style="padding:.75rem 1.25rem;text-align:right;">Actions</th>
             </tr>
@@ -69,15 +65,15 @@
             <tbody>
             {% for event in events %}
                 {% set stats = eventStats[event.eventId] %}
-                <tr style="{% if event.isChampionsEvent %}border-left: 4px solid #c9a227; background: rgba(201,162,39, 0.05);{% endif %}">
+                <tr style="{% if event.organization != 'INDEPENDENT' %}border-left: 4px solid #c9a227; background: rgba(201,162,39, 0.05);{% endif %}">
                     <td style="padding:.75rem 1.25rem;font-weight:600;color:#fafafa;">
                         {{ event.eventName }}
-                        {% if event.isChampionsEvent %}
-                            <span class="badge bg-yellow-lt ms-2" title="Champions Event — Higher Rewards"><i class="fa-solid fa-crown me-1 text-yellow"></i>CHAMPIONS</span>
+                        {% if event.organization != 'INDEPENDENT' %}
+                            <span class="badge bg-yellow-lt ms-2" title="Sanctioned Event"><i class="fa-solid fa-crown me-1 text-yellow"></i>{{ event.organization }}</span>
                         {% endif %}
                     </td>
                     <td style="padding:.75rem 1.25rem;color:#a1a1aa;">{{ event.eventDate|date('M d, Y') }}</td>
-                    <td style="padding:.75rem 1.25rem;color:#a1a1aa;">{{ event.location }}</td>
+                    <td style="padding:.75rem 1.25rem;color:#a1a1aa;">{{ event.venue }}, {{ event.city }}</td>
                     <td style="padding:.75rem 1.25rem;">
                         {% if stats.total == 0 %}
                             <span class="badge bg-secondary-lt">No Fights Scheduled</span>

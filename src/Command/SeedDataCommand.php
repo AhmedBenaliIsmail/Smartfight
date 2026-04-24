@@ -5,6 +5,7 @@ use App\Entity\Event;
 use App\Entity\Fighter;
 use App\Entity\FightResult;
 use App\Entity\FightStatistic;
+use App\Entity\WeightDivision;
 use App\Repository\EventRepository;
 use App\Repository\FighterRepository;
 use App\Repository\FightResultRepository;
@@ -19,7 +20,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'app:seed',
-    description: 'Seeds the database with realistic MMA data, physical attributes, unique events, and detailed statistics.',
+    description: 'Seeds the database with professional boxing data, weight divisions, real venues, and CompuBox statistics.',
 )]
 class SeedDataCommand extends Command
 {
@@ -34,30 +35,34 @@ class SeedDataCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $io->title('MMA System Data Seeding — Pro Edition');
+        $io->title('Boxing System Data Seeding — Pro Edition');
 
         // 1. Truncate Tables
         $io->section('Cleaning existing data...');
-        $this->truncateTables(['ranking', 'performance_score', 'fight_statistic', 'fight_results', 'events', 'fighters']);
+        $this->truncateTables(['ranking', 'performance_score', 'fight_statistic', 'fight_results', 'events', 'fighters', 'weight_division']);
 
-        // 2. Seed Fighters
-        $io->section('Seeding elite fighters with physical attributes...');
-        $fighters = $this->createFighters();
+        // 2. Seed Weight Divisions
+        $io->section('Creating standard 17 boxing weight divisions...');
+        $divisions = $this->createWeightDivisions();
+
+        // 3. Seed Fighters
+        $io->section('Seeding elite boxers...');
+        $fighters = $this->createFighters($divisions);
         
-        // 3. Seed Events
-        $io->section('Seeding unique events (Event 1, 2, 3, etc.)...');
+        // 4. Seed Events
+        $io->section('Seeding real-world boxing events and venues...');
         $events = $this->createEvents();
 
-        // 4. Seed Fights
-        $io->section('Populating fight history and real-world statistics...');
+        // 5. Seed Fights
+        $io->section('Populating fight history and CompuBox statistics...');
         $this->createFights($fighters, $events);
 
-        // 5. Final Recalculation
-        $io->section('Recalculating Global Rankings & Elo...');
+        // 6. Final Recalculation
+        $io->section('Recalculating Global Rankings & Boxing Points...');
         $this->rankingService->recomputeAllRankings();
         $this->analyticsEngine->recalculateAll();
 
-        $io->success('Database seeded successfully with unique events, physical stats, and a DQ penalty example!');
+        $io->success('Database seeded successfully with boxing events, weight divisions, and CompuBox stats!');
 
         return Command::SUCCESS;
     }
@@ -72,22 +77,55 @@ class SeedDataCommand extends Command
         $conn->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
     }
 
-    private function createFighters(): array
+    private function createWeightDivisions(): array
     {
-        // [First, Last, Nick, WC, Country, W, L, D, ELO, Ht, Reach]
+        $divs = [
+            ['Heavyweight', 999, 'heavyweight'],
+            ['Cruiserweight', 200, 'cruiserweight'],
+            ['Light Heavyweight', 175, 'light-heavyweight'],
+            ['Super Middleweight', 168, 'super-middleweight'],
+            ['Middleweight', 160, 'middleweight'],
+            ['Super Welterweight', 154, 'super-welterweight'],
+            ['Welterweight', 147, 'welterweight'],
+            ['Super Lightweight', 140, 'super-lightweight'],
+            ['Lightweight', 135, 'lightweight'],
+            ['Super Featherweight', 130, 'super-featherweight'],
+            ['Featherweight', 126, 'featherweight'],
+            ['Super Bantamweight', 122, 'super-bantamweight'],
+            ['Bantamweight', 118, 'bantamweight'],
+            ['Super Flyweight', 115, 'super-flyweight'],
+            ['Flyweight', 112, 'flyweight'],
+            ['Light Flyweight', 108, 'light-flyweight'],
+            ['Minimumweight', 105, 'minimumweight'],
+        ];
+
+        $divisions = [];
+        foreach ($divs as $d) {
+            $wd = new WeightDivision();
+            $wd->setName($d[0]);
+            $wd->setMaxWeightLbs($d[1]);
+            $wd->setSlug($d[2]);
+            $this->em->persist($wd);
+            $divisions[$d[0]] = $wd;
+        }
+        $this->em->flush();
+        return $divisions;
+    }
+
+    private function createFighters(array $divisions): array
+    {
+        // [First, Last, Nick, WC, Nat, W, L, D, ELO, Ht, Reach]
         $data = [
-            ['Jon', 'Jones', 'Bones', 'Heavyweight', 'USA', 27, 1, 0, 1950, 193, 215],
-            ['Francis', 'Ngannou', 'The Predator', 'Heavyweight', 'Cameroon', 17, 3, 0, 1880, 193, 211],
-            ['Israel', 'Adesanya', 'The Last Stylebender', 'Middleweight', 'Nigeria', 24, 3, 0, 1820, 193, 203],
-            ['Alex', 'Pereira', 'Poatan', 'Middleweight', 'Brazil', 10, 2, 0, 1850, 193, 200],
-            ['Islam', 'Makhachev', '', 'Lightweight', 'Russia', 25, 1, 0, 1920, 178, 179],
-            ['Khabib', 'Nurmagomedov', 'The Eagle', 'Lightweight', 'Russia', 29, 0, 0, 2000, 178, 178],
-            ['Leon', 'Edwards', 'Rocky', 'Welterweight', 'UK', 22, 3, 0, 1840, 183, 188],
-            ['Kamaru', 'Usman', 'The Nigerian Nightmare', 'Welterweight', 'Nigeria', 20, 4, 0, 1780, 183, 193],
-            ['Alexander', 'Volkanovski', 'The Great', 'Featherweight', 'Australia', 26, 4, 0, 1860, 168, 182],
-            ['Max', 'Holloway', 'Blessed', 'Featherweight', 'USA', 26, 7, 0, 1790, 180, 175],
-            ['Aljamain', 'Sterling', 'Funk Master', 'Bantamweight', 'USA', 23, 4, 0, 1720, 170, 180],
-            ['Sean', 'O\'Malley', 'Suga', 'Bantamweight', 'USA', 18, 1, 0, 1750, 180, 183],
+            ['Tyson', 'Fury', 'The Gypsy King', 'Heavyweight', 'GB', 34, 1, 1, 1950, 206, 216],
+            ['Oleksandr', 'Usyk', 'The Cat', 'Heavyweight', 'UA', 22, 0, 0, 2000, 191, 198],
+            ['Anthony', 'Joshua', 'AJ', 'Heavyweight', 'GB', 28, 3, 0, 1880, 198, 208],
+            ['Canelo', 'Alvarez', 'Canelo', 'Super Middleweight', 'MX', 60, 2, 2, 1980, 173, 179],
+            ['David', 'Benavidez', 'The Mexican Monster', 'Super Middleweight', 'US', 28, 0, 0, 1850, 188, 189],
+            ['Terence', 'Crawford', 'Bud', 'Welterweight', 'US', 40, 0, 0, 2050, 173, 188],
+            ['Errol', 'Spence Jr.', 'The Truth', 'Welterweight', 'US', 28, 1, 0, 1860, 177, 183],
+            ['Gervonta', 'Davis', 'Tank', 'Lightweight', 'US', 29, 0, 0, 1900, 166, 171],
+            ['Devin', 'Haney', 'The Dream', 'Super Lightweight', 'US', 31, 0, 0, 1850, 173, 180],
+            ['Naoya', 'Inoue', 'The Monster', 'Super Bantamweight', 'JP', 26, 0, 0, 2020, 165, 171],
         ];
 
         $fighters = [];
@@ -96,14 +134,15 @@ class SeedDataCommand extends Command
             $entity->setFirstName($f[0]);
             $entity->setLastName($f[1]);
             $entity->setNickname($f[2]);
-            $entity->setWeightClass($f[3]);
-            $entity->setCountry($f[4]);
+            $entity->setWeightDivision($divisions[$f[3]]);
+            $entity->setNationality($f[4]);
             $entity->setWins($f[5]);
             $entity->setLosses($f[6]);
             $entity->setDraws($f[7]);
             $entity->setEloRating($f[8]);
             $entity->setHeight($f[9]);
             $entity->setReach($f[10]);
+            $entity->setLastFightDate(new \DateTime('-2 months'));
             $this->em->persist($entity);
             $fighters[$f[0] . ' ' . $f[1]] = $entity;
         }
@@ -114,19 +153,27 @@ class SeedDataCommand extends Command
     private function createEvents(): array
     {
         $events = [];
-        $eventNames = ['Event 1', 'Event 2', 'Event 3', 'Event 100', 'Event 500'];
-        $dates = ['-10 months', '-8 months', '-5 months', '-2 months', '-1 month'];
-        $locations = ['Las Vegas, NV', 'London, UK', 'Abu Dhabi, UAE', 'Paris, France', 'Rio, Brazil'];
+        // Name, Org, Date, Venue, City, Country, Seats
+        $data = [
+            ['Fury vs Usyk', 'UNDISPUTED', '-1 month', 'Kingdom Arena', 'Riyadh', 'SA', 20000],
+            ['Canelo vs Benavidez', 'WBC', '-3 months', 'T-Mobile Arena', 'Las Vegas', 'US', 20000],
+            ['Crawford vs Spence', 'UNDISPUTED', '-8 months', 'T-Mobile Arena', 'Las Vegas', 'US', 20000],
+            ['Joshua vs Ngannou', 'INDEPENDENT', '-2 months', 'Kingdom Arena', 'Riyadh', 'SA', 20000],
+            ['Inoue vs Nery', 'UNDISPUTED', '-15 days', 'Tokyo Dome', 'Tokyo', 'JP', 55000],
+        ];
 
-        foreach ($eventNames as $i => $name) {
+        foreach ($data as $i => $d) {
             $e = new Event();
-            $e->setEventName($name);
-            $e->setEventDate(new \DateTime($dates[$i]));
-            $e->setLocation($locations[$i]);
-            // Make Event 100 and 500 Champions Events
-            $e->setIsChampionsEvent(in_array($name, ['Event 100', 'Event 500']));
+            $e->setEventName($d[0]);
+            $e->setOrganization($d[1]);
+            $e->setEventDate(new \DateTime($d[2]));
+            $e->setVenue($d[3]);
+            $e->setCity($d[4]);
+            $e->setCountry($d[5]);
+            $e->setSeatCapacity($d[6]);
+            $e->setStatus('COMPLETED');
             $this->em->persist($e);
-            $events[$name] = $e;
+            $events[$d[0]] = $e;
         }
 
         $this->em->flush();
@@ -135,76 +182,89 @@ class SeedDataCommand extends Command
 
     private function createFights(array $f, array $e): void
     {
-        // Event 1 (Regular)
-        $this->addResolvedFight($e['Event 1'], 1, $f['Khabib Nurmagomedov'], $f['Aljamain Sterling'], $f['Khabib Nurmagomedov'], 'SUBMISSION', 2, [
-            'f1' => ['sl' => 45, 'st' => 60, 'tdl' => 4, 'tda' => 6, 'ct' => 420],
-            'f2' => ['sl' => 22, 'st' => 50, 'tdl' => 0, 'tda' => 1, 'ct' => 30]
-        ]);
+        // Usyk beats Fury by Split Decision
+        $this->addResolvedFight(
+            $e['Fury vs Usyk'], 1, $f['Tyson Fury'], $f['Oleksandr Usyk'], $f['Oleksandr Usyk'], 
+            FightResult::METHOD_DECISION, 12, 'SD', 9, 12, true, 'UNDISPUTED',
+            [
+                'f1' => ['pl' => 157, 'pt' => 496, 'bpl' => 30, 'jl' => 45, 'jt' => 200, 'ppl' => 112, 'ppt' => 296, 'kd' => 0],
+                'f2' => ['pl' => 170, 'pt' => 407, 'bpl' => 42, 'jl' => 48, 'jt' => 210, 'ppl' => 122, 'ppt' => 197, 'kd' => 1]
+            ]
+        );
 
-        // Event 2 (Regular) - DQ Loss Example
-        // Aljamain wins by DQ against Petr Yan (proxying here)
-        $this->addResolvedFight($e['Event 2'], 1, $f['Aljamain Sterling'], $f['Sean O\'Malley'], $f['Aljamain Sterling'], 'DISQUALIFICATION', 4, [
-            'f1' => ['sl' => 35, 'st' => 100, 'tdl' => 1, 'tda' => 8, 'ct' => 120, 'kd' => 0],
-            'f2' => ['sl' => 78, 'st' => 120, 'tdl' => 0, 'tda' => 0, 'ct' => 10, 'kd' => 1] // Sean was winning but got DQ'd
-        ]);
-
-        // Event 100 (Champions Event)
-        $this->addResolvedFight($e['Event 100'], 1, $f['Jon Jones'], $f['Francis Ngannou'], $f['Jon Jones'], 'DECISION', 5, [
-            'f1' => ['sl' => 110, 'st' => 200, 'tdl' => 3, 'tda' => 7, 'ct' => 600, 'kd' => 0],
-            'f2' => ['sl' => 85, 'st' => 180, 'tdl' => 0, 'tda' => 1, 'ct' => 40, 'kd' => 1]
-        ]);
-
-        // Event 500 (Champions Event)
-        $this->addResolvedFight($e['Event 500'], 1, $f['Alex Pereira'], $f['Israel Adesanya'], $f['Alex Pereira'], 'KO/TKO', 2, [
-            'f1' => ['sl' => 42, 'st' => 90, 'tdl' => 0, 'tda' => 0, 'ct' => 15, 'kd' => 1],
-            'f2' => ['sl' => 38, 'st' => 85, 'tdl' => 1, 'tda' => 2, 'ct' => 180, 'kd' => 0]
-        ]);
+        // Crawford beats Spence by TKO
+        $this->addResolvedFight(
+            $e['Crawford vs Spence'], 1, $f['Terence Crawford'], $f['Errol Spence Jr.'], $f['Terence Crawford'], 
+            FightResult::METHOD_KO, 9, null, 9, 12, true, 'UNDISPUTED',
+            [
+                'f1' => ['pl' => 185, 'pt' => 369, 'bpl' => 20, 'jl' => 87, 'jt' => 200, 'ppl' => 98, 'ppt' => 169, 'kd' => 3],
+                'f2' => ['pl' => 96, 'pt' => 480, 'bpl' => 25, 'jl' => 33, 'jt' => 200, 'ppl' => 63, 'ppt' => 280, 'kd' => 0]
+            ]
+        );
         
-        $this->addResolvedFight($e['Event 500'], 2, $f['Islam Makhachev'], $f['Leon Edwards'], $f['Islam Makhachev'], 'DECISION', 5, [
-            'f1' => ['sl' => 75, 'st' => 140, 'tdl' => 6, 'tda' => 10, 'ct' => 800],
-            'f2' => ['sl' => 92, 'st' => 150, 'tdl' => 0, 'tda' => 1, 'ct' => 60]
-        ]);
+        // Canelo beats Benavidez by UD
+        $this->addResolvedFight(
+            $e['Canelo vs Benavidez'], 1, $f['Canelo Alvarez'], $f['David Benavidez'], $f['Canelo Alvarez'], 
+            FightResult::METHOD_DECISION, 12, 'UD', null, 12, true, 'WBC',
+            [
+                'f1' => ['pl' => 234, 'pt' => 500, 'bpl' => 60, 'jl' => 50, 'jt' => 150, 'ppl' => 184, 'ppt' => 350, 'kd' => 0],
+                'f2' => ['pl' => 190, 'pt' => 600, 'bpl' => 40, 'jl' => 80, 'jt' => 300, 'ppl' => 110, 'ppt' => 300, 'kd' => 0]
+            ]
+        );
     }
 
-    private function addResolvedFight(Event $event, int $num, Fighter $f1, Fighter $f2, ?Fighter $winner, string $method, int $round, array $stats): void
-    {
+    private function addResolvedFight(
+        Event $event, int $num, Fighter $f1, Fighter $f2, ?Fighter $winner, 
+        string $method, int $round, ?string $decisionType, ?int $kdRound, int $scheduledRounds, 
+        bool $isBeltFight, ?string $beltOrg, array $stats
+    ): void {
         $fr = new FightResult();
-        $fr->setEventId($event->getEventId());
+        $fr->setEvent($event);
         $fr->setFightNumber($num);
-        $fr->setFighter1Id($f1->getFighterId());
-        $fr->setFighter2Id($f2->getFighterId());
-        $fr->setWinnerId($winner ? $winner->getFighterId() : null);
+        $fr->setFighter1($f1);
+        $fr->setFighter2($f2);
+        $fr->setWinner($winner);
         $fr->setMethodOfVictory($method);
         $fr->setRoundNumber($round);
+        $fr->setDecisionType($decisionType);
+        $fr->setKnockdownRound($kdRound);
+        $fr->setScheduledRounds($scheduledRounds);
+        $fr->setIsBeltFight($isBeltFight);
+        $fr->setBeltOrganization($beltOrg);
         $fr->setFightDate($event->getEventDate());
         $fr->setStatus('COMPLETED');
         $this->em->persist($fr);
-        $this->em->flush();
 
         // Stats F1
-        $s1 = new FightStatistic();
-        $s1->setFightResultId($fr->getResultId());
-        $s1->setFighterId($f1->getFighterId());
-        $s1->setStrikesLanded($stats['f1']['sl']);
-        $s1->setStrikesThrown($stats['f1']['st']);
-        $s1->setTakedowns($stats['f1']['tdl']);
-        $s1->setTakedownAttempts($stats['f1']['tda']);
-        $s1->setKnockdowns($stats['f1']['kd'] ?? 0);
-        $s1->setControlTimeSeconds($stats['f1']['ct']);
-        $this->em->persist($s1);
-
+        $this->createTotalStats($fr, $f1, $stats['f1']);
+        
         // Stats F2
-        $s2 = new FightStatistic();
-        $s2->setFightResultId($fr->getResultId());
-        $s2->setFighterId($f2->getFighterId());
-        $s2->setStrikesLanded($stats['f2']['sl']);
-        $s2->setStrikesThrown($stats['f2']['st']);
-        $s2->setTakedowns($stats['f2']['tdl']);
-        $s2->setTakedownAttempts($stats['f2']['tda']);
-        $s2->setKnockdowns($stats['f2']['kd'] ?? 0);
-        $s2->setControlTimeSeconds($stats['f2']['ct']);
-        $this->em->persist($s2);
+        $this->createTotalStats($fr, $f2, $stats['f2']);
         
         $this->em->flush();
     }
+
+    private function createTotalStats(FightResult $fr, Fighter $fighter, array $s): void
+    {
+        $stat = new FightStatistic();
+        $stat->setFightResult($fr);
+        $stat->setFighter($fighter);
+        $stat->setRound(null); // NULL implies total fight stats
+
+        $stat->setPunchesLanded($s['pl']);
+        $stat->setPunchesThrown($s['pt']);
+        $stat->setBodyShotsLanded($s['bpl']);
+        
+        $stat->setJabsLanded($s['jl']);
+        $stat->setJabsThrown($s['jt']);
+
+        $stat->setPowerPunchesLanded($s['ppl']);
+        $stat->setPowerPunchesThrown($s['ppt']);
+
+        $stat->setKnockdowns($s['kd']);
+
+        $this->em->persist($stat);
+    }
+
 }
+

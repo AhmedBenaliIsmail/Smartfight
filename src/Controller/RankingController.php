@@ -22,11 +22,11 @@ class RankingController extends AbstractController
             $fighters = array_values($fighters);
         }
 
-        // Group by weight class
+        // Group by weight division
         $groupedRankings = [];
         foreach ($fighters as $f) {
-            $wc = $f->getWeightClass() ?: 'Unclassified';
-            $groupedRankings[$wc][] = $f;
+            $wd = $f->getWeightDivision() ? $f->getWeightDivision()->getName() : 'Unclassified';
+            $groupedRankings[$wd][] = $f;
         }
 
         return $this->render('ranking/index.html.twig', [
@@ -40,7 +40,7 @@ class RankingController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $rankingService->recomputeAllRankings();
-        $this->addFlash('success', 'All rankings recalculated from fight results!');
+        $this->addFlash('success', 'Global boxing rankings recalculated from match results!');
         return $this->redirectToRoute('app_rankings');
     }
 
@@ -51,10 +51,11 @@ class RankingController extends AbstractController
         $fighters = $rankingService->getRankedFighters();
         $response = new StreamedResponse(function() use ($fighters) {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['Rank','Fighter','Weight','ELO','Performance','Streak','SOS','Wins','Losses']);
+            fputcsv($out, ['Rank','Boxer','Division','ELO','Performance','Streak','SOS','Wins','Losses']);
             foreach ($fighters as $i => $f) {
                 fputcsv($out, [
-                    $i + 1, $f->getFullName(), $f->getWeightClass() ?? '',
+                    $i + 1, $f->getFullName(), 
+                    $f->getWeightDivision() ? $f->getWeightDivision()->getName() : 'N/A',
                     (int)$f->getEloRating(), (int)$f->getPerformanceScore(),
                     $f->getWinStreak(), (int)$f->getStrengthOfSchedule(),
                     $f->getWins(), $f->getLosses(),
@@ -63,7 +64,8 @@ class RankingController extends AbstractController
             fclose($out);
         });
         $response->headers->set('Content-Type', 'text/csv');
-        $response->headers->set('Content-Disposition', 'attachment; filename="rankings.csv"');
+        $response->headers->set('Content-Disposition', 'attachment; filename="boxing_rankings.csv"');
         return $response;
     }
 }
+

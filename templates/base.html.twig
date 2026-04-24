@@ -22,7 +22,7 @@
             <!-- Logo -->
             <div class="p-3 border-bottom" style="border-color:#27272a!important">
                 <a href="{{ path('app_dashboard') }}" class="smartfight-logo">
-                    <div class="logo-icon"><i class="fa-solid fa-fist-raised"></i></div>
+                    <div class="logo-icon"><i class="fa-solid fa-mitten"></i></div>
                     <div class="logo-text">Smart<span>Fight</span></div>
                 </a>
             </div>
@@ -45,8 +45,8 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_fighter' %}active{% endif %}" href="{{ path('app_fighters') }}">
-                            <span class="nav-link-icon"><i class="fa-solid fa-boxing-glove fa-fw"></i></span>
-                            <span class="nav-link-title">Fighters</span>
+                            <span class="nav-link-icon"><i class="fa-solid fa-mitten fa-fw"></i></span>
+                            <span class="nav-link-title">Boxers</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -66,7 +66,7 @@
                     <li class="nav-item">
                         <a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_result' %}active{% endif %}" href="{{ path('app_results') }}">
                             <span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span>
-                            <span class="nav-link-title">Fight Results</span>
+                            <span class="nav-link-title">Bout Results</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -78,19 +78,37 @@
                     <li class="nav-item">
                         <a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_performance' %}active{% endif %}" href="{{ path('app_performance') }}">
                             <span class="nav-link-icon"><i class="fa-solid fa-bolt fa-fw"></i></span>
-                            <span class="nav-link-title">Performance Scores</span>
+                            <span class="nav-link-title">Performance</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_ranking' %}active{% endif %}" href="{{ path('app_rankings') }}">
                             <span class="nav-link-icon"><i class="fa-solid fa-list-ol fa-fw"></i></span>
-                            <span class="nav-link-title">Rankings</span>
+                            <span class="nav-link-title">World Rankings</span>
                         </a>
                     </li>
+                    {% if is_granted('ROLE_USER') and not is_granted('ROLE_ADMIN') %}
+                    <li class="navbar-vertical-section">Fantasy League</li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_prediction' %}active{% endif %}" href="{{ path('app_predictions') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-crystal-ball fa-fw" style="color:#60a5fa;"></i></span>
+                            <span class="nav-link-title">Predictions</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if is_granted('ROLE_USER') %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') == 'app_leaderboard' %}active{% endif %}" href="{{ path('app_leaderboard') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-medal fa-fw" style="color:#fbbf24;"></i></span>
+                            <span class="nav-link-title">Leaderboard</span>
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
             </nav>
         </div>
     </aside>
+
 
     <!-- ── Main content ─────────────────────────────────────────── -->
     <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
@@ -107,6 +125,13 @@
             </div>
             <div class="d-flex align-items-center gap-3">
                 {% if app.user %}
+                    {{ render(controller('App\\Controller\\NotificationController::list')) }}
+                    
+                    {% if not is_granted('ROLE_ADMIN') %}
+                    <div class="d-none d-md-flex align-items-center gap-2 me-2">
+                        <span class="badge bg-blue-lt" title="Fantasy Points"><i class="fa-solid fa-star me-1 text-blue"></i>{{ app.user.predictionPoints|default(0) }} PTS</span>
+                    </div>
+                    {% endif %}
                 <div class="dropdown">
                     <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
                         <div class="avatar avatar-sm" style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">

@@ -6,7 +6,7 @@ use App\Repository\FightStatisticRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * FightStatisticService — port of Java FightStatisticService.java
+ * FightStatisticService — Remodeled for Boxing
  */
 class FightStatisticService
 {
@@ -26,8 +26,9 @@ class FightStatisticService
         $this->validate($stat);
         $this->em->persist($stat);
         $this->em->flush();
-        // Auto-recalculate performance after adding stats
-        $this->analyticsEngine->calculatePerformanceScore($stat->getFighterId());
+        
+        $fid = $stat->getFighter() ? $stat->getFighter()->getFighterId() : null;
+        if ($fid) $this->analyticsEngine->calculatePerformanceScore($fid);
         return true;
     }
 
@@ -36,7 +37,9 @@ class FightStatisticService
         $this->validate($stat);
         $this->em->persist($stat);
         $this->em->flush();
-        $this->analyticsEngine->calculatePerformanceScore($stat->getFighterId());
+        
+        $fid = $stat->getFighter() ? $stat->getFighter()->getFighterId() : null;
+        if ($fid) $this->analyticsEngine->calculatePerformanceScore($fid);
         return true;
     }
 
@@ -44,10 +47,11 @@ class FightStatisticService
     {
         $stat = $this->statRepo->find($id);
         if (!$stat) return false;
-        $fighterId = $stat->getFighterId();
+        
+        $fid = $stat->getFighter() ? $stat->getFighter()->getFighterId() : null;
         $this->em->remove($stat);
         $this->em->flush();
-        $this->analyticsEngine->calculatePerformanceScore($fighterId);
+        if ($fid) $this->analyticsEngine->calculatePerformanceScore($fid);
         return true;
     }
 
@@ -58,17 +62,18 @@ class FightStatisticService
 
     private function validate(FightStatistic $stat): void
     {
-        if ($stat->getStrikesLanded() < 0 || $stat->getStrikesThrown() < 0) {
-            throw new \RuntimeException('Strike values cannot be negative.');
+        if ($stat->getPunchesLanded() < 0 || $stat->getPunchesThrown() < 0) {
+            throw new \RuntimeException('Punch values cannot be negative.');
         }
-        if ($stat->getStrikesLanded() > $stat->getStrikesThrown()) {
-            throw new \RuntimeException('Strikes landed cannot exceed strikes thrown.');
+        if ($stat->getPunchesLanded() > $stat->getPunchesThrown()) {
+            throw new \RuntimeException('Punches landed cannot exceed thrown.');
         }
-        if ($stat->getTakedowns() < 0 || $stat->getTakedownAttempts() < 0) {
-            throw new \RuntimeException('Takedown values cannot be negative.');
+        if ($stat->getPowerPunchesLanded() > $stat->getPowerPunchesThrown()) {
+            throw new \RuntimeException('Power punches landed cannot exceed thrown.');
         }
-        if ($stat->getTakedowns() > $stat->getTakedownAttempts()) {
-            throw new \RuntimeException('Takedowns landed cannot exceed attempts.');
+        if ($stat->getJabAccuracy() > 100) {
+            throw new \RuntimeException('Jab accuracy error.');
         }
     }
 }
+

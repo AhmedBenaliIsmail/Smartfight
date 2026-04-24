@@ -13,8 +13,9 @@ class PerformanceScore
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'fighter_id')]
-    private ?int $fighterId = null;
+    #[ORM\ManyToOne(targetEntity: Fighter::class)]
+    #[ORM\JoinColumn(name: "fighter_id", referencedColumnName: "fighterId", nullable: false)]
+    private ?Fighter $fighter = null;
 
     #[ORM\Column(type: 'float', options: ['default' => 0])]
     private float $score = 0;
@@ -36,8 +37,8 @@ class PerformanceScore
 
     public function getId(): ?int { return $this->id; }
     public function setId(int $v): self { $this->id = $v; return $this; }
-    public function getFighterId(): ?int { return $this->fighterId; }
-    public function setFighterId(int $v): self { $this->fighterId = $v; return $this; }
+    public function getFighter(): ?Fighter { return $this->fighter; }
+    public function setFighter(Fighter $v): self { $this->fighter = $v; return $this; }
     public function getScore(): float { return $this->score; }
     public function setScore(float $v): self { $this->score = $v; return $this; }
     public function getAggression(): ?float { return $this->aggression; }

@@ -11,29 +11,24 @@
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
         <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Dashboard</h1>
-        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Welcome back, {{ app.user ? app.user.username : 'Admin' }}. Here's what's happening.</p>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Welcome back, {{ app.user ? app.user.username : 'Admin' }}. Professional Boxing Admin Suite.</p>
     </div>
     <div class="d-flex gap-2">
         <a href="{{ path('app_fighters') }}" class="btn btn-sm btn-outline-danger">
-            <i class="fa-solid fa-boxing-glove me-2"></i>Fighters
+            <i class="fa-solid fa-mitten me-2"></i>Boxers
         </a>
         <a href="{{ path('app_events') }}" class="btn btn-sm btn-outline-danger">
             <i class="fa-solid fa-calendar-days me-2"></i>Events
         </a>
         <a href="{{ path('app_results_champions') }}" class="btn btn-sm" style="background:rgba(201,139,39,0.15);color:#c98b27;border:1px solid rgba(201,139,39,0.3);">
-            <i class="fa-solid fa-trophy me-2"></i>Champions Results
+            <i class="fa-solid fa-trophy me-2"></i>Championship Bouts
         </a>
-        {% if not is_granted('ROLE_ADMIN') %}
-        <a href="{{ path('app_users') }}" class="btn btn-sm btn-danger">
-            <i class="fa-solid fa-user me-2"></i>My Profile
-        </a>
-        {% endif %}
     </div>
 </div>
 
 <!-- Stat Cards Row -->
 <div class="row g-3 mb-4">
-    <!-- Total Fighters -->
+    <!-- Total Boxers -->
     <div class="col-sm-6 col-xl-3">
         <div class="stat-card">
             <div class="d-flex align-items-start justify-content-between mb-3">
@@ -42,7 +37,7 @@
                 </div>
             </div>
             <div class="stat-value">{{ totalFighters }}</div>
-            <div class="stat-label">Total Fighters</div>
+            <div class="stat-label">Total Boxers</div>
         </div>
     </div>
 
@@ -57,11 +52,11 @@
             </div>
             <div class="stat-value">{{ totalEvents }}</div>
             <div class="stat-label">Total Events</div>
-            <div class="stat-change mt-2" style="color:#a1a1aa;">{{ upcomingEvents|length }} events upcoming</div>
+            <div class="stat-change mt-2" style="color:#a1a1aa;">{{ upcomingEvents|length }} upcoming cards</div>
         </div>
     </div>
 
-    <!-- Total Fights -->
+    <!-- Total Bouts -->
     <div class="col-sm-6 col-xl-3">
         <div class="stat-card">
             <div class="d-flex align-items-start justify-content-between mb-3">
@@ -70,11 +65,11 @@
                 </div>
             </div>
             <div class="stat-value">{{ totalFights }}</div>
-            <div class="stat-label">Total Fights Processed</div>
+            <div class="stat-label">Total Bouts Processed</div>
         </div>
     </div>
 
-    <!-- Number of KOs -->
+    <!-- Total KOs -->
     <div class="col-sm-6 col-xl-3">
         <div class="stat-card">
             <div class="d-flex align-items-start justify-content-between mb-3">
@@ -83,18 +78,18 @@
                 </div>
             </div>
             <div class="stat-value">{{ koCount }}</div>
-            <div class="stat-label">Total KOs</div>
+            <div class="stat-label">Total KOs/TKOs</div>
         </div>
     </div>
 </div>
 
 <div class="row g-3">
-    <!-- Recent Fighters -->
+    <!-- Recent Boxers -->
     <div class="col-lg-6">
         <div class="card" style="background:#18181b;border:1px solid #27272a;">
             <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;display:flex;align-items:center;justify-content:space-between;">
                 <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;">
-                    <i class="fa-solid fa-boxing-glove me-2" style="color:#22c55e;"></i>Recent Fighters
+                    <i class="fa-solid fa-mitten me-2" style="color:#22c55e;"></i>Recent Boxers
                 </h3>
                 <a href="{{ path('app_fighters') }}" style="font-size:.75rem;color:#dc2626;text-decoration:none;">View all →</a>
             </div>
@@ -103,7 +98,7 @@
                     <thead>
                     <tr>
                         <th style="padding:.75rem 1.25rem;">Name</th>
-                        <th>Weight Class</th>
+                        <th>Division</th>
                         <th>ELO</th>
                         <th>Record</th>
                     </tr>
@@ -112,7 +107,7 @@
                     {% for fighter in fighters|slice(0, 5) %}
                     <tr>
                         <td style="padding:.75rem 1.25rem;font-size:.875rem;">{{ fighter.fullName }}</td>
-                        <td style="font-size:.875rem;"><span class="badge" style="background:rgba(59,130,246,.1);color:#60a5fa;border:1px solid rgba(59,130,246,.2);font-size:.75rem;">{{ fighter.weightClass }}</span></td>
+                        <td style="font-size:.875rem;"><span class="badge" style="background:rgba(59,130,246,.1);color:#60a5fa;border:1px solid rgba(59,130,246,.2);font-size:.75rem;">{{ fighter.weightDivision ? fighter.weightDivision.name : 'Unknown' }}</span></td>
                         <td>{{ fighter.eloRating|round }}</td>
                         <td style="font-size:.8rem;color:#a1a1aa;">
                             <span style="color:#22c55e;font-weight:700">{{ fighter.wins }}W</span>
@@ -120,7 +115,7 @@
                         </td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="4" class="text-center">No fighters found.</td></tr>
+                    <tr><td colspan="4" class="text-center">No boxers found.</td></tr>
                     {% endfor %}
                     </tbody>
                 </table>
@@ -128,12 +123,12 @@
         </div>
     </div>
 
-    <!-- Recent Fight Results -->
+    <!-- Recent Bout Results -->
     <div class="col-lg-6">
         <div class="card" style="background:#18181b;border:1px solid #27272a;">
             <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;display:flex;align-items:center;justify-content:space-between;">
                 <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;">
-                    <i class="fa-solid fa-trophy me-2" style="color:#c9a227;"></i>Recent Fight Results
+                    <i class="fa-solid fa-trophy me-2" style="color:#c9a227;"></i>Recent Bout Results
                 </h3>
                 <a href="{{ path('app_results') }}" style="font-size:.75rem;color:#dc2626;text-decoration:none;">View all →</a>
             </div>
@@ -141,7 +136,7 @@
                 <table class="table table-hover mb-0">
                     <thead>
                     <tr>
-                        <th style="padding:.75rem 1.25rem;">Fight</th>
+                        <th style="padding:.75rem 1.25rem;">Bout</th>
                         <th>Winner</th>
                         <th>Method</th>
                         <th>Status</th>
@@ -151,11 +146,11 @@
                     {% for fight in recentResults|slice(0, 5) %}
                     <tr>
                         <td style="padding:.75rem 1.25rem;font-size:.875rem;">
-                            {{ fighterMap[fight.fighter1Id]|default('Unknown') }}
+                            {{ fight.fighter1 ? fight.fighter1.fullName : 'Unknown' }}
                             <span class="text-muted mx-1">vs</span>
-                            {{ fighterMap[fight.fighter2Id]|default('Unknown') }}
+                            {{ fight.fighter2 ? fight.fighter2.fullName : 'Unknown' }}
                         </td>
-                        <td style="font-size:.875rem;color:#c9a227;">{{ fight.winnerId ? fighterMap[fight.winnerId]|default('Unknown') : 'Draw/N/A' }}</td>
+                        <td style="font-size:.875rem;color:#c9a227;">{{ fight.winner ? fight.winner.fullName : 'Draw/N/A' }}</td>
                         <td>{{ fight.methodOfVictory|default('-') }}</td>
                         <td>
                             {% if fight.status == 'COMPLETED' %}

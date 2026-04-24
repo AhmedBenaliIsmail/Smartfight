@@ -14,11 +14,11 @@ class PerformanceScoreRepository extends ServiceEntityRepository
 
     public function findByFighter(int $fighterId): array
     {
-        return $this->findBy(['fighterId' => $fighterId], ['calculatedAt' => 'DESC']);
+        return $this->findBy(['fighter' => $fighterId], ['calculatedAt' => 'DESC']);
     }
 
     public function getLatestByFighter(int $fighterId): ?PerformanceScore
     {
-        return $this->findOneBy(['fighterId' => $fighterId], ['calculatedAt' => 'DESC']);
+        return $this->findOneBy(['fighter' => $fighterId], ['calculatedAt' => 'DESC']);
     }
 }

@@ -11,7 +11,7 @@
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
         <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">{{ title|default('Events') }}</h1>
-        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">{{ isChampionsOnly|default(false) ? 'Exclusive look at elite Champions cards' : 'Manage and schedule MMA event cards' }}</p>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Manage and schedule boxing event cards</p>
     </div>
     {% if is_granted('ROLE_ADMIN') %}
     <a href="{{ path('app_event_new') }}" class="btn btn-danger"><i class="fa-solid fa-plus me-2"></i>Create Event</a>
@@ -33,7 +33,7 @@
                         <option value="">All Categories</option>
                         <option value="1">Event Name</option>
                         <option value="2">Date</option>
-                        <option value="3">Location</option>
+                        <option value="3">Venue</option>
                     </select>
                 </div>
                 <div class="col-md-4 text-end">
@@ -52,7 +52,7 @@
                 <th style="padding:.75rem 1.25rem;">ID</th>
                 <th>Event Name</th>
                 <th>Date</th>
-                <th>Location</th>
+                <th>Venue</th>
                 <th>Fights</th>
                 <th>Status</th>
                 {% if is_granted('ROLE_ADMIN') %}
@@ -66,7 +66,7 @@
                     <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#{{ event.eventId }}</td>
                     <td style="font-size:.875rem;font-weight:600;">{{ event.eventName }}</td>
                     <td style="font-size:.8rem;color:#a1a1aa;">{{ event.eventDate ? event.eventDate|date('Y-m-d') : '-' }}</td>
-                    <td>{{ event.location|default('-') }}</td>
+                    <td>{{ event.venue|default('-') }}, {{ event.city|default('-') }}</td>
                     <td>
                         <span class="badge bg-secondary">{{ fightCounts[event.eventId] }} / 3</span>
                     </td>
