@@ -5,11 +5,15 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
+#[UniqueEntity(fields: ['username'], message: 'This username is already taken.')]
+#[UniqueEntity(fields: ['email'], message: 'This email is already in use.')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -18,12 +22,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $userId = null;
 
     #[ORM\Column(length: 100, unique: true)]
+    #[Assert\NotBlank(message: 'Username is required.')]
+    #[Assert\Length(min: 3, max: 100)]
     private ?string $username = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Password is required.')]
+    #[Assert\Length(min: 6)]
     private ?string $password = null;
 
     #[ORM\Column(length: 200, nullable: true)]
+    #[Assert\NotBlank(message: 'Email is required.')]
+    #[Assert\Email(mode: 'strict', checkMX: true, checkHost: true, message: 'This email address does not appear to exist (invalid domain).')]
     private ?string $email = null;
 
     #[ORM\Column(name: 'createdDate', type: 'datetime', nullable: true)]
@@ -39,6 +49,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         inverseJoinColumns: [new ORM\JoinColumn(name: 'roleId', referencedColumnName: 'roleId')]
     )]
     private Collection $roles;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $resetToken = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $resetTokenExpiresAt = null;
 
     public function __construct()
     {
@@ -57,6 +73,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCreatedDate(?\DateTimeInterface $v): self { $this->createdDate = $v; return $this; }
     public function getPredictionPoints(): int { return $this->predictionPoints; }
     public function setPredictionPoints(int $v): self { $this->predictionPoints = $v; return $this; }
+
+    public function getResetToken(): ?string { return $this->resetToken; }
+    public function setResetToken(?string $token): self { $this->resetToken = $token; return $this; }
+    public function getResetTokenExpiresAt(): ?\DateTimeInterface { return $this->resetTokenExpiresAt; }
+    public function setResetTokenExpiresAt(?\DateTimeInterface $v): self { $this->resetTokenExpiresAt = $v; return $this; }
 
     public function getEntityRoles(): Collection { return $this->roles; }
 
