@@ -5,6 +5,9 @@ use App\Entity\Event;
 use App\Entity\Fighter;
 use App\Entity\FightResult;
 use App\Entity\FightStatistic;
+use App\Entity\Prediction;
+use App\Entity\Role;
+use App\Entity\User;
 use App\Entity\WeightDivision;
 use App\Repository\EventRepository;
 use App\Repository\FighterRepository;
@@ -12,6 +15,7 @@ use App\Repository\FightResultRepository;
 use App\Service\RankingService;
 use App\Service\AnalyticsEngine;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,7 +31,8 @@ class SeedDataCommand extends Command
     public function __construct(
         private EntityManagerInterface $em,
         private RankingService $rankingService,
-        private AnalyticsEngine $analyticsEngine
+        private AnalyticsEngine $analyticsEngine,
+        private UserPasswordHasherInterface $hasher
     ) {
         parent::__construct();
     }
@@ -55,9 +60,13 @@ class SeedDataCommand extends Command
 
         // 5. Seed Fights
         $io->section('Populating fight history and CompuBox statistics...');
-        $this->createFights($fighters, $events);
+        $fights = $this->createFights($fighters, $events);
 
-        // 6. Final Recalculation
+        // 6. Seed Users & Predictions
+        $io->section('Seeding users and generating fan predictions...');
+        $this->createUsersAndPredictions($fights);
+
+        // 7. Final Recalculation
         $io->section('Recalculating Global Rankings & Boxing Points...');
         $this->rankingService->recomputeAllRankings();
         $this->analyticsEngine->recalculateAll();
@@ -74,6 +83,9 @@ class SeedDataCommand extends Command
         foreach ($tables as $table) {
             $conn->executeStatement("TRUNCATE TABLE $table");
         }
+        // Also truncate users and predictions for a clean test
+        $conn->executeStatement("TRUNCATE TABLE predictions");
+        $conn->executeStatement("TRUNCATE TABLE users");
         $conn->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
     }
 
@@ -211,20 +223,19 @@ class SeedDataCommand extends Command
         return $events;
     }
 
-    private function createFights(array $f, array $events): void
+    private function createFights(array $f, array $events): array
     {
         $fighters = array_values($f);
+        $allFights = [];
         
         foreach ($events as $e) {
             $org = $e->getOrganization();
-            $numFights = ($e->getStatus() === 'COMPLETED') ? 3 : 1; // Seed at least 1-3 fights
+            $numFights = ($e->getStatus() === 'COMPLETED') ? 3 : 1;
             
             $usedInEvent = [];
             for ($i = 1; $i <= $numFights; $i++) {
-                // Find 2 random fighters not already in this event
                 shuffle($fighters);
-                $f1 = null;
-                $f2 = null;
+                $f1 = null; $f2 = null;
                 foreach ($fighters as $fighter) {
                     if (!in_array($fighter->getFighterId(), $usedInEvent)) {
                         if (!$f1) $f1 = $fighter;
@@ -240,24 +251,83 @@ class SeedDataCommand extends Command
                 if ($e->getStatus() === 'COMPLETED') {
                     $winner = (rand(0, 1) === 0) ? $f1 : $f2;
                     $method = (rand(0, 5) > 1) ? FightResult::METHOD_KO : FightResult::METHOD_DECISION;
-                    
-                    $this->addResolvedFight(
-                        $e, $i, $f1, $f2, $winner, 
-                        $method, rand(1, 12), ($method === FightResult::METHOD_DECISION ? 'UD' : null), 
-                        null, 12, true, $org,
-                        [
-                            'f1' => ['pl' => rand(50, 150), 'pt' => rand(200, 500), 'bpl' => rand(10, 40), 'jl' => rand(10, 50), 'jt' => rand(50, 150), 'ppl' => rand(40, 100), 'ppt' => rand(150, 350), 'kd' => rand(0, 2)],
-                            'f2' => ['pl' => rand(50, 150), 'pt' => rand(200, 500), 'bpl' => rand(10, 40), 'jl' => rand(10, 50), 'jt' => rand(50, 150), 'ppl' => rand(40, 100), 'ppt' => rand(150, 350), 'kd' => rand(0, 2)]
-                        ]
-                    );
+                    $fr = $this->addResolvedFight($e, $i, $f1, $f2, $winner, $method, rand(1, 12), ($method === FightResult::METHOD_DECISION ? 'UD' : null), null, 12, true, $org,
+                        ['f1' => ['pl' => rand(50, 150), 'pt' => rand(200, 500), 'bpl' => rand(10, 40), 'jl' => rand(10, 50), 'jt' => rand(50, 150), 'ppl' => rand(40, 100), 'ppt' => rand(150, 350), 'kd' => rand(0, 2)],
+                         'f2' => ['pl' => rand(50, 150), 'pt' => rand(200, 500), 'bpl' => rand(10, 40), 'jl' => rand(10, 50), 'jt' => rand(50, 150), 'ppl' => rand(40, 100), 'ppt' => rand(150, 350), 'kd' => rand(0, 2)]]);
                 } else {
-                    $this->addScheduledFight($e, $i, $f1, $f2);
+                    $fr = $this->addScheduledFight($e, $i, $f1, $f2);
                 }
+                $allFights[] = $fr;
             }
         }
+        return $allFights;
     }
 
-    private function addScheduledFight(Event $event, int $num, Fighter $f1, Fighter $f2): void
+    private function createUsersAndPredictions(array $fights): void
+    {
+        // 1. Create Roles
+        $adminRole = new Role();
+        $adminRole->setRoleName('ADMIN');
+        $this->em->persist($adminRole);
+
+        $userRole = new Role();
+        $userRole->setRoleName('USER');
+        $this->em->persist($userRole);
+        $this->em->flush();
+
+        $fanData = [
+            ['john_doe', 'john@example.com', 'john123'],
+            ['jane_smith', 'jane@example.com', 'jane123'],
+            ['mike_tyson', 'mike@example.com', 'mike123'],
+            ['ali_fan', 'ali@example.com', 'ali123'],
+            ['boxerfan1', 'fan1@smartfight.com', 'fan123'],
+            ['boxerfan2', 'fan2@smartfight.com', 'fan123'],
+        ];
+
+        // Add Admin
+        $admin = new User();
+        $admin->setUsername('admin');
+        $admin->setEmail('admin@smartfight.com');
+        $admin->addRole($adminRole);
+        $admin->setPassword($this->hasher->hashPassword($admin, 'admin123'));
+        $this->em->persist($admin);
+
+        $fans = [];
+        foreach ($fanData as $data) {
+            $user = new User();
+            $user->setUsername($data[0]);
+            $user->setEmail($data[1]);
+            $user->addRole($userRole);
+            $user->setPassword($this->hasher->hashPassword($user, $data[2]));
+            $this->em->persist($user);
+            $fans[] = $user;
+        }
+        $this->em->flush();
+
+        // Generate Random Predictions
+        foreach ($fans as $fan) {
+            // Predict on 50% of fights
+            $sampledFights = array_filter($fights, fn() => rand(0, 1) === 1);
+            foreach ($sampledFights as $fight) {
+                $p = new Prediction();
+                $p->setUser($fan);
+                $p->setFight($fight);
+                $p->setPredictedWinner(rand(0, 1) === 0 ? $fight->getFighter1() : $fight->getFighter2());
+                $p->setPredictedMethod(rand(0, 1) === 0 ? 'KO' : 'DECISION');
+                $p->setPredictedRound(rand(1, 12));
+                
+                if ($fight->getStatus() === 'COMPLETED') {
+                    $p->setIsProcessed(true);
+                    $p->setPointsAwarded(rand(0, 10) * 10);
+                }
+                
+                $this->em->persist($p);
+            }
+        }
+        $this->em->flush();
+    }
+
+    private function addScheduledFight(Event $event, int $num, Fighter $f1, Fighter $f2): FightResult
     {
         $fr = new FightResult();
         $fr->setEvent($event);
@@ -269,13 +339,14 @@ class SeedDataCommand extends Command
         $fr->setScheduledRounds(12);
         $this->em->persist($fr);
         $this->em->flush();
+        return $fr;
     }
 
     private function addResolvedFight(
         Event $event, int $num, Fighter $f1, Fighter $f2, ?Fighter $winner, 
         string $method, int $round, ?string $decisionType, ?int $kdRound, int $scheduledRounds, 
         bool $isBeltFight, ?string $beltOrg, array $stats
-    ): void {
+    ): FightResult {
         $fr = new FightResult();
         $fr->setEvent($event);
         $fr->setFightNumber($num);
@@ -300,6 +371,7 @@ class SeedDataCommand extends Command
         $this->createTotalStats($fr, $f2, $stats['f2']);
         
         $this->em->flush();
+        return $fr;
     }
 
     private function createTotalStats(FightResult $fr, Fighter $fighter, array $s): void
