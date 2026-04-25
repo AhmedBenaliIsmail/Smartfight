@@ -2,18 +2,17 @@
 
 namespace App\Form;
 
-use App\Entity\Discipline;
 use App\Entity\Event;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Enum\EventStatus;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Vich\UploaderBundle\Form\Type\VichFileType;
 
 class EventType extends AbstractType
 {
@@ -23,7 +22,7 @@ class EventType extends AbstractType
             ->add('name', TextType::class, [
                 'label' => 'Event name',
                 'attr' => [
-                    'placeholder' => 'e.g. UFC Fight Night Paris',
+                    'placeholder' => 'e.g. World Championship Boxing Night',
                 ],
             ])
             ->add('description', TextareaType::class, [
@@ -34,22 +33,22 @@ class EventType extends AbstractType
                     'placeholder' => 'Short summary for this event...',
                 ],
             ])
-            ->add('startDate', DateType::class, [
-                'label' => 'Start date',
+            ->add('startsAt', DateTimeType::class, [
+                'label' => 'Starts at',
                 'widget' => 'single_text',
+                'required' => false,
             ])
-            ->add('endDate', DateType::class, [
-                'label' => 'End date',
+            ->add('endsAt', DateTimeType::class, [
+                'label' => 'Ends at',
                 'widget' => 'single_text',
+                'required' => false,
             ])
             ->add('status', ChoiceType::class, [
                 'label' => 'Status',
-                'choices' => [
-                    'Scheduled' => 'SCHEDULED',
-                    'Ongoing' => 'ONGOING',
-                    'Completed' => 'COMPLETED',
-                    'Cancelled' => 'CANCELLED',
-                ],
+                'choices' => array_combine(
+                    array_map(fn(EventStatus $s) => $s->label(), EventStatus::cases()),
+                    array_map(fn(EventStatus $s) => $s->value, EventStatus::cases()),
+                ),
             ])
             ->add('visibility', ChoiceType::class, [
                 'label' => 'Visibility',
@@ -65,38 +64,26 @@ class EventType extends AbstractType
                     'placeholder' => '0',
                 ],
             ])
-            ->add('location', TextType::class, [
-                'label' => 'Location',
+            ->add('venueName', TextType::class, [
+                'label' => 'Venue name',
                 'required' => false,
-                'attr' => [
-                    'placeholder' => 'City, country',
-                ],
+                'attr' => ['placeholder' => 'Arena or venue'],
             ])
-            ->add('venueId', IntegerType::class, [
-                'label' => 'Venue ID',
+            ->add('city', TextType::class, [
+                'label' => 'City',
                 'required' => false,
-                'attr' => [
-                    'placeholder' => 'Optional',
-                ],
+                'attr' => ['placeholder' => 'City'],
             ])
-            ->add('organizerId', IntegerType::class, [
-                'label' => 'Organizer ID',
+            ->add('country', TextType::class, [
+                'label' => 'Country',
                 'required' => false,
-                'attr' => [
-                    'min' => 1,
-                    'placeholder' => 'Optional',
-                ],
+                'attr' => ['placeholder' => 'ISO code e.g. TN'],
             ])
-            ->add('discipline', EntityType::class, [
-                'label' => 'Discipline',
-                'class' => Discipline::class,
-                'choice_label' => 'name',
+            ->add('posterFile', VichFileType::class, [
+                'label' => 'Event poster',
                 'required' => false,
-                'placeholder' => 'Select discipline',
-            ])
-            ->add('isChampionsEvent', CheckboxType::class, [
-                'label' => 'Champions event',
-                'required' => false,
+                'allow_delete' => true,
+                'download_uri' => false,
             ]);
     }
 

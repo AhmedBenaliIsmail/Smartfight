@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use App\Entity\EventBooking;
-use Doctrine\DBAL\Connection;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
@@ -13,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class QrCodeService
 {
-    public function __construct(private Connection $connection) {}
+    public function __construct() {}
 
     public function buildFanQrData(EventBooking $booking): string
     {
@@ -29,21 +28,13 @@ class QrCodeService
 
     public function buildAdminQrData(EventBooking $booking): string
     {
-        $venueCity = 'Unknown';
-        $venueId = $booking->getEvent()->getVenueId();
-
-        if ($venueId) {
-            $city = $this->connection->fetchOne('SELECT city FROM venue WHERE id = :id', ['id' => $venueId]);
-            if ($city) {
-                $venueCity = (string) $city;
-            }
-        }
+        $venueCity = $booking->getEvent()->getCity() ?? 'Unknown';
 
         return sprintf(
             "SMARTFIGHT TICKET\nRef: %s\nEvent: %s\nDate: %s\nVenue: %s\nFan: %s\nType: %s\nQty: %d\nTotal: %s TND",
             $booking->getBookingReference(),
             $booking->getEvent()->getName(),
-            $booking->getEvent()->getStartDate()->format('Y-m-d'),
+            $booking->getEvent()->getStartsAt()?->format('Y-m-d') ?? '—',
             $venueCity,
             $booking->getUser()->getFullName(),
             $booking->getTicketType(),

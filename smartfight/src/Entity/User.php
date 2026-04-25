@@ -9,6 +9,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'user')]
+#[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -21,6 +22,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(name: 'last_name', type: 'string', length: 100)]
     private string $lastName;
+
+    #[ORM\Column(type: 'string', length: 50, unique: true, nullable: true)]
+    private ?string $username = null;
 
     #[ORM\Column(type: 'string', length: 150, unique: true)]
     private string $email;
@@ -63,6 +67,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void {}
 
     public function getId(): ?int { return $this->id; }
+    public function getUsername(): ?string { return $this->username; }
+    public function setUsername(?string $username): static { $this->username = $username; return $this; }
     public function getFirstName(): string { return $this->firstName; }
     public function setFirstName(string $firstName): static { $this->firstName = $firstName; return $this; }
     public function getLastName(): string { return $this->lastName; }
@@ -78,5 +84,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isActive(): bool { return $this->isActive; }
     public function setIsActive(bool $isActive): static { $this->isActive = $isActive; return $this; }
     public function getCreatedAt(): \DateTimeInterface { return $this->createdAt; }
+    public function setCreatedAt(\DateTimeInterface $createdAt): static { $this->createdAt = $createdAt; return $this; }
     public function getUpdatedAt(): \DateTimeInterface { return $this->updatedAt; }
+    public function setUpdatedAt(\DateTimeInterface $updatedAt): static { $this->updatedAt = $updatedAt; return $this; }
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        $now = new \DateTime();
+        $this->createdAt = $now;
+        $this->updatedAt = $now;
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->updatedAt = new \DateTime();
+    }
 }

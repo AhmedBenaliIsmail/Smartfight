@@ -38,7 +38,7 @@ class EventBooking
     #[ORM\Column(name: 'ticket_quantity', type: 'integer', options: ['default' => 1])]
     private int $ticketQuantity = 1;
 
-    #[ORM\Column(name: 'total_price', type: 'decimal', precision: 10, scale: 2, options: ['default' => 0])]
+    #[ORM\Column(name: 'total_price', type: 'decimal', precision: 10, scale: 2, options: ['default' => '0.00'])]
     private string $totalPrice = '0.00';
 
     #[ORM\Column(name: 'ticket_type', type: 'string', length: 20)]

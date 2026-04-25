@@ -18,7 +18,7 @@ class EventRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('e')
             ->where('e.status = :status')
             ->setParameter('status', 'SCHEDULED')
-            ->orderBy('e.startDate', 'ASC')
+            ->orderBy('e.startsAt', 'ASC')
             ->getQuery()
             ->getResult();
     }
@@ -30,17 +30,7 @@ class EventRepository extends ServiceEntityRepository
             ->andWhere('e.visibility = :visibility')
             ->setParameter('status', 'SCHEDULED')
             ->setParameter('visibility', 'PUBLIC')
-            ->orderBy('e.startDate', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function findChampionsEvents(): array
-    {
-        return $this->createQueryBuilder('e')
-            ->where('e.isChampionsEvent = :isChampionsEvent')
-            ->setParameter('isChampionsEvent', true)
-            ->orderBy('e.startDate', 'DESC')
+            ->orderBy('e.startsAt', 'ASC')
             ->getQuery()
             ->getResult();
     }

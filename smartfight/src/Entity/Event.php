@@ -2,9 +2,13 @@
 
 namespace App\Entity;
 
+use App\Enum\EventStatus;
 use App\Repository\EventRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
+#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 #[ORM\Table(name: 'event')]
 #[ORM\HasLifecycleCallbacks]
@@ -21,11 +25,11 @@ class Event
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(name: 'start_date', type: 'date')]
-    private \DateTimeInterface $startDate;
+    #[ORM\Column(name: 'starts_at', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $startsAt = null;
 
-    #[ORM\Column(name: 'end_date', type: 'date')]
-    private \DateTimeInterface $endDate;
+    #[ORM\Column(name: 'ends_at', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $endsAt = null;
 
     #[ORM\Column(type: 'string', length: 20)]
     private string $status = 'SCHEDULED';
@@ -40,17 +44,20 @@ class Event
     #[ORM\JoinColumn(name: 'discipline_id', nullable: true)]
     private ?Discipline $discipline = null;
 
-    #[ORM\Column(name: 'venue_id', type: 'integer', nullable: true)]
-    private ?int $venueId = null;
+    #[ORM\Column(name: 'venue_name', type: 'string', length: 150, nullable: true)]
+    private ?string $venueName = null;
 
-    #[ORM\Column(name: 'organizer_id', type: 'integer', nullable: true)]
-    private ?int $organizerId = null;
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    private ?string $city = null;
 
-    #[ORM\Column(name: 'is_champions_event', type: 'boolean', options: ['default' => false])]
-    private bool $isChampionsEvent = false;
+    #[ORM\Column(type: 'string', length: 2, nullable: true)]
+    private ?string $country = null;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $location = null;
+    #[ORM\Column(name: 'poster_url', type: 'string', length: 255, nullable: true)]
+    private ?string $posterUrl = null;
+
+    #[Vich\UploadableField(mapping: 'event_poster', fileNameProperty: 'posterUrl')]
+    private ?File $posterFile = null;
 
     #[ORM\Column(name: 'created_at', type: 'datetime')]
     private \DateTimeInterface $createdAt;
@@ -73,33 +80,62 @@ class Event
     }
 
     public function getId(): ?int { return $this->id; }
+
     public function getName(): string { return $this->name; }
     public function setName(string $name): static { $this->name = $name; return $this; }
+
     public function getDescription(): ?string { return $this->description; }
     public function setDescription(?string $description): static { $this->description = $description; return $this; }
-    public function getStartDate(): \DateTimeInterface { return $this->startDate; }
-    public function setStartDate(\DateTimeInterface $startDate): static { $this->startDate = $startDate; return $this; }
-    public function getEndDate(): \DateTimeInterface { return $this->endDate; }
-    public function setEndDate(\DateTimeInterface $endDate): static { $this->endDate = $endDate; return $this; }
+
+    public function getStartsAt(): ?\DateTimeInterface { return $this->startsAt; }
+    public function setStartsAt(?\DateTimeInterface $startsAt): static { $this->startsAt = $startsAt; return $this; }
+
+    public function getEndsAt(): ?\DateTimeInterface { return $this->endsAt; }
+    public function setEndsAt(?\DateTimeInterface $endsAt): static { $this->endsAt = $endsAt; return $this; }
+
     public function getStatus(): string { return $this->status; }
     public function setStatus(string $status): static { $this->status = $status; return $this; }
+
+    public function getStatusLabel(): string
+    {
+        $case = EventStatus::tryFrom($this->status);
+        return $case !== null ? $case->label() : $this->status;
+    }
+
     public function getVisibility(): string { return $this->visibility; }
     public function setVisibility(string $visibility): static { $this->visibility = $visibility; return $this; }
+
     public function getCapacity(): int { return $this->capacity; }
     public function setCapacity(int $capacity): static { $this->capacity = $capacity; return $this; }
+
     public function getDiscipline(): ?Discipline { return $this->discipline; }
     public function setDiscipline(?Discipline $discipline): static { $this->discipline = $discipline; return $this; }
-    public function getVenueId(): ?int { return $this->venueId; }
-    public function setVenueId(?int $venueId): static { $this->venueId = $venueId; return $this; }
-    public function getOrganizerId(): ?int { return $this->organizerId; }
-    public function setOrganizerId(?int $organizerId): static { $this->organizerId = $organizerId; return $this; }
-    public function isChampionsEvent(): bool { return $this->isChampionsEvent; }
-    public function setIsChampionsEvent(bool $isChampionsEvent): static { $this->isChampionsEvent = $isChampionsEvent; return $this; }
-    public function getLocation(): ?string { return $this->location; }
-    public function setLocation(?string $location): static { $this->location = $location; return $this; }
+
+    public function getVenueName(): ?string { return $this->venueName; }
+    public function setVenueName(?string $venueName): static { $this->venueName = $venueName; return $this; }
+
+    public function getCity(): ?string { return $this->city; }
+    public function setCity(?string $city): static { $this->city = $city; return $this; }
+
+    public function getCountry(): ?string { return $this->country; }
+    public function setCountry(?string $country): static { $this->country = $country; return $this; }
+
+    public function getPosterUrl(): ?string { return $this->posterUrl; }
+    public function setPosterUrl(?string $posterUrl): static { $this->posterUrl = $posterUrl; return $this; }
+
+    public function getPosterFile(): ?File { return $this->posterFile; }
+    public function setPosterFile(?File $posterFile = null): static
+    {
+        $this->posterFile = $posterFile;
+        if ($posterFile !== null) { $this->updatedAt = new \DateTime(); }
+        return $this;
+    }
+
     public function getCreatedAt(): \DateTimeInterface { return $this->createdAt; }
     public function setCreatedAt(\DateTimeInterface $createdAt): static { $this->createdAt = $createdAt; return $this; }
+
     public function getUpdatedAt(): \DateTimeInterface { return $this->updatedAt; }
     public function setUpdatedAt(\DateTimeInterface $updatedAt): static { $this->updatedAt = $updatedAt; return $this; }
+
     public function __toString(): string { return $this->name; }
 }

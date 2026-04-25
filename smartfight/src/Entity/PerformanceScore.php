@@ -18,19 +18,19 @@ class PerformanceScore
     #[ORM\Column(name: 'fighter_id', type: 'integer')]
     private int $fighterId;
 
-    #[ORM\Column(type: 'float', options: ['default' => 0.0])]
+    #[ORM\Column(type: 'float', options: ['default' => '0'])]
     private float $score = 0.0;
 
-    #[ORM\Column(type: 'float', options: ['default' => 0.0])]
+    #[ORM\Column(type: 'float', options: ['default' => '0'])]
     private float $aggression = 0.0;
 
-    #[ORM\Column(type: 'float', options: ['default' => 0.0])]
+    #[ORM\Column(type: 'float', options: ['default' => '0'])]
     private float $defense = 0.0;
 
-    #[ORM\Column(type: 'float', options: ['default' => 0.0])]
+    #[ORM\Column(type: 'float', options: ['default' => '0'])]
     private float $technique = 0.0;
 
-    #[ORM\Column(type: 'float', options: ['default' => 0.0])]
+    #[ORM\Column(type: 'float', options: ['default' => '0'])]
     private float $experience = 0.0;
 
     #[ORM\Column(type: 'string', length: 20)]

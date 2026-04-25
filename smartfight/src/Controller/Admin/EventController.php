@@ -5,11 +5,8 @@ namespace App\Controller\Admin;
 use App\Entity\Event;
 use App\Form\EventType;
 use App\Repository\EventRepository;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,37 +15,24 @@ use Symfony\Component\Routing\Annotation\Route;
 class EventController extends AbstractController
 {
     #[Route('', name: 'index', methods: ['GET'])]
-    public function index(Request $request, EventRepository $eventRepository): Response
+    public function index(EventRepository $eventRepository): Response
     {
-        $championsOnly = $request->query->getBoolean('champions', false);
-        $events = $championsOnly
-            ? $eventRepository->findChampionsEvents()
-            : $eventRepository->findBy([], ['startDate' => 'DESC']);
+        $events = $eventRepository->findBy([], ['startsAt' => 'DESC']);
 
         return $this->render('admin/event/index.html.twig', [
             'events' => $events,
-            'championsOnly' => $championsOnly,
             'active_sidebar' => 'events',
         ]);
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $event = new Event();
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if (!$this->normalizeAndValidateOrganizer($event, $form, $userRepository)) {
-                return $this->render('admin/event/form.html.twig', [
-                    'form' => $form->createView(),
-                    'event' => $event,
-                    'is_edit' => false,
-                    'active_sidebar' => 'events',
-                ]);
-            }
-
             $entityManager->persist($event);
             $entityManager->flush();
 
@@ -75,21 +59,12 @@ class EventController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Event $event, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
+    public function edit(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if (!$this->normalizeAndValidateOrganizer($event, $form, $userRepository)) {
-                return $this->render('admin/event/form.html.twig', [
-                    'form' => $form->createView(),
-                    'event' => $event,
-                    'is_edit' => true,
-                    'active_sidebar' => 'events',
-                ]);
-            }
-
             $entityManager->flush();
 
             $this->addFlash('success', 'Event updated successfully.');
@@ -115,24 +90,5 @@ class EventController extends AbstractController
         }
 
         return $this->redirectToRoute('admin_event_index');
-    }
-
-    private function normalizeAndValidateOrganizer(Event $event, FormInterface $form, UserRepository $userRepository): bool
-    {
-        $organizerId = $event->getOrganizerId();
-
-        if ($organizerId === null || $organizerId <= 0) {
-            $event->setOrganizerId(null);
-
-            return true;
-        }
-
-        if ($userRepository->find($organizerId) === null) {
-            $form->get('organizerId')->addError(new FormError('Organizer not found. Choose a valid user id or leave this field empty.'));
-
-            return false;
-        }
-
-        return true;
     }
 }

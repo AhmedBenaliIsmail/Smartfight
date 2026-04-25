@@ -53,21 +53,28 @@ class RankingService
         $grouped = [];
 
         foreach ($fighters as $fighter) {
-            $weightClass = $fighter->getWeightClass() ?? 'UNSPECIFIED';
-            $grouped[$weightClass][] = $fighter;
+            $weightClassEntity = $fighter->getWeightClassEntity();
+            $key = $weightClassEntity?->getId() ?? 0;
+            $grouped[$key]['entity'] = $weightClassEntity;
+            $grouped[$key]['fighters'][] = $fighter;
         }
 
-        foreach ($grouped as $weightClass => $list) {
-            foreach ($list as $index => $fighter) {
+        foreach ($grouped as $group) {
+            $weightClassEntity = $group['entity'] ?? null;
+            $weightClassName = $weightClassEntity?->getName() ?? 'UNSPECIFIED';
+            $fightersInClass = $group['fighters'] ?? [];
+
+            foreach ($fightersInClass as $index => $fighter) {
                 $ranking = $this->rankingRepository->findOneBy([
                     'fighterId' => $fighter->getId(),
-                    'weightClass' => $weightClass,
+                    'weightClassEntity' => $weightClassEntity,
                     'season' => $season,
                 ]) ?? new Ranking();
 
                 $ranking
                     ->setFighterId((int) $fighter->getId())
-                    ->setWeightClass($weightClass)
+                    ->setWeightClassEntity($weightClassEntity)
+                    ->setWeightClass($weightClassName)
                     ->setSeason($season)
                     ->setRankPosition($index + 1)
                     ->setPoints($fighter->getEloRating());
@@ -115,7 +122,7 @@ class RankingService
         $winner->setWinStreak($winner->getWinStreak() + 1);
         $loser->setWinStreak(0);
 
-        if ($result->getEvent()->isChampionsEvent()) {
+        if ($result->getMatch() !== null && $result->getMatch()->isTitleFight()) {
             $winner->setChampionsEventWinStreak($winner->getChampionsEventWinStreak() + 1);
         }
     }

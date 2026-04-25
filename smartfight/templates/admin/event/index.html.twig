@@ -10,33 +10,15 @@
     </a>
 </div>
 
-<div class="card mb-3">
-    <div class="card-body">
-        <form method="get" class="row g-3 align-items-end">
-            <div class="col-md-4">
-                <label class="form-label">Champions Filter</label>
-                <select name="champions" class="form-select">
-                    <option value="0" {{ not championsOnly ? 'selected' : '' }}>All events</option>
-                    <option value="1" {{ championsOnly ? 'selected' : '' }}>Champions events only</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <button class="btn btn-primary" type="submit">Apply</button>
-                <a href="{{ path('admin_event_index') }}" class="btn btn-outline-secondary ms-2">Reset</a>
-            </div>
-        </form>
-    </div>
-</div>
-
 <div class="card">
     <div class="table-responsive">
         <table class="table table-vcenter card-table">
             <thead>
             <tr>
                 <th>Name</th>
-                <th>Date</th>
+                <th>Starts at</th>
+                <th>Venue</th>
                 <th>Status</th>
-                <th>Champions</th>
                 <th class="text-end">Actions</th>
             </tr>
             </thead>
@@ -44,9 +26,12 @@
             {% for event in events %}
                 <tr>
                     <td>{{ event.name }}</td>
-                    <td>{{ event.startDate|date('Y-m-d') }}</td>
-                    <td>{{ event.status }}</td>
-                    <td>{{ event.isChampionsEvent ? 'Yes' : 'No' }}</td>
+                    <td>{{ event.startsAt ? event.startsAt|date('Y-m-d') : '—' }}</td>
+                    <td>{{ event.venueName ?: '—' }}{% if event.city %}, {{ event.city }}{% endif %}</td>
+                    <td>
+                        {% set statusColors = {SCHEDULED:'primary',LIVE:'danger',COMPLETED:'success',CANCELLED:'secondary'} %}
+                        <span class="badge bg-{{ statusColors[event.status]|default('secondary') }}">{{ event.statusLabel }}</span>
+                    </td>
                     <td class="text-end">
                         <a class="btn btn-sm btn-outline-info" href="{{ path('admin_event_show', {id: event.id}) }}">View</a>
                         <a class="btn btn-sm btn-outline-primary" href="{{ path('admin_event_edit', {id: event.id}) }}">Edit</a>

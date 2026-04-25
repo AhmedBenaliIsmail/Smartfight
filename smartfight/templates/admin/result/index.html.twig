@@ -54,8 +54,11 @@
                     <td>{{ result.fightLabel }}</td>
                     <td>{{ result.event.name }}</td>
                     <td>{{ result.fightDate|date('Y-m-d') }}</td>
-                    <td>{{ result.status }}</td>
-                    <td>{{ result.methodOfVictory }}</td>
+                    <td>
+                        {% set statusColors = {SCHEDULED:'primary',COMPLETED:'success',CANCELLED:'secondary',LIVE:'danger'} %}
+                        <span class="badge bg-{{ statusColors[result.status]|default('secondary') }}">{{ result.status|title }}</span>
+                    </td>
+                    <td>{{ result.methodLabel }}</td>
                     <td class="text-end">
                         <a class="btn btn-sm btn-outline-info" href="{{ path('admin_result_show', {id: result.id}) }}">View</a>
                         <a class="btn btn-sm btn-outline-primary" href="{{ path('admin_result_edit', {id: result.id}) }}">Edit</a>

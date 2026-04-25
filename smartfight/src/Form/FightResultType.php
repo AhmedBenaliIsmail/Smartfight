@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Event;
 use App\Entity\FightResult;
 use App\Entity\Fighter;
+use App\Enum\FightMethod;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -14,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Choice;
 
 class FightResultType extends AbstractType
 {
@@ -63,13 +65,20 @@ class FightResultType extends AbstractType
             ])
             ->add('method', ChoiceType::class, [
                 'label' => 'Method',
-                'choices' => [
-                    'Decision' => 'DECISION',
-                    'KO/TKO' => 'KO',
-                    'Submission' => 'SUBMISSION',
-                    'Draw' => 'DRAW',
-                    'Disqualification' => 'DQ',
+                'choices' => array_flip(FightMethod::labels()),
+                'constraints' => [
+                    new Choice(['choices' => FightMethod::values()]),
                 ],
+            ])
+            ->add('knockdownsFighterRed', IntegerType::class, [
+                'label' => 'Knockdowns (Red)',
+                'required' => false,
+                'attr' => ['min' => 0, 'placeholder' => '0'],
+            ])
+            ->add('knockdownsFighterBlue', IntegerType::class, [
+                'label' => 'Knockdowns (Blue)',
+                'required' => false,
+                'attr' => ['min' => 0, 'placeholder' => '0'],
             ])
             ->add('roundEnded', IntegerType::class, [
                 'label' => 'Round ended',

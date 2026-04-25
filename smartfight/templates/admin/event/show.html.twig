@@ -16,13 +16,13 @@
         <dl class="row mb-0">
             <dt class="col-sm-3">Name</dt><dd class="col-sm-9">{{ event.name }}</dd>
             <dt class="col-sm-3">Description</dt><dd class="col-sm-9">{{ event.description ?: 'N/A' }}</dd>
-            <dt class="col-sm-3">Date Window</dt><dd class="col-sm-9">{{ event.startDate|date('Y-m-d') }} to {{ event.endDate|date('Y-m-d') }}</dd>
-            <dt class="col-sm-3">Status</dt><dd class="col-sm-9">{{ event.status }}</dd>
+            <dt class="col-sm-3">Starts at</dt><dd class="col-sm-9">{{ event.startsAt ? event.startsAt|date('Y-m-d H:i') : 'N/A' }}</dd>
+            <dt class="col-sm-3">Ends at</dt><dd class="col-sm-9">{{ event.endsAt ? event.endsAt|date('Y-m-d H:i') : 'N/A' }}</dd>
+            <dt class="col-sm-3">Status</dt><dd class="col-sm-9">{{ event.statusLabel }}</dd>
             <dt class="col-sm-3">Visibility</dt><dd class="col-sm-9">{{ event.visibility }}</dd>
-            <dt class="col-sm-3">Location</dt><dd class="col-sm-9">{{ event.location ?: 'N/A' }}</dd>
+            <dt class="col-sm-3">Venue</dt><dd class="col-sm-9">{{ event.venueName ?: 'N/A' }}{% if event.city %}, {{ event.city }}{% endif %}{% if event.country %} ({{ event.country }}){% endif %}</dd>
             <dt class="col-sm-3">Capacity</dt><dd class="col-sm-9">{{ event.capacity }}</dd>
             <dt class="col-sm-3">Discipline</dt><dd class="col-sm-9">{{ event.discipline ? event.discipline.name : 'N/A' }}</dd>
-            <dt class="col-sm-3">Champions Event</dt><dd class="col-sm-9">{{ event.isChampionsEvent ? 'Yes' : 'No' }}</dd>
         </dl>
     </div>
 </div>

@@ -32,7 +32,7 @@ class PredictionController extends AbstractController
         return $this->render('front/prediction/index.html.twig', [
             'leaderboard' => $leaderboardService->getRankings('2026', 10),
             'myPredictions' => $myPredictions,
-            'events' => $eventRepo->findBy(['status' => 'SCHEDULED'], ['startDate' => 'ASC']),
+            'events' => $eventRepo->findBy(['status' => 'SCHEDULED'], ['startsAt' => 'ASC']),
         ]);
     }
 

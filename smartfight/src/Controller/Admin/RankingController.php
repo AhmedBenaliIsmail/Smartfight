@@ -70,7 +70,7 @@ class RankingController extends AbstractController
                 fputcsv($handle, [
                     $row->getFighterId(),
                     $fighter?->getDisplayName(),
-                    $row->getWeightClass(),
+                    $row->getWeightClassEntity()?->getName() ?? $row->getWeightClass(),
                     $row->getRankPosition(),
                     $row->getPoints(),
                     $row->getSeason(),

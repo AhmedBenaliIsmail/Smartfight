@@ -17,6 +17,12 @@
         .form-control:focus { background: #09090b; border-color: #dc2626; color: #fff; box-shadow: 0 0 0 0.2rem rgba(220,38,38,.25); }
         .btn-sf-primary { background: #dc2626; border: none; color: #fff; font-family: 'Oswald', sans-serif; font-weight: 600; letter-spacing: 1px; padding: .75rem; width: 100%; }
         .btn-sf-primary:hover { background: #b91c1c; color: #fff; }
+        .btn-sf-secondary { background: transparent; border: 1px solid #27272a; color: #a1a1aa; font-family: 'Oswald', sans-serif; font-weight: 600; letter-spacing: 1px; padding: .75rem; width: 100%; }
+        .btn-sf-secondary:hover { border-color: #52525b; color: #fff; background: #27272a; }
+        .divider { display: flex; align-items: center; color: #52525b; font-size: .75rem; margin: 1rem 0; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-top: 1px solid #27272a; }
+        .divider::before { margin-right: .75rem; }
+        .divider::after { margin-left: .75rem; }
         label { color: #a1a1aa; font-size: .875rem; }
     </style>
 {% endblock %}
@@ -49,6 +55,16 @@
             <i class="fa-solid fa-right-to-bracket me-2"></i>Sign In
         </button>
     </form>
+
+    <div class="divider">or</div>
+
+    <a href="{{ path('connect_google_start') }}" class="btn btn-sf-secondary mb-3">
+        <i class="fa-brands fa-google me-2"></i>Sign in with Google
+    </a>
+
+    <a href="{{ path('app_register') }}" class="btn btn-sf-secondary">
+        <i class="fa-solid fa-user-plus me-2"></i>Create an account
+    </a>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

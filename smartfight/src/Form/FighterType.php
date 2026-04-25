@@ -2,8 +2,10 @@
 
 namespace App\Form;
 
+use App\Entity\Discipline;
 use App\Entity\Fighter;
 use App\Entity\User;
+use App\Entity\WeightClass;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -24,12 +26,21 @@ class FighterType extends AbstractType
                 'class' => User::class,
                 'choice_label' => fn(User $u) => $u->getFirstName() . ' ' . $u->getLastName(),
                 'placeholder' => 'Select user...',
+                'required' => false,
                 'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('u')
                     ->orderBy('u.firstName', 'ASC'),
             ])
             ->add('nickname', TextType::class, [
                 'required' => false,
                 'attr' => ['placeholder' => 'Fighter nickname'],
+            ])
+            ->add('firstName', TextType::class, [
+                'required' => false,
+                'attr' => ['placeholder' => 'First name'],
+            ])
+            ->add('lastName', TextType::class, [
+                'required' => false,
+                'attr' => ['placeholder' => 'Last name'],
             ])
             ->add('dateOfBirth', DateType::class, [
                 'required' => false,
@@ -39,9 +50,20 @@ class FighterType extends AbstractType
                 'required' => false,
                 'attr' => ['placeholder' => 'e.g. Tunisian'],
             ])
-            ->add('weightClassId', IntegerType::class, [
+            ->add('countryCode', TextType::class, [
                 'required' => false,
-                'label' => 'Weight Class ID',
+                'attr' => ['placeholder' => 'e.g. TN'],
+            ])
+            ->add('weightClassEntity', EntityType::class, [
+                'required' => false,
+                'class' => WeightClass::class,
+                'choice_label' => 'name',
+                'placeholder' => 'Select weight class',
+            ])
+            ->add('discipline', EntityType::class, [
+                'class' => Discipline::class,
+                'choice_label' => 'name',
+                'placeholder' => 'Select discipline',
             ])
             ->add('status', ChoiceType::class, [
                 'choices' => [

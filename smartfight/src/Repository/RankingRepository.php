@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Ranking;
+use App\Entity\WeightClass;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -13,10 +14,10 @@ class RankingRepository extends ServiceEntityRepository
         parent::__construct($registry, Ranking::class);
     }
 
-    public function findByWeightClassAndSeason(string $weightClass, string $season = 'CURRENT'): array
+    public function findByWeightClassAndSeason(?WeightClass $weightClass, string $season = 'CURRENT'): array
     {
         return $this->createQueryBuilder('r')
-            ->where('r.weightClass = :weightClass')
+            ->where('r.weightClassEntity = :weightClass')
             ->andWhere('r.season = :season')
             ->setParameter('weightClass', $weightClass)
             ->setParameter('season', $season)
@@ -28,9 +29,12 @@ class RankingRepository extends ServiceEntityRepository
     public function findGroupedByWeightClass(string $season = 'CURRENT'): array
     {
         return $this->createQueryBuilder('r')
+            ->leftJoin('r.weightClassEntity', 'wc')
+            ->addSelect('wc')
             ->where('r.season = :season')
             ->setParameter('season', $season)
-            ->orderBy('r.weightClass', 'ASC')
+            ->orderBy('wc.displayOrder', 'ASC')
+            ->addOrderBy('r.weightClass', 'ASC')
             ->addOrderBy('r.rankPosition', 'ASC')
             ->getQuery()
             ->getResult();

@@ -23,6 +23,13 @@ vich_uploader:
             delete_on_update: true
             delete_on_remove: true
 
+        event_poster:
+            uri_prefix: /uploads/events
+            upload_destination: '%kernel.project_dir%/public/uploads/events'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            delete_on_update: true
+            delete_on_remove: true
+
         category_image:
             uri_prefix: /uploads/categories
             upload_destination: '%kernel.project_dir%/public/uploads/categories'

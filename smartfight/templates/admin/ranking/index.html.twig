@@ -24,7 +24,7 @@
             {% for ranking in rankings %}
                 <tr>
                     <td>{{ ranking.season }}</td>
-                    <td>{{ ranking.weightClass }}</td>
+                    <td>{{ ranking.weightClassEntity ? ranking.weightClassEntity.name : ranking.weightClass }}</td>
                     <td>#{{ ranking.rankPosition }}</td>
                     <td>{{ ranking.points|number_format(2, '.', ',') }}</td>
                     <td>{{ fightersById[ranking.fighterId] is defined ? fightersById[ranking.fighterId].displayName : 'Unknown' }}</td>
