@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marcus Santos – Fighter Profile – SmartFight</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="sf-navbar navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">SMART<span>FIGHT</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sfNavCollapse">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="sfNavCollapse">
+      <ul class="navbar-nav mx-auto gap-1">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="matches.html">Events</a></li>
+        <li class="nav-item"><a class="nav-link active" href="team.html">Fighters</a></li>
+        <li class="nav-item"><a class="nav-link" href="blog.html">News</a></li>
+        <li class="nav-item"><a class="nav-link" href="gallery.html">Gallery</a></li>
+        <li class="nav-item"><a class="nav-link live-badge-nav" href="live-stream.html">Live</a></li>
+        <li class="nav-item"><a class="nav-link" href="predictions.html">Predictions</a></li>
+        <li class="nav-item"><a class="nav-link" href="booking.html">Bookings</a></li>
+      </ul>
+      <div class="nav-actions d-flex align-items-center gap-2 mt-2 mt-lg-0">
+        <a href="#" class="btn btn-sf-ghost">Login</a>
+        <a href="#" class="btn btn-sf-primary">Register</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== FIGHTER HERO ===== -->
+<div class="fighter-hero">
+  <div class="container">
+    <div class="breadcrumb-sf mb-4" style="display:flex; align-items:center; gap:8px; font-size:0.78rem; color:var(--text-muted);">
+      <a href="index.html" style="color:var(--text-muted);">Home</a>
+      <i class="fa-solid fa-chevron-right" style="font-size:0.55rem;"></i>
+      <a href="team.html" style="color:var(--text-muted);">Fighters</a>
+      <i class="fa-solid fa-chevron-right" style="font-size:0.55rem;"></i>
+      <span>Marcus Santos</span>
+    </div>
+
+    <div class="row align-items-center g-5">
+      <div class="col-lg-3 col-md-4 text-center text-md-start">
+        <div style="position:relative; display:inline-block;">
+          <img src="https://placehold.co/280x360/18181b/dc2626?text=Marcus+Santos" alt="Marcus Santos"
+               style="border-radius:var(--radius-xl); border:2px solid var(--primary); width:100%; max-width:280px;" />
+          <div style="position:absolute; bottom:-12px; left:50%; transform:translateX(-50%);">
+            <span style="background:var(--gold); color:#000; font-size:0.65rem; font-weight:700; padding:5px 14px; border-radius:99px; letter-spacing:0.1em; text-transform:uppercase; white-space:nowrap;">
+              <i class="fa-solid fa-crown me-1"></i>Heavyweight Champion
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-9 col-md-8">
+        <span style="font-size:0.72rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--primary); display:block; margin-bottom:8px;">Fighter Profile</span>
+        <h1 style="font-size:clamp(2rem,5vw,3.5rem); margin-bottom:4px;">Marcus Santos</h1>
+        <div style="font-family:var(--font-body); font-style:italic; font-size:1.2rem; color:var(--gold); font-weight:500; margin-bottom:20px;">"The Lion"</div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-3">
+            <div class="stat-block">
+              <span class="stat-val" style="color:#22c55e;">24</span>
+              <span class="stat-key">Wins</span>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="stat-block">
+              <span class="stat-val" style="color:var(--primary);">3</span>
+              <span class="stat-key">Losses</span>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="stat-block">
+              <span class="stat-val" style="color:var(--gold);">1</span>
+              <span class="stat-key">Draws</span>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="stat-block">
+              <span class="stat-val">18</span>
+              <span class="stat-key">KO/TKOs</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-6 col-md-3">
+            <div class="stat-block">
+              <span class="stat-val" style="font-size:1.2rem;">6'4"</span>
+              <span class="stat-key">Height</span>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="stat-block">
+              <span class="stat-val" style="font-size:1.2rem;">252 lbs</span>
+              <span class="stat-key">Walk-in Weight</span>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="stat-block">
+              <span class="stat-val" style="font-size:1.2rem;">80"</span>
+              <span class="stat-key">Reach</span>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="stat-block">
+              <span class="stat-val" style="font-size:1.2rem;">Orthodox</span>
+              <span class="stat-key">Stance</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROFILE CONTENT ===== -->
+<section class="section-pad">
+  <div class="container">
+    <div class="row g-5">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+
+        <!-- Bio -->
+        <div class="sf-card mb-5">
+          <div class="sf-card-body">
+            <div style="font-size:0.8rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--primary); margin-bottom:12px;">Biography</div>
+            <p style="color:var(--text-muted); line-height:1.8; margin-bottom:16px;">
+              Marcus "The Lion" Santos is the reigning UFC Heavyweight Champion, known for his explosive power striking and elite wrestling credentials. Born in São Paulo, Brazil, Santos began training in mixed martial arts at age 15, earning his professional debut at 20.
+            </p>
+            <p style="color:var(--text-muted); line-height:1.8; margin-bottom:0;">
+              Santos captured the heavyweight title at UFC 298 with a stunning second-round TKO, and has since made five successful defenses. His combination of raw power, technical precision, and relentless pressure makes him arguably the most complete heavyweight in the sport's history. He enters UFC 310 looking to cement his legacy as the greatest heavyweight of all time.
+            </p>
+          </div>
+        </div>
+
+        <!-- Stats Breakdown -->
+        <div class="sf-card mb-5">
+          <div class="sf-card-body">
+            <div style="font-size:0.8rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--primary); margin-bottom:20px;">Fight Statistics</div>
+            <div class="row g-4">
+              <div class="col-6 col-md-3 text-center">
+                <div style="font-family:var(--font-heading); font-size:2rem; font-weight:700; color:var(--gold);">75%</div>
+                <div style="font-size:0.72rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted);">Win Rate</div>
+                <div class="win-bar mt-2"><div class="win-bar-fill" style="width:75%;"></div></div>
+              </div>
+              <div class="col-6 col-md-3 text-center">
+                <div style="font-family:var(--font-heading); font-size:2rem; font-weight:700; color:var(--primary);">64%</div>
+                <div style="font-size:0.72rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted);">KO Rate</div>
+                <div class="win-bar mt-2"><div class="win-bar-fill" style="width:64%;"></div></div>
+              </div>
+              <div class="col-6 col-md-3 text-center">
+                <div style="font-family:var(--font-heading); font-size:2rem; font-weight:700; color:#22c55e;">4.8</div>
+                <div style="font-size:0.72rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted);">Sig. Strikes/Min</div>
+                <div class="win-bar mt-2"><div class="win-bar-fill" style="width:82%; background:linear-gradient(90deg,#22c55e,#16a34a);"></div></div>
+              </div>
+              <div class="col-6 col-md-3 text-center">
+                <div style="font-family:var(--font-heading); font-size:2rem; font-weight:700; color:var(--text-primary);">3.4</div>
+                <div style="font-size:0.72rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted);">Takedowns/15min</div>
+                <div class="win-bar mt-2"><div class="win-bar-fill" style="width:55%;"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fight History -->
+        <div>
+          <div style="font-size:0.8rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--primary); margin-bottom:20px;">Fight History</div>
+          <div style="overflow-x:auto;">
+            <table class="fight-history-table">
+              <thead>
+                <tr>
+                  <th>Result</th>
+                  <th>Opponent</th>
+                  <th>Method</th>
+                  <th>Round</th>
+                  <th>Time</th>
+                  <th>Event</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="result-win">WIN</span></td>
+                  <td style="font-weight:600; color:var(--text-primary);">Dmitri Volkov</td>
+                  <td style="color:var(--text-muted);">TKO (Punches)</td>
+                  <td style="color:var(--text-muted);">R3</td>
+                  <td style="color:var(--text-muted);">4:22</td>
+                  <td style="color:var(--text-muted);">UFC 305</td>
+                  <td style="color:var(--text-muted);">Jan 2026</td>
+                </tr>
+                <tr>
+                  <td><span class="result-win">WIN</span></td>
+                  <td style="font-weight:600; color:var(--text-primary);">Brad Harper</td>
+                  <td style="color:var(--text-muted);">KO (Left Hook)</td>
+                  <td style="color:var(--text-muted);">R1</td>
+                  <td style="color:var(--text-muted);">1:47</td>
+                  <td style="color:var(--text-muted);">UFC 299</td>
+                  <td style="color:var(--text-muted);">Sep 2025</td>
+                </tr>
+                <tr>
+                  <td><span class="result-win">WIN</span></td>
+                  <td style="font-weight:600; color:var(--text-primary);">Andre Souza</td>
+                  <td style="color:var(--text-muted);">Decision (UD)</td>
+                  <td style="color:var(--text-muted);">R5</td>
+                  <td style="color:var(--text-muted);">5:00</td>
+                  <td style="color:var(--text-muted);">UFC 295</td>
+                  <td style="color:var(--text-muted);">May 2025</td>
+                </tr>
+                <tr>
+                  <td><span class="result-loss">LOSS</span></td>
+                  <td style="font-weight:600; color:var(--text-primary);">Ivan Kraskov</td>
+                  <td style="color:var(--text-muted);">Submission (RNC)</td>
+                  <td style="color:var(--text-muted);">R2</td>
+                  <td style="color:var(--text-muted);">3:08</td>
+                  <td style="color:var(--text-muted);">UFC 288</td>
+                  <td style="color:var(--text-muted);">Oct 2024</td>
+                </tr>
+                <tr>
+                  <td><span class="result-win">WIN</span></td>
+                  <td style="font-weight:600; color:var(--text-primary);">David O'Connor</td>
+                  <td style="color:var(--text-muted);">TKO (Elbows)</td>
+                  <td style="color:var(--text-muted);">R2</td>
+                  <td style="color:var(--text-muted);">2:56</td>
+                  <td style="color:var(--text-muted);">UFC 282</td>
+                  <td style="color:var(--text-muted);">Jun 2024</td>
+                </tr>
+                <tr>
+                  <td><span class="result-win">WIN</span></td>
+                  <td style="font-weight:600; color:var(--text-primary);">Marcus Bell</td>
+                  <td style="color:var(--text-muted);">KO (Overhand Right)</td>
+                  <td style="color:var(--text-muted);">R1</td>
+                  <td style="color:var(--text-muted);">0:59</td>
+                  <td style="color:var(--text-muted);">UFC 278</td>
+                  <td style="color:var(--text-muted);">Feb 2024</td>
+                </tr>
+                <tr>
+                  <td><span class="result-draw">DRAW</span></td>
+                  <td style="font-weight:600; color:var(--text-primary);">Tommy Chen</td>
+                  <td style="color:var(--text-muted);">Decision (MD)</td>
+                  <td style="color:var(--text-muted);">R5</td>
+                  <td style="color:var(--text-muted);">5:00</td>
+                  <td style="color:var(--text-muted);">UFC 271</td>
+                  <td style="color:var(--text-muted);">Sep 2023</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Next Fight -->
+        <div class="sf-card mb-4" style="border-color:var(--primary);">
+          <div class="sf-card-body">
+            <div style="font-size:0.72rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--primary); margin-bottom:12px;"><i class="fa-solid fa-calendar-check me-1"></i> Next Fight</div>
+            <div style="font-weight:700; font-size:1rem; color:var(--text-primary); margin-bottom:4px; text-transform:uppercase;">vs Kyle "Ice Cold" Jensen</div>
+            <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px;">UFC 310 · Heavyweight Title · May 15, 2026</div>
+            <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:16px;"><i class="fa-solid fa-location-dot me-1" style="color:var(--primary);"></i>T-Mobile Arena, Las Vegas</div>
+            <a href="booking.html" class="btn btn-sf-primary w-100" style="font-size:0.85rem;"><i class="fa-solid fa-ticket"></i> Get Tickets</a>
+          </div>
+        </div>
+
+        <!-- Fighter Details -->
+        <div class="sf-card mb-4">
+          <div class="sf-card-body">
+            <div style="font-size:0.72rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); margin-bottom:16px;">Fighter Details</div>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <div style="display:flex; justify-content:space-between; font-size:0.875rem; padding-bottom:10px; border-bottom:1px solid var(--border-color);">
+                <span style="color:var(--text-muted);">Age</span>
+                <span style="font-weight:600;">31</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.875rem; padding-bottom:10px; border-bottom:1px solid var(--border-color);">
+                <span style="color:var(--text-muted);">Nationality</span>
+                <span style="font-weight:600;">Brazilian</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.875rem; padding-bottom:10px; border-bottom:1px solid var(--border-color);">
+                <span style="color:var(--text-muted);">Height</span>
+                <span style="font-weight:600;">6'4" / 193 cm</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.875rem; padding-bottom:10px; border-bottom:1px solid var(--border-color);">
+                <span style="color:var(--text-muted);">Weight</span>
+                <span style="font-weight:600;">265 lbs (HW)</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.875rem; padding-bottom:10px; border-bottom:1px solid var(--border-color);">
+                <span style="color:var(--text-muted);">Reach</span>
+                <span style="font-weight:600;">80" / 203 cm</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.875rem; padding-bottom:10px; border-bottom:1px solid var(--border-color);">
+                <span style="color:var(--text-muted);">Stance</span>
+                <span style="font-weight:600;">Orthodox</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.875rem;">
+                <span style="color:var(--text-muted);">Team</span>
+                <span style="font-weight:600;">Lions Den MMA</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social -->
+        <div class="sf-card">
+          <div class="sf-card-body">
+            <div style="font-size:0.72rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); margin-bottom:16px;">Follow Marcus</div>
+            <div style="display:flex; gap:10px;">
+              <a href="#" class="social-link" style="flex:1; justify-content:center;"><i class="fa-brands fa-x-twitter"></i></a>
+              <a href="#" class="social-link" style="flex:1; justify-content:center;"><i class="fa-brands fa-instagram"></i></a>
+              <a href="#" class="social-link" style="flex:1; justify-content:center;"><i class="fa-brands fa-tiktok"></i></a>
+              <a href="#" class="social-link" style="flex:1; justify-content:center;"><i class="fa-brands fa-youtube"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="sf-footer">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-4 col-md-6">
+        <a href="index.html" class="footer-logo">SMART<span>FIGHT</span></a>
+        <p class="footer-about">The premier destination for UFC and MMA fans worldwide.</p>
+        <div class="social-links">
+          <a href="#" class="social-link"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-discord"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Home</a></li>
+          <li><a href="matches.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Events</a></li>
+          <li><a href="team.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Fighters</a></li>
+          <li><a href="blog.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Features</div>
+        <ul class="footer-links">
+          <li><a href="predictions.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Predictions</a></li>
+          <li><a href="leaderboard.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Leaderboard</a></li>
+          <li><a href="booking.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Book Tickets</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="footer-col-title">Newsletter</div>
+        <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:12px;">Get fight cards and exclusive content.</p>
+        <div class="newsletter-form">
+          <input type="email" placeholder="Your email address" />
+          <button type="button"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 SmartFight. All rights reserved.</p>
+      <div style="display:flex; gap:20px;"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

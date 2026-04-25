@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}SmartFight Admin{% endblock %}</title>
+    {% block stylesheets %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+    <link rel="stylesheet" href="{{ asset('backoffice/css/smartfight-admin.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/smartfight-admin.css') }}" />
+    {% endblock %}
+</head>
+<body class="antialiased">
+<div class="wrapper">
+
+    <!-- ── Sidebar ─────────────────────────────────────────────── -->
+    <aside class="navbar navbar-vertical navbar-expand-lg" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+        <div class="container-fluid flex-column align-items-stretch p-0">
+
+            <!-- Logo -->
+            <div class="p-3 border-bottom" style="border-color:#27272a!important">
+                <a href="{{ path('app_dashboard') }}" style="text-decoration:none;display:flex;align-items:center;gap:.75rem;">
+                    <div style="width:36px;height:36px;background:#dc2626;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;">
+                        <i class="fa-solid fa-fist-raised"></i>
+                    </div>
+                    <span style="font-family:'Oswald',sans-serif;font-weight:700;font-size:1.2rem;color:#fff;letter-spacing:1px;">SMART<span style="color:#dc2626;">FIGHT</span></span>
+                </a>
+            </div>
+
+            <!-- Nav -->
+            <nav class="flex-fill py-2">
+                <div class="navbar-vertical-section">Management</div>
+                <ul class="navbar-nav flex-column px-2 gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') == 'app_dashboard' %}active{% endif %}" href="{{ path('app_dashboard') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-chart-line fa-fw"></i></span>
+                            <span class="nav-link-title">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_users' %}active{% endif %}" href="{{ path('app_users') }}">
+                            <span class="nav-link-icon"><i class="fa-solid {% if is_granted('ROLE_ADMIN') %}fa-users{% else %}fa-user{% endif %} fa-fw"></i></span>
+                            <span class="nav-link-title">{% if is_granted('ROLE_ADMIN') %}Users{% else %}My Profile{% endif %}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_fighter' %}active{% endif %}" href="{{ path('app_fighters') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-mitten fa-fw"></i></span>
+                            <span class="nav-link-title">Boxers</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_event' %}active{% endif %}" href="{{ path('app_events') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span>
+                            <span class="nav-link-title">Events</span>
+                        </a>
+                    </li>
+                    {% if is_granted('ROLE_ADMIN') %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') == 'app_event_champions_new' %}active{% endif %}" href="{{ path('app_event_champions_new') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-crown fa-fw" style="color:#fbbf24;"></i></span>
+                            <span class="nav-link-title" style="color:#fbbf24;">Champions Event</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_result' %}active{% endif %}" href="{{ path('app_results') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span>
+                            <span class="nav-link-title">Bout Results</span>
+                        </a>
+                    </li>
+                    {% if is_granted('ROLE_ADMIN') %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'admin_contract' %}active{% endif %}" href="{{ path('admin_contract_index') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-file-invoice-dollar fa-fw text-success"></i></span>
+                            <span class="nav-link-title">Purses & Contracts</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_stats' %}active{% endif %}" href="{{ path('app_stats') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-chart-simple fa-fw"></i></span>
+                            <span class="nav-link-title">Statistics</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_performance' %}active{% endif %}" href="{{ path('app_performance') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-bolt fa-fw"></i></span>
+                            <span class="nav-link-title">Performance</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_ranking' %}active{% endif %}" href="{{ path('app_rankings') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-list-ol fa-fw"></i></span>
+                            <span class="nav-link-title">World Rankings</span>
+                        </a>
+                    </li>
+
+                    <div class="navbar-vertical-section">Fan Experience</div>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'admin_blog' or app.request.attributes.get('_route') starts with 'front_blog' %}active{% endif %}" 
+                           href="{{ is_granted('ROLE_ADMIN') ? path('admin_blog_index') : path('front_blog_index') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw text-orange"></i></span>
+                            <span class="nav-link-title">Blog / News</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'admin_booking' or app.request.attributes.get('_route') starts with 'front_booking' %}active{% endif %}" 
+                           href="{{ is_granted('ROLE_ADMIN') ? path('admin_booking_index') : path('front_booking_index') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw text-purple"></i></span>
+                            <span class="nav-link-title">{% if is_granted('ROLE_ADMIN') %}Event Bookings{% else %}Book Tickets{% endif %}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'admin_reaction' or app.request.attributes.get('_route') starts with 'front_reaction' %}active{% endif %}" 
+                           href="{{ is_granted('ROLE_ADMIN') ? path('admin_reaction_index') : path('front_reaction_index') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-fire fa-fw text-red"></i></span>
+                            <span class="nav-link-title">Fan Reactions</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') == 'app_match_proposal_index' or app.request.attributes.get('_route') == 'app_fan_dashboard' %}active{% endif %}" 
+                           href="{{ is_granted('ROLE_ADMIN') ? path('app_match_proposal_index') : path('app_fan_dashboard') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-square-poll-vertical fa-fw text-indigo"></i></span>
+                            <span class="nav-link-title">{% if is_granted('ROLE_ADMIN') %}Voting Pool Admin{% else %}Matchmaking Voting{% endif %}</span>
+                        </a>
+                    </li>
+
+                    {% if is_granted('ROLE_USER') and not is_granted('ROLE_ADMIN') %}
+                    <li class="navbar-vertical-section">Fantasy League</li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_prediction' %}active{% endif %}" href="{{ path('app_predictions') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-crystal-ball fa-fw" style="color:#60a5fa;"></i></span>
+                            <span class="nav-link-title">Predictions</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if is_granted('ROLE_USER') %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') == 'app_leaderboard' %}active{% endif %}" href="{{ path('app_leaderboard') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-medal fa-fw" style="color:#fbbf24;"></i></span>
+                            <span class="nav-link-title">Leaderboard</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+
+    <!-- ── Main content ─────────────────────────────────────────── -->
+    <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
+
+        <!-- Topbar -->
+        <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
+            <div class="d-flex align-items-center gap-3 flex-fill">
+                <!-- Breadcrumb -->
+                <ol class="breadcrumb mb-0">
+                    {% block breadcrumb %}
+                    <li class="breadcrumb-item active">Dashboard</li>
+                    {% endblock %}
+                </ol>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                {% if app.user %}
+                    {{ render(controller('App\\Controller\\NotificationController::list')) }}
+                    
+                    {% if not is_granted('ROLE_ADMIN') %}
+                    <div class="d-none d-md-flex align-items-center gap-2 me-2">
+                        <span class="badge bg-blue-lt" title="Fantasy Points"><i class="fa-solid fa-star me-1 text-blue"></i>{{ app.user.predictionPoints|default(0) }} PTS</span>
+                    </div>
+                    {% endif %}
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+                        <div class="avatar avatar-sm" style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">
+                            {{ app.user.username|first|upper }}
+                        </div>
+                        <span style="font-size:.875rem;color:#fafafa;">{{ app.user.username }}</span>
+                        <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="background:#18181b; border: 1px solid #27272a;">
+                        {% if is_granted('ROLE_USER') and not is_granted('ROLE_ADMIN') %}
+                            <li><a class="dropdown-item text-white" href="{{ path('front_booking_index') }}"><i class="fa-solid fa-cart-plus fa-fw me-2 text-danger"></i>Book Tickets</a></li>
+                            <li><a class="dropdown-item text-white" href="{{ path('front_booking_my') }}"><i class="fa-solid fa-ticket fa-fw me-2 text-danger"></i>My Bookings</a></li>
+                            <li><hr class="dropdown-divider" style="border-color:#27272a;"></li>
+                        {% endif %}
+                        <li><a class="dropdown-item text-danger" href="{{ path('app_logout') }}"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
+                {% else %}
+                <a href="{{ path('app_login') }}" class="btn btn-sm btn-outline-danger">Login</a>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="flex-fill p-4" style="background:#09090b;">
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible" role="alert">
+                        <div class="d-flex">
+                            <div>
+                                <i class="fa-solid fa-{{ label == 'error' ? 'circle-exclamation' : 'circle-check' }} fa-fw me-2"></i>
+                            </div>
+                            <div>
+                                {{ message }}
+                            </div>
+                        </div>
+                        <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</div>
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Flatpickr Init
+        if (typeof flatpickr !== 'undefined') {
+            flatpickr(".datepicker", {
+                dateFormat: "Y-m-d",
+                theme: "dark",
+                allowInput: true
+            });
+        }
+
+        // Live Search / Instant Narrowing Logic
+        const searchInputs = document.querySelectorAll('[data-live-search]');
+        searchInputs.forEach(input => {
+            const targetSelector = input.getAttribute('data-live-search');
+            const itemSelector = input.getAttribute('data-live-search-item') || 'tbody tr';
+            const container = document.querySelector(targetSelector);
+            if (!container) return;
+
+            input.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                const items = container.querySelectorAll(itemSelector);
+                const colIndexAttr = input.getAttribute('data-live-search-column');
+                const filterSelectSelector = input.getAttribute('data-live-search-filter-select');
+                const filterSelect = filterSelectSelector ? document.querySelector(filterSelectSelector) : null;
+                
+                items.forEach(item => {
+                    // Skip special rows
+                    if (item.tagName === 'TR' && item.cells.length === 1 && item.cells[0].colSpan > 1) return;
+
+                    let text = '';
+                    let colIndex = (colIndexAttr !== null) ? colIndexAttr : (filterSelect ? filterSelect.value : null);
+
+                    if (colIndex !== null && colIndex !== "" && item.cells && item.cells[colIndex]) {
+                        text = item.cells[colIndex].innerText.toLowerCase();
+                    } else {
+                        text = item.innerText.toLowerCase();
+                    }
+
+                    if (text.includes(query)) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}
+</body>
+</html>

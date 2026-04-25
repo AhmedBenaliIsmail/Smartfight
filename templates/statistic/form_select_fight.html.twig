@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Select Fight — SmartFight Admin{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_stats') }}" style="color:#a1a1aa;text-decoration:none;">Statistics</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_stat_new') }}" style="color:#a1a1aa;text-decoration:none;">Select Event</a></li>
+    <li class="breadcrumb-item active">Select Fight</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Step 2: Select Fight in {{ event.eventName }}</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Showing all completed fights for this event</p>
+    </div>
+    <a href="{{ path('app_stat_new') }}" class="btn btn-sm btn-secondary"><i class="fa-solid fa-arrow-left me-1"></i>Back to Events</a>
+</div>
+
+<div class="row g-4">
+    {% for fight in fights %}
+    <div class="col-md-6">
+        <a href="{{ path('app_stat_new', {'fightId': fight.resultId}) }}" style="text-decoration:none;">
+            <div class="card card-link" style="background:#18181b;border:1px solid #27272a;transition:transform 0.2s;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-danger rounded-pill px-3">Fight #{{ fight.fightNumber }}</span>
+                        <div class="text-muted small">ID: FR-{{ fight.resultId }}</div>
+                    </div>
+                    
+                    <div class="row text-center align-items-center">
+                        <div class="col-5">
+                            <div class="fw-bold fs-5" style="color:#ef4444;">{{ fight.fighter1 ? fight.fighter1.fullName : 'Fighter 1' }}</div>
+                        </div>
+                        <div class="col-2">
+                            <div class="text-muted fw-bold">VS</div>
+                        </div>
+                        <div class="col-5">
+                            <div class="fw-bold fs-5" style="color:#3b82f6;">{{ fight.fighter2 ? fight.fighter2.fullName : 'Fighter 2' }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 p-2 rounded text-center" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);">
+                        <span class="text-muted small">Winner: </span>
+                        <span class="fw-bold" style="color:#fbbf24;">{{ fight.winner ? fight.winner.fullName : 'Draw/No Result' }}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5">
+        <i class="fa-solid fa-triangle-exclamation fa-4x mb-3 text-muted"></i>
+        <h3 class="text-muted">No completed fights found for this event.</h3>
+        <p class="text-muted">You must enter fight results before adding statistics.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+.card-link:hover { transform: translateY(-3px); border-color: #ef4444 !important; }
+</style>
+{% endblock %}

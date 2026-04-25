@@ -1,0 +1,235 @@
+{% extends 'front/base_front.html.twig' %}
+{% block title %}Book Tickets — SmartFight{% endblock %}
+
+{% block content %}
+<section class="py-5" style="background:#09090b;min-height:100vh;">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 style="font-family:'Oswald',sans-serif;color:#fff;font-size:2.4rem;" class="mb-0">BOOK TICKETS</h1>
+                <p class="text-muted mb-0">Experience combat sports live. Select your event and secure your seat.</p>
+            </div>
+            <a href="{{ path('front_booking_my') }}" class="btn btn-danger btn-lg px-4" style="border-radius:8px;">
+                <i class="fa-solid fa-ticket me-2"></i> View My Bookings
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card" style="background:#18181b;border:1px solid #27272a;border-radius:10px;">
+                    <div class="card-body p-4">
+                        <form method="post" id="bookingForm">
+                            <div class="mb-4">
+                                <label class="form-label" style="color:#a1a1aa;">Event</label>
+                                <select name="event_id" id="eventSelect" class="form-select form-select-lg" style="background:#09090b;border-color:#27272a;color:#fff;" required>
+                                    <option value="">Choose an event...</option>
+                                    {% for event in events %}
+                                        <option value="{{ event.id }}" 
+                                                data-name="{{ event.name }}" 
+                                                data-date="{{ event.startDate|date('d M Y') }}"
+                                                {% if event.id in bookedEventIds %}disabled{% endif %}>
+                                            {{ event.name }} — {{ event.startDate|date('d M Y') }}
+                                            {% if event.id in bookedEventIds %} (Already Booked){% endif %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Dynamic Messaging Container -->
+                            <div id="dynamicMessages" class="mb-4" style="display: none;">
+                                <div class="p-3 rounded" style="background: rgba(220, 38, 38, 0.05); border: 1px solid rgba(220, 38, 38, 0.2);">
+                                    <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #dc2626; font-weight: bold; margin-bottom: 8px;">Pricing Insight</div>
+                                    <ul id="messageList" class="list-unstyled mb-0" style="font-size: 0.9rem; color: #e4e4e7;">
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label" style="color:#a1a1aa;">Ticket Type</label>
+                                <div class="row g-3">
+                                    {% for typeKey, typeLabel in ticketTypes %}
+                                        <div class="col-md-4">
+                                            <label class="w-100 h-100">
+                                                <input type="radio" name="ticket_type" value="{{ typeKey }}" class="d-none ticket-type-radio" {% if loop.index == 3 %}checked{% endif %}>
+                                                <div class="p-3 h-100 ticket-type-card" data-type="{{ typeKey }}" style="border:1px solid #27272a;border-radius:8px;background:#09090b;cursor:pointer;transition: all 0.2s;">
+                                                    <div style="font-size:.75rem;letter-spacing:.08em;color:#71717a;text-transform:uppercase;">{{ typeLabel }}</div>
+                                                    <div class="mt-2" style="font-size:1.4rem;font-family:'Oswald',sans-serif;color:#fff;">
+                                                        $ <span class="price-display" data-type="{{ typeKey }}">---</span>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="row g-3 align-items-end mt-4">
+                                <div class="col-md-4">
+                                    <label class="form-label" style="color:#a1a1aa;">Quantity</label>
+                                    <input type="number" name="quantity" id="quantityInput" class="form-control form-control-lg" min="1" max="4" value="1" required style="background:#09090b;border-color:#27272a;color:#fff;">
+                                </div>
+                                <div class="col-md-8">
+                                    <button type="submit" id="submitBtn" class="btn btn-danger w-100 btn-lg fw-bold rounded-pill" disabled>Confirm Booking</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card" style="background:#18181b;border:1px solid #27272a;border-radius:10px;position:sticky;top:90px;">
+                    <div class="card-body p-4">
+                        <h6 style="color:#fff;font-family:'Oswald',sans-serif;font-size: 1.2rem;letter-spacing: 1px;">ORDER SUMMARY</h6>
+                        <div class="d-flex justify-content-between py-3 mt-3" style="border-bottom:1px solid #27272a;">
+                            <span style="color:#71717a;">Event</span>
+                            <span id="sumEvent" style="color:#fff;font-weight: 600;text-align: right;">—</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-3" style="border-bottom:1px solid #27272a;">
+                            <span style="color:#71717a;">Date</span>
+                            <span id="sumDate" style="color:#fff;">—</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-3" style="border-bottom:1px solid #27272a;">
+                            <span style="color:#71717a;">Availability</span>
+                            <span id="sumRemaining" style="color:#10b981;font-weight: bold;">—</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-3" style="border-bottom:1px solid #27272a;">
+                            <span style="color:#71717a;">Ticket Tier</span>
+                            <span id="sumType" style="color:#fff;font-weight: bold;">—</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-3" style="border-bottom:1px solid #27272a;">
+                            <span style="color:#71717a;">Quantity</span>
+                            <span id="sumQty" style="color:#fff;">1</span>
+                        </div>
+                        <div class="d-flex justify-content-between pt-4 mt-2">
+                            <span style="font-family:'Oswald',sans-serif;color:#fff;font-size:1.2rem;">TOTAL</span>
+                            <span id="sumTotal" style="font-family:'Oswald',sans-serif;color:#dc2626;font-size:1.6rem;">$0.00</span>
+                        </div>
+                        <div class="mt-4 text-center" style="font-size:.75rem;color:#52525b;">Limit 4 tickets per transaction. Secure payment processing.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    const eventDetails = {{ eventDetails|raw }};
+    
+    const eventSelect = document.getElementById('eventSelect');
+    const qtyInput = document.getElementById('quantityInput');
+    const typeRadios = document.querySelectorAll('.ticket-type-radio');
+    const typeCards = document.querySelectorAll('.ticket-type-card');
+    const priceDisplays = document.querySelectorAll('.price-display');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const dynamicMessages = document.getElementById('dynamicMessages');
+    const messageList = document.getElementById('messageList');
+
+    const sumEvent = document.getElementById('sumEvent');
+    const sumDate = document.getElementById('sumDate');
+    const sumRemaining = document.getElementById('sumRemaining');
+    const sumType = document.getElementById('sumType');
+    const sumQty = document.getElementById('sumQty');
+    const sumTotal = document.getElementById('sumTotal');
+
+    function getFriendlyLabel(key) {
+        return key.replace(/_/g, ' ');
+    }
+
+    function selectedType() {
+        const checked = document.querySelector('.ticket-type-radio:checked');
+        return checked ? checked.value : null;
+    }
+
+    function highlightCards() {
+        const type = selectedType();
+        typeCards.forEach((card) => {
+            if (card.dataset.type === type && eventSelect.value) {
+                card.style.borderColor = '#dc2626';
+                card.style.boxShadow = '0 0 0 1px #dc2626 inset';
+                card.style.background = 'rgba(220, 38, 38, 0.05)';
+            } else {
+                card.style.borderColor = '#27272a';
+                card.style.boxShadow = 'none';
+                card.style.background = '#09090b';
+            }
+        });
+    }
+
+    function updateSummary() {
+        const eventId = eventSelect.value;
+        const type = selectedType();
+        const qty = Math.max(1, Math.min(4, parseInt(qtyInput.value || '1', 10)));
+        qtyInput.value = qty;
+
+        highlightCards();
+
+        if (!eventId) {
+            priceDisplays.forEach(el => el.textContent = '---');
+            sumEvent.textContent = '—';
+            sumDate.textContent = '—';
+            sumRemaining.textContent = '—';
+            sumType.textContent = '—';
+            sumQty.textContent = '1';
+            sumTotal.textContent = '$0.00';
+            dynamicMessages.style.display = 'none';
+            submitBtn.disabled = true;
+            return;
+        }
+
+        const details = eventDetails[eventId];
+        if (!details) return;
+
+        // Update card prices
+        priceDisplays.forEach(el => {
+            const t = el.dataset.type;
+            if (details.prices[t]) {
+                el.textContent = details.prices[t].toFixed(2);
+            }
+        });
+
+        // Update Messages
+        if (details.messages && details.messages.length > 0) {
+            messageList.innerHTML = details.messages.map(m => `<li class="mb-1"><i class="fa-solid fa-circle-info me-2 text-muted"></i>${m}</li>`).join('');
+            dynamicMessages.style.display = 'block';
+        } else {
+            dynamicMessages.style.display = 'none';
+        }
+
+        // Update Summary Sidebar
+        const option = eventSelect.options[eventSelect.selectedIndex];
+        sumEvent.textContent = option.dataset.name;
+        sumDate.textContent = option.dataset.date;
+        
+        if (details.remaining <= 0) {
+            sumRemaining.textContent = 'SOLD OUT';
+            sumRemaining.style.color = '#ef4444';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sold Out';
+        } else {
+            sumRemaining.textContent = details.remaining + (details.remaining === 1 ? ' seat' : ' seats');
+            sumRemaining.style.color = '#10b981';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Confirm Booking';
+        }
+
+        if (type && details.prices[type]) {
+            sumType.textContent = getFriendlyLabel(type);
+            sumQty.textContent = String(qty);
+            sumTotal.textContent = '$' + (details.prices[type] * qty).toFixed(2);
+        }
+    }
+
+    eventSelect.addEventListener('change', updateSummary);
+    qtyInput.addEventListener('input', updateSummary);
+    typeRadios.forEach((radio) => radio.addEventListener('change', updateSummary));
+    
+    // Initialize
+    updateSummary();
+})();
+</script>
+{% endblock %}

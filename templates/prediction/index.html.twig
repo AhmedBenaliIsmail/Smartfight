@@ -1,0 +1,175 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Prediction Center — SmartFight{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item active">Prediction Center</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Prediction Center</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Place your bets on upcoming professional bouts</p>
+    </div>
+    <div class="text-end">
+        <div class="text-muted small mb-1">Your Season Score</div>
+        <div class="h2 mb-0 fw-bold text-blue">{{ app.user.predictionPoints|default(0) }} <span style="font-size: .8rem; font-weight: normal; color: #a1a1aa;">PTS</span></div>
+    </div>
+</div>
+
+{% if is_granted('ROLE_ADMIN') %}
+<div class="alert alert-info border-0 mb-4" style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6 !important;">
+    <div class="d-flex align-items-center">
+        <i class="fa-solid fa-eye fa-2x me-3 text-blue"></i>
+        <div>
+            <h4 class="alert-title mb-1 text-blue">Read-Only Mode</h4>
+            <div class="text-muted">You are viewing the Prediction Center as an Administrator. You can see upcoming fights and community predictions, but you cannot submit predictions yourself.</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <h2 class="h5 mb-3" style="color:#fafafa;"><i class="fa-solid fa-fire me-2 text-danger"></i>Open for Predictions</h2>
+        
+        {% for fight in upcomingFights %}
+            {% set myPred = predictionMap[fight.resultId]|default(null) %}
+            <div class="card mb-3" style="background:#18181b; border:1px solid #27272a; overflow:hidden;">
+                <div class="card-header border-0 d-flex justify-content-between align-items-center py-2" style="background: #27272a;">
+                    <span class="small fw-bold" style="color:#a1a1aa;">{{ fight.event.eventName }} • {{ fight.event.eventDate|date('M d, Y') }}</span>
+                    {% if myPred %}
+                        <span class="badge bg-green-lt"><i class="fa-solid fa-check me-1"></i>PREDICTED</span>
+                    {% else %}
+                        <span class="badge bg-blue-lt">PENDING</span>
+                    {% endif %}
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ path('app_prediction_submit', {fightId: fight.resultId}) }}" method="post">
+                        <fieldset {% if is_granted('ROLE_ADMIN') %}disabled{% endif %}>
+                        <div class="row align-items-center text-center">
+                            <!-- Fighter 1 -->
+                            <div class="col-5">
+                                <label class="d-block cursor-pointer">
+                                    <input type="radio" name="predictedWinnerId" value="{{ fight.fighter1.fighterId }}" class="btn-check" required {% if myPred and myPred.predictedWinner.fighterId|default(0) == fight.fighter1.fighterId %}checked{% endif %}>
+                                    <div class="prediction-fighter-card p-3 rounded border-2 border" style="border-color: #27272a; transition: all 0.2s;">
+                                        <div class="avatar avatar-xl mb-2" style="background:#27272a; color:#ef4444; width:64px; height:64px;">
+                                            {% if fight.fighter1.photoFilename %}
+                                                <img src="{{ asset('uploads/boxers/' ~ fight.fighter1.photoFilename) }}" class="rounded-circle" style="width:100%; height:100%; object-fit:cover;">
+                                            {% else %}
+                                                <i class="fa-solid fa-user fa-2x"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div class="fw-bold text-truncate" style="color:#fafafa;">{{ fight.fighter1.lastName }}</div>
+                                        <div class="text-muted x-small">{{ fight.fighter1.wins }}-{{ fight.fighter1.losses }}</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="col-2">
+                                <div class="fw-bold text-muted h4 mb-0">VS</div>
+                                <label class="mt-2 small cursor-pointer d-block">
+                                    <input type="radio" name="predictedWinnerId" value="" class="btn-check" {% if myPred and myPred.predictedWinner == null %}checked{% endif %}>
+                                    <div class="badge bg-secondary-lt">DRAW</div>
+                                </label>
+                            </div>
+
+                            <!-- Fighter 2 -->
+                            <div class="col-5">
+                                <label class="d-block cursor-pointer">
+                                    <input type="radio" name="predictedWinnerId" value="{{ fight.fighter2.fighterId }}" class="btn-check" required {% if myPred and myPred.predictedWinner.fighterId|default(0) == fight.fighter2.fighterId %}checked{% endif %}>
+                                    <div class="prediction-fighter-card p-3 rounded border-2 border" style="border-color: #27272a; transition: all 0.2s;">
+                                        <div class="avatar avatar-xl mb-2" style="background:#27272a; color:#3b82f6; width:64px; height:64px;">
+                                             {% if fight.fighter2.photoFilename %}
+                                                <img src="{{ asset('uploads/boxers/' ~ fight.fighter2.photoFilename) }}" class="rounded-circle" style="width:100%; height:100%; object-fit:cover;">
+                                            {% else %}
+                                                <i class="fa-solid fa-user fa-2x"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div class="fw-bold text-truncate" style="color:#fafafa;">{{ fight.fighter2.lastName }}</div>
+                                        <div class="text-muted x-small">{{ fight.fighter2.wins }}-{{ fight.fighter2.losses }}</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4 g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted">Method of Victory</label>
+                                <select name="method" class="form-select bg-dark border-secondary text-white" required>
+                                    <option value="DECISION" {% if myPred and myPred.predictedMethod == 'DECISION' %}selected{% endif %}>Decision (UD/SD/MD)</option>
+                                    <option value="KO" {% if myPred and myPred.predictedMethod == 'KO' %}selected{% endif %}>KO / TKO</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted">Predicted Round (If KO)</label>
+                                <select name="round" class="form-select bg-dark border-secondary text-white">
+                                    <option value="">N/A (Decision)</option>
+                                    {% for r in 1..12 %}
+                                        <option value="{{ r }}" {% if myPred and myPred.predictedRound == r %}selected{% endif %}>Round {{ r }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <div class="btn btn-secondary w-100 py-2 disabled">
+                                    <i class="fa-solid fa-eye me-2"></i>Admin Read-Only Mode
+                                </div>
+                            {% else %}
+                                <button type="submit" class="btn btn-primary w-100 py-2">
+                                    <i class="fa-solid fa-paper-plane me-2"></i>
+                                    {{ myPred ? 'Update Prediction' : 'Lock in Prediction' }}
+                                </button>
+                            {% endif %}
+                        </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info border-0 p-5 text-center" style="background:#18181b;">
+                <i class="fa-solid fa-hourglass-start fa-3x mb-3 text-muted"></i>
+                <h4 style="color:#fafafa;">No Upcoming Fights</h4>
+                <p class="text-muted mb-0">Check back later for new scheduled events.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="col-lg-5">
+        <h2 class="h5 mb-3" style="color:#fafafa;"><i class="fa-solid fa-history me-2 text-blue"></i>Your Recent History</h2>
+        <div class="card" style="background:#18181b; border:1px solid #27272a;">
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% set processedPredictions = myPredictions|filter(p => p.isProcessed) %}
+                    {% for pred in processedPredictions %}
+                        <div class="list-group-item bg-transparent border-secondary p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small fw-bold" style="color:#fafafa;">{{ pred.fight.fighter1.lastName }} vs {{ pred.fight.fighter2.lastName }}</span>
+                                <span class="badge {{ pred.pointsAwarded > 0 ? 'bg-success-lt' : 'bg-danger-lt' }}">
+                                    {{ pred.pointsAwarded > 0 ? '+' ~ pred.pointsAwarded ~ ' PTS' : '0 PTS' }}
+                                </span>
+                            </div>
+                            <div class="small text-muted">
+                                Picked: {{ pred.predictedWinner.lastName|default('Draw') }} by {{ pred.predictedMethod }} 
+                                {% if pred.predictedRound %}(Rd {{ pred.predictedRound }}){% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="p-4 text-center text-muted small">No completed predictions yet.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .prediction-fighter-card:hover { background: #27272a; }
+    .btn-check:checked + .prediction-fighter-card { border-color: #3b82f6 !important; background: rgba(59, 130, 246, 0.1); }
+    .x-small { font-size: 0.75rem; }
+</style>
+{% endblock %}

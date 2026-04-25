@@ -1,0 +1,101 @@
+{% extends 'front/base_front.html.twig' %}
+{% block title %}Leaderboard — SmartFight{% endblock %}
+
+{% block content %}
+<section class="py-5" style="background:#09090b;min-height:100vh;">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h1 style="font-family:'Oswald',sans-serif;color:#fff;font-size:3rem;letter-spacing:2px;">LEADERBOARD</h1>
+            <p class="text-muted">Season {{ season }} standings — top prediction players</p>
+        </div>
+
+        {# Podium Top 3 #}
+        {% if topThree|length >= 1 %}
+        <div class="row justify-content-center align-items-end mb-5 g-3">
+            {# 2nd place #}
+            {% if topThree|length >= 2 %}
+            <div class="col-4 col-md-3 text-center">
+                <div style="font-size:2rem;">🥈</div>
+                <div style="background:#18181b;border:1px solid #27272a;border-radius:10px;padding:1.5rem 1rem;">
+                    <div style="font-size:1.5rem;font-weight:700;color:#71717a;">2</div>
+                    <div style="color:#fff;font-weight:600;font-size:.9rem;">{{ topThree[1].first_name }} {{ topThree[1].last_name }}</div>
+                    <div style="color:#c9a227;font-family:'Oswald',sans-serif;font-size:1.2rem;">{{ topThree[1].total_points }} pts</div>
+                </div>
+            </div>
+            {% endif %}
+
+            {# 1st place #}
+            <div class="col-4 col-md-3 text-center">
+                <div style="font-size:2.5rem;">🥇</div>
+                <div style="background:#18181b;border:2px solid #c9a227;border-radius:10px;padding:2rem 1rem;">
+                    <div style="font-size:2rem;font-weight:700;color:#c9a227;">1</div>
+                    <div style="color:#fff;font-weight:600;">{{ topThree[0].first_name }} {{ topThree[0].last_name }}</div>
+                    <div style="color:#c9a227;font-family:'Oswald',sans-serif;font-size:1.5rem;">{{ topThree[0].total_points }} pts</div>
+                </div>
+            </div>
+
+            {# 3rd place #}
+            {% if topThree|length >= 3 %}
+            <div class="col-4 col-md-3 text-center">
+                <div style="font-size:2rem;">🥉</div>
+                <div style="background:#18181b;border:1px solid #27272a;border-radius:10px;padding:1.5rem 1rem;">
+                    <div style="font-size:1.5rem;font-weight:700;color:#c9a227;">3</div>
+                    <div style="color:#fff;font-weight:600;font-size:.9rem;">{{ topThree[2].first_name }} {{ topThree[2].last_name }}</div>
+                    <div style="color:#c9a227;font-family:'Oswald',sans-serif;font-size:1.2rem;">{{ topThree[2].total_points }} pts</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {# Full Rankings Table #}
+        <div class="card" style="background:#18181b;border:1px solid #27272a;border-radius:10px;">
+            <div class="table-responsive">
+                <table class="table table-dark mb-0" style="--bs-table-bg:#18181b;">
+                    <thead>
+                        <tr style="border-bottom:1px solid #27272a;">
+                            <th style="color:#71717a;">#</th>
+                            <th style="color:#71717a;">Fan</th>
+                            <th style="color:#71717a;">Points</th>
+                            <th style="color:#71717a;">Predictions</th>
+                            <th style="color:#71717a;">Accuracy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rankings %}
+                        <tr {% if app.user and app.user.id == row.fan_id %}style="background:#1c1116;"{% endif %}>
+                            <td style="color:{% if row.rank <= 3 %}#c9a227{% else %}#71717a{% endif %};font-weight:{% if row.rank <= 3 %}700{% else %}400{% endif %};">
+                                {{ row.rank }}
+                            </td>
+                            <td style="color:#fff;">
+                                {{ row.first_name }} {{ row.last_name }}
+                                {% if app.user and app.user.id == row.fan_id %}
+                                    <span class="badge ms-2" style="background:#dc2626;font-size:.65rem;">YOU</span>
+                                {% endif %}
+                            </td>
+                            <td style="color:#c9a227;font-weight:600;">{{ row.total_points }}</td>
+                            <td style="color:#a1a1aa;">{{ row.total_predictions }}</td>
+                            <td>
+                                <div class="progress" style="height:6px;background:#27272a;width:80px;display:inline-block;vertical-align:middle;">
+                                    <div class="progress-bar" style="width:{{ row.accuracy }}%;background:#dc2626;"></div>
+                                </div>
+                                <small style="color:#71717a;margin-left:.5rem;">{{ row.accuracy }}%</small>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="5" class="text-center text-muted py-5">No scored predictions yet for season {{ season }}.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if myRank %}
+        <div class="alert mt-4" style="background:#1c1116;border:1px solid #dc2626;color:#d4d4d8;border-radius:8px;">
+            <i class="fa-solid fa-trophy me-2" style="color:#c9a227;"></i>
+            Your current rank: <strong style="color:#c9a227;">#{{ myRank }}</strong>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends 'admin/base_admin.html.twig' %}
+{% set breadcrumb_title = 'Bookings' %}
+
+{% block admin_content %}
+<div class="page-header d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h2 class="page-title mb-1" style="font-family:'Oswald',sans-serif;color:#fff;">Event Bookings</h2>
+        <p class="text-muted mb-0">{{ pagination.getTotalItemCount() }} bookings</p>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card" style="background:#18181b;border:1px solid #27272a;"><div class="card-body text-center">
+            <div style="font-size:1.8rem;font-weight:700;color:#fff;">{{ stats.total_bookings|default(0) }}</div>
+            <div style="color:#71717a;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;">Total Bookings</div>
+        </div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card" style="background:#18181b;border:1px solid #27272a;"><div class="card-body text-center">
+            <div style="font-size:1.8rem;font-weight:700;color:#16a34a;">{{ stats.confirmed_count|default(0) }}</div>
+            <div style="color:#71717a;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;">Confirmed</div>
+        </div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card" style="background:#18181b;border:1px solid #27272a;"><div class="card-body text-center">
+            <div style="font-size:1.8rem;font-weight:700;color:#dc2626;">{{ stats.cancelled_count|default(0) }}</div>
+            <div style="color:#71717a;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;">Cancelled</div>
+        </div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card" style="background:#18181b;border:1px solid #27272a;"><div class="card-body text-center">
+            <div style="font-size:1.8rem;font-weight:700;color:#c9a227;">${{ stats.total_revenue|default(0) }}</div>
+            <div style="color:#71717a;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;">Revenue</div>
+        </div></div>
+    </div>
+</div>
+
+<div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-6">
+                <select name="event" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;">
+                    <option value="">All Events</option>
+                    {% for event in events %}
+                        <option value="{{ event.eventId }}" {% if filters.event|default('') == (event.eventId ~ '') %}selected{% endif %}>{{ event.eventName }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select name="status" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;">
+                    <option value="">All Status</option>
+                    <option value="CONFIRMED" {% if filters.status|default('') == 'CONFIRMED' %}selected{% endif %}>CONFIRMED</option>
+                    <option value="CANCELLED" {% if filters.status|default('') == 'CANCELLED' %}selected{% endif %}>CANCELLED</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-secondary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card" style="background:#18181b;border:1px solid #27272a;">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0" style="--bs-table-bg:#18181b;">
+            <thead>
+            <tr style="border-bottom:1px solid #27272a;">
+                <th style="color:#71717a;">Event</th>
+                <th style="color:#71717a;">Fan</th>
+                <th style="color:#71717a;">Email</th>
+                <th style="color:#71717a;">Type</th>
+                <th style="color:#71717a;">Qty</th>
+                <th style="color:#71717a;">Total</th>
+                <th style="color:#71717a;">Date</th>
+                <th style="color:#71717a;">Status</th>
+                <th style="color:#71717a;">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for booking in pagination %}
+                <tr>
+                    <td style="color:#fff;">{{ booking.event.eventName }}</td>
+                    <td style="color:#d4d4d8;">{{ booking.user.fullName }}</td>
+                    <td style="color:#a1a1aa;">{{ booking.user.email }}</td>
+                    <td><span class="badge bg-secondary">{{ booking.ticketType }}</span></td>
+                    <td style="color:#fff;">{{ booking.ticketQuantity }}</td>
+                    <td style="color:#c9a227;">${{ booking.totalPrice }}</td>
+                    <td style="color:#a1a1aa;">{{ booking.bookingDate|date('d M Y') }}</td>
+                    <td>
+                        {% if booking.bookingStatus == 'CONFIRMED' %}
+                            <span class="badge" style="background:#16a34a;">CONFIRMED</span>
+                        {% else %}
+                            <span class="badge" style="background:#dc2626;">CANCELLED</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            {% if booking.bookingStatus == 'CONFIRMED' %}
+                                <a href="{{ path('admin_booking_qr', {id: booking.id}) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fa-solid fa-qrcode"></i>
+                                </a>
+                                <form method="post" action="{{ path('admin_booking_cancel', {id: booking.id}) }}" onsubmit="return confirm('Cancel this booking?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('admin_cancel_booking_' ~ booking.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-xmark"></i></button>
+                                </form>
+                            {% else %}
+                                <span class="text-muted" style="font-size:.8rem;">No actions</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="9" class="text-center text-muted py-5">No bookings found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if pagination.pageCount > 1 %}
+        <div class="card-footer d-flex justify-content-center" style="border-top:1px solid #27272a;background:#18181b;">
+            {{ knp_pagination_render(pagination) }}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

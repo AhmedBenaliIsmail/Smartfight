@@ -1,0 +1,161 @@
+{% extends 'front/base_front.html.twig' %}
+{% block title %}Blog & News — SmartFight{% endblock %}
+
+{% block extra_css %}
+<style>
+    #blog-pagination .pagination {
+        gap: .35rem;
+        margin-bottom: 0;
+    }
+
+    #blog-pagination .page-link {
+        background: #18181b;
+        border: 1px solid #27272a;
+        color: #a1a1aa;
+        border-radius: .45rem;
+        min-width: 2.4rem;
+        text-align: center;
+        font-size: .82rem;
+        font-weight: 600;
+        transition: all .18s ease;
+    }
+
+    #blog-pagination .page-link:hover {
+        background: #1f1f23;
+        border-color: #dc2626;
+        color: #fafafa;
+    }
+
+    #blog-pagination .page-item.active .page-link {
+        background: #dc2626;
+        border-color: #dc2626;
+        color: #fff;
+        box-shadow: 0 0 0 1px rgba(220, 38, 38, .2);
+    }
+
+    #blog-pagination .page-item.disabled .page-link {
+        background: #131316;
+        border-color: #27272a;
+        color: #52525b;
+    }
+
+    #blog-pagination .page-item.previous .page-link,
+    #blog-pagination .page-item.next .page-link {
+        padding-left: .9rem;
+        padding-right: .9rem;
+        letter-spacing: .03em;
+        text-transform: uppercase;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-5" style="background:#09090b;min-height:100vh;">
+    <div class="container">
+
+        {# Featured Article #}
+        {% if featured %}
+        <div class="mb-5">
+            <div class="row g-0" style="background:#18181b;border:1px solid #27272a;border-radius:12px;overflow:hidden;">
+                <div class="col-md-6">
+                    {% if featured.imagePath %}
+                        <img src="{{ vich_uploader_asset(featured, 'imageFile') }}" alt="{{ featured.title }}" style="width:100%;height:100%;object-fit:cover;min-height:300px;">
+                    {% else %}
+                        <div style="background:#27272a;height:100%;min-height:300px;display:flex;align-items:center;justify-content:center;">
+                            <i class="fa-solid fa-newspaper" style="font-size:3rem;color:#52525b;"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 d-flex flex-column justify-content-center p-4 p-lg-5">
+                    <span style="color:#dc2626;font-family:'Oswald',sans-serif;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;">Featured</span>
+                    <h2 style="font-family:'Oswald',sans-serif;color:#fff;margin-top:.5rem;">{{ featured.title }}</h2>
+                    {% if featured.summary %}
+                        <p style="color:#a1a1aa;">{{ featured.summary }}</p>
+                    {% endif %}
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <span style="color:#71717a;font-size:.85rem;">{{ featured.createdAt|date('d M Y') }}</span>
+                        <span style="color:#71717a;font-size:.85rem;"><i class="fa-solid fa-eye me-1"></i>{{ featured.viewCount }}</span>
+                    </div>
+                    <a href="{{ path('front_blog_show', {id: featured.id}) }}" class="btn btn-sf-primary" style="align-self:flex-start;">
+                        Read More <i class="fa-solid fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row">
+            {# Articles Grid #}
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h3 style="font-family:'Oswald',sans-serif;color:#fff;margin:0;">Latest Articles</h3>
+                </div>
+
+                <div class="row g-4">
+                    {% for article in pagination %}
+                    <div class="col-md-6">
+                        <div class="card h-100" style="background:#18181b;border:1px solid #27272a;border-radius:10px;overflow:hidden;">
+                            {% if article.imagePath %}
+                                <img src="{{ vich_uploader_asset(article, 'imageFile') }}" alt="{{ article.title }}" style="height:200px;width:100%;object-fit:cover;">
+                            {% else %}
+                                <div style="height:160px;background:#27272a;display:flex;align-items:center;justify-content:center;">
+                                    <i class="fa-solid fa-newspaper" style="font-size:2rem;color:#52525b;"></i>
+                                </div>
+                            {% endif %}
+                            <div class="card-body d-flex flex-column">
+                                <span class="badge mb-2" style="background:#dc2626;color:#fff;align-self:flex-start;">{{ article.category.name }}</span>
+                                <h5 style="font-family:'Oswald',sans-serif;color:#fff;">{{ article.title }}</h5>
+                                {% if article.summary %}
+                                    <p style="color:#a1a1aa;font-size:.9rem;flex-grow:1;">{{ article.summary|length > 100 ? article.summary|slice(0,100) ~ '…' : article.summary }}</p>
+                                {% endif %}
+                                <div class="d-flex align-items-center justify-content-between mt-auto pt-3" style="border-top:1px solid #27272a;">
+                                    <span style="color:#71717a;font-size:.8rem;">{{ article.createdAt|date('d M Y') }}</span>
+                                    <a href="{{ path('front_blog_show', {id: article.id}) }}" class="btn btn-sm btn-outline-danger">Read</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-12 text-center py-5">
+                        <p class="text-muted">No articles found.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if pagination.pageCount > 1 %}
+                <div id="blog-pagination" class="d-flex justify-content-center mt-4">
+                    {{ knp_pagination_render(pagination) }}
+                </div>
+                {% endif %}
+            </div>
+
+            {# Sidebar: Categories #}
+            <div class="col-lg-4">
+                <div class="card" style="background:#18181b;border:1px solid #27272a;border-radius:10px;position:sticky;top:80px;">
+                    <div class="card-header" style="border-bottom:1px solid #27272a;">
+                        <h6 style="font-family:'Oswald',sans-serif;color:#fff;margin:0;letter-spacing:1px;">CATEGORIES</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <a href="{{ path('front_blog_index') }}"
+                           class="d-flex align-items-center justify-content-between p-3 text-decoration-none {% if not activeCategory %}active{% endif %}"
+                           style="color:#d4d4d8;border-bottom:1px solid #27272a;">
+                            <span>All Articles</span>
+                            <span class="badge bg-secondary">{{ pagination.getTotalItemCount() }}</span>
+                        </a>
+                        {% for row in categories %}
+                            {% set cat = row[0] is defined ? row[0] : row %}
+                            {% set count = row.articleCount is defined ? row.articleCount : 0 %}
+                            <a href="{{ path('front_blog_index', {category: cat.slug}) }}"
+                               class="d-flex align-items-center justify-content-between p-3 text-decoration-none"
+                               style="color:{% if activeCategory == cat.slug %}#dc2626{% else %}#d4d4d8{% endif %};border-bottom:1px solid #27272a;">
+                                <span>{{ cat.name }}</span>
+                                <span class="badge" style="background:#dc2626;">{{ count }}</span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,205 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SmartFight Admin — Create Major Event{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_events') }}" style="color:#a1a1aa;text-decoration:none;">Schedule</a></li>
+    <li class="breadcrumb-item active">Major Event</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fbbf24;"><i class="fa-solid fa-crown me-2"></i>Create World Title Card</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Automatically schedule #1 vs #2 contenders for Sanctioned Titles</p>
+    </div>
+    <a href="{{ path('app_events') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+</div>
+
+<form method="post">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card mb-4" style="background:#18181b;border:1px solid #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.1);">
+                <div class="card-header" style="background:#18181b;border-bottom:1px solid #3f3f46;">
+                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;">Event & Sanctioning Details</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label" style="color:#a1a1aa;">Event Branding <span style="color:#dc2626;">*</span></label>
+                        <input type="text" name="eventName" class="form-control" style="background:#27272a;border-color:#3f3f46;color:#fafafa;" placeholder="e.g. World Boxing Super Series Final" required />
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" style="color:#a1a1aa;">Date <span style="color:#dc2626;">*</span></label>
+                            <input type="date" name="eventDate" class="form-control" style="background:#27272a;border-color:#3f3f46;color:#fafafa;" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" style="color:#a1a1aa;">Primary Organization</label>
+                            <select name="organization" class="form-select" style="background:#27272a;border-color:#3f3f46;color:#fafafa;">
+                                <option value="UNDISPUTED">UNDISPUTED (Unified)</option>
+                                <option value="WBC">WBC</option>
+                                <option value="WBA">WBA</option>
+                                <option value="IBF">IBF</option>
+                                <option value="WBO">WBO</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" style="color:#a1a1aa;">City <span style="color:#dc2626;">*</span></label>
+                            <select id="city-selector" name="city" class="form-select" style="background:#27272a;border-color:#3f3f46;color:#fafafa;" required>
+                                <option value="">Select City...</option>
+                                <option value="Anaheim, USA">Anaheim, USA</option>
+                                <option value="Antalya, Turkey">Antalya, Turkey</option>
+                                <option value="Arlington, USA">Arlington, USA</option>
+                                <option value="Astana, Kazakhstan">Astana, Kazakhstan</option>
+                                <option value="Atlanta, USA">Atlanta, USA</option>
+                                <option value="Atlantic City, USA">Atlantic City, USA</option>
+                                <option value="Baku, Azerbaijan">Baku, Azerbaijan</option>
+                                <option value="Bangkok, Thailand">Bangkok, Thailand</option>
+                                <option value="Belfast, UK">Belfast, UK</option>
+                                <option value="Belgrade, Serbia">Belgrade, Serbia</option>
+                                <option value="Berlin, Germany">Berlin, Germany</option>
+                                <option value="Brooklyn, USA">Brooklyn, USA</option>
+                                <option value="Cardiff, Wales">Cardiff, Wales</option>
+                                <option value="Chicago, USA">Chicago, USA</option>
+                                <option value="Cleveland, USA">Cleveland, USA</option>
+                                <option value="Dallas, USA">Dallas, USA</option>
+                                <option value="Doha, Qatar">Doha, Qatar</option>
+                                <option value="London, UK">London, UK</option>
+                                <option value="Manchester, UK">Manchester, UK</option>
+                                <option value="Glasgow, Scotland">Glasgow, Scotland</option>
+                                <option value="Hamburg, Germany">Hamburg, Germany</option>
+                                <option value="Houston, USA">Houston, USA</option>
+                                <option value="Istanbul, Turkey">Istanbul, Turkey</option>
+                                <option value="Las Vegas, USA">Las Vegas, USA</option>
+                                <option value="Los Angeles, USA">Los Angeles, USA</option>
+                                <option value="Miami Gardens, USA">Miami Gardens, USA</option>
+                                <option value="Milan, Italy">Milan, Italy</option>
+                                <option value="New Delhi, India">New Delhi, India</option>
+                                <option value="New York, USA">New York, USA</option>
+                                <option value="Riyadh, Saudi Arabia">Riyadh, Saudi Arabia</option>
+                                <option value="Tokyo, Japan">Tokyo, Japan</option>
+                                <option value="Tashkent, Uzbekistan">Tashkent, Uzbekistan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" style="color:#a1a1aa;">Venue <span style="color:#dc2626;">*</span></label>
+                            <select id="venue-selector" name="venue" class="form-select" style="background:#27272a;border-color:#3f3f46;color:#fafafa;" required>
+                                <option value="">Select Venue...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-list-ol me-2" style="color:#fbbf24;"></i>Select Championship Divisions</h3>
+                    <p class="mb-0 mt-1" style="color:#a1a1aa;font-size:0.8rem;">Select 3 different divisions. The system will auto-schedule the top 2 ranked boxers in each.</p>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        {% for i in 1..3 %}
+                        <div class="col-md-4">
+                            <label class="form-label" style="color:#a1a1aa;">Title Fight {{ i }} Division</label>
+                            <select name="wd{{ i }}" class="form-select wc-selector" data-index="{{ i }}" style="background:#27272a;border-color:#3f3f46;color:#fafafa;" required>
+                                <option value="">Choose Division...</option>
+                                {% for wd in weightDivisions %}
+                                    <option value="{{ wd.id }}">{{ wd.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-body p-4">
+                    <button type="submit" class="btn w-100 py-2 fw-bold" style="background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border:none; color:white; font-size:1.1rem; box-shadow: 0 4px 14px 0 rgba(251, 191, 36, 0.39);">
+                        <i class="fa-solid fa-bolt me-2"></i>Generate Sanctioned Card
+                    </button>
+                    <p class="text-center mt-2 mb-0" style="color:#a1a1aa;font-size:0.8rem;">This will find the top 2 boxers in these divisions and setup the Triple-Header immediately.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectors = document.querySelectorAll('.wc-selector');
+    
+    function updateOptions() {
+        const selectedValues = Array.from(selectors).map(s => s.value).filter(v => v !== "");
+        
+        selectors.forEach(selector => {
+            const currentValue = selector.value;
+            const options = selector.querySelectorAll('option');
+            
+            options.forEach(option => {
+                if (option.value === "") return;
+                const isSelectedElsewhere = selectedValues.includes(option.value) && option.value !== currentValue;
+                option.disabled = isSelectedElsewhere;
+                option.style.display = isSelectedElsewhere ? 'none' : 'block';
+            });
+        });
+    }
+
+    selectors.forEach(s => s.addEventListener('change', updateOptions));
+
+    const venueData = {
+        "Anaheim, USA": ["Honda Center"],
+        "Antalya, Turkey": ["Antalya Expo Center"],
+        "Arlington, USA": ["AT&T Stadium"],
+        "Astana, Kazakhstan": ["Barys Arena", "Saryarka Velodrome"],
+        "Atlanta, USA": ["Mercedes-Benz Stadium", "State Farm Arena"],
+        "Atlantic City, USA": ["Boardwalk Hall"],
+        "Baku, Azerbaijan": ["Baku Crystal Hall"],
+        "Bangkok, Thailand": ["Rajadamnern Stadium", "Lumpinee Stadium"],
+        "Belfast, UK": ["SSE Arena", "Odyssey Complex"],
+        "Belgrade, Serbia": ["Stark Arena"],
+        "Berlin, Germany": ["Max-Schmeling-Halle"],
+        "Brooklyn, USA": ["Barclays Center"],
+        "Cardiff, Wales": ["Principality Stadium", "Motorpoint Arena"],
+        "Chicago, USA": ["United Center", "UIC Pavilion"],
+        "Cleveland, USA": ["Rocket Mortgage FieldHouse"],
+        "Dallas, USA": ["American Airlines Center"],
+        "Doha, Qatar": ["Lusail Sports Arena"],
+        "London, UK": ["Wembley Stadium", "O2 Arena", "Copper Box Arena", "York Hall"],
+        "Manchester, UK": ["AO Arena", "Manchester Arena"],
+        "Glasgow, Scotland": ["SSE Hydro"],
+        "Hamburg, Germany": ["Barclaycard Arena"],
+        "Houston, USA": ["Toyota Center", "NRG Stadium"],
+        "Istanbul, Turkey": ["Sinan Erdem Dome"],
+        "Las Vegas, USA": ["MGM Grand Garden Arena", "Mandalay Bay Events Center", "T-Mobile Arena", "Caesars Palace"],
+        "Los Angeles, USA": ["Crypto.com Arena", "Kia Forum", "Staples Center"],
+        "Miami Gardens, USA": ["Hard Rock Stadium"],
+        "Milan, Italy": ["Mediolanum Forum"],
+        "New Delhi, India": ["Indira Gandhi Arena"],
+        "New York, USA": ["Madison Square Garden", "Barclays Center", "Radio City Music Hall"],
+        "Riyadh, Saudi Arabia": ["Kingdom Arena", "Boulevard Hall", "Riyadh International Convention & Exhibition Center"],
+        "Tokyo, Japan": ["Tokyo Dome", "Ariake Arena", "Saitama Super Arena"],
+        "Tashkent, Uzbekistan": ["Humo Arena"]
+    };
+
+    const citySelector = document.getElementById('city-selector');
+    const venueSelector = document.getElementById('venue-selector');
+
+    function updateVenues() {
+        const city = citySelector.value;
+        const venues = venueData[city] || [];
+        
+        venueSelector.innerHTML = '<option value="">Select Venue...</option>';
+        venues.forEach(v => {
+            const opt = document.createElement('option');
+            opt.value = v;
+            opt.textContent = v;
+            venueSelector.appendChild(opt);
+        });
+    }
+
+    citySelector.addEventListener('change', updateVenues);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Profile — SmartFight{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item active">My Profile</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">My Profile</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Manage your account details and security</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-user me-2" style="color:#3b82f6;"></i>Account Details</h3>
+            </div>
+            <div class="card-body p-4">
+                <form action="{{ path('app_user_update', {'id': user.userId}) }}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label" style="color:#d4d4d8;">Username</label>
+                        <input type="text" name="username" class="form-control" value="{{ user.username }}" required />
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label" style="color:#d4d4d8;">Email</label>
+                        <input type="email" name="email" class="form-control" value="{{ user.email }}" required />
+                    </div>
+                    
+                    <div class="mb-4 p-3 rounded" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);">
+                        <div class="d-flex w-100 justify-content-between">
+                            <span style="color:#a1a1aa;font-size:0.875rem;">Account Created:</span>
+                            <span style="color:#fafafa;font-weight:500;">{{ user.createdDate ? user.createdDate|date('Y-m-d') : 'Unknown' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn" style="background:#dc2626;color:#fff;border:none;">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-lock me-2" style="color:#eab308;"></i>Security</h3>
+            </div>
+            <div class="card-body p-4">
+                <form action="{{ path('app_user_password', {'id': user.userId}) }}" method="post">
+                    <div class="mb-4">
+                        <label class="form-label" style="color:#d4d4d8;">New Password</label>
+                        <input type="password" name="newPassword" class="form-control" required minlength="4" />
+                        <div class="form-text mt-2" style="color:#71717a;">Please choose a strong password. You will use this to sign in.</div>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn" style="background:#dc2626;color:#fff;border:none;">Change Password</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

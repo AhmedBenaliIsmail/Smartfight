@@ -1,0 +1,2 @@
+[2026-04-25 06:03:07] BOOKING EMAIL ERROR: Connection could not be established with host "127.0.0.1:1025": stream_socket_client(): Unable to connect to 127.0.0.1:1025 (No connection could be made because the target machine actively refused it)
+[2026-04-25 06:49:50] BOOKING EMAIL ERROR: Warning: Undefined property: App\Service\BookingService::$qrCodeService

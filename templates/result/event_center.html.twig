@@ -1,0 +1,125 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Manage Event Card — {{ event.eventName }}{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_results') }}" style="color:#a1a1aa;text-decoration:none;">Results</a></li>
+    <li class="breadcrumb-item active">Manage Card</li>
+{% endblock %}
+
+{% block content %}
+<div class="mb-5">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+        <div>
+            <span class="badge {{ event.organization != 'INDEPENDENT' ? 'bg-yellow-lt' : 'bg-primary-lt' }} mb-2">
+                <i class="fa-solid {{ event.organization != 'INDEPENDENT' ? 'fa-crown text-yellow' : 'fa-calendar' }} me-1"></i>
+                {{ event.organization != 'INDEPENDENT' ? event.organization ~ ' EVENT' : 'STANDARD EVENT' }}
+            </span>
+            <h1 class="h2 mb-1 fw-bold" style="color:#fafafa;">{{ event.eventName }}</h1>
+            <p class="mb-0" style="color:#a1a1aa;"><i class="fa-solid fa-location-dot me-1"></i>{{ event.venue }}, {{ event.city }} — {{ event.eventDate|date('l, F d, Y') }}</p>
+        </div>
+        <a href="{{ path('app_results') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Back to All Events</a>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for fight in fights %}
+        {% set f1 = fight.fighter1 %}
+        {% set f2 = fight.fighter2 %}
+        {% set winner = fight.winner %}
+        
+        <div class="col-xl-4 col-md-6">
+            <div class="card h-100" style="background:#18181b; border: 1px solid {{ fight.status == 'COMPLETED' ? '#22c55e' : '#27272a' }}; position: relative; overflow: hidden;">
+                
+                {# Card Header #}
+                <div class="card-header d-flex justify-content-between align-items-center" style="background: rgba(255,255,255,0.02); border-bottom: 1px solid #27272a;">
+                    <span class="fw-bold small" style="color:#71717a;">FIGHT #{{ fight.fightNumber }}</span>
+                    {% if fight.status == 'COMPLETED' %}
+                        <span class="badge bg-green-lt">COMPLETED</span>
+                    {% elseif fight.status == 'CANCELLED' %}
+                        <span class="badge bg-red-lt">CANCELLED</span>
+                    {% else %}
+                        <span class="badge bg-yellow-lt">SCHEDULED</span>
+                    {% endif %}
+                </div>
+
+                <div class="card-body p-4 text-center">
+                    <div class="d-flex align-items-center justify-content-between mb-4 mt-2">
+                        {# Fighter 1 #}
+                        <div style="flex: 1;">
+                            <div class="mb-2">
+                                <span class="badge bg-danger-lt px-2" style="font-size: 10px;">RED CORNER</span>
+                            </div>
+                            <h4 class="mb-1 fw-bold" style="color: {{ winner and winner.fighterId == f1.fighterId ? '#22c55e' : '#fafafa' }};">
+                                {{ f1 ? f1.fullName : 'Unknown' }}
+                                {% if winner and winner.fighterId == f1.fighterId %}<i class="fa-solid fa-circle-check ms-1"></i>{% endif %}
+                            </h4>
+                            <small class="text-muted d-block">{{ f1 ? f1.nickname|default('No Nickname') : '-' }}</small>
+                            <div class="mt-1">
+                                <span class="text-muted small">{{ f1 and f1.weightDivision ? f1.weightDivision.name : '-' }}</span>
+                            </div>
+                        </div>
+
+                        {# VS Divider #}
+                        <div class="px-3">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: #27272a; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: #71717a; border: 1px solid #3f3f46;">VS</div>
+                        </div>
+
+                        {# Fighter 2 #}
+                        <div style="flex: 1;">
+                            <div class="mb-2">
+                                <span class="badge bg-blue-lt px-2" style="font-size: 10px;">BLUE CORNER</span>
+                            </div>
+                            <h4 class="mb-1 fw-bold" style="color: {{ winner and winner.fighterId == f2.fighterId ? '#22c55e' : '#fafafa' }};">
+                                {{ f2 ? f2.fullName : 'Unknown' }}
+                                {% if winner and winner.fighterId == f2.fighterId %}<i class="fa-solid fa-circle-check ms-1"></i>{% endif %}
+                            </h4>
+                            <small class="text-muted d-block">{{ f2 ? f2.nickname|default('No Nickname') : '-' }}</small>
+                            <div class="mt-1">
+                                <span class="text-muted small">{{ f2 and f2.weightDivision ? f2.weightDivision.name : '-' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if fight.status == 'COMPLETED' %}
+                        <div class="p-3 rounded mt-3" style="background: rgba(34, 197, 94, 0.05); border: 1px dashed rgba(34,197,94,0.3);">
+                            <div class="small text-muted mb-1 text-uppercase fw-bold">Result</div>
+                            <div class="h5 mb-0" style="color:#22c55e;">{{ fight.methodOfVictory }}{{ fight.decisionType ? ' (' ~ fight.decisionType ~ ')' : '' }} — R{{ fight.roundNumber }}</div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {# Card Footer Actions #}
+                <div class="card-footer p-3 d-flex gap-2" style="background: transparent; border-top: 1px solid #27272a;">
+                    {% if is_granted('ROLE_ADMIN') and fight.status == 'SCHEDULED' %}
+                        <a href="{{ path('app_result_enter', {id: fight.resultId}) }}" class="btn btn-success flex-fill fw-bold">
+                            <i class="fa-solid fa-gavel me-1"></i>Enter Result
+                        </a>
+                        <form action="{{ path('app_result_cancel', {id: fight.resultId}) }}" method="post" onsubmit="return confirm('Cancel this fight?');" class="d-inline">
+                            <button type="submit" class="btn btn-outline-warning"><i class="fa-solid fa-ban"></i></button>
+                        </form>
+                    {% elseif fight.status == 'COMPLETED' %}
+                        <a href="{{ path('app_result_show', {id: fight.resultId}) }}" class="btn btn-primary flex-fill fw-bold">
+                            <i class="fa-solid fa-chart-line me-1"></i>View Analytics
+                        </a>
+                        <div class="d-flex gap-1 flex-fill">
+                            <a href="{{ path('app_performance_show', {id: f1.fighterId}) }}" class="btn btn-sm btn-outline-danger" title="Red Corner Stats"><i class="fa-solid fa-user"></i></a>
+                            <a href="{{ path('app_performance_show', {id: f2.fighterId}) }}" class="btn btn-sm btn-outline-primary" title="Blue Corner Stats"><i class="fa-solid fa-user"></i></a>
+                        </div>
+                    {% else %}
+                        <div class="text-muted small text-center w-100 italic">Fight is currently {{ fight.status }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="col-12 text-center text-muted p-5">
+            <i class="fa-solid fa-ghost fa-3x mb-3" style="opacity: 0.2;"></i>
+            <p>No fights scheduled for this card yet.</p>
+            <a href="{{ path('app_result_schedule') }}?eventId={{ event.eventId }}" class="btn btn-primary btn-sm">Add Fights Now</a>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
+

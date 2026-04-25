@@ -1,0 +1,108 @@
+{% extends 'front/base_front.html.twig' %}
+
+{% block title %}Fan Reactions — SmartFight{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Main Feed -->
+        <div class="col-lg-8">
+            <h1 class="h2 mb-4" style="font-family:'Oswald',sans-serif;color:#fff;">FAN REACTIONS FEED</h1>
+            
+            {% for reaction in reactions %}
+                <div class="card mb-3" style="background:#18181b; border:1px solid #27272a;">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar avatar-sm me-3" style="background:#27272a; color:#a1a1aa;">{{ reaction.fan.username|first|upper }}</div>
+                            <div>
+                                <div class="fw-bold" style="color:#fafafa;">{{ reaction.fan.username }}</div>
+                                <div class="text-muted small">{{ reaction.reactedAt|date('M d, g:i A') }}</div>
+                            </div>
+                            {% if reaction.isPinned %}
+                                <span class="badge bg-yellow-lt ms-auto"><i class="fa-solid fa-thumbtack me-1"></i>PINNED</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <span class="badge bg-secondary-lt mb-2">{{ reaction.fightResult.event.eventName }} • {{ reaction.fightResult.fighter1.lastName }} vs {{ reaction.fightResult.fighter2.lastName }}</span>
+                            <div class="d-flex gap-3 align-items-start">
+                                <div style="font-size: 2.5rem; line-height: 1;">{{ reaction.reactionEmoji }}</div>
+                                {% if reaction.comment %}
+                                    <p class="mb-0" style="color:#e4e4e7; font-size: 1.1rem; flex: 1;">"{{ reaction.comment }}"</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fa-solid fa-comments fa-3x text-muted mb-3"></i>
+                    <h3 style="color:#fafafa;">No Reactions Yet</h3>
+                    <p class="text-muted">Be the first to react to a completed fight!</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Post Reaction Form -->
+        <div class="col-lg-4">
+            <div class="card sticky-top" style="background:#18181b; border:1px solid #27272a; top: 100px;">
+                <div class="card-header border-0 pb-0 pt-4 px-4">
+                    <h3 class="h5 mb-0" style="color:#fafafa;"><i class="fa-solid fa-plus-circle me-2 text-danger"></i>Post a Reaction</h3>
+                </div>
+                <div class="card-body p-4">
+                    {% if not is_granted('ROLE_USER') %}
+                        <div class="alert alert-info border-0" style="background:#27272a;">
+                            Please <a href="{{ path('app_login') }}" class="fw-bold text-white">Sign In</a> to share your reaction.
+                        </div>
+                    {% else %}
+                        <form method="post" action="{{ path('front_reaction_index') }}">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Select Fight</label>
+                                <select name="fight_result_id" class="form-select bg-dark border-secondary text-white" required>
+                                    <option value="">-- Choose a completed fight --</option>
+                                    {% for fight in fights %}
+                                        <option value="{{ fight.resultId }}">{{ fight.fighter1.lastName }} vs {{ fight.fighter2.lastName }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Reaction</label>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="reaction_type" value="FIRE" class="btn-check" required>
+                                        <div class="btn btn-outline-secondary px-3 py-2">🔥 Fire</div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="reaction_type" value="SHOCK" class="btn-check">
+                                        <div class="btn btn-outline-secondary px-3 py-2">😱 Shock</div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="reaction_type" value="RESPECT" class="btn-check">
+                                        <div class="btn btn-outline-secondary px-3 py-2">👏 Respect</div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="reaction_type" value="DOMINANT" class="btn-check">
+                                        <div class="btn btn-outline-secondary px-3 py-2">🏆 Dominant</div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="reaction_type" value="CONTROVERSIAL" class="btn-check">
+                                        <div class="btn btn-outline-secondary px-3 py-2">💔 Robbery</div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label text-muted small">Comment (Optional)</label>
+                                <textarea name="comment" class="form-control bg-dark border-secondary text-white" rows="3" maxlength="140" placeholder="Max 140 characters..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-sf-primary w-100">Post Reaction</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

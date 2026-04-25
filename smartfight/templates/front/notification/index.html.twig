@@ -1,0 +1,78 @@
+{% extends 'front/base_front.html.twig' %}
+{% block title %}Notifications — SmartFight{% endblock %}
+
+{% block content %}
+<section class="py-5" style="background:#09090b;min-height:100vh;">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 style="font-family:'Oswald',sans-serif;color:#fff;font-size:2rem;">NOTIFICATIONS</h1>
+                {% if unreadCount > 0 %}
+                    <span class="badge" style="background:#dc2626;">{{ unreadCount }} unread</span>
+                {% endif %}
+            </div>
+            {% if unreadCount > 0 %}
+            <form method="POST" action="{{ path('front_notification_mark_all_read') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('mark_all_read') }}">
+                <button type="submit" class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-check-double me-2"></i>Mark All Read
+                </button>
+            </form>
+            {% endif %}
+        </div>
+
+        {# Tabs #}
+        <div class="d-flex gap-2 mb-4 flex-wrap">
+            <a href="{{ path('front_notification_index') }}" class="btn btn-sm {% if activeTab == 'all' %}btn-danger{% else %}btn-outline-secondary{% endif %}">All</a>
+            <a href="{{ path('front_notification_index', {unread: 1}) }}" class="btn btn-sm {% if activeTab == 'unread' %}btn-danger{% else %}btn-outline-secondary{% endif %}">Unread</a>
+            <a href="{{ path('front_notification_index', {type: 'NEW_EVENT'}) }}" class="btn btn-sm {% if activeTab == 'NEW_EVENT' %}btn-danger{% else %}btn-outline-secondary{% endif %}">Events</a>
+            <a href="{{ path('front_notification_index', {type: 'PREDICTION_SCORED'}) }}" class="btn btn-sm {% if activeTab == 'PREDICTION_SCORED' %}btn-danger{% else %}btn-outline-secondary{% endif %}">Predictions</a>
+            <a href="{{ path('front_notification_index', {type: 'ADMIN_BROADCAST'}) }}" class="btn btn-sm {% if activeTab == 'ADMIN_BROADCAST' %}btn-danger{% else %}btn-outline-secondary{% endif %}">Announcements</a>
+        </div>
+
+        {# Notification List #}
+        <div class="d-flex flex-column gap-3">
+            {% for notif in pagination %}
+            <div class="card {% if not notif.isRead %}border-start border-3 border-danger{% endif %}" style="background:#18181b;border:1px solid #27272a;border-radius:10px;">
+                <div class="card-body d-flex align-items-start gap-3">
+                    <div style="width:40px;height:40px;background:#09090b;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">
+                        {{ notif.typeIcon }}
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
+                            <h6 style="color:{% if not notif.isRead %}#fff{% else %}#a1a1aa{% endif %};margin:0;">{{ notif.title }}</h6>
+                            <div class="d-flex flex-column align-items-end gap-1">
+                                <span style="color:#52525b;font-size:.75rem;">{{ notif.createdAt|date('d M Y, H:i') }}</span>
+                                {% if not notif.isRead %}
+                                    <form method="POST" action="{{ path('front_notification_mark_read', {id: notif.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('mark_read_' ~ notif.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary" style="font-size:.68rem;line-height:1;padding:4px 8px;">
+                                            Mark read
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <p style="color:#71717a;margin:.25rem 0 0;font-size:.875rem;">{{ notif.message }}</p>
+                        {% if not notif.isRead %}
+                            <span class="badge mt-1" style="background:#dc2626;font-size:.65rem;">NEW</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fa-solid fa-bell-slash" style="font-size:3rem;color:#374151;"></i>
+                <p class="text-muted mt-3">No notifications here.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if pagination.pageCount > 1 %}
+        <div class="d-flex justify-content-center mt-4">
+            {{ knp_pagination_render(pagination) }}
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

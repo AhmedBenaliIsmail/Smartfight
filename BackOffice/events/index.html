@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Events — SmartFight Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/smartfight-admin.css" />
+</head>
+<body class="antialiased">
+<div class="wrapper">
+  <aside class="navbar navbar-vertical navbar-expand-lg" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+    <div class="container-fluid flex-column align-items-stretch p-0">
+      <div class="p-3 border-bottom" style="border-color:#27272a!important">
+        <a href="../dashboard.html" class="smartfight-logo"><div class="logo-icon"><i class="fa-solid fa-fist-raised"></i></div><div class="logo-text">Smart<span>Fight</span></div></a>
+      </div>
+      <nav class="flex-fill py-2">
+        <div class="navbar-vertical-section">Management</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../dashboard.html"><span class="nav-link-icon"><i class="fa-solid fa-chart-line fa-fw"></i></span><span class="nav-link-title">Dashboard</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../users/index.html"><span class="nav-link-icon"><i class="fa-solid fa-users fa-fw"></i></span><span class="nav-link-title">Users</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fighters/index.html"><span class="nav-link-icon"><i class="fa-solid fa-boxing-glove fa-fw"></i></span><span class="nav-link-title">Fighters</span></a></li>
+          <li class="nav-item"><a class="nav-link active" href="index.html"><span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span><span class="nav-link-title">Events</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fight-results/index.html"><span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span><span class="nav-link-title">Fight Results</span></a></li>
+        </ul>
+        <div class="navbar-vertical-section mt-2">Fan Experience</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../blog/index.html"><span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw"></i></span><span class="nav-link-title">Blog Articles</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../bookings/index.html"><span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw"></i></span><span class="nav-link-title">Event Bookings</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../predictions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span><span class="nav-link-title">Predictions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../reactions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-comments fa-fw"></i></span><span class="nav-link-title">Reactions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../notifications/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span><span class="nav-link-title">Notifications</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
+    <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
+      <div class="d-flex align-items-center gap-3 flex-fill">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="../dashboard.html" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+          <li class="breadcrumb-item active">Events</li>
+        </ol>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="#" class="nav-link p-1 text-muted"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="../notifications/index.html" class="nav-link p-1 position-relative text-muted"><i class="fa-solid fa-bell"></i><span class="badge bg-danger rounded-pill" style="position:absolute;top:-4px;right:-4px;font-size:.6rem;padding:2px 5px;">7</span></a>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+            <div style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">A</div>
+            <span style="font-size:.875rem;color:#fafafa;">Admin</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user fa-fw me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-fill p-4" style="background:#09090b;">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Events</h1>
+          <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Manage fight events and scheduling</p>
+        </div>
+        <a href="form.html" class="btn btn-danger"><i class="fa-solid fa-plus me-2"></i>Create Event</a>
+      </div>
+
+      <div class="card" style="background:#18181b;border:1px solid #27272a;">
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th style="padding:.75rem 1.25rem;">#ID</th>
+                <th>Event Name</th>
+                <th>Date</th>
+                <th>Venue</th>
+                <th>Discipline</th>
+                <th>Capacity</th>
+                <th>Status</th>
+                <th class="text-end" style="padding-right:1.25rem;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#EV001</td>
+                <td>
+                  <div style="font-size:.875rem;font-weight:600;">UFC 312 — Championship Night</div>
+                  <div style="font-size:.75rem;color:#a1a1aa;">Las Vegas, NV</div>
+                </td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 19, 2026</td>
+                <td style="font-size:.875rem;">T-Mobile Arena</td>
+                <td><span class="badge" style="background:rgba(220,38,38,.1);color:#f87171;border:1px solid rgba(220,38,38,.2);">MMA</span></td>
+                <td style="font-size:.875rem;">20,000</td>
+                <td>
+                  <span class="badge badge-live" style="animation:pulse-live 1.5s infinite;">
+                    <i class="fa-solid fa-circle fa-xs me-1"></i>LIVE
+                  </span>
+                </td>
+                <td class="text-end" style="padding-right:1.25rem;">
+                  <a href="show.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-eye"></i></a>
+                  <a href="form.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-pen"></i></a>
+                  <button class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#EV002</td>
+                <td>
+                  <div style="font-size:.875rem;font-weight:600;">Bellator 305 — Paris</div>
+                  <div style="font-size:.75rem;color:#a1a1aa;">Paris, France</div>
+                </td>
+                <td style="font-size:.8rem;color:#a1a1aa;">May 10, 2026</td>
+                <td style="font-size:.875rem;">Accor Arena</td>
+                <td><span class="badge" style="background:rgba(220,38,38,.1);color:#f87171;border:1px solid rgba(220,38,38,.2);">MMA</span></td>
+                <td style="font-size:.875rem;">15,000</td>
+                <td><span class="badge" style="background:rgba(59,130,246,.15);color:#3b82f6;">UPCOMING</span></td>
+                <td class="text-end" style="padding-right:1.25rem;">
+                  <a href="show.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-eye"></i></a>
+                  <a href="form.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-pen"></i></a>
+                  <button class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#EV003</td>
+                <td>
+                  <div style="font-size:.875rem;font-weight:600;">ONE FC: Dawn of Heroes</div>
+                  <div style="font-size:.75rem;color:#a1a1aa;">Singapore</div>
+                </td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Jun 7, 2026</td>
+                <td style="font-size:.875rem;">Singapore Indoor</td>
+                <td><span class="badge" style="background:rgba(201,162,39,.1);color:#f59e0b;border:1px solid rgba(201,162,39,.2);">Kickboxing</span></td>
+                <td style="font-size:.875rem;">12,500</td>
+                <td><span class="badge" style="background:rgba(59,130,246,.15);color:#3b82f6;">UPCOMING</span></td>
+                <td class="text-end" style="padding-right:1.25rem;">
+                  <a href="show.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-eye"></i></a>
+                  <a href="form.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-pen"></i></a>
+                  <button class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#EV004</td>
+                <td>
+                  <div style="font-size:.875rem;font-weight:600;">UFC 311 — Title Clash</div>
+                  <div style="font-size:.75rem;color:#a1a1aa;">Los Angeles, CA</div>
+                </td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Mar 8, 2026</td>
+                <td style="font-size:.875rem;">Kia Forum</td>
+                <td><span class="badge" style="background:rgba(220,38,38,.1);color:#f87171;border:1px solid rgba(220,38,38,.2);">MMA</span></td>
+                <td style="font-size:.875rem;">18,000</td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">COMPLETED</span></td>
+                <td class="text-end" style="padding-right:1.25rem;">
+                  <a href="show.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-eye"></i></a>
+                  <a href="form.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-pen"></i></a>
+                  <button class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#EV005</td>
+                <td>
+                  <div style="font-size:.875rem;font-weight:600;">PFL 2026 — Season Opener</div>
+                  <div style="font-size:.75rem;color:#a1a1aa;">London, UK</div>
+                </td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Feb 14, 2026</td>
+                <td style="font-size:.875rem;">The O2 Arena</td>
+                <td><span class="badge" style="background:rgba(220,38,38,.1);color:#f87171;border:1px solid rgba(220,38,38,.2);">MMA</span></td>
+                <td style="font-size:.875rem;">8,000</td>
+                <td><span class="badge" style="background:rgba(161,161,170,.15);color:#a1a1aa;">CANCELLED</span></td>
+                <td class="text-end" style="padding-right:1.25rem;">
+                  <a href="show.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-eye"></i></a>
+                  <a href="form.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-pen"></i></a>
+                  <button class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer" style="background:#18181b;border-top:1px solid #27272a;">
+          <div class="d-flex align-items-center justify-content-between">
+            <span style="font-size:.8125rem;color:#a1a1aa;">Showing 1–5 of 42 events</span>
+            <nav><ul class="pagination pagination-sm mb-0 gap-1">
+              <li class="page-item disabled"><a class="page-link" href="#">‹</a></li>
+              <li class="page-item active"><a class="page-link" href="#">1</a></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item"><a class="page-link" href="#">›</a></li>
+            </ul></nav>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Predictions — SmartFight Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/smartfight-admin.css" />
+</head>
+<body class="antialiased">
+<div class="wrapper">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────── -->
+  <aside class="navbar navbar-vertical navbar-expand-lg" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+    <div class="container-fluid flex-column align-items-stretch p-0">
+      <div class="p-3 border-bottom" style="border-color:#27272a!important">
+        <a href="../dashboard.html" class="smartfight-logo">
+          <div class="logo-icon"><i class="fa-solid fa-fist-raised"></i></div>
+          <div class="logo-text">Smart<span>Fight</span></div>
+        </a>
+      </div>
+      <nav class="flex-fill py-2">
+        <div class="navbar-vertical-section">Management</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../dashboard.html"><span class="nav-link-icon"><i class="fa-solid fa-chart-line fa-fw"></i></span><span class="nav-link-title">Dashboard</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../users/index.html"><span class="nav-link-icon"><i class="fa-solid fa-users fa-fw"></i></span><span class="nav-link-title">Users</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fighters/index.html"><span class="nav-link-icon"><i class="fa-solid fa-boxing-glove fa-fw"></i></span><span class="nav-link-title">Fighters</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../events/index.html"><span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span><span class="nav-link-title">Events</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fight-results/index.html"><span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span><span class="nav-link-title">Fight Results</span></a></li>
+        </ul>
+        <div class="navbar-vertical-section mt-2">Fan Experience</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../blog/index.html"><span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw"></i></span><span class="nav-link-title">Blog Articles</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../bookings/index.html"><span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw"></i></span><span class="nav-link-title">Event Bookings</span></a></li>
+          <li class="nav-item"><a class="nav-link active" href="index.html"><span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span><span class="nav-link-title">Predictions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../reactions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-comments fa-fw"></i></span><span class="nav-link-title">Reactions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../notifications/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span><span class="nav-link-title">Notifications</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- ── Main content ─────────────────────────────────────────── -->
+  <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
+
+    <!-- Topbar -->
+    <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
+      <div class="d-flex align-items-center gap-3 flex-fill">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="../dashboard.html" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+          <li class="breadcrumb-item active">Predictions</li>
+        </ol>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="#" class="nav-link p-1 text-muted"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="../notifications/index.html" class="nav-link p-1 position-relative text-muted">
+          <i class="fa-solid fa-bell"></i>
+          <span class="badge bg-danger rounded-pill" style="position:absolute;top:-4px;right:-4px;font-size:.6rem;padding:2px 5px;">7</span>
+        </a>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+            <div style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">A</div>
+            <span style="font-size:.875rem;color:#fafafa;">Admin</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user fa-fw me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-fill p-4" style="background:#09090b;">
+
+      <!-- Page Header -->
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Predictions</h1>
+          <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Review fan predictions and score completed fights</p>
+        </div>
+        <a href="score.html" class="btn btn-danger">
+          <i class="fa-solid fa-star me-2"></i>Score a Fight
+        </a>
+      </div>
+
+      <!-- Stats row -->
+      <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between mb-3">
+              <div class="stat-icon" style="background:rgba(201,162,39,.15);color:#c9a227;"><i class="fa-solid fa-bullseye"></i></div>
+              <span class="badge" style="background:rgba(201,162,39,.15);color:#c9a227;font-size:.7rem;">Total</span>
+            </div>
+            <div class="stat-value">4,521</div>
+            <div class="stat-label">Total Predictions</div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between mb-3">
+              <div class="stat-icon" style="background:rgba(34,197,94,.15);color:#22c55e;"><i class="fa-solid fa-check-circle"></i></div>
+              <span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;font-size:.7rem;">62%</span>
+            </div>
+            <div class="stat-value">2,803</div>
+            <div class="stat-label">Correct Picks</div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between mb-3">
+              <div class="stat-icon" style="background:rgba(234,179,8,.15);color:#eab308;"><i class="fa-solid fa-clock"></i></div>
+              <span class="badge badge-live px-2 py-1" style="font-size:.7rem;">Pending</span>
+            </div>
+            <div class="stat-value">318</div>
+            <div class="stat-label">Awaiting Score</div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between mb-3">
+              <div class="stat-icon" style="background:rgba(59,130,246,.15);color:#3b82f6;"><i class="fa-solid fa-users"></i></div>
+            </div>
+            <div class="stat-value">841</div>
+            <div class="stat-label">Participating Fans</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="card mb-3" style="background:#18181b;border:1px solid #27272a;">
+        <div class="card-body py-3">
+          <div class="row g-2 align-items-center">
+            <div class="col-md-4">
+              <div class="input-group">
+                <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <input type="text" class="form-control" placeholder="Search by fan or fight..." />
+              </div>
+            </div>
+            <div class="col-md-3">
+              <select class="form-select">
+                <option value="">All Events</option>
+                <option>UFC 310</option>
+                <option>Bellator 302</option>
+                <option>UFC 311</option>
+                <option>PFL 2026</option>
+                <option>ONE FC 185</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <select class="form-select">
+                <option value="">All Results</option>
+                <option>Correct</option>
+                <option>Wrong</option>
+                <option>Pending</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <select class="form-select">
+                <option value="">All Methods</option>
+                <option>KO/TKO</option>
+                <option>Submission</option>
+                <option>Decision</option>
+              </select>
+            </div>
+            <div class="col-md-1">
+              <button class="btn w-100" style="background:#dc2626;color:#fff;border:none;"><i class="fa-solid fa-filter"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Predictions Table -->
+      <div class="card" style="background:#18181b;border:1px solid #27272a;">
+        <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;display:flex;align-items:center;justify-content:space-between;">
+          <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;">All Predictions</h3>
+          <div class="d-flex align-items-center gap-2">
+            <span style="font-size:.8rem;color:#a1a1aa;">318 pending score</span>
+            <a href="score.html" class="btn btn-sm" style="background:#dc2626;color:#fff;border:none;font-size:.8rem;"><i class="fa-solid fa-star me-1"></i>Score Now</a>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th style="padding:.75rem 1.25rem;width:50px;">#</th>
+                <th>Fan</th>
+                <th>Fight</th>
+                <th>Event</th>
+                <th>Predicted Winner</th>
+                <th>Method</th>
+                <th>Points</th>
+                <th>Result</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#P001</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width:30px;height:30px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.75rem;color:#a1a1aa;">LP</div>
+                    <span style="font-size:.875rem;">Lucas P.</span>
+                  </div>
+                </td>
+                <td style="font-size:.875rem;font-weight:500;">Jones vs Aspinall</td>
+                <td style="font-size:.8rem;color:#a1a1aa;">UFC 310</td>
+                <td style="color:#c9a227;font-size:.875rem;">Jon Jones</td>
+                <td><span class="badge" style="background:rgba(220,38,38,.12);color:#f87171;border:1px solid rgba(220,38,38,.2);font-size:.72rem;">KO/TKO</span></td>
+                <td style="font-weight:700;color:#22c55e;">+15</td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;"><i class="fa-solid fa-check me-1"></i>Correct</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 5</td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#P002</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width:30px;height:30px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.75rem;color:#a1a1aa;">EV</div>
+                    <span style="font-size:.875rem;">Elena V.</span>
+                  </div>
+                </td>
+                <td style="font-size:.875rem;font-weight:500;">Poirier vs McGregor</td>
+                <td style="font-size:.8rem;color:#a1a1aa;">UFC 310</td>
+                <td style="color:#c9a227;font-size:.875rem;">McGregor</td>
+                <td><span class="badge" style="background:rgba(234,179,8,.12);color:#fbbf24;border:1px solid rgba(234,179,8,.2);font-size:.72rem;">Decision</span></td>
+                <td style="font-weight:700;color:#a1a1aa;">+0</td>
+                <td><span class="badge" style="background:rgba(220,38,38,.15);color:#dc2626;"><i class="fa-solid fa-xmark me-1"></i>Wrong</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 5</td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#P003</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width:30px;height:30px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.75rem;color:#a1a1aa;">TH</div>
+                    <span style="font-size:.875rem;">Tom H.</span>
+                  </div>
+                </td>
+                <td style="font-size:.875rem;font-weight:500;">Nunes vs Pena III</td>
+                <td style="font-size:.8rem;color:#a1a1aa;">UFC 311</td>
+                <td style="color:#c9a227;font-size:.875rem;">Nunes</td>
+                <td><span class="badge" style="background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.2);font-size:.72rem;">Submission</span></td>
+                <td style="font-weight:700;color:#a1a1aa;">—</td>
+                <td><span class="badge" style="background:rgba(234,179,8,.15);color:#eab308;"><i class="fa-solid fa-clock me-1"></i>Pending</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 6</td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#P004</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width:30px;height:30px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.75rem;color:#a1a1aa;">PS</div>
+                    <span style="font-size:.875rem;">Priya S.</span>
+                  </div>
+                </td>
+                <td style="font-size:.875rem;font-weight:500;">Adesanya vs Du Plessis</td>
+                <td style="font-size:.8rem;color:#a1a1aa;">UFC 310</td>
+                <td style="color:#c9a227;font-size:.875rem;">Adesanya</td>
+                <td><span class="badge" style="background:rgba(234,179,8,.12);color:#fbbf24;border:1px solid rgba(234,179,8,.2);font-size:.72rem;">Decision</span></td>
+                <td style="font-weight:700;color:#22c55e;">+10</td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;"><i class="fa-solid fa-check me-1"></i>Correct</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 4</td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#P005</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width:30px;height:30px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.75rem;color:#a1a1aa;">CN</div>
+                    <span style="font-size:.875rem;">Carlos N.</span>
+                  </div>
+                </td>
+                <td style="font-size:.875rem;font-weight:500;">Oliveira vs Tsarukyan</td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Bellator 302</td>
+                <td style="color:#c9a227;font-size:.875rem;">Oliveira</td>
+                <td><span class="badge" style="background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.2);font-size:.72rem;">Submission</span></td>
+                <td style="font-weight:700;color:#22c55e;">+10</td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;"><i class="fa-solid fa-check me-1"></i>Correct</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 3</td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#P006</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width:30px;height:30px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.75rem;color:#a1a1aa;">MR</div>
+                    <span style="font-size:.875rem;">Maria R.</span>
+                  </div>
+                </td>
+                <td style="font-size:.875rem;font-weight:500;">Poirier vs McGregor</td>
+                <td style="font-size:.8rem;color:#a1a1aa;">UFC 310</td>
+                <td style="color:#c9a227;font-size:.875rem;">Poirier</td>
+                <td><span class="badge" style="background:rgba(220,38,38,.12);color:#f87171;border:1px solid rgba(220,38,38,.2);font-size:.72rem;">KO/TKO</span></td>
+                <td style="font-weight:700;color:#22c55e;">+10</td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;"><i class="fa-solid fa-check me-1"></i>Correct</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 3</td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#P007</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width:30px;height:30px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.75rem;color:#a1a1aa;">JK</div>
+                    <span style="font-size:.875rem;">James K.</span>
+                  </div>
+                </td>
+                <td style="font-size:.875rem;font-weight:500;">Nunes vs Pena III</td>
+                <td style="font-size:.8rem;color:#a1a1aa;">UFC 311</td>
+                <td style="color:#c9a227;font-size:.875rem;">Pena</td>
+                <td><span class="badge" style="background:rgba(234,179,8,.12);color:#fbbf24;border:1px solid rgba(234,179,8,.2);font-size:.72rem;">Decision</span></td>
+                <td style="font-weight:700;color:#a1a1aa;">—</td>
+                <td><span class="badge" style="background:rgba(234,179,8,.15);color:#eab308;"><i class="fa-solid fa-clock me-1"></i>Pending</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 6</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer" style="background:#18181b;border-top:1px solid #27272a;">
+          <div class="d-flex align-items-center justify-content-between">
+            <span style="font-size:.8125rem;color:#a1a1aa;">Showing 1–7 of 4,521 predictions</span>
+            <nav><ul class="pagination pagination-sm mb-0 gap-1">
+              <li class="page-item disabled"><a class="page-link" href="#">‹</a></li>
+              <li class="page-item active"><a class="page-link" href="#">1</a></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item"><a class="page-link" href="#">›</a></li>
+            </ul></nav>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SmartFight Admin — Fighter Contracts{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .pro-table {
+            background: #09090b;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #18181b;
+        }
+        .pro-table thead th {
+            background: #000;
+            color: #71717a;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 1.25rem 1rem;
+            border-bottom: 2px solid #18181b;
+        }
+        .pro-table tbody tr {
+            background: #111827;
+            border-bottom: 1px solid #1f2937;
+            transition: all 0.2s;
+        }
+        .pro-table tbody tr:hover {
+            background: #1f2937;
+        }
+        .pro-table td {
+            color: #e5e7eb;
+            padding: 1rem;
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+        .fighter-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .fighter-meta img {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid #374151;
+        }
+        .badge-pending {
+            background: #374151;
+            color: #d1d5db;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        .badge-paid {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        .action-btn-del {
+            width: 32px;
+            height: 32px;
+            background: rgba(220, 38, 38, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .action-btn-del:hover {
+            background: #dc2626;
+            color: #fff;
+        }
+        .action-btn-pay {
+            background: #10b981;
+            color: #fff;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+    </style>
+{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">Fighter Contracts</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h2 text-white mb-0" style="font-family:'Oswald',sans-serif;letter-spacing:1px;">FIGHTER CONTRACTS & PURSES</h1>
+            <p class="text-muted small">Manage organization payroll and bout agreements.</p>
+        </div>
+        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#createContractModal" style="background:#dc2626; border:none; padding:.6rem 1.25rem; font-weight:600; letter-spacing:0.5px;">
+            <i class="fa-solid fa-file-signature me-2"></i>NEW CONTRACT
+        </button>
+    </div>
+
+    <div class="table-responsive pro-table">
+        <table class="table table-borderless mb-0">
+            <thead>
+                <tr>
+                    <th>FIGHTER</th>
+                    <th>EVENT</th>
+                    <th>BASE PAY</th>
+                    <th>WIN BONUS</th>
+                    <th>PAYOUT STATUS</th>
+                    <th>TOTAL PAYOUT</th>
+                    <th class="text-end">ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contract in contracts %}
+                    <tr>
+                        <td>
+                            <div class="fighter-meta">
+                                {% if contract.fighter.photoFilename %}
+                                    <img src="{{ asset('uploads/boxers/' ~ contract.fighter.photoFilename) }}" alt="">
+                                {% else %}
+                                    <div class="bg-dark rounded d-flex align-items-center justify-content-center" style="width:32px;height:32px;border:1px solid #374151;">
+                                        <i class="fa-solid fa-user small text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                <span class="fw-bold">{{ contract.fighter.fullName }}</span>
+                            </div>
+                        </td>
+                        <td class="text-muted">{{ contract.event.eventName }}</td>
+                        <td class="fw-bold">${{ contract.basePay|number_format(2) }}</td>
+                        <td class="text-muted">+${{ contract.winBonus|number_format(2) }}</td>
+                        <td>
+                            {% if contract.isPaid %}
+                                <span class="badge-paid">PAID</span>
+                            {% elseif contract.calculatedPayout is not null %}
+                                <span class="badge-pending" style="background:#dc2626; color:#fff;">READY TO PAY</span>
+                            {% else %}
+                                <span class="badge-pending">PENDING RESULT</span>
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold">
+                            {% if contract.calculatedPayout is not null %}
+                                ${{ contract.calculatedPayout|number_format(2) }}
+                            {% else %}
+                                <span class="text-muted">---</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-end gap-2">
+                                {% if not contract.isPaid and contract.calculatedPayout is not null %}
+                                    <form method="post" action="{{ path('admin_contract_pay', {'id': contract.id}) }}">
+                                        <button class="action-btn-pay"><i class="fa-solid fa-check me-1"></i> PAY</button>
+                                    </form>
+                                {% endif %}
+                                <form method="post" action="{{ path('admin_contract_delete', {'id': contract.id}) }}" onsubmit="return confirm('Revoke this contract?');">
+                                    <button class="action-btn-del"><i class="fa-solid fa-trash-can"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">No active contracts found in the organization archives.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Create Contract Modal (Pro Edition) -->
+<div class="modal fade" id="createContractModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" action="{{ path('admin_contract_create') }}" class="modal-content" style="background: #0f0f14; border: 1px solid rgba(220, 38, 38, 0.3); border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); overflow: hidden;">
+            <div class="modal-header border-0 pb-0" style="padding: 1.5rem 1.5rem 0.5rem; background: #0f0f14;">
+                <div>
+                    <h5 class="modal-title text-white mb-0" style="font-family:'Oswald',sans-serif; font-size: 1.5rem; letter-spacing: 1.5px; text-transform: uppercase;">
+                        <span style="color: #dc2626;">SIGN</span> FIGHTER CONTRACT
+                    </h5>
+                    <p class="text-muted small mb-0">Legalizing bout participation & purse details</p>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" style="opacity: 0.5;"></button>
+            </div>
+            
+            <div class="modal-body" style="padding: 1.5rem;">
+                <!-- Event Selection -->
+                <div class="mb-4">
+                    <label class="form-label d-flex align-items-center gap-2" style="color: #a1a1aa; font-weight: 500; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+                        <i class="fa-solid fa-calendar-day text-danger"></i> Select Event
+                    </label>
+                    <div class="input-group">
+                        <select name="event_id" id="eventSelect" class="form-select" style="background: #09090b; border: 1px solid #27272a; color: #fff; padding: 0.75rem 1rem; border-radius: 8px;" required>
+                            <option value="">Choose organization event...</option>
+                            {% for event in events %}
+                            <option value="{{ event.eventId }}">{{ event.eventName }} ({{ event.eventDate|date('Y-m-d') }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Fighter Selection -->
+                <div class="mb-4">
+                    <label class="form-label d-flex align-items-center gap-2" style="color: #a1a1aa; font-weight: 500; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+                        <i class="fa-solid fa-user-ninja text-danger"></i> Assign Fighter
+                    </label>
+                    <select name="fighter_id" id="fighterSelect" class="form-select" style="background: #09090b; border: 1px solid #27272a; color: #fff; padding: 0.75rem 1rem; border-radius: 8px;" required>
+                        <option value="">Select an Event first...</option>
+                    </select>
+                </div>
+
+                <!-- Financial Configuration -->
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label d-flex align-items-center gap-2" style="color: #a1a1aa; font-weight: 500; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+                            <i class="fa-solid fa-money-bill-1 text-success"></i> Base Pay
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: #27272a; border: 1px solid #27272a; color: #71717a;">$</span>
+                            <input type="number" step="0.01" name="base_pay" class="form-control" style="background: #09090b; border: 1px solid #27272a; color: #fff;" required placeholder="0.00">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label d-flex align-items-center gap-2" style="color: #a1a1aa; font-weight: 500; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+                            <i class="fa-solid fa-trophy text-warning"></i> Win Bonus
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: #27272a; border: 1px solid #27272a; color: #71717a;">$</span>
+                            <input type="number" step="0.01" name="win_bonus" class="form-control" style="background: #09090b; border: 1px solid #27272a; color: #fff;" required placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0" style="padding: 0.5rem 1.5rem 1.5rem;">
+                <button type="button" class="btn btn-link text-muted text-decoration-none" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-danger px-4 py-2" style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); border: none; border-radius: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);">
+                    Sign Contract
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        const eventFighters = {{ eventFightersJson|raw }};
+        const eventSelect = document.getElementById('eventSelect');
+        const fighterSelect = document.getElementById('fighterSelect');
+
+        eventSelect.addEventListener('change', function() {
+            const eventId = this.value;
+            fighterSelect.innerHTML = '<option value="">Select Fighter...</option>';
+            
+            if (eventId && eventFighters[eventId]) {
+                const fighters = eventFighters[eventId];
+                for (const [id, name] of Object.entries(fighters)) {
+                    const opt = document.createElement('option');
+                    opt.value = id;
+                    opt.textContent = name;
+                    fighterSelect.appendChild(opt);
+                }
+            } else if (!eventId) {
+                fighterSelect.innerHTML = '<option value="">Select an Event first...</option>';
+            } else {
+                fighterSelect.innerHTML = '<option value="">No fighters found for this event</option>';
+            }
+        });
+    </script>
+{% endblock %}

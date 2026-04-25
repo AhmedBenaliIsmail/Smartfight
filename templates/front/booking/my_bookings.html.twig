@@ -1,0 +1,104 @@
+{% extends 'front/base_front.html.twig' %}
+{% block title %}My Bookings — SmartFight{% endblock %}
+
+{% block content %}
+<section class="py-5" style="background:#09090b;min-height:100vh;">
+    <div class="container">
+        <div class="mb-4 d-flex justify-content-between align-items-center">
+            <div>
+                <h1 style="font-family:'Oswald',sans-serif;color:#fff;font-size:2.2rem;">MY BOOKINGS</h1>
+                <p class="text-muted mb-0">View QR tickets and manage your confirmed bookings.</p>
+            </div>
+            <a href="{{ path('front_booking_index') }}" class="btn btn-sf-primary">Book Tickets</a>
+        </div>
+
+        <div class="card" style="background:#18181b;border:1px solid #27272a;border-radius:10px;">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0" style="--bs-table-bg:#18181b;">
+                    <thead>
+                    <tr style="border-bottom:1px solid #27272a;">
+                        <th style="color:#71717a;">Event</th>
+                        <th style="color:#71717a;">Date</th>
+                        <th style="color:#71717a;">Type</th>
+                        <th style="color:#71717a;">Qty</th>
+                        <th style="color:#71717a;">Total</th>
+                        <th style="color:#71717a;">Status</th>
+                        <th style="color:#71717a;">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in bookings %}
+                        {% set booking = item.data %}
+                        <tr>
+                            <td style="color:#fff;">{{ booking.event.name }}</td>
+                            <td style="color:#a1a1aa;">{{ booking.bookingDate|date('d M Y') }}</td>
+                            <td><span class="badge bg-secondary">{{ booking.ticketType }}</span></td>
+                            <td style="color:#fff;">{{ booking.ticketQuantity }}</td>
+                            <td style="color:#c9a227;">${{ booking.totalPrice }}</td>
+                            <td>
+                                {% if booking.bookingStatus == 'CONFIRMED' %}
+                                    <span class="badge" style="background:#16a34a;">CONFIRMED</span>
+                                {% else %}
+                                    <span class="badge" style="background:#dc2626;">CANCELLED</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    {% if booking.bookingStatus == 'CONFIRMED' %}
+                                        <button
+                                            class="btn btn-sm btn-primary"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#qrModal"
+                                            data-qr-src="{{ item.qrBase64 }}"
+                                            data-ref="{{ booking.bookingReference }}"
+                                        >
+                                            <i class="fa-solid fa-qrcode me-1"></i> View Ticket
+                                        </button>
+                                        <form method="post" action="{{ path('front_booking_cancel', {id: booking.id}) }}" onsubmit="return confirm('Cancel this booking?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('cancel_booking_' ~ booking.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-xmark"></i></button>
+                                        </form>
+                                    {% else %}
+                                        <span class="text-muted" style="font-size:.8rem;">No actions</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="7" class="text-center text-muted py-5">No bookings found yet.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="qrModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background:#18181b;border:1px solid #27272a;">
+            <div class="modal-header" style="border-bottom:1px solid #27272a;">
+                <h5 class="modal-title text-white">Ticket QR</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="qrModalImage" src="" alt="Ticket QR" width="250" height="250" class="mb-3" style="border-radius:8px;background:#fff;padding:8px;">
+                <div id="qrModalRef" class="text-muted"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const qrModal = document.getElementById('qrModal');
+if (qrModal) {
+    qrModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        document.getElementById('qrModalImage').src = button.getAttribute('data-qr-src');
+        document.getElementById('qrModalRef').textContent = 'Reference: ' + button.getAttribute('data-ref');
+    });
+}
+</script>
+{% endblock %}

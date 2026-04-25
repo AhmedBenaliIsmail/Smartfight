@@ -1,0 +1,202 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title|default('Events') }} — SmartFight Admin{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item active">{{ title|default('Events') }}</li>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .event-card-ultra {
+            background: linear-gradient(145deg, #18181b, #09090b);
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            height: 100%;
+            overflow: hidden;
+        }
+        .event-card-ultra:hover {
+            border-color: #dc2626;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(220, 38, 38, 0.1);
+            transform: translateY(-10px);
+        }
+        .event-card-ultra::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #dc2626, #fbbf24);
+            opacity: 0.6;
+        }
+        .org-tag-top {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(251, 191, 36, 0.15);
+            color: #fbbf24;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .event-title-pro {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #a1a1aa;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+        .status-box {
+            background: rgba(24, 24, 27, 0.8);
+            border: 1px solid #27272a;
+            border-radius: 16px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+        .ultra-manage-btn {
+            background: #dc2626;
+            color: #fff;
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none !important;
+        }
+        .ultra-manage-btn:hover {
+            background: #ef4444;
+            transform: scale(1.02);
+            color: #fff;
+        }
+        .action-dot {
+            width: 40px;
+            height: 40px;
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #71717a;
+            transition: all 0.2s;
+        }
+        .action-dot:hover {
+            background: #27272a;
+            color: #fff;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center justify-content-between mb-5">
+        <div>
+            <h1 class="h2 fw-bold text-white mb-1" style="font-family: 'Oswald', sans-serif; letter-spacing: 1px;">EVENT MANAGEMENT</h1>
+            <p class="text-muted mb-0">Directing professional boxing spectacles and world title events</p>
+        </div>
+        <div class="d-flex gap-3">
+            {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_event_new') }}" class="btn btn-danger px-4 fw-bold">
+                <i class="fa-solid fa-plus me-2"></i>CREATE EVENT
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for event in events %}
+            {% set fight_count = fightCounts[event.eventId]|default(0) %}
+            <div class="col-lg-4 col-md-6">
+                <div class="event-card-ultra">
+                    <div class="event-title-pro">{{ event.eventName }}</div>
+                    
+                    {% if event.isChampionsEvent %}
+                        <div class="org-tag-top">
+                            <i class="fa-solid fa-crown"></i>
+                            {{ event.organization }} BELT
+                        </div>
+                    {% endif %}
+                    
+                    <div class="info-row">
+                        <i class="fa-solid fa-calendar-day text-danger"></i>
+                        <span>{{ event.eventDate ? event.eventDate|date('l, M d, Y') : 'Date TBD' }}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <i class="fa-solid fa-map-pin text-danger"></i>
+                        <span>{{ event.venue|default('TBD') }}, {{ event.city|default('TBD') }}</span>
+                    </div>
+
+                    <div class="status-box">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small text-muted fw-bold uppercase">Sanctioning Progress</span>
+                            <span class="text-white small fw-bold">{{ fight_count }}/3 BOUTS</span>
+                        </div>
+                        <div class="progress" style="height: 6px; background: #09090b; border-radius: 10px;">
+                            <div class="progress-bar bg-danger" style="width: {{ (fight_count/3*100) }}%; border-radius: 10px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <a href="{{ path('app_event_fights', {'id': event.eventId}) }}" class="ultra-manage-btn flex-grow-1">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            Manage Card
+                        </a>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <div class="dropdown">
+                                <button class="action-dot" data-bs-toggle="dropdown">
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end bg-dark border-secondary">
+                                    <li><a class="dropdown-item text-white" href="{{ path('app_event_edit', {'id': event.eventId}) }}"><i class="fa-solid fa-pen me-2"></i>Edit Profile</a></li>
+                                    <li><hr class="dropdown-divider border-secondary"></li>
+                                    <li>
+                                        <form method="post" action="{{ path('app_event_delete', {'id': event.eventId}) }}" onsubmit="return confirm('Delete this event?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.eventId) }}">
+                                            <button class="dropdown-item text-danger"><i class="fa-solid fa-trash me-2"></i>Remove Event</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <i class="fa-solid fa-calendar-xmark fa-3x text-muted mb-3"></i>
+                <h3 class="text-white">No Sanctioned Events</h3>
+                <p class="text-muted">Start by scheduling a professional boxing card.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
