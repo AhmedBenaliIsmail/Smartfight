@@ -89,19 +89,26 @@ class SecurityController extends AbstractController
     public function forgotPassword(Request $request, UserRepository $userRepo, EntityManagerInterface $em, MailerInterface $mailer): Response
     {
         if ($request->isMethod('POST')) {
-            $email = trim($request->request->get('email', ''));
+            $identifier = trim($request->request->get('email', ''));
 
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $this->addFlash('error', 'Enter valid email');
+            if (empty($identifier)) {
+                $this->addFlash('error', 'Please enter your username or email');
                 return $this->render('security/forgot_password.html.twig');
             }
 
-            $user = $userRepo->findOneBy(['email' => $email]);
+            // Search by email OR username
+            $user = $userRepo->createQueryBuilder('u')
+                ->where('u.email = :id')
+                ->orWhere('u.username = :id')
+                ->setParameter('id', $identifier)
+                ->getQuery()
+                ->getOneOrNullResult();
 
             if ($user) {
                 $token = bin2hex(random_bytes(32));
                 $user->setResetToken($token);
                 $user->setResetTokenExpiresAt(new \DateTime('+1 hour'));
+                $em->persist($user);
                 $em->flush();
 
                 // Send real recovery email
@@ -118,7 +125,7 @@ class SecurityController extends AbstractController
                         ]);
 
                     $mailer->send($emailObj);
-                    $this->addFlash('success', "Recovery link sent to your inbox.");
+                    $this->addFlash('success', "Recovery link sent to " . $user->getEmail());
                 } catch (\Exception $e) {
                     $this->addFlash('error', "Failed to send reset email. Please try again later.");
                 }
