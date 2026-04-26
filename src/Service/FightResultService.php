@@ -7,10 +7,7 @@ use App\Repository\FightResultRepository;
 use App\Repository\FighterRepository;
 use App\Repository\FighterContractRepository;
 use Doctrine\ORM\EntityManagerInterface;
-
-/**
- * FightResultService — Remodeled for Boxing
- */
+use Symfony\Component\HttpFoundation\File\File;
 class FightResultService
 {
     public function __construct(
@@ -105,10 +102,16 @@ class FightResultService
         int $round, 
         ?string $decisionType = null,
         ?int $knockdownRound = null,
-        ?\DateTimeInterface $fightDate = null
+        ?\DateTimeInterface $fightDate = null,
+        ?string $highlightVideoUrl = null,
+        ?File $videoFile = null
     ): bool {
         $fr = $this->resultRepo->find($resultId);
-        if (!$fr || $fr->getStatus() !== 'SCHEDULED') return false;
+        if (!$fr) return false;
+        
+        $alreadyCompleted = ($fr->getStatus() === 'COMPLETED');
+        // Only allow updating if SCHEDULED or already COMPLETED (for edits)
+        if ($fr->getStatus() !== 'SCHEDULED' && !$alreadyCompleted) return false;
 
         if ($winnerId !== null) {
             $winner = $this->fighterRepo->find($winnerId);
@@ -122,40 +125,44 @@ class FightResultService
         $fr->setDecisionType($decisionType);
         $fr->setKnockdownRound($knockdownRound);
         $fr->setFightDate($fightDate ?? new \DateTime());
+        $fr->setHighlightVideoUrl($highlightVideoUrl);
+        $fr->setVideoFile($videoFile);
         $fr->setStatus('COMPLETED');
 
         $this->em->persist($fr);
         $this->em->flush();
 
-        // Process rankings
-        $this->rankingService->processCompletedFight($fr);
+        if (!$alreadyCompleted) {
+            // Process rankings only on first completion
+            $this->rankingService->processCompletedFight($fr);
 
-        // Calculate Purses
-        if ($fr->getFighter1()) {
-            $f1Contract = $this->contractRepo->findOneBy(['fighter' => $fr->getFighter1(), 'event' => $fr->getEvent()]);
-            if ($f1Contract && !$f1Contract->isPaid()) {
-                $payout = $f1Contract->getBasePay();
-                if ($fr->getWinner() && $fr->getWinner()->getFighterId() === $fr->getFighter1()->getFighterId()) {
-                    $payout += $f1Contract->getWinBonus();
+            // Calculate Purses
+            if ($fr->getFighter1()) {
+                $f1Contract = $this->contractRepo->findOneBy(['fighter' => $fr->getFighter1(), 'event' => $fr->getEvent()]);
+                if ($f1Contract && !$f1Contract->isPaid()) {
+                    $payout = $f1Contract->getBasePay();
+                    if ($fr->getWinner() && $fr->getWinner()->getFighterId() === $fr->getFighter1()->getFighterId()) {
+                        $payout += $f1Contract->getWinBonus();
+                    }
+                    $f1Contract->setCalculatedPayout($payout);
+                    $this->em->persist($f1Contract);
                 }
-                $f1Contract->setCalculatedPayout($payout);
-                $this->em->persist($f1Contract);
             }
-        }
 
-        if ($fr->getFighter2()) {
-            $f2Contract = $this->contractRepo->findOneBy(['fighter' => $fr->getFighter2(), 'event' => $fr->getEvent()]);
-            if ($f2Contract && !$f2Contract->isPaid()) {
-                $payout = $f2Contract->getBasePay();
-                if ($fr->getWinner() && $fr->getWinner()->getFighterId() === $fr->getFighter2()->getFighterId()) {
-                    $payout += $f2Contract->getWinBonus();
+            if ($fr->getFighter2()) {
+                $f2Contract = $this->contractRepo->findOneBy(['fighter' => $fr->getFighter2(), 'event' => $fr->getEvent()]);
+                if ($f2Contract && !$f2Contract->isPaid()) {
+                    $payout = $f2Contract->getBasePay();
+                    if ($fr->getWinner() && $fr->getWinner()->getFighterId() === $fr->getFighter2()->getFighterId()) {
+                        $payout += $f2Contract->getWinBonus();
+                    }
+                    $f2Contract->setCalculatedPayout($payout);
+                    $this->em->persist($f2Contract);
                 }
-                $f2Contract->setCalculatedPayout($payout);
-                $this->em->persist($f2Contract);
             }
+            
+            $this->em->flush();
         }
-        
-        $this->em->flush();
 
         return true;
     }

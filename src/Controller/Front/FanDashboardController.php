@@ -118,8 +118,8 @@ class FanDashboardController extends AbstractController
         // Upcoming Events (only future events)
         $upcomingEvents = array_slice($eventRepo->findUpcoming(), 0, 6);
 
-        // Latest Results
-        $latestResults = $resultRepo->findBy([], ['resultId' => 'DESC'], 5);
+        // Latest Results (Only COMPLETED fights)
+        $latestResults = $resultRepo->findBy(['status' => 'COMPLETED'], ['resultId' => 'DESC'], 5);
 
         // Trending Articles
         $trendingArticles = $articleRepo->findBy([], ['createdAt' => 'DESC'], 4);

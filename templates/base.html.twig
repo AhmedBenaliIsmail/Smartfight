@@ -41,9 +41,15 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_users' %}active{% endif %}" href="{{ path('app_users') }}">
-                            <span class="nav-link-icon"><i class="fa-solid {% if is_granted('ROLE_ADMIN') %}fa-users{% else %}fa-user{% endif %} fa-fw"></i></span>
-                            <span class="nav-link-title">{% if is_granted('ROLE_ADMIN') %}Users{% else %}My Profile{% endif %}</span>
+                        <a class="nav-link {% if app.request.attributes.get('_route') == 'app_profile' %}active{% endif %}" href="{{ path('app_profile') }}">
+                            <span class="nav-link-icon"><i class="fa-solid fa-id-card fa-fw"></i></span>
+                            <span class="nav-link-title">Account Settings</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_users' and app.request.attributes.get('_route') != 'app_profile' %}active{% endif %}" href="{{ path('app_users') }}">
+                            <span class="nav-link-icon"><i class="fa-solid {% if is_granted('ROLE_ADMIN') %}fa-users{% else %}fa-user-group{% endif %} fa-fw"></i></span>
+                            <span class="nav-link-title">{% if is_granted('ROLE_ADMIN') %}Users Management{% else %}Community{% endif %}</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -156,16 +162,38 @@
     <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
 
         <!-- Topbar -->
-        <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
-            <div class="d-flex align-items-center gap-3 flex-fill">
-                <!-- Breadcrumb -->
-                <ol class="breadcrumb mb-0">
-                    {% block breadcrumb %}
-                    <li class="breadcrumb-item active">Dashboard</li>
-                    {% endblock %}
-                </ol>
-            </div>
-            <div class="d-flex align-items-center gap-3">
+        <header class="navbar navbar-expand-md" style="background:#09090b; border-bottom:1px solid #27272a; padding: 0.75rem 1.5rem; position:sticky; top:0; z-index:99; height: 64px;">
+            <div class="container-fluid p-0 d-flex align-items-center justify-content-between">
+                
+                <!-- Left: Breadcrumb -->
+                <div class="d-flex align-items-center" style="min-width: 200px;">
+                    <ol class="breadcrumb mb-0 d-none d-xl-flex">
+                        {% block breadcrumb %}
+                        <li class="breadcrumb-item active">Dashboard</li>
+                        {% endblock %}
+                    </ol>
+                </div>
+
+                <!-- Center: Global Search Bar -->
+                <div class="position-relative d-flex justify-content-center flex-grow-1 px-4">
+                    <div class="input-group input-group-flat shadow-sm" style="max-width: 500px; border-radius: 8px; overflow: hidden; border: 1px solid #27272a;">
+                        <span class="input-group-text bg-dark border-0 px-3">
+                            <i class="fa-solid fa-magnifying-glass text-muted" style="font-size: 0.85rem;"></i>
+                        </span>
+                        <input type="text" id="globalSearchInput" class="form-control bg-dark border-0 text-white ps-0" placeholder="Search Boxers, Events, or News..." autocomplete="off" style="font-size: 0.85rem; height: 38px;">
+                        <span class="input-group-text bg-dark border-0 pe-3 d-none" id="globalSearchSpinner">
+                            <i class="fa-solid fa-circle-notch fa-spin text-muted" style="font-size: 0.85rem;"></i>
+                        </span>
+                    </div>
+                    
+                    <!-- Search Results Dropdown -->
+                    <div id="globalSearchResults" class="position-absolute mt-2 shadow-lg d-none" style="background:#18181b; border: 1px solid #27272a; border-radius: 8px; z-index: 1000; width: 500px; max-height: 400px; overflow-y: auto; backdrop-filter: blur(10px); top: 100%;">
+                        <!-- Results will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Right: Notifications & User -->
+                <div class="d-flex align-items-center gap-3" style="min-width: 200px; justify-content: flex-end;">
                 {% if app.user %}
                     {{ render(controller('App\\Controller\\NotificationController::list')) }}
                     
@@ -183,6 +211,8 @@
                         <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="background:#18181b; border: 1px solid #27272a;">
+                        <li><a class="dropdown-item text-white" href="{{ path('app_profile') }}"><i class="fa-solid fa-user-gear fa-fw me-2 text-blue"></i>Profile & Security</a></li>
+                        <li><hr class="dropdown-divider" style="border-color:#27272a;"></li>
                         {% if is_granted('ROLE_USER') and not is_granted('ROLE_ADMIN') %}
                             <li><a class="dropdown-item text-white" href="{{ path('front_booking_index') }}"><i class="fa-solid fa-cart-plus fa-fw me-2 text-danger"></i>Book Tickets</a></li>
                             <li><a class="dropdown-item text-white" href="{{ path('front_booking_my') }}"><i class="fa-solid fa-ticket fa-fw me-2 text-danger"></i>My Bookings</a></li>
@@ -245,33 +275,84 @@
             input.addEventListener('input', function() {
                 const query = this.value.toLowerCase().trim();
                 const items = container.querySelectorAll(itemSelector);
-                const colIndexAttr = input.getAttribute('data-live-search-column');
-                const filterSelectSelector = input.getAttribute('data-live-search-filter-select');
-                const filterSelect = filterSelectSelector ? document.querySelector(filterSelectSelector) : null;
                 
                 items.forEach(item => {
-                    // Skip special rows
                     if (item.tagName === 'TR' && item.cells.length === 1 && item.cells[0].colSpan > 1) return;
-
-                    let text = '';
-                    let colIndex = (colIndexAttr !== null) ? colIndexAttr : (filterSelect ? filterSelect.value : null);
-
-                    if (colIndex !== null && colIndex !== "" && item.cells && item.cells[colIndex]) {
-                        text = item.cells[colIndex].innerText.toLowerCase();
-                    } else {
-                        text = item.innerText.toLowerCase();
-                    }
-
-                    if (text.includes(query)) {
-                        item.style.display = '';
-                    } else {
-                        item.style.display = 'none';
-                    }
+                    let text = item.innerText.toLowerCase();
+                    item.style.display = text.includes(query) ? '' : 'none';
                 });
             });
         });
+
+        // Global Search Logic
+        const gSearchInput = document.getElementById('globalSearchInput');
+        const gSearchResults = document.getElementById('globalSearchResults');
+        const gSearchSpinner = document.getElementById('globalSearchSpinner');
+        let searchTimeout;
+
+        if (gSearchInput) {
+            gSearchInput.addEventListener('input', function() {
+                const q = this.value.trim();
+                clearTimeout(searchTimeout);
+
+                if (q.length < 2) {
+                    gSearchResults.classList.add('d-none');
+                    return;
+                }
+
+                gSearchSpinner.classList.remove('d-none');
+                
+                searchTimeout = setTimeout(async () => {
+                    try {
+                        const response = await fetch(`/api/global-search?q=${encodeURIComponent(q)}`);
+                        const data = await response.json();
+                        
+                        gSearchSpinner.classList.add('d-none');
+                        gSearchResults.innerHTML = '';
+                        
+                        if (data.results.length > 0) {
+                            data.results.forEach(res => {
+                                const item = document.createElement('a');
+                                item.href = res.url;
+                                item.className = 'd-flex align-items-center gap-3 p-3 text-decoration-none border-bottom hover-bg-dark';
+                                item.style.borderColor = '#27272a';
+                                item.innerHTML = `
+                                    <div style="width:32px; height:32px; background:rgba(220,38,38,0.1); border-radius:6px; display:flex; align-items:center; justify-content:center; color:#dc2626;">
+                                        <i class="fa-solid ${res.icon}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-white fw-bold small">${res.title}</div>
+                                        <div class="text-muted" style="font-size:0.7rem;">${res.type} • ${res.subtitle}</div>
+                                    </div>
+                                `;
+                                gSearchResults.appendChild(item);
+                            });
+                            gSearchResults.classList.remove('d-none');
+                        } else {
+                            gSearchResults.innerHTML = '<div class="p-4 text-center text-muted small"><i class="fa-solid fa-face-frown mb-2 d-block fa-2x opacity-25"></i>No matches found for "' + q + '"</div>';
+                            gSearchResults.classList.remove('d-none');
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        gSearchSpinner.classList.add('d-none');
+                    }
+                }, 300);
+            });
+
+            // Close search results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!gSearchInput.contains(e.target) && !gSearchResults.contains(e.target)) {
+                    gSearchResults.classList.add('d-none');
+                }
+            });
+        }
     });
 </script>
+<style>
+    .hover-bg-dark:hover { background: rgba(255,255,255,0.05); }
+    .navbar-vertical-section { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #71717a; padding: 1.5rem 1.5rem .5rem; }
+    .breadcrumb-item + .breadcrumb-item::before { color: #52525b; }
+</style>
 {% endblock %}
 </body>
 </html>

@@ -26,7 +26,7 @@
                 <div class="col-md-6">
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
-                        <input type="text" name="q" id="user-search-input" class="form-control" placeholder="Search by username..." value="{{ q|default('') }}" />
+                        <input type="text" name="q" id="user-search-input" class="form-control" placeholder="Search by username..." value="{{ q|default('') }}" data-live-search="table tbody" data-live-search-item="tr" />
                     </div>
                 </div>
                 <div class="col-md-3">

@@ -14,7 +14,10 @@
         <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Schedule Fight</h1>
         <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Add a new fight to an upcoming event</p>
     </div>
-    <a href="{{ path('app_results') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+    <div class="d-flex gap-2">
+        <button type="button" id="aiMatchmakingBtn" class="btn btn-sm px-3" style="background:rgba(139, 92, 246, 0.1);color:#8b5cf6;border:1px solid #8b5cf6;"><i class="fa-solid fa-wand-magic-sparkles me-1"></i>AI Suggestions</button>
+        <a href="{{ path('app_results') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+    </div>
 </div>
 
 <form method="post">
@@ -105,6 +108,58 @@ document.addEventListener('DOMContentLoaded', function() {
                 preview.innerHTML = `<i class="fa-solid fa-user fa-2x text-muted"></i>`;
             }
         });
+    });
+
+    // AI Matchmaking Suggestions
+    document.getElementById('aiMatchmakingBtn').addEventListener('click', async function(e) {
+        e.preventDefault();
+        const btn = this;
+        const originalText = btn.innerHTML;
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i>Getting suggestions...';
+        
+        try {
+            const response = await fetch('{{ path("api_ai_matchmaking") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ count: 5 })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.success && data.matches && data.matches.length > 0) {
+                const match = data.matches[0];
+                
+                // Populate the form
+                const f1Select = document.querySelector('select[name="fighter1Id"]');
+                const f2Select = document.querySelector('select[name="fighter2Id"]');
+                
+                f1Select.value = match.fighter1_id;
+                f1Select.dispatchEvent(new Event('change'));
+                
+                f2Select.value = match.fighter2_id;
+                f2Select.dispatchEvent(new Event('change'));
+                
+                // Show suggestion reason
+                alert(`✅ Match Suggested:\n\n${match.reason}\n\nExcitement Level: ${match.excitement_level}\n\nReview and schedule!`);
+            } else {
+                alert('⚠️ Could not generate matchmaking suggestions: ' + (data.error || 'Not enough fighters'));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error calling AI service: ' + error.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
     });
 });
 </script>

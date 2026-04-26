@@ -109,6 +109,13 @@ class FightStatisticController extends AbstractController
             'round' => $round
         ]) ?: new FightStatistic();
 
+        // VALIDATION: Prevent entry for rounds beyond the actual fight end
+        $maxRound = ($fight->getStatus() === 'COMPLETED' && $fight->getRoundNumber()) ? $fight->getRoundNumber() : ($fight->getScheduledRounds() ?: 12);
+        if ($round > $maxRound) {
+            $this->addFlash('warning', "This fight ended in Round $maxRound. You cannot enter statistics for Round $round.");
+            return $this->redirectToRoute('app_stat_new', ['fightId' => $fightId, 'round' => $maxRound]);
+        }
+
         if ($request->isMethod('POST')) {
             try {
                 $this->bindPairedStats($stat1, $stat2, $fight, $request);
@@ -147,7 +154,7 @@ class FightStatisticController extends AbstractController
             'fighter1' => $boxer1,
             'fighter2' => $boxer2,
             'currentRound' => $round,
-            'totalRounds' => $fight->getScheduledRounds() ?: 12,
+            'totalRounds' => $maxRound,
         ]);
     }
 

@@ -80,6 +80,39 @@ class FighterController extends AbstractController
         return $this->redirectToRoute('app_fighters');
     }
 
+    #[Route('/{id}/generate-ai-profile', name: 'app_fighter_generate_ai_profile', methods: ['POST'])]
+    public function generateAiProfile(int $id, FighterRepository $repo, \App\Service\AIService $aiService, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $f = $repo->find($id);
+        if (!$f) {
+            throw $this->createNotFoundException();
+        }
+
+        $fighterData = [
+            'name' => $f->getFullName(),
+            'wins' => $f->getWins(),
+            'losses' => $f->getLosses(),
+            'draws' => $f->getDraws(),
+            'ko_wins' => $f->getKoWins(),
+            'height' => $f->getHeight() ?? 0,
+            'reach' => $f->getReach() ?? 0,
+        ];
+
+        $response = $aiService->generateFighterProfile($fighterData);
+
+        if ($response['success'] && isset($response['profile'])) {
+            $f->setAiStyleTag($response['profile']['aiStyleTag'] ?? null);
+            $f->setAiDescription($response['profile']['aiDescription'] ?? null);
+            $em->flush();
+            $this->addFlash('success', 'AI Profile generated successfully.');
+        } else {
+            $this->addFlash('error', 'Failed to generate AI profile: ' . ($response['error'] ?? 'Unknown error'));
+        }
+
+        return $this->redirectToRoute('app_fighter_edit', ['id' => $f->getFighterId()]);
+    }
+
     private function bindFighter(Fighter $f, Request $r, EntityManagerInterface $em): void
     {
         $f->setFirstName(trim($r->request->get('firstName', '')));

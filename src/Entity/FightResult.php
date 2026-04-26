@@ -5,8 +5,13 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\FightResultRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+
+#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: FightResultRepository::class)]
 #[ORM\Table(name: 'fight_results')]
+#[ORM\HasLifecycleCallbacks]
 class FightResult
 {
     public const METHOD_KO = 'KO';
@@ -84,6 +89,18 @@ class FightResult
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $insideTheNumbers = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $highlightVideoUrl = null;
+
+    #[ORM\Column(name: 'video_path', type: 'string', length: 255, nullable: true)]
+    private ?string $videoPath = null;
+
+    #[Vich\UploadableField(mapping: 'fight_highlight', fileNameProperty: 'videoPath')]
+    private ?File $videoFile = null;
+
+    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
+
     public function getResultId(): ?int { return $this->resultId; }
     public function getEvent(): ?Event { return $this->event; }
     public function setEvent(Event $v): self { $this->event = $v; return $this; }
@@ -128,6 +145,30 @@ class FightResult
 
     public function getInsideTheNumbers(): ?string { return $this->insideTheNumbers; }
     public function setInsideTheNumbers(?string $v): self { $this->insideTheNumbers = $v; return $this; }
+
+    public function getHighlightVideoUrl(): ?string { return $this->highlightVideoUrl; }
+    public function setHighlightVideoUrl(?string $v): self { $this->highlightVideoUrl = $v; return $this; }
+
+    public function getVideoPath(): ?string { return $this->videoPath; }
+    public function setVideoPath(?string $v): self { $this->videoPath = $v; return $this; }
+
+    public function getVideoFile(): ?File { return $this->videoFile; }
+    public function setVideoFile(?File $v = null): self
+    {
+        $this->videoFile = $v;
+        if ($v !== null) { $this->updatedAt = new \DateTime(); }
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface { return $this->updatedAt; }
+    public function setUpdatedAt(?\DateTimeInterface $v): self { $this->updatedAt = $v; return $this; }
+
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function updateTimestamps(): void
+    {
+        $this->updatedAt = new \DateTime();
+    }
 
     public function getLoser(): ?Fighter
     {

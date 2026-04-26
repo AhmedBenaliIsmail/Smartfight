@@ -47,14 +47,19 @@ class FightResultRepository extends ServiceEntityRepository
         return $this->count(['event' => $eventId]);
     }
 
-    public function findCompletedByFighter(int $fighterId): array
+    public function findCompletedByFighter(int $fighterId, int $limit = 0): array
     {
-        return $this->createQueryBuilder('r')
+        $qb = $this->createQueryBuilder('r')
             ->where('(r.fighter1 = :fid OR r.fighter2 = :fid) AND r.status = :s')
             ->setParameter('fid', $fighterId)
             ->setParameter('s', 'COMPLETED')
-            ->orderBy('r.fightDate', 'DESC')
-            ->getQuery()->getResult();
+            ->orderBy('r.fightDate', 'DESC');
+        
+        if ($limit > 0) {
+            $qb->setMaxResults($limit);
+        }
+        
+        return $qb->getQuery()->getResult();
     }
 
     public function findAllCompleted(): array
@@ -101,6 +106,23 @@ class FightResultRepository extends ServiceEntityRepository
             if ($r->getFighter2()) $ids[] = $r->getFighter2()->getFighterId();
         }
         return array_unique($ids);
+    }
+
+    public function findRecentMatch(int $fighter1Id, int $fighter2Id, int $monthsBack = 12): ?FightResult
+    {
+        $since = new \DateTime("-{$monthsBack} months");
+        
+        return $this->createQueryBuilder('r')
+            ->where('((r.fighter1 = :f1 AND r.fighter2 = :f2) OR (r.fighter1 = :f2 AND r.fighter2 = :f1))')
+            ->andWhere('r.fightDate >= :since')
+            ->andWhere('r.status = :status')
+            ->setParameter('f1', $fighter1Id)
+            ->setParameter('f2', $fighter2Id)
+            ->setParameter('since', $since)
+            ->setParameter('status', 'COMPLETED')
+            ->orderBy('r.fightDate', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()->getOneOrNullResult();
     }
 }
 

@@ -122,4 +122,34 @@ class UserController extends AbstractController
         if ($user) { $em->remove($user); $em->flush(); $this->addFlash('success', 'User deleted.'); }
         return $this->redirectToRoute('app_users');
     }
+    #[Route('/profile', name: 'app_profile', methods: ['GET', 'POST'])]
+    public function profile(Request $request, UserPasswordHasherInterface $hasher, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if ($request->isMethod('POST')) {
+            $action = $request->request->get('action');
+
+            if ($action === 'update_info') {
+                $user->setUsername(trim($request->request->get('username')));
+                $user->setEmail(trim($request->request->get('email')));
+                $em->flush();
+                $this->addFlash('success', 'Information updated.');
+            } elseif ($action === 'change_password') {
+                $newPass = $request->request->get('newPassword');
+                if ($newPass) {
+                    $user->setPassword($hasher->hashPassword($user, $newPass));
+                    $em->flush();
+                    $this->addFlash('success', 'Password updated.');
+                }
+            }
+            return $this->redirectToRoute('app_profile');
+        }
+
+        return $this->render('user/profile.html.twig', [
+            'user' => $user,
+        ]);
+    }
 }

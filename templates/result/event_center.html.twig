@@ -100,12 +100,24 @@
                             <button type="submit" class="btn btn-outline-warning"><i class="fa-solid fa-ban"></i></button>
                         </form>
                     {% elseif fight.status == 'COMPLETED' %}
-                        <a href="{{ path('app_result_show', {id: fight.resultId}) }}" class="btn btn-primary flex-fill fw-bold">
-                            <i class="fa-solid fa-chart-line me-1"></i>View Analytics
-                        </a>
-                        <div class="d-flex gap-1 flex-fill">
-                            <a href="{{ path('app_performance_show', {id: f1.fighterId}) }}" class="btn btn-sm btn-outline-danger" title="Red Corner Stats"><i class="fa-solid fa-user"></i></a>
-                            <a href="{{ path('app_performance_show', {id: f2.fighterId}) }}" class="btn btn-sm btn-outline-primary" title="Blue Corner Stats"><i class="fa-solid fa-user"></i></a>
+                        <div class="d-flex flex-column gap-2 w-100">
+                            <div class="d-flex gap-2">
+                                <a href="{{ path('app_result_show', {id: fight.resultId}) }}" class="btn btn-primary flex-fill fw-bold">
+                                    <i class="fa-solid fa-chart-line me-1"></i>View Analytics
+                                </a>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a href="{{ path('app_result_enter', {id: fight.resultId}) }}" class="btn btn-outline-success fw-bold" title="Update Media/Result">
+                                        <i class="fa-solid fa-video"></i>
+                                    </a>
+                                    <a href="{{ path('app_result_stats', {id: fight.resultId}) }}" class="btn btn-warning fw-bold" title="Manage Stats">
+                                        <i class="fa-solid fa-calculator"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                            <div class="d-flex gap-1">
+                                <a href="{{ path('app_performance_show', {id: f1.fighterId}) }}" class="btn btn-sm btn-outline-danger flex-fill" title="Red Corner Stats"><i class="fa-solid fa-user me-1"></i>Red</a>
+                                <a href="{{ path('app_performance_show', {id: f2.fighterId}) }}" class="btn btn-sm btn-outline-primary flex-fill" title="Blue Corner Stats"><i class="fa-solid fa-user me-1"></i>Blue</a>
+                            </div>
                         </div>
                     {% else %}
                         <div class="text-muted small text-center w-100 italic">Fight is currently {{ fight.status }}</div>

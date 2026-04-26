@@ -31,8 +31,10 @@ class EventRepository extends ServiceEntityRepository
     public function findFinishedEvents(): array
     {
         return $this->createQueryBuilder('e')
-            ->where('e.eventDate < :today')
-            ->setParameter('today', new \DateTime('today'))
+            ->innerJoin('App\Entity\FightResult', 'fr', 'WITH', 'fr.event = e')
+            ->where('fr.status = :status')
+            ->setParameter('status', 'COMPLETED')
+            ->groupBy('e.eventId')
             ->orderBy('e.eventDate', 'DESC')
             ->getQuery()->getResult();
     }

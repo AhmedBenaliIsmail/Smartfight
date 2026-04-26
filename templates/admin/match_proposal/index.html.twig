@@ -41,10 +41,42 @@
             <h1 class="h2 fw-bold text-white mb-1">VOTING POOL MANAGEMENT</h1>
             <p class="text-muted mb-0">Select matchups for fans to vote on. High-voted bouts appear on the Community Card.</p>
         </div>
-        <button class="btn btn-danger px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#newProposalModal">
-            <i class="fa-solid fa-plus me-2"></i>ADD TO POOL
-        </button>
+        <div class="d-flex gap-2">
+            <button id="aiGenerateBtn" class="btn btn-primary px-4 fw-bold" style="background:#8b5cf6; border:none;">
+                <i class="fa-solid fa-wand-magic-sparkles me-2"></i>AI GENERATE PROPOSALS
+            </button>
+            <button class="btn btn-danger px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#newProposalModal">
+                <i class="fa-solid fa-plus me-2"></i>ADD TO POOL
+            </button>
+        </div>
     </div>
+
+    <script>
+    document.getElementById('aiGenerateBtn').addEventListener('click', async function() {
+        if(!confirm('This will use DeepSeek AI to analyze the entire roster and create 5 high-excitement match proposals for fan voting. Proceed?')) return;
+        
+        const btn = this;
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>GENERATING...';
+        
+        try {
+            const res = await fetch('{{ path('api_ai_generate_proposals') }}', { method: 'POST' });
+            const data = await res.json();
+            if(data.success) {
+                alert('Success! ' + data.message);
+                window.location.reload();
+            } else {
+                alert('Error: ' + (data.error || 'Unknown error'));
+            }
+        } catch(e) {
+            alert('Connection failed: ' + e.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    });
+    </script>
 
     <div class="row">
         <div class="col-lg-12">
@@ -56,12 +88,39 @@
                         {{ proposal.voteCount }}
                     </div>
                     <div>
-                        <div class="h4 mb-1 text-white fw-bold">
-                            {{ proposal.fighter1.fullName }} <span class="text-danger mx-2">VS</span> {{ proposal.fighter2.fullName }}
+                        <div class="d-flex align-items-center gap-4 mb-2">
+                            <!-- Fighter 1 -->
+                            <div class="d-flex align-items-center gap-2">
+                                {% if proposal.fighter1.photoFilename %}
+                                    <img src="{{ asset('uploads/boxers/' ~ proposal.fighter1.photoFilename) }}" style="width:48px; height:48px; border-radius:50%; object-fit:cover; border:2px solid #ef4444;" alt="">
+                                {% else %}
+                                    <div style="width:48px; height:48px; border-radius:50%; border:2px solid #ef4444; background:#18181b; display:flex; align-items:center; justify-content:center; color:#71717a;"><i class="fa-solid fa-user"></i></div>
+                                {% endif %}
+                                <div>
+                                    <div class="text-white fw-bold" style="font-size:1.1rem; text-transform:uppercase;">{{ proposal.fighter1.fullName }}</div>
+                                    <div class="small text-muted" style="font-size:0.75rem; font-weight:600; letter-spacing:0.5px;">{{ proposal.fighter1.wins }}-{{ proposal.fighter1.losses }}-{{ proposal.fighter1.draws }} ({{ proposal.fighter1.koWins }} KOs)</div>
+                                </div>
+                            </div>
+                            
+                            <!-- VS Badge -->
+                            <div class="text-danger fw-bold" style="font-style:italic; font-size:1.2rem;">VS</div>
+
+                            <!-- Fighter 2 -->
+                            <div class="d-flex align-items-center gap-2 flex-row-reverse text-end">
+                                {% if proposal.fighter2.photoFilename %}
+                                    <img src="{{ asset('uploads/boxers/' ~ proposal.fighter2.photoFilename) }}" style="width:48px; height:48px; border-radius:50%; object-fit:cover; border:2px solid #3b82f6;" alt="">
+                                {% else %}
+                                    <div style="width:48px; height:48px; border-radius:50%; border:2px solid #3b82f6; background:#18181b; display:flex; align-items:center; justify-content:center; color:#71717a;"><i class="fa-solid fa-user"></i></div>
+                                {% endif %}
+                                <div>
+                                    <div class="text-white fw-bold" style="font-size:1.1rem; text-transform:uppercase;">{{ proposal.fighter2.fullName }}</div>
+                                    <div class="small text-muted" style="font-size:0.75rem; font-weight:600; letter-spacing:0.5px;">{{ proposal.fighter2.wins }}-{{ proposal.fighter2.losses }}-{{ proposal.fighter2.draws }} ({{ proposal.fighter2.koWins }} KOs)</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-muted small">
-                            <span class="badge bg-dark border border-secondary me-2">{{ proposal.weightDivision ? proposal.weightDivision.name : 'Unassigned' }}</span>
-                            Added on {{ proposal.proposedAt|date('M d, Y') }}
+                        <div class="text-muted small mt-1" style="font-size:0.8rem;">
+                            <span class="badge bg-dark border border-secondary me-2 px-2 py-1">{{ proposal.weightDivision ? proposal.weightDivision.name : 'Unassigned' }}</span>
+                            <i class="fa-regular fa-clock me-1"></i> Added on {{ proposal.proposedAt|date('M d, Y') }}
                         </div>
                     </div>
                 </div>

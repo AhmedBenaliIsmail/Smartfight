@@ -129,7 +129,13 @@
             <h1 class="h2 fw-bold text-white mb-1" style="font-family: 'Oswald', sans-serif; letter-spacing: 1px;">ORGANIZATION ROSTER</h1>
             <p class="text-muted mb-0">Managing professional combatant portfolios</p>
         </div>
-        <div class="d-flex gap-3">
+        <div class="d-flex gap-3 align-items-center">
+            <div class="input-icon" style="width: 250px;">
+                <span class="input-icon-addon">
+                    <i class="fa-solid fa-search"></i>
+                </span>
+                <input type="text" class="form-control" style="background:#18181b; border:1px solid #27272a; color:#fafafa;" placeholder="Search roster..." data-live-search=".fighter-grid" data-live-search-item=".fighter-card-col">
+            </div>
             <a href="{{ path('app_fighter_new') }}" class="btn btn-danger px-4 fw-bold">
                 <i class="fa-solid fa-plus me-2"></i>ADD BOXER
             </a>
@@ -142,7 +148,7 @@
             {% set win_rate = total_fights > 0 ? (fighter.wins / total_fights * 100)|round : 0 %}
             {% set standing_percent = max(5, min(100, (fighter.eloRating / 2000 * 100))) %}
             
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-4 col-md-6 fighter-card-col">
                 <div class="fighter-card-pro">
                     <div class="d-flex gap-4 mb-5">
                         <div class="fighter-photo-container">

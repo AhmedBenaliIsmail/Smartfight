@@ -23,6 +23,12 @@ class Fighter
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $nickname = null;
 
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $aiStyleTag = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $aiDescription = null;
+
     #[ORM\ManyToOne(targetEntity: WeightDivision::class)]
     #[ORM\JoinColumn(name: 'weight_division_id', referencedColumnName: 'id', nullable: true)]
     #[Assert\NotNull(message: 'Weight division is required.')]
@@ -85,6 +91,15 @@ class Fighter
     #[ORM\Column(name: 'strikes_landed', type: 'integer', options: ['default' => 0])]
     private int $strikesLanded = 0;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $strength = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $weakness = null;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $weight = null;
+
     // Getters and Setters
     public function getFighterId(): ?int { return $this->fighterId; }
     public function setFighterId(int $id): self { $this->fighterId = $id; return $this; }
@@ -97,6 +112,30 @@ class Fighter
 
     public function getNickname(): ?string { return $this->nickname; }
     public function setNickname(?string $v): self { $this->nickname = $v; return $this; }
+
+    public function getAiStyleTag(): ?string
+    {
+        return $this->aiStyleTag;
+    }
+
+    public function setAiStyleTag(?string $aiStyleTag): static
+    {
+        $this->aiStyleTag = $aiStyleTag;
+
+        return $this;
+    }
+
+    public function getAiDescription(): ?string
+    {
+        return $this->aiDescription;
+    }
+
+    public function setAiDescription(?string $aiDescription): static
+    {
+        $this->aiDescription = $aiDescription;
+
+        return $this;
+    }
 
     public function getWeightDivision(): ?WeightDivision { return $this->weightDivision; }
     public function setWeightDivision(?WeightDivision $v): self { $this->weightDivision = $v; return $this; }
@@ -155,6 +194,15 @@ class Fighter
     public function getStrikesLanded(): int { return $this->strikesLanded; }
     public function setStrikesLanded(int $v): self { $this->strikesLanded = $v; return $this; }
 
+    public function getStrength(): ?string { return $this->strength; }
+    public function setStrength(?string $v): self { $this->strength = $v; return $this; }
+
+    public function getWeakness(): ?string { return $this->weakness; }
+    public function setWeakness(?string $v): self { $this->weakness = $v; return $this; }
+
+    public function getWeight(): ?int { return $this->weight; }
+    public function setWeight(?int $v): self { $this->weight = $v; return $this; }
+
     public function getStrikeAccuracy(): float
     {
         if ($this->strikesThrown <= 0) return 0.0;
@@ -163,35 +211,45 @@ class Fighter
 
     public function getCalculatedFightingStyle(): string
     {
-        $totalFights = $this->getTotalFights();
-        if ($totalFights < 5) {
-            return 'PROSPECT';
+        if ($this->aiStyleTag) {
+            return $this->aiStyleTag;
         }
 
-        if ($this->losses > $this->wins) {
-            return 'JOURNEYMAN';
+        $totalFights = $this->getTotalFights();
+        if ($totalFights < 3) {
+            return 'PROSPECT';
         }
 
         $koRate = $this->wins > 0 ? ($this->koWins / $this->wins) * 100 : 0;
         $accuracy = $this->getStrikeAccuracy();
-        $volumePerFight = $totalFights > 0 ? ($this->strikesThrown / $totalFights) : 0;
+        $reachAdvantage = ($this->reach ?? 180) > ($this->height ?? 175);
 
-        if ($koRate >= 70) {
-            if ($volumePerFight > 400) {
-                return 'PRESSURE FIGHTER';
-            }
+        // 1. ELITE FINISHERS
+        if ($koRate >= 75) {
             return 'SLUGGER';
         }
 
-        if ($koRate >= 45 && $koRate < 70) {
+        // 2. TACTICAL HYBRIDS
+        if ($koRate >= 45 && $koRate < 75) {
+            if ($accuracy > 42) return 'TACTICIAN';
             return 'BOXER-PUNCHER';
         }
 
-        if ($this->decisionWins >= $this->koWins || $koRate < 45) {
-            if ($accuracy > 38) {
-                return 'TACTICIAN';
-            }
+        // 3. SPECIALIZED STYLES
+        if ($accuracy > 45) {
+            return 'SHARPSHOOTER';
+        }
+
+        if ($reachAdvantage && $accuracy > 35) {
             return 'OUT-BOXER';
+        }
+
+        if ($this->strikesThrown > 2000 && $totalFights > 0 && ($this->strikesThrown / $totalFights) > 500) {
+            return 'PRESSURE FIGHTER';
+        }
+
+        if ($this->losses >= $this->wins && $totalFights > 10) {
+            return 'GATEKEEPER';
         }
 
         return 'BALANCED';

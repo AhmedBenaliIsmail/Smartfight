@@ -2,69 +2,371 @@
 
 {% block title %}My Profile — SmartFight{% endblock %}
 
-{% block breadcrumb %}
-    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
-    <li class="breadcrumb-item active">My Profile</li>
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .profile-card-premium {
+            background: linear-gradient(145deg, #18181b, #09090b);
+            border: 1px solid #27272a;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        }
+        .profile-header {
+            background: linear-gradient(90deg, #dc2626 0%, #991b1b 100%);
+            padding: 3rem 2rem;
+            color: #fff;
+            text-align: center;
+        }
+        .avatar-container {
+            position: relative;
+            margin-top: -60px;
+            margin-bottom: 1.5rem;
+        }
+        .avatar-huge {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #27272a;
+            border: 5px solid #09090b;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #dc2626;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .section-divider {
+            border-bottom: 1px solid #27272a;
+            margin: 2rem 0;
+            position: relative;
+        }
+        .section-title {
+            background: #09090b;
+            padding: 0 1rem;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: #71717a;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .face-id-btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: #fff;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        .face-id-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+            color: #fff;
+        }
+        .face-id-btn.active {
+            background: linear-gradient(135deg, #22c55e, #15803d);
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 15px #00ffff;
+            animation: scan 2s linear infinite;
+            z-index: 10;
+        }
+        @keyframes scan {
+            0% { top: 0; }
+            50% { top: 100%; }
+            100% { top: 0; }
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-4">
-    <div>
-        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">My Profile</h1>
-        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Manage your account details and security</p>
-    </div>
-</div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="profile-card-premium">
+                <div class="profile-header">
+                    <h1 class="h2 mb-0 fw-bold" style="font-family: 'Oswald', sans-serif; letter-spacing: 1px;">ACCOUNT MANAGEMENT</h1>
+                    <p class="mb-0 text-white-50 small">Manage your identity and security protocols</p>
+                </div>
 
-<div class="row g-4">
-    <div class="col-lg-6">
-        <div class="card" style="background:#18181b;border:1px solid #27272a;">
-            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
-                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-user me-2" style="color:#3b82f6;"></i>Account Details</h3>
-            </div>
-            <div class="card-body p-4">
-                <form action="{{ path('app_user_update', {'id': user.userId}) }}" method="post">
-                    <div class="mb-3">
-                        <label class="form-label" style="color:#d4d4d8;">Username</label>
-                        <input type="text" name="username" class="form-control" value="{{ user.username }}" required />
+                <div class="p-5">
+                    <div class="text-center avatar-container">
+                        <div class="avatar-huge">
+                            {{ user.username|first|upper }}
+                        </div>
+                        <h2 class="text-white mt-2">{{ user.username }}</h2>
+                        <div class="badge bg-secondary-lt">ID: #{{ user.userId }} — {{ user.rolesAsString }}</div>
                     </div>
-                    <div class="mb-4">
-                        <label class="form-label" style="color:#d4d4d8;">Email</label>
-                        <input type="email" name="email" class="form-control" value="{{ user.email }}" required />
-                    </div>
-                    
-                    <div class="mb-4 p-3 rounded" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);">
-                        <div class="d-flex w-100 justify-content-between">
-                            <span style="color:#a1a1aa;font-size:0.875rem;">Account Created:</span>
-                            <span style="color:#fafafa;font-weight:500;">{{ user.createdDate ? user.createdDate|date('Y-m-d') : 'Unknown' }}</span>
+
+                    <div class="section-divider"><span class="section-title">Personal Details</span></div>
+
+                    <form method="post">
+                        <input type="hidden" name="action" value="update_info">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small fw-bold">USERNAME</label>
+                                <input type="text" name="username" class="form-control bg-dark border-secondary text-white" value="{{ user.username }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small fw-bold">EMAIL ADDRESS</label>
+                                <input type="email" name="email" class="form-control bg-dark border-secondary text-white" value="{{ user.email }}" required>
+                            </div>
+                            <div class="col-12 text-center mt-4">
+                                <button type="submit" class="btn btn-primary px-5 py-2 fw-bold">UPDATE IDENTITY</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="section-divider"><span class="section-title">Security Protocols</span></div>
+
+                    <form method="post">
+                        <input type="hidden" name="action" value="change_password">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label text-muted small fw-bold">NEW PASSWORD</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark border-secondary"><i class="fa-solid fa-key text-muted"></i></span>
+                                    <input type="password" name="newPassword" class="form-control bg-dark border-secondary text-white" placeholder="Leave blank to keep current">
+                                </div>
+                                <small class="text-muted mt-2 d-block">Minimum 8 characters with specialized symbols recommended.</small>
+                            </div>
+                            <div class="col-12 text-center mt-4">
+                                <button type="submit" class="btn btn-outline-danger px-5 py-2 fw-bold">UPDATE PASSCODE</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="section-divider"><span class="section-title">Biometric Authentication</span></div>
+
+                    <div class="bg-dark p-4 rounded-4 border border-secondary text-center">
+                        <div class="d-flex flex-column align-items-center gap-3">
+                            <i class="fa-solid fa-face-viewfinder fa-4x text-blue mb-2"></i>
+                            <div>
+                                <h4 class="text-white mb-1">Face ID / Biometric Login</h4>
+                                <p class="text-muted small mb-3">Secure your account with hardware-level biometric authentication.</p>
+                            </div>
+                            
+                            <div class="d-flex gap-2">
+                                <button type="button" id="btn-face-id" class="face-id-btn {{ user.webauthnCredentialId ? 'active' : '' }}">
+                                    <i class="fa-solid {{ user.webauthnCredentialId ? 'fa-circle-check' : 'fa-fingerprint' }} fa-lg"></i>
+                                    <span>{{ user.webauthnCredentialId ? 'FACE ID ENABLED' : 'ACTIVATE FACE ID' }}</span>
+                                </button>
+                                <button type="button" id="btn-camera-scan" class="btn btn-outline-info rounded-4 px-4 fw-bold">
+                                    <i class="fa-solid fa-camera me-2"></i>CAMERA SCAN
+                                </button>
+                            </div>
+                            
+                            <div id="camera-container" class="mt-4 d-none" style="max-width: 320px; margin: 0 auto; position: relative;">
+                                <video id="webcam" autoplay playsinline class="rounded-4 border border-info" style="width: 100%; transform: scaleX(-1);"></video>
+                                <canvas id="photo-canvas" class="d-none"></canvas>
+                                <div class="scanner-line"></div>
+                                <div class="mt-2">
+                                    <button type="button" id="btn-capture" class="btn btn-info w-100 fw-bold">CAPTURE & VERIFY</button>
+                                </div>
+                            </div>
+
+                            {% if user.facePhoto %}
+                                <div class="mt-4">
+                                    <img src="{{ user.facePhoto }}" class="rounded-circle border border-success" style="width: 80px; height: 80px; object-fit: cover;" alt="Face Profile">
+                                    <div class="text-success small mt-1">Visual Profile Verified</div>
+                                </div>
+                            {% endif %}
+                            
+                            {% if user.webauthnCredentialId %}
+                                <div class="text-success small fw-bold mt-2"><i class="fa-solid fa-shield-check me-1"></i>Biometric signature stored on this device.</div>
+                            {% endif %}
                         </div>
                     </div>
-
-                    <div class="text-end">
-                        <button type="submit" class="btn" style="background:#dc2626;color:#fff;border:none;">Save Changes</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-6">
-        <div class="card" style="background:#18181b;border:1px solid #27272a;">
-            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
-                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-lock me-2" style="color:#eab308;"></i>Security</h3>
-            </div>
-            <div class="card-body p-4">
-                <form action="{{ path('app_user_password', {'id': user.userId}) }}" method="post">
-                    <div class="mb-4">
-                        <label class="form-label" style="color:#d4d4d8;">New Password</label>
-                        <input type="password" name="newPassword" class="form-control" required minlength="4" />
-                        <div class="form-text mt-2" style="color:#71717a;">Please choose a strong password. You will use this to sign in.</div>
-                    </div>
-                    <div class="text-end">
-                        <button type="submit" class="btn" style="background:#dc2626;color:#fff;border:none;">Change Password</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    // Load AI Models
+    const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
+    Promise.all([
+        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)
+    ]).then(() => console.log('AI Profile Models Loaded'));
+
+    const faceBtn = document.getElementById('btn-face-id');
+    
+    function showProMessage(title, message, type = 'danger') {
+        const toastId = 'toast-' + Math.random().toString(36).substring(7);
+        const toastHtml = `
+            <div id="${toastId}" class="alert alert-important alert-${type} alert-dismissible position-fixed top-0 end-0 m-3 z-index-100" role="alert" style="max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                <div class="d-flex">
+                    <div><i class="fa-solid fa-${type === 'danger' ? 'triangle-exclamation' : 'circle-check'} fa-fw me-2"></i></div>
+                    <div>
+                        <div class="fw-bold">${title}</div>
+                        <div class="small text-muted" style="color: rgba(255,255,255,0.7) !important;">${message}</div>
+                    </div>
+                </div>
+                <a class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="close"></a>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', toastHtml);
+        setTimeout(() => {
+            const el = document.getElementById(toastId);
+            if (el) el.remove();
+        }, 8000);
+    }
+
+    faceBtn.addEventListener('click', async function() {
+        if (!window.PublicKeyCredential) {
+            showProMessage('Hardware Incompatible', 'Your current browser or hardware does not support Biometric Security protocols (WebAuthn).');
+            return;
+        }
+
+        const originalText = this.innerHTML;
+        this.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i>SYNCHRONIZING...';
+        this.disabled = true;
+
+        try {
+            const randomString = Math.random().toString(36).substring(7);
+            const challenge = new TextEncoder().encode(randomString);
+            
+            const credential = await navigator.credentials.create({
+                publicKey: {
+                    challenge: challenge,
+                    rp: { name: "SmartFight Platform" },
+                    user: {
+                        id: new TextEncoder().encode("{{ user.userId }}"),
+                        name: "{{ user.username }}",
+                        displayName: "{{ user.username }}"
+                    },
+                    pubKeyCredParams: [{ alg: -7, type: "public-key" }],
+                    authenticatorSelection: {
+                        userVerification: "preferred"
+                    },
+                    timeout: 30000
+                }
+            });
+
+            if (credential) {
+                const response = await fetch('{{ path('app_face_id_register') }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        credentialId: credential.id,
+                        publicKey: 'WEB_AUTHN_SIGNED_KEY'
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    showProMessage('Face ID Activated', 'Your biometric signature has been securely bound to this account.', 'success');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    throw new Error(result.error);
+                }
+            }
+        } catch (err) {
+            console.error(err);
+            let userMsg = 'The biometric operation was cancelled or timed out. Please ensure Windows Hello or Touch ID is configured in your OS settings.';
+            if (err.name === 'NotAllowedError') {
+                userMsg = 'Access Denied: Biometric verification was rejected or cancelled. Please enable Windows Hello to continue.';
+            }
+            
+            showProMessage('Security Handshake Failed', userMsg);
+            this.innerHTML = originalText;
+            this.disabled = false;
+        }
+    });
+
+    // Camera Scan Logic
+    const camBtn = document.getElementById('btn-camera-scan');
+    const camContainer = document.getElementById('camera-container');
+    const video = document.getElementById('webcam');
+    const canvas = document.getElementById('photo-canvas');
+    const captureBtn = document.getElementById('btn-capture');
+
+    if (camBtn) {
+        camBtn.addEventListener('click', async function() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                video.srcObject = stream;
+                camContainer.classList.remove('d-none');
+                camBtn.classList.add('active');
+
+                // AI Tracking Overlay
+                video.addEventListener('play', () => {
+                    const overlay = faceapi.createCanvasFromMedia(video);
+                    overlay.style.position = 'absolute';
+                    overlay.style.top = '0';
+                    overlay.style.left = '0';
+                    overlay.style.zIndex = '5';
+                    camContainer.append(overlay);
+                    
+                    const displaySize = { width: video.clientWidth, height: video.clientHeight };
+                    faceapi.matchDimensions(overlay, displaySize);
+
+                    setInterval(async () => {
+                        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+                        const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                        overlay.getContext('2d').clearRect(0, 0, overlay.width, overlay.height);
+                        
+                        faceapi.draw.drawDetections(overlay, resizedDetections);
+                        faceapi.draw.drawFaceLandmarks(overlay, resizedDetections);
+                    }, 100);
+                });
+            } catch (err) {
+                showProMessage('Camera Error', 'Could not access your camera. Please check permissions.');
+            }
+        });
+    }
+
+    if (captureBtn) {
+        captureBtn.addEventListener('click', async function() {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const photoData = canvas.toDataURL('image/jpeg', 0.8);
+            
+            this.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>ENROLLING...';
+            this.disabled = true;
+
+            try {
+                const response = await fetch('{{ path('app_face_id_save_photo') }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ photo: photoData })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showProMessage('Enrollment Complete', 'AI Visual Identity stored securely.', 'success');
+                    setTimeout(() => location.reload(), 1500);
+                }
+            } catch (err) {
+                showProMessage('Error', 'Failed to save biometric data.');
+                this.innerHTML = 'RETRY CAPTURE';
+                this.disabled = false;
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

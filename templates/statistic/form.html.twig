@@ -1,272 +1,428 @@
 {% extends 'base.html.twig' %}
+{% block title %}CompuBox Entry — Round {{ currentRound }}{% endblock %}
 
-{% block title %}SmartFight Entry — SmartFight Admin{% endblock %}
+{% block stylesheets %}{{ parent() }}
+<style>
+:root { --red:#ef4444;--blue:#3b82f6;--gold:#f59e0b;--surface:#18181b;--border:#27272a;--muted:#71717a; }
+.cb-card { background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden; }
+.cb-red-top { border-top:3px solid var(--red); }
+.cb-blue-top { border-top:3px solid var(--blue); }
+.cb-header { padding:.75rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between; }
+.corner-tag { font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .75rem;border-radius:20px; }
+.red-tag { background:rgba(239,68,68,.15);color:var(--red); }
+.blue-tag { background:rgba(59,130,246,.15);color:var(--blue); }
+.stat-row { display:grid;grid-template-columns:1fr 1fr;gap:.75rem;padding:1rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.04); }
+.stat-row:last-child { border-bottom:none; }
+.stat-label { font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:.3rem; }
+.stat-input { background:#0c0c0e;border:1px solid var(--border);border-radius:6px;color:#fafafa;padding:.5rem .75rem;width:100%;font-size:.9rem;transition:border-color .2s; }
+.stat-input:focus { outline:none;border-color:#52525b;box-shadow:0 0 0 2px rgba(255,255,255,.05); }
+.stat-input.is-invalid { border-color:var(--red) !important;background:rgba(239,68,68,.05); }
+.stat-input.is-ok { border-color:#22c55e; }
+.stat-group-label { font-size:.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#3f3f46;padding:.5rem 1.25rem .25rem;display:flex;align-items:center;gap:.5rem; }
+.stat-group-label::after { content:'';flex:1;height:1px;background:var(--border); }
+.round-pill { display:inline-flex;align-items:center;justify-content:center;min-width:56px;height:32px;border-radius:20px;font-size:.78rem;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--muted);background:transparent;text-decoration:none;transition:all .2s; }
+.round-pill:hover { border-color:#52525b;color:#fafafa; }
+.round-pill.active { background:var(--red);border-color:var(--red);color:#fff; }
+.round-pill.has-data { border-color:#22c55e;color:#22c55e; }
+.round-pill.active.has-data { background:#16a34a;border-color:#16a34a;color:#fff; }
+.itn-banner { background:linear-gradient(135deg,#991b1b,#7f1d1d);border-radius:8px;padding:1rem 1.25rem;margin-top:1.5rem; }
+.itn-title { font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:.4rem; }
+.itn-text { font-size:.875rem;color:#fff;line-height:1.6; }
+.itn-placeholder { color:rgba(255,255,255,.4);font-style:italic; }
+.ai-btn { background:rgba(139,92,246,.1);color:#8b5cf6;border:1px solid #8b5cf6;border-radius:8px;padding:.6rem 1.5rem;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.5rem; }
+.ai-btn:hover { background:rgba(139,92,246,.2); }
+.ai-btn:disabled { opacity:.5;cursor:not-allowed; }
+.save-btn { background:var(--red);color:#fff;border:none;border-radius:8px;padding:.6rem 2rem;font-size:.9rem;font-weight:600;cursor:pointer;transition:opacity .2s; }
+.save-btn:hover { opacity:.85; }
+.error-hint { font-size:.7rem;color:var(--red);margin-top:.2rem;display:none; }
+.stat-input.is-invalid + .error-hint { display:block; }
+</style>
+{% endblock %}
 
 {% block breadcrumb %}
-    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
-    <li class="breadcrumb-item"><a href="{{ path('app_stats') }}" style="color:#a1a1aa;text-decoration:none;">Statistics</a></li>
-    <li class="breadcrumb-item active">SmartFight Entry</li>
+<li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none">Home</a></li>
+<li class="breadcrumb-item"><a href="{{ path('app_stats') }}" style="color:#a1a1aa;text-decoration:none">Statistics</a></li>
+<li class="breadcrumb-item active">CompuBox Entry</li>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-4">
+<div class="d-flex align-items-start justify-content-between mb-4">
     <div>
-        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Step 3: Professional Bouting Stats — Round {{ currentRound }}</h1>
-        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">{{ event.eventName|default('Unknown Event') }} — {{ fighter1.fullName }} vs {{ fighter2.fullName }}</p>
+        <h1 class="h4 fw-bold mb-1" style="color:#fafafa">CompuBox Statistics Entry</h1>
+        <p class="mb-0" style="color:#71717a;font-size:.8rem">{{ event.eventName }} — <span style="color:#ef4444">{{ fighter1.fullName }}</span> vs <span style="color:#3b82f6">{{ fighter2.fullName }}</span></p>
     </div>
-    <a href="{{ path('app_stat_new', {'eventId': event.eventId}) }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back to Card</a>
+    <a href="{{ path('app_stat_new', {eventId: event.eventId}) }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;font-size:.8rem"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
 </div>
 
 {# Round Selector #}
-<div class="mb-4 d-flex flex-wrap gap-2 justify-content-center">
+<div class="mb-4 d-flex flex-wrap gap-2">
     {% for r in 1..totalRounds %}
-        <a href="{{ path('app_stat_new', {'fightId': fight.resultId, 'round': r}) }}" 
-           class="btn btn-sm rounded-pill px-3 {% if r == currentRound %}btn-danger{% else %}btn-outline-secondary{% endif %}"
-           style="min-width: 80px;">
-            Round {{ r }}
+        <a href="{{ path('app_stat_new', {fightId: fight.resultId, round: r}) }}"
+           class="round-pill {% if r == currentRound %}active{% endif %}">
+            R{{ r }}
         </a>
     {% endfor %}
 </div>
 
-<form method="post" id="statsForm">
-    <div class="row g-4">
-        <!-- Boxer 1 (Red Corner) -->
-        <div class="col-lg-6">
-            <div class="card" style="background:#18181b;border:1px solid #ef4444; border-top-width: 4px;">
-                <div class="card-header d-flex justify-content-between align-items-center" style="background:rgba(239, 68, 68, 0.05);border-bottom:1px solid #27272a;">
-                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-mitten me-2" style="color:#ef4444;"></i>{{ fighter1.fullName }} (Red)</h3>
-                    <span class="badge bg-danger">Boxer 1</span>
+<form method="post" id="statsForm" novalidate>
+<div class="row g-3">
+
+    {# ─── RED CORNER ─── #}
+    <div class="col-lg-6">
+        <div class="cb-card cb-red-top">
+            <div class="cb-header">
+                <span style="color:#fafafa;font-size:.9rem;font-weight:600">{{ fighter1.fullName }}</span>
+                <span class="corner-tag red-tag">Red Corner</span>
+            </div>
+
+            <div class="stat-group-label">Total Punches</div>
+            <div class="stat-row">
+                <div>
+                    <div class="stat-label">Punches Thrown</div>
+                    <input type="number" name="s1_punchesThrown" id="s1_pt" class="stat-input" value="{{ stat1 ? stat1.punchesThrown : 0 }}" min="0">
                 </div>
-                <div class="card-body p-4">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Total Punches Thrown</label>
-                            <input type="number" name="s1_punchesThrown" id="s1_punchesThrown" class="form-control" value="{{ stat1 ? stat1.punchesThrown : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Total Punches Landed</label>
-                            <input type="number" name="s1_punchesLanded" id="s1_punchesLanded" class="form-control" value="{{ stat1 ? stat1.punchesLanded : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Power Punches Thrown</label>
-                            <input type="number" name="s1_powerPunchesThrown" id="s1_powerPunchesThrown" class="form-control" value="{{ stat1 ? stat1.powerPunchesThrown : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Power Punches Landed</label>
-                            <input type="number" name="s1_powerPunchesLanded" id="s1_powerPunchesLanded" class="form-control" value="{{ stat1 ? stat1.powerPunchesLanded : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Jabs Thrown</label>
-                            <input type="number" name="s1_jabsThrown" id="s1_jabsThrown" class="form-control" value="{{ stat1 ? stat1.jabsThrown : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Jabs Landed</label>
-                            <input type="number" name="s1_jabsLanded" id="s1_jabsLanded" class="form-control" value="{{ stat1 ? stat1.jabsLanded : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Uppercuts Thrown</label>
-                            <input type="number" name="s1_uppercutsThrown" id="s1_uppercutsThrown" class="form-control" value="{{ stat1 ? stat1.uppercutsThrown : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Uppercuts Landed</label>
-                            <input type="number" name="s1_uppercutsLanded" id="s1_uppercutsLanded" class="form-control" value="{{ stat1 ? stat1.uppercutsLanded : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Right Hand Thrown</label>
-                            <input type="number" name="s1_rightThrown" id="s1_rightThrown" class="form-control" value="{{ stat1 ? stat1.rightHandThrown : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Right Hand Landed</label>
-                            <input type="number" name="s1_rightLanded" id="s1_rightLanded" class="form-control" value="{{ stat1 ? stat1.rightHandLanded : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Left Hand Thrown</label>
-                            <input type="number" name="s1_leftThrown" id="s1_leftThrown" class="form-control" value="{{ stat1 ? stat1.leftHandThrown : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Left Hand Landed</label>
-                            <input type="number" name="s1_leftLanded" id="s1_leftLanded" class="form-control" value="{{ stat1 ? stat1.leftHandLanded : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Body Shots Landed</label>
-                            <input type="number" name="s1_bodyShotsLanded" id="s1_bodyShotsLanded" class="form-control" value="{{ stat1 ? stat1.bodyShotsLanded : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Knockdowns</label>
-                            <input type="number" name="s1_knockdowns" id="s1_knockdowns" class="form-control" value="{{ stat1 ? stat1.knockdowns : 0 }}" min="0" required />
-                        </div>
-                    </div>
+                <div>
+                    <div class="stat-label">Punches Landed</div>
+                    <input type="number" name="s1_punchesLanded" id="s1_pl" class="stat-input" value="{{ stat1 ? stat1.punchesLanded : 0 }}" min="0">
+                    <div class="error-hint">Cannot exceed thrown</div>
                 </div>
             </div>
-        </div>
 
-        <!-- Boxer 2 (Blue Corner) -->
-        <div class="col-lg-6">
-            <div class="card" style="background:#18181b;border:1px solid #3b82f6; border-top-width: 4px;">
-                <div class="card-header d-flex justify-content-between align-items-center" style="background:rgba(59, 130, 246, 0.05);border-bottom:1px solid #27272a;">
-                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-mitten me-2" style="color:#3b82f6;"></i>{{ fighter2.fullName }} (Blue)</h3>
-                    <span class="badge bg-primary">Boxer 2</span>
+            <div class="stat-group-label">Right Hand</div>
+            <div class="stat-row">
+                <div>
+                    <div class="stat-label">Right Thrown</div>
+                    <input type="number" name="s1_rightThrown" id="s1_rt" class="stat-input" value="{{ stat1 ? stat1.rightHandThrown : 0 }}" min="0">
                 </div>
-                <div class="card-body p-4">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Total Punches Thrown</label>
-                            <input type="number" name="s2_punchesThrown" id="s2_punchesThrown" class="form-control" value="{{ stat2 ? stat2.punchesThrown : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Total Punches Landed</label>
-                            <input type="number" name="s2_punchesLanded" id="s2_punchesLanded" class="form-control" value="{{ stat2 ? stat2.punchesLanded : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Power Punches Thrown</label>
-                            <input type="number" name="s2_powerPunchesThrown" id="s2_powerPunchesThrown" class="form-control" value="{{ stat2 ? stat2.powerPunchesThrown : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Power Punches Landed</label>
-                            <input type="number" name="s2_powerPunchesLanded" id="s2_powerPunchesLanded" class="form-control" value="{{ stat2 ? stat2.powerPunchesLanded : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Jabs Thrown</label>
-                            <input type="number" name="s2_jabsThrown" id="s2_jabsThrown" class="form-control" value="{{ stat2 ? stat2.jabsThrown : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Jabs Landed</label>
-                            <input type="number" name="s2_jabsLanded" id="s2_jabsLanded" class="form-control" value="{{ stat2 ? stat2.jabsLanded : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Uppercuts Thrown</label>
-                            <input type="number" name="s2_uppercutsThrown" id="s2_uppercutsThrown" class="form-control" value="{{ stat2 ? stat2.uppercutsThrown : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Uppercuts Landed</label>
-                            <input type="number" name="s2_uppercutsLanded" id="s2_uppercutsLanded" class="form-control" value="{{ stat2 ? stat2.uppercutsLanded : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Right Hand Thrown</label>
-                            <input type="number" name="s2_rightThrown" id="s2_rightThrown" class="form-control" value="{{ stat2 ? stat2.rightHandThrown : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Right Hand Landed</label>
-                            <input type="number" name="s2_rightLanded" id="s2_rightLanded" class="form-control" value="{{ stat2 ? stat2.rightHandLanded : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Left Hand Thrown</label>
-                            <input type="number" name="s2_leftThrown" id="s2_leftThrown" class="form-control" value="{{ stat2 ? stat2.leftHandThrown : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Left Hand Landed</label>
-                            <input type="number" name="s2_leftLanded" id="s2_leftLanded" class="form-control" value="{{ stat2 ? stat2.leftHandLanded : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Body Shots Landed</label>
-                            <input type="number" name="s2_bodyShotsLanded" id="s2_bodyShotsLanded" class="form-control" value="{{ stat2 ? stat2.bodyShotsLanded : 0 }}" min="0" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Knockdowns</label>
-                            <input type="number" name="s2_knockdowns" id="s2_knockdowns" class="form-control" value="{{ stat2 ? stat2.knockdowns : 0 }}" min="0" required />
-                        </div>
-                    </div>
+                <div>
+                    <div class="stat-label">Right Landed</div>
+                    <input type="number" name="s1_rightLanded" id="s1_rl" class="stat-input" value="{{ stat1 ? stat1.rightHandLanded : 0 }}" min="0">
+                    <div class="error-hint">Cannot exceed thrown</div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-12 mt-4">
-            <div class="card" style="background:#18181b;border:1px solid #27272a;">
-                <div class="card-body p-4 d-flex justify-content-between align-items-center">
-                    <div>
-                        <p class="mb-0 text-muted small"><i class="fa-solid fa-circle-info me-2"></i>SmartFight logic will analyze accuracy rates and power impact after saving.</p>
-                    </div>
-                    <button type="submit" class="btn btn-lg btn-danger px-5"><i class="fa-solid fa-floppy-disk me-2"></i>Save Round {{ currentRound }} Stats</button>
+            <div class="stat-group-label">Left Hand</div>
+            <div class="stat-row">
+                <div>
+                    <div class="stat-label">Left Thrown</div>
+                    <input type="number" name="s1_leftThrown" id="s1_lt" class="stat-input" value="{{ stat1 ? stat1.leftHandThrown : 0 }}" min="0">
+                </div>
+                <div>
+                    <div class="stat-label">Left Landed</div>
+                    <input type="number" name="s1_leftLanded" id="s1_ll" class="stat-input" value="{{ stat1 ? stat1.leftHandLanded : 0 }}" min="0">
+                    <div class="error-hint">Cannot exceed thrown</div>
+                </div>
+            </div>
+
+            <div class="stat-group-label">Power & Jabs</div>
+            <div class="stat-row">
+                <div>
+                    <div class="stat-label">Power Thrown</div>
+                    <input type="number" name="s1_powerPunchesThrown" id="s1_pwt" class="stat-input" value="{{ stat1 ? stat1.powerPunchesThrown : 0 }}" min="0">
+                </div>
+                <div>
+                    <div class="stat-label">Power Landed</div>
+                    <input type="number" name="s1_powerPunchesLanded" id="s1_pwl" class="stat-input" value="{{ stat1 ? stat1.powerPunchesLanded : 0 }}" min="0">
+                    <div class="error-hint">Cannot exceed thrown</div>
+                </div>
+            </div>
+            <div class="stat-row">
+                <div>
+                    <div class="stat-label">Jabs Thrown</div>
+                    <input type="number" name="s1_jabsThrown" id="s1_jt" class="stat-input" value="{{ stat1 ? stat1.jabsThrown : 0 }}" min="0">
+                </div>
+                <div>
+                    <div class="stat-label">Jabs Landed</div>
+                    <input type="number" name="s1_jabsLanded" id="s1_jl" class="stat-input" value="{{ stat1 ? stat1.jabsLanded : 0 }}" min="0">
+                    <div class="error-hint">Cannot exceed thrown</div>
+                </div>
+            </div>
+
+            <div class="stat-group-label">Uppercuts & Body</div>
+            <div class="stat-row">
+                <div>
+                    <div class="stat-label">Uppercuts Thrown</div>
+                    <input type="number" name="s1_uppercutsThrown" id="s1_ut" class="stat-input" value="{{ stat1 ? stat1.uppercutsThrown : 0 }}" min="0">
+                </div>
+                <div>
+                    <div class="stat-label">Uppercuts Landed</div>
+                    <input type="number" name="s1_uppercutsLanded" id="s1_ul" class="stat-input" value="{{ stat1 ? stat1.uppercutsLanded : 0 }}" min="0">
+                    <div class="error-hint">Cannot exceed thrown</div>
+                </div>
+            </div>
+            <div class="stat-row">
+                <div>
+                    <div class="stat-label">Body Shots Landed</div>
+                    <input type="number" name="s1_bodyShotsLanded" id="s1_bs" class="stat-input" value="{{ stat1 ? stat1.bodyShotsLanded : 0 }}" min="0">
+                </div>
+                <div>
+                    <div class="stat-label">Knockdowns</div>
+                    <input type="number" name="s1_knockdowns" id="s1_kd" class="stat-input" value="{{ stat1 ? stat1.knockdowns : 0 }}" min="0" max="3">
                 </div>
             </div>
         </div>
     </div>
+
+    {# ─── BLUE CORNER ─── #}
+    <div class="col-lg-6">
+        <div class="cb-card cb-blue-top">
+            <div class="cb-header">
+                <span style="color:#fafafa;font-size:.9rem;font-weight:600">{{ fighter2.fullName }}</span>
+                <span class="corner-tag blue-tag">Blue Corner</span>
+            </div>
+
+            <div class="stat-group-label">Total Punches</div>
+            <div class="stat-row">
+                <div>
+                    <div class="stat-label">Punches Thrown</div>
+                    <input type="number" name="s2_punchesThrown" id="s2_pt" class="stat-input" value="{{ stat2 ? stat2.punchesThrown : 0 }}" min="0">
+                </div>
+                <div>
+                    <div class="stat-label">Punches Landed</div>
+                    <input type="number" name="s2_punchesLanded" id="s2_pl" class="stat-input" value="{{ stat2 ? stat2.punchesLanded : 0 }}" min="0">
+                    <div class="error-hint">Cannot exceed thrown</div>
+                </div>
+            </div>
+
+            <div class="stat-group-label">Right Hand</div>
+            <div class="stat-row">
+                <div>
+                    <div class="stat-label">Right Thrown</div>
+                    <input type="number" name="s2_rightThrown" id="s2_rt" class="stat-input" value="{{ stat2 ? stat2.rightHandThrown : 0 }}" min="0">
+                </div>
+                <div>
+                    <div class="stat-label">Right Landed</div>
+                    <input type="number" name="s2_rightLanded" id="s2_rl" class="stat-input" value="{{ stat2 ? stat2.rightHandLanded : 0 }}" min="0">
+                    <div class="error-hint">Cannot exceed thrown</div>
+                </div>
+            </div>
+
+            <div class="stat-group-label">Left Hand</div>
+            <div class="stat-row">
+                <div>
+                    <div class="stat-label">Left Thrown</div>
+                    <input type="number" name="s2_leftThrown" id="s2_lt" class="stat-input" value="{{ stat2 ? stat2.leftHandThrown : 0 }}" min="0">
+                </div>
+                <div>
+                    <div class="stat-label">Left Landed</div>
+                    <input type="number" name="s2_leftLanded" id="s2_ll" class="stat-input" value="{{ stat2 ? stat2.leftHandLanded : 0 }}" min="0">
+                    <div class="error-hint">Cannot exceed thrown</div>
+                </div>
+            </div>
+
+            <div class="stat-group-label">Power & Jabs</div>
+            <div class="stat-row">
+                <div>
+                    <div class="stat-label">Power Thrown</div>
+                    <input type="number" name="s2_powerPunchesThrown" id="s2_pwt" class="stat-input" value="{{ stat2 ? stat2.powerPunchesThrown : 0 }}" min="0">
+                </div>
+                <div>
+                    <div class="stat-label">Power Landed</div>
+                    <input type="number" name="s2_powerPunchesLanded" id="s2_pwl" class="stat-input" value="{{ stat2 ? stat2.powerPunchesLanded : 0 }}" min="0">
+                    <div class="error-hint">Cannot exceed thrown</div>
+                </div>
+            </div>
+            <div class="stat-row">
+                <div>
+                    <div class="stat-label">Jabs Thrown</div>
+                    <input type="number" name="s2_jabsThrown" id="s2_jt" class="stat-input" value="{{ stat2 ? stat2.jabsThrown : 0 }}" min="0">
+                </div>
+                <div>
+                    <div class="stat-label">Jabs Landed</div>
+                    <input type="number" name="s2_jabsLanded" id="s2_jl" class="stat-input" value="{{ stat2 ? stat2.jabsLanded : 0 }}" min="0">
+                    <div class="error-hint">Cannot exceed thrown</div>
+                </div>
+            </div>
+
+            <div class="stat-group-label">Uppercuts & Body</div>
+            <div class="stat-row">
+                <div>
+                    <div class="stat-label">Uppercuts Thrown</div>
+                    <input type="number" name="s2_uppercutsThrown" id="s2_ut" class="stat-input" value="{{ stat2 ? stat2.uppercutsThrown : 0 }}" min="0">
+                </div>
+                <div>
+                    <div class="stat-label">Uppercuts Landed</div>
+                    <input type="number" name="s2_uppercutsLanded" id="s2_ul" class="stat-input" value="{{ stat2 ? stat2.uppercutsLanded : 0 }}" min="0">
+                    <div class="error-hint">Cannot exceed thrown</div>
+                </div>
+            </div>
+            <div class="stat-row">
+                <div>
+                    <div class="stat-label">Body Shots Landed</div>
+                    <input type="number" name="s2_bodyShotsLanded" id="s2_bs" class="stat-input" value="{{ stat2 ? stat2.bodyShotsLanded : 0 }}" min="0">
+                </div>
+                <div>
+                    <div class="stat-label">Knockdowns</div>
+                    <input type="number" name="s2_knockdowns" id="s2_kd" class="stat-input" value="{{ stat2 ? stat2.knockdowns : 0 }}" min="0" max="3">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ─── INSIDE THE NUMBERS ─── #}
+    <div class="col-12">
+        <div class="itn-banner">
+            <div class="itn-title"><i class="fa-solid fa-chart-bar me-2"></i>Inside The Numbers — Round {{ currentRound }}</div>
+            <div class="itn-text" id="itnText">
+                <span class="itn-placeholder">Click "AI Auto-Fill" to generate a CompuBox broadcast analysis of this round.</span>
+            </div>
+        </div>
+    </div>
+
+    {# ─── ACTIONS ─── #}
+    <div class="col-12">
+        <div class="cb-card">
+            <div style="padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+                <p class="mb-0" style="color:#52525b;font-size:.78rem"><i class="fa-solid fa-circle-info me-1"></i>Right + Left Thrown must equal Total Thrown. Same rule applies for Landed.</p>
+                <div class="d-flex gap-2 align-items-center">
+                    <button type="button" id="aiAutoFillBtn" class="ai-btn">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>AI Auto-Fill
+                    </button>
+                    <button type="submit" class="save-btn">
+                        <i class="fa-solid fa-floppy-disk me-2"></i>Save Round {{ currentRound }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </form>
 
 <script>
-// Live validation: Landed cannot exceed Thrown
-const validateStat = (landedId, thrownId, label) => {
-    const landed = document.getElementById(landedId);
-    const thrown = document.getElementById(thrownId);
-    
-    const sync = () => {
-        const lVal = parseInt(landed.value) || 0;
-        const tVal = parseInt(thrown.value) || 0;
-        
-        if (lVal > tVal) {
-            landed.classList.add('is-invalid');
-            landed.setCustomValidity(`${label}: Landed cannot exceed thrown.`);
-        } else {
-            landed.classList.remove('is-invalid');
-            landed.setCustomValidity('');
+// ── helpers ──────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const val = id => parseInt($(id)?.value) || 0;
+const set = (id, v) => { if ($(id)) $(id).value = v; };
+
+function markInvalid(id, msg) {
+    const el = $(id); if (!el) return;
+    el.classList.add('is-invalid'); el.classList.remove('is-ok');
+    el.setCustomValidity(msg);
+    const hint = el.nextElementSibling;
+    if (hint && hint.classList.contains('error-hint')) { hint.textContent = msg; hint.style.display = 'block'; }
+}
+function markOk(id) {
+    const el = $(id); if (!el) return;
+    el.classList.remove('is-invalid'); el.classList.add('is-ok');
+    el.setCustomValidity('');
+    const hint = el.nextElementSibling;
+    if (hint && hint.classList.contains('error-hint')) hint.style.display = 'none';
+}
+
+// ── per-boxer validation ──────────────────────────────────
+function validate(p) {
+    const pt=val(p+'_pt'), pl=val(p+'_pl');
+    const rt=val(p+'_rt'), rl=val(p+'_rl');
+    const lt=val(p+'_lt'), ll=val(p+'_ll');
+    const pwt=val(p+'_pwt'), pwl=val(p+'_pwl');
+    const jt=val(p+'_jt'), jl=val(p+'_jl');
+    const ut=val(p+'_ut'), ul=val(p+'_ul');
+
+    // landed ≤ thrown
+    pl > pt ? markInvalid(p+'_pl','Landed > Thrown') : markOk(p+'_pl');
+    rl > rt ? markInvalid(p+'_rl','Landed > Thrown') : markOk(p+'_rl');
+    ll > lt ? markInvalid(p+'_ll','Landed > Thrown') : markOk(p+'_ll');
+    pwl > pwt ? markInvalid(p+'_pwl','Landed > Thrown') : markOk(p+'_pwl');
+    jl > jt ? markInvalid(p+'_jl','Landed > Thrown') : markOk(p+'_jl');
+    ul > ut ? markInvalid(p+'_ul','Landed > Thrown') : markOk(p+'_ul');
+
+    // right + left = total
+    if (rt + lt !== pt) {
+        markInvalid(p+'_pt', `Right(${rt}) + Left(${lt}) = ${rt+lt} ≠ Total(${pt})`);
+    } else { markOk(p+'_pt'); }
+    if (rl + ll !== pl) {
+        markInvalid(p+'_pl', `Right(${rl}) + Left(${ll}) = ${rl+ll} ≠ Total(${pl})`);
+    } else if (pl <= pt) { markOk(p+'_pl'); }
+}
+
+['s1','s2'].forEach(p => {
+    ['_pt','_pl','_rt','_rl','_lt','_ll','_pwt','_pwl','_jt','_jl','_ut','_ul'].forEach(s => {
+        const el = $(p+s); if(el) el.addEventListener('input', ()=>validate(p));
+    });
+    validate(p);
+});
+
+// ── AI Auto-Fill ─────────────────────────────────────────
+document.getElementById('aiAutoFillBtn').addEventListener('click', async function() {
+    const btn = this;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analyzing...';
+
+    try {
+        const res = await fetch('{{ path("api_ai_stat_suggestions") }}', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest'},
+            body: JSON.stringify({
+                fighter1_id: {{ fight.fighter1.fighterId }},
+                fighter2_id: {{ fight.fighter2.fighterId }},
+                round: {{ currentRound }}
+            })
+        });
+
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+
+        if (!data.success || !data.suggestions) {
+            throw new Error(data.error || 'No suggestions returned');
         }
-    };
 
-    landed.addEventListener('input', sync);
-    thrown.addEventListener('input', sync);
-    sync(); 
-};
+        const sug = data.suggestions;
 
-validateStat('s1_punchesLanded', 's1_punchesThrown', 'B1 Punches');
-validateStat('s1_powerPunchesLanded', 's1_powerPunchesThrown', 'B1 Power');
-validateStat('s1_jabsLanded', 's1_jabsThrown', 'B1 Jabs');
-validateStat('s1_uppercutsLanded', 's1_uppercutsThrown', 'B1 Uppercuts');
-validateStat('s1_rightLanded', 's1_rightThrown', 'B1 Right Hand');
-validateStat('s1_leftLanded', 's1_leftThrown', 'B1 Left Hand');
+        function fillCorner(prefix, f) {
+            if (!f) return;
+            // totals
+            const pt = f.punches_thrown || 0;
+            const pl = f.punches_landed || 0;
+            // right / left — use AI values if provided, else split 55/45
+            let rt = f.right_hand_thrown !== undefined ? f.right_hand_thrown : Math.round(pt * 0.55);
+            let lt = pt - rt; // ENFORCE math
+            let rl = f.right_hand_landed !== undefined ? f.right_hand_landed : Math.round(pl * 0.55);
+            let ll = pl - rl; // ENFORCE math
 
-validateStat('s2_punchesLanded', 's2_punchesThrown', 'B2 Punches');
-validateStat('s2_powerPunchesLanded', 's2_powerPunchesThrown', 'B2 Power');
-validateStat('s2_jabsLanded', 's2_jabsThrown', 'B2 Jabs');
-validateStat('s2_uppercutsLanded', 's2_uppercutsThrown', 'B2 Uppercuts');
-validateStat('s2_rightLanded', 's2_rightThrown', 'B2 Right Hand');
-validateStat('s2_leftLanded', 's2_leftThrown', 'B2 Left Hand');
-
-// Strict logic: Left + Right must equal Total
-const enforceTotalLogic = (prefix) => {
-    const totalT = document.getElementById(prefix + '_punchesThrown');
-    const totalL = document.getElementById(prefix + '_punchesLanded');
-    const rightT = document.getElementById(prefix + '_rightThrown');
-    const rightL = document.getElementById(prefix + '_rightLanded');
-    const leftT = document.getElementById(prefix + '_leftThrown');
-    const leftL = document.getElementById(prefix + '_leftLanded');
-
-    const check = () => {
-        const tt = parseInt(totalT.value) || 0;
-        const tl = parseInt(totalL.value) || 0;
-        const rt = parseInt(rightT.value) || 0;
-        const rl = parseInt(rightL.value) || 0;
-        const lt = parseInt(leftT.value) || 0;
-        const ll = parseInt(leftL.value) || 0;
-
-        if (rt + lt !== tt) {
-            totalT.classList.add('is-invalid');
-            totalT.setCustomValidity('Right + Left thrown must equal Total thrown');
-        } else {
-            totalT.classList.remove('is-invalid');
-            totalT.setCustomValidity('');
+            set(prefix+'_pt', pt);
+            set(prefix+'_pl', pl);
+            set(prefix+'_rt', rt);
+            set(prefix+'_rl', rl);
+            set(prefix+'_lt', lt);
+            set(prefix+'_ll', ll);
+            set(prefix+'_pwt', f.power_punches_thrown || 0);
+            set(prefix+'_pwl', f.power_punches_landed || 0);
+            set(prefix+'_jt',  f.jabs_thrown || 0);
+            set(prefix+'_jl',  f.jabs_landed || 0);
+            set(prefix+'_ut',  f.uppercuts_thrown || 0);
+            set(prefix+'_ul',  f.uppercuts_landed || 0);
+            set(prefix+'_bs',  f.body_shots_landed || 0);
+            set(prefix+'_kd',  f.knockdowns || 0);
+            validate(prefix);
         }
 
-        if (rl + ll !== tl) {
-            totalL.classList.add('is-invalid');
-            totalL.setCustomValidity('Right + Left landed must equal Total landed');
-        } else {
-            totalL.classList.remove('is-invalid');
-            totalL.setCustomValidity('');
+        fillCorner('s1', sug.fighter1);
+        fillCorner('s2', sug.fighter2);
+
+        // Inside The Numbers
+        const itn = sug.inside_the_numbers || sug.inside_the_numbers_text || '';
+        const itnEl = document.getElementById('itnText');
+        if (itnEl) {
+            itnEl.innerHTML = itn
+                ? `<span>${itn}</span>`
+                : `<span class="itn-placeholder">No broadcast analysis returned.</span>`;
         }
-    };
 
-    [totalT, totalL, rightT, rightL, leftT, leftL].forEach(el => el.addEventListener('input', check));
-};
-
-enforceTotalLogic('s1');
-enforceTotalLogic('s2');
-</script>
-
-<style>
-    .is-invalid {
-        border-color: #dc3545 !important;
-        background-image: none !important;
+    } catch (err) {
+        alert('AI Error: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> AI Auto-Fill';
     }
-</style>
-{% endblock %}
+});
 
+// ── prevent submit if invalid ─────────────────────────────
+document.getElementById('statsForm').addEventListener('submit', function(e) {
+    validate('s1'); validate('s2');
+    if (document.querySelector('.stat-input.is-invalid')) {
+        e.preventDefault();
+        alert('Please fix validation errors before saving.');
+    }
+});
+</script>
+{% endblock %}

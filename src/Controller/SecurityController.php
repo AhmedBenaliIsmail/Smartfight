@@ -11,6 +11,10 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mime\Address;
+
 class SecurityController extends AbstractController
 {
     #[Route('/login', name: 'app_login')]
@@ -26,7 +30,7 @@ class SecurityController extends AbstractController
     }
 
     #[Route('/register', name: 'app_register', methods: ['GET', 'POST'])]
-    public function register(Request $request, UserPasswordHasherInterface $hasher, EntityManagerInterface $em): Response
+    public function register(Request $request, UserPasswordHasherInterface $hasher, EntityManagerInterface $em, MailerInterface $mailer): Response
     {
         if ($this->getUser()) {
             return $this->redirectToRoute('app_dashboard');
@@ -54,9 +58,24 @@ class SecurityController extends AbstractController
             $em->persist($user);
             $em->flush();
 
-            // Simulate sending verification email
-            $verifyUrl = $this->generateUrl('app_verify_email', ['token' => $token], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
-            $this->addFlash('success', "Registration successful! Proof of email ownership required. Recovery/Verification link (Simulated Email): $verifyUrl");
+            // Send real verification email
+            try {
+                $verifyUrl = $this->generateUrl('app_verify_email', ['token' => $token], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+                $email = (new TemplatedEmail())
+                    ->from(new Address('mahdidaly24@gmail.com', 'SmartFight Security'))
+                    ->to($user->getEmail())
+                    ->subject('Verify your SmartFight Account')
+                    ->htmlTemplate('emails/verification.html.twig')
+                    ->context([
+                        'user' => $user,
+                        'verifyUrl' => $verifyUrl,
+                    ]);
+
+                $mailer->send($email);
+                $this->addFlash('success', "Email sent.");
+            } catch (\Exception $e) {
+                $this->addFlash('warning', "Registration successful, but we couldn't send the verification email. Please contact support.");
+            }
             
             return $this->redirectToRoute('app_login');
         }
@@ -67,7 +86,7 @@ class SecurityController extends AbstractController
     }
 
     #[Route('/forgot-password', name: 'app_forgot_password', methods: ['GET', 'POST'])]
-    public function forgotPassword(Request $request, UserRepository $userRepo, EntityManagerInterface $em): Response
+    public function forgotPassword(Request $request, UserRepository $userRepo, EntityManagerInterface $em, MailerInterface $mailer): Response
     {
         if ($request->isMethod('POST')) {
             $email = $request->request->get('email');
@@ -79,9 +98,24 @@ class SecurityController extends AbstractController
                 $user->setResetTokenExpiresAt(new \DateTime('+1 hour'));
                 $em->flush();
 
-                // In a real app, send email here. For demo, we show it in a flash message.
-                $resetUrl = $this->generateUrl('app_reset_password', ['token' => $token], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
-                $this->addFlash('success', "Recovery link generated (Simulated Email): $resetUrl");
+                // Send real recovery email
+                try {
+                    $resetUrl = $this->generateUrl('app_reset_password', ['token' => $token], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+                    $email = (new TemplatedEmail())
+                        ->from(new Address('mahdidaly24@gmail.com', 'SmartFight Security'))
+                        ->to($user->getEmail())
+                        ->subject('Reset your SmartFight Password')
+                        ->htmlTemplate('emails/password_reset.html.twig')
+                        ->context([
+                            'user' => $user,
+                            'resetUrl' => $resetUrl,
+                        ]);
+
+                    $mailer->send($email);
+                    $this->addFlash('success', "Email sent.");
+                } catch (\Exception $e) {
+                    $this->addFlash('error', "Failed to send reset email. Please try again later.");
+                }
             } else {
                 $this->addFlash('error', 'Email not found.');
             }

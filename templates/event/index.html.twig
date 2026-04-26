@@ -122,7 +122,13 @@
             <h1 class="h2 fw-bold text-white mb-1" style="font-family: 'Oswald', sans-serif; letter-spacing: 1px;">EVENT MANAGEMENT</h1>
             <p class="text-muted mb-0">Directing professional boxing spectacles and world title events</p>
         </div>
-        <div class="d-flex gap-3">
+        <div class="d-flex gap-3 align-items-center">
+            <div class="input-icon" style="width: 250px;">
+                <span class="input-icon-addon">
+                    <i class="fa-solid fa-search"></i>
+                </span>
+                <input type="text" class="form-control" style="background:#18181b; border:1px solid #27272a; color:#fafafa;" placeholder="Search events..." data-live-search=".event-grid" data-live-search-item=".event-card-col">
+            </div>
             {% if is_granted('ROLE_ADMIN') %}
             <a href="{{ path('app_event_new') }}" class="btn btn-danger px-4 fw-bold">
                 <i class="fa-solid fa-plus me-2"></i>CREATE EVENT
@@ -131,10 +137,10 @@
         </div>
     </div>
 
-    <div class="row g-4">
+    <div class="row g-4 event-grid">
         {% for event in events %}
             {% set fight_count = fightCounts[event.eventId]|default(0) %}
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-4 col-md-6 event-card-col">
                 <div class="event-card-ultra">
                     <div class="event-title-pro">{{ event.eventName }}</div>
                     

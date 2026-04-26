@@ -28,7 +28,8 @@
         "symfony/twig-bundle": "7.1.*",
         "symfony/validator": "7.1.*",
         "symfony/yaml": "7.1.*",
-        "vich/uploader-bundle": "^2.3"
+        "vich/uploader-bundle": "^2.3",
+        "web-auth/webauthn-symfony-bundle": "^5.2"
     },
     "require-dev": {
         "symfony/maker-bundle": "^1.50"

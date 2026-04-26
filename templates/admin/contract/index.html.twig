@@ -5,91 +5,87 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
+        .page-header {
+            background: linear-gradient(to right, #09090b, #18181b);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid #27272a;
+            margin-bottom: 2rem;
+        }
         .pro-table {
             background: #09090b;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            border: 1px solid #18181b;
+            border: 1px solid #27272a;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
         }
         .pro-table thead th {
-            background: #000;
+            background: #111111;
             color: #71717a;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 1.25rem 1rem;
-            border-bottom: 2px solid #18181b;
+            letter-spacing: 1.5px;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #27272a;
+            font-weight: 700;
         }
         .pro-table tbody tr {
-            background: #111827;
-            border-bottom: 1px solid #1f2937;
-            transition: all 0.2s;
+            background: transparent;
+            border-bottom: 1px solid #18181b;
+            transition: all 0.3s ease;
         }
         .pro-table tbody tr:hover {
-            background: #1f2937;
+            background: rgba(220, 38, 38, 0.03);
         }
         .pro-table td {
             color: #e5e7eb;
-            padding: 1rem;
+            padding: 1.25rem 1.5rem;
             vertical-align: middle;
-            font-size: 0.9rem;
         }
-        .fighter-meta {
+        .fighter-badge {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
         }
-        .fighter-meta img {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
+        .fighter-photo-wrapper {
+            position: relative;
+            width: 50px;
+            height: 50px;
+        }
+        .fighter-photo {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
             object-fit: cover;
-            border: 1px solid #374151;
+            border: 2px solid #27272a;
         }
-        .badge-pending {
-            background: #374151;
-            color: #d1d5db;
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 6px;
             font-size: 0.7rem;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 4px;
-            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.5px;
         }
-        .badge-paid {
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 4px;
-            text-transform: uppercase;
-        }
-        .action-btn-del {
-            width: 32px;
-            height: 32px;
-            background: rgba(220, 38, 38, 0.1);
-            color: #ef4444;
-            border: 1px solid rgba(220, 38, 38, 0.2);
-            border-radius: 4px;
+        .status-pending { background: #18181b; color: #71717a; border: 1px solid #27272a; }
+        .status-ready { background: rgba(220, 38, 38, 0.1); color: #ef4444; border: 1px solid rgba(220, 38, 38, 0.2); }
+        .status-paid { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+        
+        .action-icon-btn {
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
+            border-radius: 8px;
             transition: all 0.2s;
+            border: 1px solid transparent;
         }
-        .action-btn-del:hover {
-            background: #dc2626;
-            color: #fff;
-        }
-        .action-btn-pay {
-            background: #10b981;
-            color: #fff;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
+        .btn-pay { background: #10b981; color: #fff; width: auto; padding: 0 15px; font-size: 0.75rem; font-weight: 700; border: none; }
+        .btn-pay:hover { background: #059669; transform: translateY(-1px); }
+        .btn-revoke { background: rgba(255, 255, 255, 0.05); color: #71717a; border: 1px solid transparent; }
+        .btn-revoke:hover { background: #ef4444; color: #fff; }
     </style>
 {% endblock %}
 
@@ -99,14 +95,22 @@
 
 {% block content %}
 <div class="container-fluid py-4">
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="page-header d-flex align-items-center justify-content-between">
         <div>
-            <h1 class="h2 text-white mb-0" style="font-family:'Oswald',sans-serif;letter-spacing:1px;">FIGHTER CONTRACTS & PURSES</h1>
-            <p class="text-muted small">Manage organization payroll and bout agreements.</p>
+            <h1 class="h2 text-white mb-1" style="font-family:'Oswald',sans-serif; letter-spacing:1px; text-transform:uppercase;">Fighter Contracts & Purses</h1>
+            <p class="text-muted small mb-0">Centralized payroll management and fight agreement tracking.</p>
         </div>
-        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#createContractModal" style="background:#dc2626; border:none; padding:.6rem 1.25rem; font-weight:600; letter-spacing:0.5px;">
-            <i class="fa-solid fa-file-signature me-2"></i>NEW CONTRACT
-        </button>
+        <div class="d-flex gap-3">
+            <div class="input-icon" style="width: 300px;">
+                <span class="input-icon-addon">
+                    <i class="fa-solid fa-magnifying-glass text-muted"></i>
+                </span>
+                <input type="text" class="form-control form-control-dark border-secondary" placeholder="Search by fighter or event..." data-live-search=".pro-table tbody" data-live-search-item="tr">
+            </div>
+            <button class="btn btn-danger d-flex align-items-center gap-2 px-4" data-bs-toggle="modal" data-bs-target="#createContractModal" style="font-weight:700;">
+                <i class="fa-solid fa-plus-circle"></i> NEW CONTRACT
+            </button>
+        </div>
     </div>
 
     <div class="table-responsive pro-table">
@@ -126,32 +130,47 @@
                 {% for contract in contracts %}
                     <tr>
                         <td>
-                            <div class="fighter-meta">
-                                {% if contract.fighter.photoFilename %}
-                                    <img src="{{ asset('uploads/boxers/' ~ contract.fighter.photoFilename) }}" alt="">
-                                {% else %}
-                                    <div class="bg-dark rounded d-flex align-items-center justify-content-center" style="width:32px;height:32px;border:1px solid #374151;">
-                                        <i class="fa-solid fa-user small text-muted"></i>
-                                    </div>
-                                {% endif %}
-                                <span class="fw-bold">{{ contract.fighter.fullName }}</span>
+                            <div class="fighter-badge">
+                                <div class="fighter-photo-wrapper">
+                                    {% if contract.fighter.photoFilename %}
+                                        <img src="{{ asset('uploads/boxers/' ~ contract.fighter.photoFilename) }}" class="fighter-photo" alt="">
+                                    {% else %}
+                                        <div class="fighter-photo d-flex align-items-center justify-content-center bg-dark">
+                                            <i class="fa-solid fa-user text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-white">{{ contract.fighter.fullName }}</div>
+                                    <div class="text-muted xsmall" style="font-size: 0.7rem;">{{ contract.fighter.weightDivision ? contract.fighter.weightDivision.name : 'Unknown' }} division</div>
+                                </div>
                             </div>
                         </td>
-                        <td class="text-muted">{{ contract.event.eventName }}</td>
-                        <td class="fw-bold">${{ contract.basePay|number_format(2) }}</td>
-                        <td class="text-muted">+${{ contract.winBonus|number_format(2) }}</td>
+                        <td>
+                            <div class="text-white fw-bold mb-0">{{ contract.event.eventName }}</div>
+                            <div class="text-muted small">{{ contract.event.eventDate ? contract.event.eventDate|date('M d, Y') : 'TBA' }}</div>
+                        </td>
+                        <td>
+                            <div class="text-success fw-bold">${{ contract.basePay|number_format(0) }}</div>
+                            <div class="text-muted xsmall" style="font-size: 0.65rem;">GUARANTEED BASE</div>
+                        </td>
+                        <td>
+                            <div class="text-warning fw-bold">+${{ contract.winBonus|number_format(0) }}</div>
+                            <div class="text-muted xsmall" style="font-size: 0.65rem;">WIN INCENTIVE</div>
+                        </td>
                         <td>
                             {% if contract.isPaid %}
-                                <span class="badge-paid">PAID</span>
+                                <span class="status-badge status-paid"><i class="fa-solid fa-circle-check me-2"></i> PAID</span>
                             {% elseif contract.calculatedPayout is not null %}
-                                <span class="badge-pending" style="background:#dc2626; color:#fff;">READY TO PAY</span>
+                                <span class="status-badge status-ready"><i class="fa-solid fa-bolt me-2"></i> READY</span>
                             {% else %}
-                                <span class="badge-pending">PENDING RESULT</span>
+                                <span class="status-badge status-pending"><i class="fa-solid fa-clock me-2"></i> PENDING</span>
                             {% endif %}
                         </td>
-                        <td class="fw-bold">
+                        <td>
                             {% if contract.calculatedPayout is not null %}
-                                ${{ contract.calculatedPayout|number_format(2) }}
+                                <div class="text-white fw-black" style="font-size: 1.1rem;">${{ contract.calculatedPayout|number_format(0) }}</div>
+                                <div class="text-muted xsmall" style="font-size: 0.65rem;">FINAL PURSE</div>
                             {% else %}
                                 <span class="text-muted">---</span>
                             {% endif %}
@@ -160,11 +179,11 @@
                             <div class="d-flex justify-content-end gap-2">
                                 {% if not contract.isPaid and contract.calculatedPayout is not null %}
                                     <form method="post" action="{{ path('admin_contract_pay', {'id': contract.id}) }}">
-                                        <button class="action-btn-pay"><i class="fa-solid fa-check me-1"></i> PAY</button>
+                                        <button class="action-icon-btn btn-pay">PAY FIGHTER</button>
                                     </form>
                                 {% endif %}
                                 <form method="post" action="{{ path('admin_contract_delete', {'id': contract.id}) }}" onsubmit="return confirm('Revoke this contract?');">
-                                    <button class="action-btn-del"><i class="fa-solid fa-trash-can"></i></button>
+                                    <button class="action-icon-btn btn-revoke"><i class="fa-solid fa-trash"></i></button>
                                 </form>
                             </div>
                         </td>

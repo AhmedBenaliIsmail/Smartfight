@@ -60,6 +60,15 @@ class FightStatisticService
         $this->analyticsEngine->calculatePerformanceScore($fighterId);
     }
 
+    public function clearStatsForFight(\App\Entity\FightResult $fr): void
+    {
+        $stats = $this->statRepo->findBy(['fightResult' => $fr]);
+        foreach ($stats as $s) {
+            $this->em->remove($s);
+        }
+        $this->em->flush();
+    }
+
     private function validate(FightStatistic $stat): void
     {
         if ($stat->getPunchesLanded() < 0 || $stat->getPunchesThrown() < 0) {

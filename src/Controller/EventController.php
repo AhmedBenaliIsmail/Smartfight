@@ -8,6 +8,7 @@ use App\Repository\FighterRepository;
 use App\Repository\FightResultRepository;
 use App\Repository\WeightDivisionRepository;
 use App\Repository\RankingRepository;
+use App\Repository\MatchProposalRepository;
 use App\Service\FightResultService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -215,11 +216,27 @@ class EventController extends AbstractController
             if ($wdId > 0) $byWeight[$wdId][] = $f;
         }
 
-        $bestPair = null;
-        $bestScore = PHP_FLOAT_MAX;
+        // Identify weight classes already present in this event card
+        $existingFights = $resultRepo->findByEvent($id);
+        $usedWeightIds = [];
+        foreach ($existingFights as $ef) {
+            if ($ef->getFighter1() && $ef->getFighter1()->getWeightDivision()) {
+                $usedWeightIds[] = $ef->getFighter1()->getWeightDivision()->getId();
+            }
+        }
 
-        foreach ($byWeight as $wdId => $fighters) {
+        // Shuffle the weight divisions to provide variety each time
+        $wdIds = array_keys($byWeight);
+        shuffle($wdIds);
+
+        $allMatches = [];
+
+        foreach ($wdIds as $wdId) {
+            $fighters = $byWeight[$wdId];
             if (count($fighters) < 2) continue;
+
+            // Give a "bonus" to weight classes not yet used in this event card
+            $isNewWeightClass = !in_array($wdId, $usedWeightIds);
 
             for ($i = 0; $i < count($fighters); $i++) {
                 for ($j = $i + 1; $j < count($fighters); $j++) {
@@ -227,40 +244,62 @@ class EventController extends AbstractController
                     $f2 = $fighters[$j];
 
                     // Heuristic scoring: Smaller difference is better match
-                    // We look at Win/Loss parity, physical parity, and "Experience"
                     $diffWins = abs($f1->getWins() - $f2->getWins());
                     $diffLosses = abs($f1->getLosses() - $f2->getLosses());
                     $diffHeight = abs(($f1->getHeight() ?? 175) - ($f2->getHeight() ?? 175));
                     $diffReach = abs(($f1->getReach() ?? 180) - ($f2->getReach() ?? 180));
                     
-                    // KO Rate difference
                     $ko1 = $f1->getWins() > 0 ? $f1->getKoWins() / $f1->getWins() : 0;
                     $ko2 = $f2->getWins() > 0 ? $f2->getKoWins() / $f2->getWins() : 0;
                     $diffKO = abs($ko1 - $ko2) * 10; 
 
-                    // Strike Accuracy difference (New Vector)
                     $acc1 = $f1->getStrikeAccuracy();
                     $acc2 = $f2->getStrikeAccuracy();
-                    $diffAcc = abs($acc1 - $acc2) / 10; // Scale it down as accuracy % can be large
+                    $diffAcc = abs($acc1 - $acc2) / 10;
 
                     $score = ($diffWins * 1.0) + ($diffLosses * 1.0) + ($diffHeight * 0.5) + ($diffReach * 0.5) + ($diffKO * 2.0) + ($diffAcc * 1.5);
 
-                    if ($score < $bestScore) {
-                        $bestScore = $score;
-                        $bestPair = [$f1, $f2];
+                    // --- STYLISTIC CLASH VECTOR ---
+                    $style1 = $f1->getCalculatedFightingStyle();
+                    $style2 = $f2->getCalculatedFightingStyle();
+                    
+                    if ($style1 !== $style2) {
+                        $score -= 3.0; // Bonus for varied styles (Bull vs Matador logic)
+                    } else if ($style1 === 'SLUGGER') {
+                        $score -= 1.0; // Two sluggers is always fun
                     }
+
+                    // Strongly prioritize weight classes NOT already on the card
+                    if (!$isNewWeightClass) {
+                        $score += 15.0; // Significant penalty for duplicate weight classes
+                    }
+
+                    $allMatches[] = [
+                        'pair' => [$f1, $f2],
+                        'score' => $score
+                    ];
                 }
             }
         }
 
-        if (!$bestPair) {
+        if (empty($allMatches)) {
             return $this->json(['error' => 'No appropriate matches found in same weight classes'], 400);
         }
+
+        // Sort by score (best matches first)
+        usort($allMatches, fn($a, $b) => $a['score'] <=> $b['score']);
+
+        // Pick a random match from the top 5 (to provide variety)
+        $poolSize = min(5, count($allMatches));
+        $selectedIndex = rand(0, $poolSize - 1);
+        $bestPair = $allMatches[$selectedIndex]['pair'];
+        $bestScore = $allMatches[$selectedIndex]['score'];
 
         return $this->json([
             'fighter1' => [
                 'id' => $bestPair[0]->getFighterId(),
                 'name' => $bestPair[0]->getFullName(),
+                'style' => $bestPair[0]->getCalculatedFightingStyle(),
                 'weight' => $bestPair[0]->getWeightDivision()->getName(),
                 'stats' => [
                     'record' => sprintf('%d-%d', $bestPair[0]->getWins(), $bestPair[0]->getLosses()),
@@ -273,6 +312,7 @@ class EventController extends AbstractController
             'fighter2' => [
                 'id' => $bestPair[1]->getFighterId(),
                 'name' => $bestPair[1]->getFullName(),
+                'style' => $bestPair[1]->getCalculatedFightingStyle(),
                 'weight' => $bestPair[1]->getWeightDivision()->getName(),
                 'stats' => [
                     'record' => sprintf('%d-%d', $bestPair[1]->getWins(), $bestPair[1]->getLosses()),
@@ -285,6 +325,68 @@ class EventController extends AbstractController
             'score' => $bestScore,
             'matchQuality' => $bestScore < 3 ? 'EXCELLENT' : ($bestScore < 7 ? 'GOOD' : 'FAIR')
         ]);
+    }
+
+    #[Route('/fan-favorite/create', name: 'app_event_create_fan_favorite', methods: ['POST'])]
+    public function createFanFavoriteEvent(
+        MatchProposalRepository $proposalRepo,
+        FightResultService $fightService,
+        EntityManagerInterface $em
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        // Fetch top 3 most-voted pending proposals
+        $topProposals = $proposalRepo->createQueryBuilder('p')
+            ->where('p.status = :status')
+            ->setParameter('status', 'PENDING')
+            ->orderBy('p.voteCount', 'DESC')
+            ->setMaxResults(3)
+            ->getQuery()
+            ->getResult();
+
+        if (count($topProposals) < 1) {
+            $this->addFlash('error', 'No voted proposals available to build a Fan Event.');
+            return $this->redirectToRoute('app_dashboard');
+        }
+
+        // Create the Fan Favorite event
+        $event = new Event();
+        $event->setEventName('Fan Favorite Night — ' . (new \DateTime())->format('M j, Y'));
+        $event->setEventDate(new \DateTime('+14 days'));
+        $event->setVenue('Community Arena');
+        $event->setCity('TBD');
+        $event->setOrganization('FAN CHOICE');
+        $em->persist($event);
+        $em->flush();
+
+        // Schedule each top proposal as a fight
+        $fightNumber = 1;
+        foreach ($topProposals as $proposal) {
+            try {
+                $fightService->addScheduledFight(
+                    $event->getEventId(),
+                    $fightNumber,
+                    $proposal->getFighter1()->getFighterId(),
+                    $proposal->getFighter2()->getFighterId()
+                );
+                // Mark proposal as approved
+                $proposal->setStatus('APPROVED');
+                $proposal->setEvent($event);
+                $fightNumber++;
+            } catch (\Exception $ex) {
+                $this->addFlash('warning', 'Could not schedule "' . $proposal->getFightLabel() . '": ' . $ex->getMessage());
+            }
+        }
+
+        $em->flush();
+
+        $this->addFlash('success', sprintf(
+            'Fan Favorite Event "%s" created with %d fight(s)!',
+            $event->getEventName(),
+            $fightNumber - 1
+        ));
+
+        return $this->redirectToRoute('app_event_fights', ['id' => $event->getEventId()]);
     }
 }
 

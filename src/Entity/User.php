@@ -62,6 +62,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $verificationToken = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $webauthnCredentialId = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $webauthnPublicKey = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $facePhoto = null;
+
+    public function getFacePhoto(): ?string { return $this->facePhoto; }
+    public function setFacePhoto(?string $photo): self { $this->facePhoto = $photo; return $this; }
+
     public function __construct()
     {
         $this->createdDate = new \DateTime();
@@ -85,6 +97,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCreatedDate(?\DateTimeInterface $v): self { $this->createdDate = $v; return $this; }
     public function getPredictionPoints(): int { return $this->predictionPoints; }
     public function setPredictionPoints(int $v): self { $this->predictionPoints = $v; return $this; }
+
+    public function getWebauthnCredentialId(): ?string { return $this->webauthnCredentialId; }
+    public function setWebauthnCredentialId(?string $id): self { $this->webauthnCredentialId = $id; return $this; }
+
+    public function getWebauthnPublicKey(): ?string { return $this->webauthnPublicKey; }
+    public function setWebauthnPublicKey(?string $key): self { $this->webauthnPublicKey = $key; return $this; }
 
     public function getResetToken(): ?string { return $this->resetToken; }
     public function setResetToken(?string $token): self { $this->resetToken = $token; return $this; }
