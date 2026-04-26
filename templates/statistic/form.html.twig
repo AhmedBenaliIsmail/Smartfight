@@ -409,7 +409,16 @@ document.getElementById('aiAutoFillBtn').addEventListener('click', async functio
         }
 
     } catch (err) {
-        alert('AI Error: ' + err.message);
+        // Show polished error instead of sloppy alert()
+        const errBanner = document.createElement('div');
+        errBanner.className = 'col-12';
+        errBanner.innerHTML = `<div style="background:linear-gradient(135deg,#7f1d1d,#450a0a);border:1px solid #dc2626;border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;display:flex;align-items:center;gap:.75rem;">
+            <i class="fa-solid fa-circle-exclamation text-danger"></i>
+            <div><div class="fw-bold text-white" style="font-size:.8rem;">AI Engine Error</div>
+            <div class="small" style="color:#fca5a5;">${err.message || 'Unable to generate stats. The AI service may be temporarily unavailable.'}</div></div>
+            <button onclick="this.closest('.col-12').remove()" class="btn-close btn-close-white ms-auto" style="font-size:.5rem;"></button>
+        </div>`;
+        document.getElementById('statsForm').querySelector('.row').prepend(errBanner);
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> AI Auto-Fill';
@@ -421,8 +430,19 @@ document.getElementById('statsForm').addEventListener('submit', function(e) {
     validate('s1'); validate('s2');
     if (document.querySelector('.stat-input.is-invalid')) {
         e.preventDefault();
-        alert('Please fix validation errors before saving.');
+        // Show inline warning instead of alert()
+        const existing = document.querySelector('.validation-warning');
+        if (existing) existing.remove();
+        const warn = document.createElement('div');
+        warn.className = 'col-12 validation-warning';
+        warn.innerHTML = `<div style="background:rgba(245,158,11,.1);border:1px solid #f59e0b;border-radius:8px;padding:.6rem 1rem;display:flex;align-items:center;gap:.5rem;font-size:.8rem;">
+            <i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b;"></i>
+            <span style="color:#fde68a;">Fix the highlighted validation errors before saving this round.</span>
+        </div>`;
+        document.getElementById('statsForm').querySelector('.row').prepend(warn);
+        window.scrollTo({top: 0, behavior: 'smooth'});
     }
 });
 </script>
 {% endblock %}
+

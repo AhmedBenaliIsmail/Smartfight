@@ -119,7 +119,23 @@ class UserController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $user = $repo->find($id);
-        if ($user) { $em->remove($user); $em->flush(); $this->addFlash('success', 'User deleted.'); }
+        if ($user) {
+            $userId = $user->getUserId();
+            
+            // Delete related entities to avoid foreign key constraint violations (SQLSTATE 1451)
+            $em->createQuery('DELETE FROM App\Entity\Notification n WHERE n.user = :id')->setParameter('id', $userId)->execute();
+            $em->createQuery('DELETE FROM App\Entity\Prediction p WHERE p.user = :id')->setParameter('id', $userId)->execute();
+            $em->createQuery('DELETE FROM App\Entity\FanReaction r WHERE r.fan = :id')->setParameter('id', $userId)->execute();
+            $em->createQuery('DELETE FROM App\Entity\FanVote v WHERE v.user = :id')->setParameter('id', $userId)->execute();
+            $em->createQuery('DELETE FROM App\Entity\EventBooking b WHERE b.user = :id')->setParameter('id', $userId)->execute();
+            $em->createQuery('DELETE FROM App\Entity\FanPreference fp WHERE fp.fan = :id')->setParameter('id', $userId)->execute();
+            $em->createQuery('DELETE FROM App\Entity\FanProfile fprof WHERE fprof.user = :id')->setParameter('id', $userId)->execute();
+            $em->createQuery('DELETE FROM App\Entity\BlogArticle ba WHERE ba.author = :id')->setParameter('id', $userId)->execute();
+
+            $em->remove($user); 
+            $em->flush(); 
+            $this->addFlash('success', 'User deleted successfully.'); 
+        }
         return $this->redirectToRoute('app_users');
     }
     #[Route('/profile', name: 'app_profile', methods: ['GET', 'POST'])]

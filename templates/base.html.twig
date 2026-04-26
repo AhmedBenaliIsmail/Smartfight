@@ -129,7 +129,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if app.request.attributes.get('_route') == 'app_match_proposal_index' or app.request.attributes.get('_route') == 'app_fan_dashboard' %}active{% endif %}" 
-                           href="{{ is_granted('ROLE_ADMIN') ? path('app_match_proposal_index') : path('app_fan_dashboard') }}">
+                           href="{{ is_granted('ROLE_ADMIN') ? path('app_match_proposal_index') : path('app_fan_dashboard') ~ '#matchmaking' }}">
                             <span class="nav-link-icon"><i class="fa-solid fa-square-poll-vertical fa-fw text-indigo"></i></span>
                             <span class="nav-link-title">{% if is_granted('ROLE_ADMIN') %}Voting Pool Admin{% else %}Matchmaking Voting{% endif %}</span>
                         </a>

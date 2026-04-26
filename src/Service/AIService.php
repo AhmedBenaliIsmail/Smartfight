@@ -138,11 +138,7 @@ class AIService
     public function suggestMatches(array $availableFighters): array
     {
         if (!$this->apiKey) {
-            return [
-                'success' => false,
-                'error' => 'API Key not configured',
-                'matches' => []
-            ];
+            return $this->generateLocalMatchmaking($availableFighters);
         }
 
         $prompt = $this->buildMatchmakingPrompt($availableFighters);
@@ -193,11 +189,8 @@ class AIService
                 'matches' => []
             ];
         } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'error' => $e->getMessage(),
-                'matches' => []
-            ];
+            // FALLBACK: Generate local matchmaking when API fails
+            return $this->generateLocalMatchmaking($availableFighters);
         }
     }
 
@@ -270,6 +263,58 @@ class AIService
                 'analysis' => null
             ];
         }
+    }
+    /**
+     * Local fallback matchmaking engine — pairs fighters by division/ELO proximity
+     */
+    private function generateLocalMatchmaking(array $fighters): array
+    {
+        $matches = [];
+        $used = [];
+
+        // Group by division
+        $byDivision = [];
+        foreach ($fighters as $f) {
+            $div = $f['division'] ?? 'Unknown';
+            $byDivision[$div][] = $f;
+        }
+
+        // Pair fighters within same division by closest ELO
+        foreach ($byDivision as $division => $divFighters) {
+            usort($divFighters, fn($a, $b) => ($a['elo'] ?? 1000) - ($b['elo'] ?? 1000));
+
+            for ($i = 0; $i < count($divFighters) - 1 && count($matches) < 5; $i++) {
+                $f1 = $divFighters[$i];
+                $f2 = $divFighters[$i + 1];
+
+                if (in_array($f1['id'], $used) || in_array($f2['id'], $used)) continue;
+
+                $eloDiff = abs(($f1['elo'] ?? 1000) - ($f2['elo'] ?? 1000));
+                $excitement = $eloDiff < 100 ? 'high' : ($eloDiff < 250 ? 'medium' : 'low');
+
+                $matches[] = [
+                    'fighter1_id' => $f1['id'],
+                    'fighter2_id' => $f2['id'],
+                    'reason' => sprintf(
+                        '%s (%d-%d, ELO %d) vs %s (%d-%d, ELO %d) — %s division clash with %d ELO gap. %s',
+                        $f1['name'], $f1['wins'], $f1['losses'], $f1['elo'] ?? 1000,
+                        $f2['name'], $f2['wins'], $f2['losses'], $f2['elo'] ?? 1000,
+                        $division, $eloDiff,
+                        $excitement === 'high' ? 'An extremely competitive matchup!' : 'Solid competitive pairing.'
+                    ),
+                    'excitement_level' => $excitement
+                ];
+
+                $used[] = $f1['id'];
+                $used[] = $f2['id'];
+            }
+        }
+
+        return [
+            'success' => true,
+            'is_local' => true,
+            'matches' => $matches
+        ];
     }
 
     private function buildStatSuggestionPrompt(array $f1, array $f2, int $round): string

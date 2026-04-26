@@ -51,26 +51,60 @@
         </div>
     </div>
 
+    <div id="aiToast" style="display:none; position:fixed; top:20px; right:20px; z-index:9999; min-width:350px; border-radius:12px; padding:1rem 1.25rem; box-shadow:0 10px 40px rgba(0,0,0,0.5); font-size:.85rem; animation: slideIn .3s ease;">
+        <div class="d-flex align-items-center gap-2">
+            <i id="aiToastIcon" class="fa-solid fa-lg"></i>
+            <div>
+                <div id="aiToastTitle" class="fw-bold"></div>
+                <div id="aiToastMsg" class="small mt-1" style="opacity:.8;"></div>
+            </div>
+            <button onclick="document.getElementById('aiToast').style.display='none'" class="btn-close btn-close-white ms-auto" style="font-size:.6rem;"></button>
+        </div>
+    </div>
+    <style>
+        @keyframes slideIn { from { transform: translateX(100%); opacity:0; } to { transform: translateX(0); opacity:1; } }
+    </style>
     <script>
+    function showToast(type, title, msg) {
+        const t = document.getElementById('aiToast');
+        const icon = document.getElementById('aiToastIcon');
+        const colors = { success: '#16a34a', error: '#dc2626', info: '#3b82f6' };
+        const icons = { success: 'fa-circle-check', error: 'fa-circle-exclamation', info: 'fa-circle-info' };
+        t.style.display = 'block';
+        t.style.background = type === 'error' ? 'linear-gradient(135deg,#7f1d1d,#450a0a)' : type === 'success' ? 'linear-gradient(135deg,#14532d,#052e16)' : 'linear-gradient(135deg,#1e3a5f,#0c1929)';
+        t.style.border = '1px solid ' + colors[type];
+        icon.className = 'fa-solid fa-lg ' + icons[type];
+        icon.style.color = colors[type];
+        document.getElementById('aiToastTitle').textContent = title;
+        document.getElementById('aiToastTitle').style.color = '#fafafa';
+        document.getElementById('aiToastMsg').textContent = msg;
+        document.getElementById('aiToastMsg').style.color = '#d4d4d8';
+        if (type === 'success') setTimeout(() => { t.style.display = 'none'; }, 4000);
+    }
+
     document.getElementById('aiGenerateBtn').addEventListener('click', async function() {
-        if(!confirm('This will use DeepSeek AI to analyze the entire roster and create 5 high-excitement match proposals for fan voting. Proceed?')) return;
+        if(!confirm('Analyze the roster and generate competitive match proposals for fan voting. Continue?')) return;
         
         const btn = this;
         const originalText = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>GENERATING...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>ANALYZING ROSTER...';
+        showToast('info', 'AI Engine Active', 'Analyzing fighters by division, ELO, and win rate...');
         
         try {
-            const res = await fetch('{{ path('api_ai_generate_proposals') }}', { method: 'POST' });
+            const res = await fetch('{{ path('api_ai_generate_proposals') }}', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            });
             const data = await res.json();
             if(data.success) {
-                alert('Success! ' + data.message);
-                window.location.reload();
+                showToast('success', 'Proposals Generated!', data.message || (data.count + ' matchups added to the voting pool.'));
+                setTimeout(() => window.location.reload(), 2000);
             } else {
-                alert('Error: ' + (data.error || 'Unknown error'));
+                showToast('error', 'Generation Failed', data.error || 'The AI could not generate proposals. Please try again.');
             }
         } catch(e) {
-            alert('Connection failed: ' + e.message);
+            showToast('error', 'Connection Error', 'Unable to reach the AI service. Check your internet connection and try again.');
         } finally {
             btn.disabled = false;
             btn.innerHTML = originalText;

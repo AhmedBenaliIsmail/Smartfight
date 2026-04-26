@@ -189,6 +189,6 @@ class FanDashboardController extends AbstractController
         $em->flush();
 
         $this->addFlash('success', 'Your vote has been recorded! Thanks for shaping the future of SmartFight.');
-        return $this->redirectToRoute('app_fan_dashboard');
+        return $this->redirect($this->generateUrl('app_fan_dashboard') . '#matchmaking');
     }
 }
