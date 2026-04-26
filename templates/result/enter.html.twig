@@ -258,9 +258,13 @@
     const decisionCol = document.getElementById('decision-type-col');
 
     if (methodSelect) {
-        methodSelect.addEventListener('change', function() {
-            decisionCol.style.display = (this.value === 'DECISION') ? 'block' : 'none';
-        });
+        // Sync visibility on load
+        const syncDecisionUI = () => {
+            decisionCol.style.display = (methodSelect.value === 'DECISION') ? 'block' : 'none';
+        };
+        
+        syncDecisionUI();
+        methodSelect.addEventListener('change', syncDecisionUI);
     }
 });
 </script>
