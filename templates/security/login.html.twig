@@ -83,12 +83,19 @@
 
             <script>
                 document.getElementById('login-form').addEventListener('submit', function(e) {
-                    const email = document.getElementById('login-email').value;
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailRegex.test(email)) {
+                    const identifier = document.getElementById('login-email').value.trim();
+                    // Only enforce email validation if user types something with an '@'
+                    if (identifier.includes('@')) {
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (!emailRegex.test(identifier)) {
+                            e.preventDefault();
+                            alert('Enter valid email');
+                        }
+                    } else if (identifier.length === 0) {
                         e.preventDefault();
-                        alert('Enter valid email');
+                        alert('Please enter your username or email');
                     }
+                    // 'admin' and other non-email usernames pass through
                 });
             </script>
 
