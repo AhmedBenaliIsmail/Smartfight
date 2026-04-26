@@ -460,81 +460,98 @@
         <div class="col-md-6">
             <h2 class="section-title"><i class="fa-solid fa-bolt-lightning me-2"></i>Recent Fight Results</h2>
             {% for result in latestResults %}
-            <div class="result-card mb-4 p-4">
-                <div class="d-flex align-items-center justify-content-between">
-                    <!-- Boxer 1 -->
-                    <div class="text-center" style="width: 35%;">
-                        <div class="position-relative d-inline-block mb-2">
-                            {% if result.fighter1.photoFilename %}
-                                <img src="{{ asset('uploads/boxers/' ~ result.fighter1.photoFilename) }}" class="result-boxer-photo" alt="">
-                            {% else %}
-                                <div class="result-boxer-photo d-flex align-items-center justify-content-center bg-dark">
-                                    <i class="fa-solid fa-user text-muted fa-2x"></i>
-                                </div>
-                            {% endif %}
-                            {% if result.winner == result.fighter1 %}
-                                <div class="win-indicator">WINNER</div>
-                            {% endif %}
+            <div class="result-card mb-5 p-0 overflow-hidden" style="background: rgba(24, 24, 27, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px;">
+                <div class="row g-0">
+                    <!-- Left: Matchup & Outcome (60%) -->
+                    <div class="col-lg-7 p-4" style="border-right: 1px solid rgba(255, 255, 255, 0.05);">
+                        <div class="d-flex align-items-center justify-content-center gap-3 mb-4">
+                            <span class="badge rounded-pill px-3 py-1" style="background: rgba(220, 38, 38, 0.1); color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.2); font-size: 0.6rem; letter-spacing: 1px; font-weight: 800;">OFFICIAL RESULT</span>
+                            <span class="text-white small fw-bold text-uppercase" style="letter-spacing: 1px;">{{ result.methodOfVictory }} — ROUND {{ result.roundNumber }}</span>
                         </div>
-                        <h6 class="fw-black mb-1 text-white" style="font-family:'Oswald',sans-serif; letter-spacing:0.5px;">{{ result.fighter1.fullName|upper }}</h6>
-                        <div class="text-muted xsmall" style="font-size: 0.7rem; font-weight: 700;">{{ result.fighter1.wins }}-{{ result.fighter1.losses }}-{{ result.fighter1.draws }} ({{ result.fighter1.koWins }} KO)</div>
-                    </div>
 
-                    <!-- VS / Result Info -->
-                    <div class="text-center" style="width: 25%;">
-                        <div class="badge bg-dark rounded-pill px-3 py-1 mb-2 border border-secondary" style="font-size: 0.6rem; letter-spacing: 1px;">FINAL</div>
-                        <div class="text-danger fw-black h4 mb-0" style="font-family:'Oswald',sans-serif;">{{ result.methodOfVictory|upper }}</div>
-                        <div class="text-muted small fw-bold">ROUND {{ result.roundNumber }}</div>
-                        <div class="mt-3">
-                            {% if result.videoPath %}
-                                <div class="ratio ratio-16x9 rounded-3 overflow-hidden border border-secondary" style="background:#000; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
-                                    <video controls style="width:100%;height:100%;object-fit:contain;">
-                                        <source src="{{ asset('uploads/fights/highlights/' ~ result.videoPath) }}" type="video/mp4">
-                                        Your browser does not support the video tag.
-                                    </video>
-                                </div>
-                            {% elseif result.highlightVideoUrl %}
-                                {% set isYouTube = 'youtube.com' in result.highlightVideoUrl or 'youtu.be' in result.highlightVideoUrl %}
-                                {% set isVimeo = 'vimeo.com' in result.highlightVideoUrl %}
-                                
-                                <div class="ratio ratio-16x9 rounded-3 overflow-hidden border border-secondary" style="background:#000; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
-                                    {% if isYouTube %}
-                                        {% set videoId = result.highlightVideoUrl|split('v=')|last|split('&')|first|split('?')|first %}
-                                        {% if '/' in videoId %}{% set videoId = videoId|split('/')|last %}{% endif %}
-                                        <iframe src="https://www.youtube.com/embed/{{ videoId }}?autoplay=0&rel=0" 
-                                                title="Fight Highlights" allowfullscreen style="border:none;"></iframe>
-                                    {% elseif isVimeo %}
-                                        {% set videoId = result.highlightVideoUrl|split('/')|last|split('?')|first %}
-                                        <iframe src="https://player.vimeo.com/video/{{ videoId }}" 
-                                                title="Fight Highlights" allowfullscreen style="border:none;"></iframe>
+                        <div class="d-flex align-items-center justify-content-between px-2">
+                            <!-- Fighter 1 -->
+                            <div class="text-center" style="width: 40%;">
+                                <div class="position-relative d-inline-block mb-3">
+                                    {% if result.fighter1.photoFilename %}
+                                        <img src="{{ asset('uploads/boxers/' ~ result.fighter1.photoFilename) }}" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid {{ result.winner == result.fighter1 ? '#dc2626' : '#27272a' }}; box-shadow: 0 10px 20px rgba(0,0,0,0.4);" alt="">
                                     {% else %}
-                                        <div class="d-flex align-items-center justify-content-center h-100 text-muted small">
-                                            <a href="{{ result.highlightVideoUrl }}" target="_blank" class="text-danger fw-bold">Watch on Platform <i class="fa-solid fa-external-link ms-1"></i></a>
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center bg-dark" style="width: 100px; height: 100px; border: 3px solid #27272a;">
+                                            <i class="fa-solid fa-user text-muted fa-2x"></i>
+                                        </div>
+                                    {% endif %}
+                                    {% if result.winner == result.fighter1 %}
+                                        <div class="position-absolute top-0 start-50 translate-middle-x" style="top: -10px;">
+                                            <span class="badge bg-danger text-uppercase px-2" style="font-size: 0.55rem; font-weight: 900; letter-spacing: 1px;">WINNER</span>
                                         </div>
                                     {% endif %}
                                 </div>
-                            {% else %}
-                                <div class="text-muted xsmall italic" style="font-size:0.6rem;">HIGHLIGHTS PENDING</div>
-                            {% endif %}
+                                <h6 class="text-white fw-bold mb-1 fs-6">{{ result.fighter1.fullName|upper }}</h6>
+                                <div class="text-muted small" style="font-size: 0.65rem; font-weight: 700;">{{ result.fighter1.wins }}-{{ result.fighter1.losses }} ({{ result.fighter1.koWins }} KO)</div>
+                            </div>
+
+                            <!-- VS Divider -->
+                            <div class="text-danger fw-black italic h2 opacity-25" style="font-family:'Oswald', sans-serif;">VS</div>
+
+                            <!-- Fighter 2 -->
+                            <div class="text-center" style="width: 40%;">
+                                <div class="position-relative d-inline-block mb-3">
+                                    {% if result.fighter2.photoFilename %}
+                                        <img src="{{ asset('uploads/boxers/' ~ result.fighter2.photoFilename) }}" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid {{ result.winner == result.fighter2 ? '#dc2626' : '#27272a' }}; box-shadow: 0 10px 20px rgba(0,0,0,0.4);" alt="">
+                                    {% else %}
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center bg-dark" style="width: 100px; height: 100px; border: 3px solid #27272a;">
+                                            <i class="fa-solid fa-user text-muted fa-2x"></i>
+                                        </div>
+                                    {% endif %}
+                                    {% if result.winner == result.fighter2 %}
+                                        <div class="position-absolute top-0 start-50 translate-middle-x" style="top: -10px;">
+                                            <span class="badge bg-danger text-uppercase px-2" style="font-size: 0.55rem; font-weight: 900; letter-spacing: 1px;">WINNER</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <h6 class="text-white fw-bold mb-1 fs-6">{{ result.fighter2.fullName|upper }}</h6>
+                                <div class="text-muted small" style="font-size: 0.65rem; font-weight: 700;">{{ result.fighter2.wins }}-{{ result.fighter2.losses }} ({{ result.fighter2.koWins }} KO)</div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Boxer 2 -->
-                    <div class="text-center" style="width: 35%;">
-                        <div class="position-relative d-inline-block mb-2">
-                            {% if result.fighter2.photoFilename %}
-                                <img src="{{ asset('uploads/boxers/' ~ result.fighter2.photoFilename) }}" class="result-boxer-photo" alt="">
-                            {% else %}
-                                <div class="result-boxer-photo d-flex align-items-center justify-content-center bg-dark">
-                                    <i class="fa-solid fa-user text-muted fa-2x"></i>
-                                </div>
-                            {% endif %}
-                            {% if result.winner == result.fighter2 %}
-                                <div class="win-indicator">WINNER</div>
-                            {% endif %}
+                    <!-- Right: Cinematic Video (40%) -->
+                    <div class="col-lg-5 p-4 d-flex flex-column justify-content-center bg-black-50" style="background: rgba(0,0,0,0.1);">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <i class="fa-solid fa-clapperboard text-danger"></i>
+                            <span class="text-white-50 fw-bold small text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">Highlights Reel</span>
                         </div>
-                        <h6 class="fw-black mb-1 text-white" style="font-family:'Oswald',sans-serif; letter-spacing:0.5px;">{{ result.fighter2.fullName|upper }}</h6>
-                        <div class="text-muted xsmall" style="font-size: 0.7rem; font-weight: 700;">{{ result.fighter2.wins }}-{{ result.fighter2.losses }}-{{ result.fighter2.draws }} ({{ result.fighter2.koWins }} KO)</div>
+                        
+                        {% if result.videoPath %}
+                            <div class="ratio ratio-16x9 rounded-3 overflow-hidden border border-secondary" style="background:#000; box-shadow: 0 5px 25px rgba(0,0,0,0.5);">
+                                <video controls style="width:100%;height:100%;object-fit:cover;">
+                                    <source src="{{ asset('uploads/fights/highlights/' ~ result.videoPath) }}" type="video/mp4">
+                                </video>
+                            </div>
+                        {% elseif result.highlightVideoUrl %}
+                            {% set isYouTube = 'youtube.com' in result.highlightVideoUrl or 'youtu.be' in result.highlightVideoUrl %}
+                            {% set isVimeo = 'vimeo.com' in result.highlightVideoUrl %}
+                            
+                            <div class="ratio ratio-16x9 rounded-3 overflow-hidden border border-secondary" style="background:#000;">
+                                {% if isYouTube %}
+                                    {% set videoId = result.highlightVideoUrl|split('v=')|last|split('&')|first|split('?')|first %}
+                                    {% if '/' in videoId %}{% set videoId = videoId|split('/')|last %}{% endif %}
+                                    <iframe src="https://www.youtube.com/embed/{{ videoId }}" allowfullscreen style="border:none;"></iframe>
+                                {% elseif isVimeo %}
+                                    {% set videoId = result.highlightVideoUrl|split('/')|last|split('?')|first %}
+                                    <iframe src="https://player.vimeo.com/video/{{ videoId }}" allowfullscreen style="border:none;"></iframe>
+                                {% else %}
+                                    <div class="d-flex align-items-center justify-content-center h-100 text-muted small">
+                                        <a href="{{ result.highlightVideoUrl }}" target="_blank" class="text-danger fw-bold">Watch Stream <i class="fa-solid fa-external-link ms-1"></i></a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="flex-grow-1 d-flex flex-column align-items-center justify-content-center rounded-3 border-1 border-dashed" style="background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1);">
+                                <i class="fa-solid fa-video-slash mb-2 opacity-25"></i>
+                                <span class="text-muted small fw-bold uppercase" style="font-size: 0.6rem; letter-spacing: 1px;">Processing Highlights</span>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

@@ -89,7 +89,13 @@ class SecurityController extends AbstractController
     public function forgotPassword(Request $request, UserRepository $userRepo, EntityManagerInterface $em, MailerInterface $mailer): Response
     {
         if ($request->isMethod('POST')) {
-            $email = $request->request->get('email');
+            $email = trim($request->request->get('email', ''));
+
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $this->addFlash('error', 'Enter valid email');
+                return $this->render('security/forgot_password.html.twig');
+            }
+
             $user = $userRepo->findOneBy(['email' => $email]);
 
             if ($user) {
@@ -101,7 +107,7 @@ class SecurityController extends AbstractController
                 // Send real recovery email
                 try {
                     $resetUrl = $this->generateUrl('app_reset_password', ['token' => $token], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
-                    $email = (new TemplatedEmail())
+                    $emailObj = (new TemplatedEmail())
                         ->from(new Address('mahdidaly24@gmail.com', 'SmartFight Security'))
                         ->to($user->getEmail())
                         ->subject('Reset your SmartFight Password')
@@ -111,13 +117,13 @@ class SecurityController extends AbstractController
                             'resetUrl' => $resetUrl,
                         ]);
 
-                    $mailer->send($email);
-                    $this->addFlash('success', "Email sent.");
+                    $mailer->send($emailObj);
+                    $this->addFlash('success', "Recovery link sent to your inbox.");
                 } catch (\Exception $e) {
                     $this->addFlash('error', "Failed to send reset email. Please try again later.");
                 }
             } else {
-                $this->addFlash('error', 'Email not found.');
+                $this->addFlash('error', 'You don\'t have an account.');
             }
         }
         return $this->render('security/forgot_password.html.twig');

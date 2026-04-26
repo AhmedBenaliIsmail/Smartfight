@@ -59,10 +59,10 @@
             <div class="alert alert-success">{{ msg }}</div>
         {% endfor %}
 
-        <form action="{{ path('app_login') }}" method="post" autocomplete="off">
+        <form action="{{ path('app_login') }}" method="post" autocomplete="off" id="login-form" novalidate>
             <div class="mb-3">
-                <label class="form-label">Username</label>
-                <input type="text" name="_username" class="form-control" placeholder="Enter username" value="{{ last_username }}" required autofocus>
+                <label class="form-label">Email Address</label>
+                <input type="email" name="_username" id="login-email" class="form-control" placeholder="Enter email" value="{{ last_username }}" required autofocus>
             </div>
             <div class="mb-4">
                 <label class="form-label">
@@ -80,6 +80,17 @@
             <div class="form-footer">
                 <button type="submit" class="btn btn-danger w-100 py-2 fs-5 fw-bold">Sign In</button>
             </div>
+
+            <script>
+                document.getElementById('login-form').addEventListener('submit', function(e) {
+                    const email = document.getElementById('login-email').value;
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(email)) {
+                        e.preventDefault();
+                        alert('Enter valid email');
+                    }
+                });
+            </script>
 
             <div class="hr-text" style="color: #52525b; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Or continue with</div>
             <div class="row g-2">
@@ -148,128 +159,102 @@
 <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', async function() {
-    // Background AI Warming (Preload models silently)
-    const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
+document.addEventListener('DOMContentLoaded', function() {
     const loaderText = document.getElementById('ai-loader-text');
     const loaderIcon = document.getElementById('ai-loader-icon');
     const toggleBtn = document.getElementById('btn-face-scan-toggle');
-    
-    let modelsLoaded = false;
-
-    // Load models silently to keep UI clean
-    Promise.all([
-        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)
-    ]).then(() => {
-        modelsLoaded = true;
-        console.log('AI Models Armed');
-        if (loaderIcon) {
-            loaderIcon.classList.remove('fa-circle-notch', 'fa-spin');
-            loaderIcon.classList.add('fa-face-viewfinder');
-        }
-    }).catch(err => {
-        console.warn('AI Models failed to warm in background:', err);
-    });
-
-    // Ensure button is always enabled so user doesn't feel "stuck"
-    if (toggleBtn) {
-        toggleBtn.classList.remove('disabled');
-        loaderText.innerText = 'Face ID';
-    }
-
     const faceIdBtn = document.getElementById('faceIdLoginBtn');
-    const toggleBtn = document.getElementById('btn-face-scan-toggle');
     const container = document.getElementById('login-camera-container');
     const video = document.getElementById('login-webcam');
     const canvas = document.getElementById('login-canvas');
     const captureBtn = document.getElementById('btn-login-capture');
     const usernameInput = document.querySelector('input[name="_username"]');
+    
+    const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights';
+    let modelsLoaded = false;
 
-    // Hardware Passkey Logic
-    if (faceIdBtn) {
-        faceIdBtn.addEventListener('click', async () => {
-            if (!window.PublicKeyCredential) {
-                alert('WebAuthn is not supported.');
-                return;
-            }
-            try {
-                const challenge = new Uint8Array(32);
-                window.crypto.getRandomValues(challenge);
-                const assertion = await navigator.credentials.get({
-                    publicKey: { challenge: challenge, timeout: 60000, userVerification: 'preferred' }
-                });
-                if (assertion) {
-                    const credentialId = btoa(String.fromCharCode.apply(null, new Uint8Array(assertion.rawId)));
-                    const response = await fetch('{{ path('app_face_id_login') }}', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ credentialId: credentialId })
-                    });
-                    const result = await response.json();
-                    if (result.success) window.location.href = result.redirect;
-                    else alert(result.error);
-                }
-            } catch (err) {
-                alert('Passkey login failed.');
-            }
+    // Force Enable: Ensure user is NEVER stuck on "Loading AI"
+    const fallbackTimeout = setTimeout(() => {
+        if (!modelsLoaded) {
+            console.warn('AI models taking too long - Enabling manual FaceID mode');
+            activateFaceIdUI();
+        }
+    }, 4000);
+
+    function activateFaceIdUI() {
+        if (toggleBtn) {
+            toggleBtn.classList.remove('disabled');
+            if (loaderText) loaderText.innerText = 'Log In with Face ID';
+            if (loaderIcon) loaderIcon.className = 'fa-solid fa-face-viewfinder me-2 text-primary';
+        }
+    }
+
+    // Preload AI models
+    if (window.faceapi) {
+        Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+            faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)
+        ]).then(() => {
+            modelsLoaded = true;
+            clearTimeout(fallbackTimeout);
+            console.log('FaceAI Armed');
+            activateFaceIdUI();
+        }).catch(err => {
+            console.warn('AI Init failed, falling back to legacy mode:', err);
+            activateFaceIdUI();
         });
     }
 
+    // Toggle Camera View
     if (toggleBtn) {
         toggleBtn.addEventListener('click', async function() {
-            if (!modelsLoaded) {
-                const originalText = loaderText.innerText;
-                loaderText.innerText = 'Warming up AI...';
-                setTimeout(() => { if (!modelsLoaded) loaderText.innerText = originalText; }, 2000);
-                if (!modelsLoaded) return;
-            }
-            
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                video.srcObject = stream;
-                container.classList.remove('d-none');
-                toggleBtn.classList.add('d-none');
+            if (container.classList.contains('d-none')) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                    video.srcObject = stream;
+                    container.classList.remove('d-none');
+                    toggleBtn.style.display = 'none';
+                    if (faceIdBtn) faceIdBtn.style.display = 'none';
 
-                // Start AI Tracking
-                video.addEventListener('play', () => {
-                    const overlay = faceapi.createCanvasFromMedia(video);
-                    overlay.style.position = 'absolute';
-                    overlay.style.top = '0';
-                    overlay.style.left = '0';
-                    overlay.style.zIndex = '5';
-                    container.append(overlay);
-                    
-                    const displaySize = { width: video.clientWidth, height: video.clientHeight };
-                    faceapi.matchDimensions(overlay, displaySize);
-
-                    setInterval(async () => {
-                        // High-Speed Detection Optimization: inputSize 128 is much faster than default 416
-                        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 128, scoreThreshold: 0.5 })).withFaceLandmarks();
-                        const resizedDetections = faceapi.resizeResults(detections, displaySize);
-                        overlay.getContext('2d').clearRect(0, 0, overlay.width, overlay.height);
+                    video.onplay = () => {
+                        const overlay = faceapi.createCanvasFromMedia(video);
+                        overlay.style.position = 'absolute';
+                        overlay.style.top = '0';
+                        overlay.style.left = '0';
+                        overlay.style.zIndex = '5';
+                        container.append(overlay);
                         
-                        // Draw AI box and points
-                        faceapi.draw.drawDetections(overlay, resizedDetections);
-                        faceapi.draw.drawFaceLandmarks(overlay, resizedDetections);
-                        
-                        if (detections.length > 0) {
-                            captureBtn.classList.remove('disabled');
-                            captureBtn.innerHTML = 'IDENTIFY & LOGIN';
-                        } else {
-                            captureBtn.classList.add('disabled');
-                            captureBtn.innerHTML = '<i class="fa-solid fa-hourglass-start me-2"></i>WAITING FOR FACE...';
-                        }
-                    }, 150); // Balanced interval for performance and battery
-                });
-                });
+                        const displaySize = { width: video.clientWidth, height: video.clientHeight };
+                        faceapi.matchDimensions(overlay, displaySize);
 
-            } catch (err) {
-                alert('Camera access denied.');
+                        setInterval(async () => {
+                            if (modelsLoaded) {
+                                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 128 })).withFaceLandmarks();
+                                const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                                overlay.getContext('2d').clearRect(0, 0, overlay.width, overlay.height);
+                                faceapi.draw.drawDetections(overlay, resizedDetections);
+                                
+                                if (detections.length > 0) {
+                                    captureBtn.classList.remove('disabled');
+                                    captureBtn.innerHTML = 'IDENTIFY & LOGIN';
+                                } else {
+                                    captureBtn.classList.add('disabled');
+                                    captureBtn.innerHTML = '<i class="fa-solid fa-hourglass-start me-2"></i>WAITING FOR FACE...';
+                                }
+                            } else {
+                                captureBtn.classList.remove('disabled');
+                                captureBtn.innerHTML = 'IDENTIFY & LOGIN';
+                            }
+                        }, 150);
+                    };
+                } catch (err) {
+                    alert('Could not access camera. Please check permissions.');
+                }
             }
         });
     }
 
+    // Biometric Verification Handler
     if (captureBtn) {
         captureBtn.addEventListener('click', async function() {
             if (this.classList.contains('disabled')) return;
@@ -297,10 +282,42 @@ document.addEventListener('DOMContentLoaded', async function() {
                 } else {
                     alert(result.error);
                     this.disabled = false;
+                    this.innerHTML = 'IDENTIFY & LOGIN';
                 }
             } catch (err) {
                 alert('Security server unreachable.');
                 this.disabled = false;
+                this.innerHTML = 'IDENTIFY & LOGIN';
+            }
+        });
+    }
+
+    // Standard Passkey Handler (WebAuthn)
+    if (faceIdBtn) {
+        faceIdBtn.addEventListener('click', async () => {
+            if (!window.PublicKeyCredential) {
+                alert('Passkey not supported on this browser.');
+                return;
+            }
+            try {
+                const challenge = new Uint8Array(32);
+                window.crypto.getRandomValues(challenge);
+                const assertion = await navigator.credentials.get({
+                    publicKey: { challenge: challenge, timeout: 60000, userVerification: 'preferred' }
+                });
+                if (assertion) {
+                    const credentialId = btoa(String.fromCharCode.apply(null, new Uint8Array(assertion.rawId)));
+                    const response = await fetch('{{ path('app_face_id_login') }}', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ credentialId: credentialId })
+                    });
+                    const result = await response.json();
+                    if (result.success) window.location.href = result.redirect;
+                    else alert(result.error);
+                }
+            } catch (err) {
+                alert('Passkey verification failed.');
             }
         });
     }
