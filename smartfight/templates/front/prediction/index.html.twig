@@ -1,0 +1,235 @@
+{% extends 'front/base_front.html.twig' %}
+{% block title %}Predictions — SmartFight{% endblock %}
+
+{% block extra_css %}
+<style>
+    #predTabs {
+        border-bottom: 1px solid #27272a;
+        padding-bottom: .55rem;
+        gap: .55rem !important;
+    }
+
+    #predTabs .nav-link {
+        background: #18181b;
+        border: 1px solid #27272a;
+        border-radius: .55rem;
+        color: #a1a1aa;
+        font-size: .8rem;
+        font-weight: 700;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        padding: .58rem 1rem;
+        transition: all .18s ease;
+    }
+
+    #predTabs .nav-link:hover,
+    #predTabs .nav-link:focus {
+        background: #1f1f23;
+        border-color: #dc2626;
+        color: #fafafa;
+    }
+
+    #predTabs .nav-link.active,
+    #predTabs .show > .nav-link {
+        background: #dc2626;
+        border-color: #dc2626;
+        color: #fff;
+        box-shadow: 0 0 0 1px rgba(220, 38, 38, .2);
+    }
+    
+    @media (max-width: 575.98px) {
+        #predTabs .nav-item {
+            flex: 1 1 calc(50% - .35rem);
+        }
+
+        #predTabs .nav-link {
+            text-align: center;
+            width: 100%;
+            font-size: .76rem;
+            padding: .52rem .6rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-5" style="background:#09090b;min-height:100vh;">
+    <div class="container">
+        <div class="mb-4">
+            <h1 style="font-family:'Oswald',sans-serif;color:#fff;font-size:2.5rem;">FAN PREDICTIONS</h1>
+            <p class="text-muted">Pick the winners, earn points, climb the leaderboard.</p>
+        </div>
+
+        {# Tabs #}
+        <ul class="nav nav-pills mb-4 gap-2" id="predTabs">
+            <li class="nav-item"><a class="nav-link active" data-bs-toggle="pill" href="#leaderboard">Leaderboard</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#my-picks">My Picks</a></li>
+            {% if app.user %}<li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#make-pick">Make a Pick</a></li>{% endif %}
+        </ul>
+
+        <div class="tab-content">
+            {# Leaderboard Tab #}
+            <div class="tab-pane fade show active" id="leaderboard">
+                <div class="card" style="background:#18181b;border:1px solid #27272a;border-radius:10px;">
+                    <div class="table-responsive">
+                        <table class="table table-dark mb-0" style="--bs-table-bg:#18181b;">
+                            <thead>
+                                <tr style="border-bottom:1px solid #27272a;">
+                                    <th style="color:#71717a;">#</th>
+                                    <th style="color:#71717a;">Fan</th>
+                                    <th style="color:#71717a;">Points</th>
+                                    <th style="color:#71717a;">Predictions</th>
+                                    <th style="color:#71717a;">Accuracy</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in leaderboard %}
+                                <tr {% if app.user and app.user.id == row.fan_id %}style="background:#1c1116;"{% endif %}>
+                                    <td>
+                                        {% if row.rank == 1 %}<span style="color:#c9a227;font-weight:700;">🥇</span>
+                                        {% elseif row.rank == 2 %}<span style="color:#71717a;font-weight:700;">🥈</span>
+                                        {% elseif row.rank == 3 %}<span style="color:#c9a227;font-weight:700;">🥉</span>
+                                        {% else %}{{ row.rank }}{% endif %}
+                                    </td>
+                                    <td style="color:#fff;">{{ row.first_name }} {{ row.last_name }}</td>
+                                    <td style="color:#c9a227;font-weight:600;">{{ row.total_points }}</td>
+                                    <td style="color:#a1a1aa;">{{ row.total_predictions }}</td>
+                                    <td>
+                                        <div class="progress" style="height:6px;background:#27272a;width:80px;">
+                                            <div class="progress-bar" style="width:{{ row.accuracy }}%;background:#dc2626;"></div>
+                                        </div>
+                                        <small style="color:#71717a;">{{ row.accuracy }}%</small>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr><td colspan="5" class="text-center text-muted py-4">No scored predictions yet.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {# My Picks Tab #}
+            <div class="tab-pane fade" id="my-picks">
+                {% if app.user %}
+                <div class="card" style="background:#18181b;border:1px solid #27272a;border-radius:10px;">
+                    <div class="table-responsive">
+                        <table class="table table-dark mb-0" style="--bs-table-bg:#18181b;">
+                            <thead>
+                                <tr style="border-bottom:1px solid #27272a;">
+                                    <th style="color:#71717a;">Fight</th>
+                                    <th style="color:#71717a;">My Pick</th>
+                                    <th style="color:#71717a;">Method</th>
+                                    <th style="color:#71717a;">Result</th>
+                                    <th style="color:#71717a;">Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pred in myPredictions %}
+                                <tr>
+                                    <td style="color:#a1a1aa;font-size:.85rem;">{{ pred.matchProposal.fightLabel }}</td>
+                                    <td style="color:#fff;">{{ pred.predictedWinner.displayName }}</td>
+                                    <td><span class="badge bg-secondary">{{ pred.predictedMethod }}</span></td>
+                                    <td>
+                                        {% if not pred.isScored %}<span class="badge" style="background:#374151;">Pending</span>
+                                        {% elseif pred.pointsEarned > 0 %}<span class="badge" style="background:#16a34a;">Correct</span>
+                                        {% else %}<span class="badge" style="background:#dc2626;">Wrong</span>{% endif %}
+                                    </td>
+                                    <td style="color:{% if pred.pointsEarned > 0 %}#16a34a{% else %}#71717a{% endif %};">
+                                        {{ pred.pointsEarned is not null ? '+' ~ pred.pointsEarned : '—' }}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr><td colspan="5" class="text-center text-muted py-4">You haven't made any predictions yet.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <p class="text-muted">Please <a href="{{ path('app_login') }}" style="color:#dc2626;">log in</a> to see your picks.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            {# Make a Pick Tab #}
+            {% if app.user %}
+            <div class="tab-pane fade" id="make-pick">
+                <div class="card" style="background:#18181b;border:1px solid #27272a;border-radius:10px;">
+                    <div class="card-body">
+                        <form method="POST" action="{{ path('front_prediction_submit') }}" id="predictionsForm">
+
+                        <div class="mb-4">
+                            <label class="form-label" style="color:#a1a1aa;">Select Event</label>
+                            <select id="eventSelect" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;">
+                                <option value="">Choose an upcoming event...</option>
+                                {% for event in events %}
+                                    <option value="{{ event.id }}">{{ event.name }} — {{ event.startDate|date('d M Y') }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div id="fightsContainer"></div>
+
+                        <button type="submit" class="btn btn-sf-primary mt-3" id="submitBtn" style="display:none;">
+                            <i class="fa-solid fa-check me-2"></i>Submit Predictions
+                        </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('eventSelect')?.addEventListener('change', function() {
+    const eventId = this.value;
+    const container = document.getElementById('fightsContainer');
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (!eventId) { container.innerHTML = ''; submitBtn.style.display = 'none'; return; }
+
+    fetch(`/predictions/fights/${eventId}`)
+        .then(r => r.json())
+        .then(fights => {
+            if (!fights.length) {
+                container.innerHTML = '<p class="text-muted">No fights with accepted proposals for this event.</p>';
+                submitBtn.style.display = 'none';
+                return;
+            }
+            container.innerHTML = fights.map((f, i) => `
+                <div class="card mb-3" style="background:#09090b;border:1px solid #27272a;border-radius:8px;">
+                    <div class="card-body">
+                        <h6 style="color:#fff;font-family:'Oswald',sans-serif;">${f.label}</h6>
+                        <input type="hidden" name="predictions[${i}][match_proposal_id]" value="${f.id}">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label style="color:#a1a1aa;font-size:.8rem;">Winner Pick</label>
+                                <select name="predictions[${i}][predicted_winner_id]" class="form-select" style="background:#18181b;border-color:#27272a;color:#fff;" required>
+                                    <option value="">Select winner...</option>
+                                    <option value="${f.fighter1.id}">${f.fighter1.name} (${f.fighter1.record})</option>
+                                    <option value="${f.fighter2.id}">${f.fighter2.name} (${f.fighter2.record})</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label style="color:#a1a1aa;font-size:.8rem;">Method</label>
+                                <select name="predictions[${i}][predicted_method]" class="form-select" style="background:#18181b;border-color:#27272a;color:#fff;" required>
+                                    <option value="">Select method...</option>
+                                    ${['KO','TKO','SUBMISSION','DECISION','DRAW'].map(m => `<option value="${m}">${m}</option>`).join('')}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            submitBtn.style.display = 'block';
+        });
+});
+</script>
+{% endblock %}

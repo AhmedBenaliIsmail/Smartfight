@@ -1,0 +1,221 @@
+{% extends 'front/base_front.html.twig' %}
+
+{% block title %}SmartFight — Professional Roster{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .fighter-card-pro {
+            background: #09090b;
+            border: 1px solid rgba(220, 38, 38, 0.4);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+        }
+        .fighter-card-pro:hover {
+            border-color: #dc2626;
+            box-shadow: 0 10px 40px rgba(220, 38, 38, 0.15);
+            transform: translateY(-8px);
+        }
+        .fighter-photo-container {
+            width: 120px;
+            height: 120px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #18181b;
+            border: 2px solid #27272a;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .status-dot {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 14px;
+            height: 14px;
+            background: #dc2626;
+            border-radius: 50%;
+            border: 3px solid #09090b;
+        }
+        .badge-tactician {
+            background: rgba(37, 99, 235, 0.1);
+            color: #3b82f6;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            padding: 4px 14px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+        .nickname-text {
+            color: #ef4444;
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .stat-group {
+            text-align: center;
+        }
+        .stat-label {
+            color: #71717a;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .stat-value {
+            color: #fff;
+            font-size: 1.75rem;
+            font-weight: 800;
+            font-family: 'Inter', sans-serif;
+        }
+        .division-standing-bar {
+            height: 8px;
+            background: #18181b;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+        .standing-progress {
+            height: 100%;
+            background: #dc2626;
+            border-radius: 10px;
+        }
+        .bottom-icon-group {
+            color: #a1a1aa;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .bottom-action-btn {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: #18181b;
+            color: #71717a;
+            border: 1px solid #27272a;
+            transition: all 0.2s;
+            text-decoration: none !important;
+        }
+        .bottom-action-btn:hover {
+            background: #27272a;
+            color: #fafafa;
+            transform: scale(1.05);
+        }
+        .btn-delete:hover {
+            background: rgba(220, 38, 38, 0.1);
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center justify-content-between mb-5">
+        <div>
+            <h1 class="h2 fw-bold text-white mb-1" style="font-family: 'Oswald', sans-serif; letter-spacing: 1px;">ORGANIZATION ROSTER</h1>
+            <p class="text-muted mb-0">Managing professional combatant portfolios</p>
+        </div>
+        <div class="d-flex gap-3 align-items-center">
+            <div class="input-icon" style="width: 250px;">
+                <span class="input-icon-addon">
+                    <i class="fa-solid fa-search"></i>
+                </span>
+                <input type="text" class="form-control" style="background:#18181b; border:1px solid #27272a; color:#fafafa;" placeholder="Search roster..." data-live-search=".fighter-grid" data-live-search-item=".fighter-card-col">
+            </div>
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_fighter_new') }}" class="btn btn-danger px-4 fw-bold">
+                <i class="fa-solid fa-plus me-2"></i>ADD BOXER
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-4 fighter-grid">
+    {% for fighter in fighters %}
+        {% set total_fights = fighter.wins + fighter.losses + fighter.draws %}
+        {% set win_rate = total_fights > 0 ? (fighter.wins / total_fights * 100)|round : 0 %}
+        {% set standing_percent = max(5, min(100, (fighter.eloRating / 2000 * 100))) %}
+        
+        <div class="col-lg-4 col-md-6 fighter-card-col">
+            <div class="fighter-card-pro">
+                <div class="d-flex gap-4 mb-5">
+                    <div class="fighter-photo-container">
+                        {% if fighter.photoFilename %}
+                            <img src="{{ asset('uploads/boxers/' ~ fighter.photoFilename) }}" class="w-100 h-100 object-fit-cover" alt="{{ fighter.fullName }}">
+                        {% else %}
+                            <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-dark text-muted">
+                                <i class="fa-solid fa-user fa-3x"></i>
+                            </div>
+                        {% endif %}
+                        <div class="status-dot"></div>
+                    </div>
+                    <div class="pt-2">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <h3 class="h4 fw-bold text-white mb-0">{{ fighter.fullName }}</h3>
+                            <span class="badge-tactician" style="color: #3b82f6; background: rgba(37, 99, 235, 0.1); border-color: rgba(37, 99, 235, 0.3);">
+                                {{ fighter.calculatedFightingStyle }}
+                            </span>
+                        </div>
+                        <div class="nickname-text">"{{ fighter.nickname|default('No Nickname') }}"</div>
+                        <div class="text-muted small fw-medium">{{ fighter.weightDivision ? fighter.weightDivision.name : 'Unassigned' }} Division</div>
+                    </div>
+                </div>
+
+                <div class="row mb-5">
+                    <div class="col-4 stat-group">
+                        <div class="stat-label">WIN RATE</div>
+                        <div class="stat-value">{{ win_rate }}%</div>
+                    </div>
+                    <div class="col-4 stat-group">
+                        <div class="stat-label">ELO SCORE</div>
+                        <div class="stat-value">{{ fighter.eloRating|round }}</div>
+                    </div>
+                    <div class="col-4 stat-group">
+                        <div class="stat-label">RECORD</div>
+                        <div class="stat-value">{{ fighter.wins }}-{{ fighter.losses }}-{{ fighter.draws }}</div>
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <div class="d-flex justify-content-between align-items-end mb-1">
+                        <div class="stat-label mb-0" style="font-size: 0.8rem;">DIVISION STANDING</div>
+                        <div class="text-white fw-bold">{{ fighter.eloRating|round }}/2000</div>
+                    </div>
+                    <div class="division-standing-bar">
+                        <div class="standing-progress" style="width: {{ standing_percent }}%;"></div>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-top border-secondary border-opacity-10 d-flex align-items-center justify-content-between">
+                    <div class="d-flex gap-4 bottom-icon-group">
+                        <span><i class="fa-solid fa-ruler-vertical me-2"></i>{{ fighter.height|default('--') }}cm</span>
+                        <span><i class="fa-solid fa-arrows-left-right me-2"></i>{{ fighter.reach|default('--') }}cm</span>
+                    </div>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <div class="d-flex gap-2">
+                            <a href="{{ path('app_fighter_edit', {'id': fighter.fighterId}) }}" class="bottom-action-btn" title="Edit Profile">
+                                <i class="fa-solid fa-user-pen"></i>
+                            </a>
+                            <form method="post" action="{{ path('app_fighter_delete', {'id': fighter.fighterId}) }}" onsubmit="return confirm('Delete this profile?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ fighter.fighterId) }}">
+                                <button class="bottom-action-btn btn-delete" title="Delete Profile">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

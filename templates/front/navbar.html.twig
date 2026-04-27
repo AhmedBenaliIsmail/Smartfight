@@ -1,0 +1,55 @@
+<nav class="sf-navbar navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="{{ path('front_blog_index') }}">SMART<span>FIGHT</span></a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sfNavCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="sfNavCollapse">
+            <ul class="navbar-nav ms-auto align-items-center gap-2">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('front_blog_index') }}">Blog</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('front_reaction_index') }}">Reactions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('app_predictions') }}">Predictions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('app_leaderboard') }}">Leaderboard</a>
+                </li>
+                {% if app.user %}
+                    {% if is_granted('ROLE_USER') %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('front_booking_index') }}">Book Tickets</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('front_booking_my') }}">My Bookings</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a
+                            class="nav-link notif-bell-link"
+                            href="#"
+                            data-notif-bell="true"
+                            data-notif-snapshot-url="{{ path('front_notification_snapshot') }}"
+                            aria-label="Notifications"
+                        >
+                            <i class="fa-solid fa-bell"></i>
+                            <span class="notif-badge-count is-hidden" aria-live="polite">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_logout') }}">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="btn btn-sf-primary btn-sm" href="{{ path('app_login') }}">Sign In</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

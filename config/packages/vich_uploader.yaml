@@ -1,0 +1,15 @@
+vich_uploader:
+    db_driver: orm
+    mappings:
+        blog_image:
+            uri_prefix: /uploads/blog/images
+            upload_destination: '%kernel.project_dir%/public/uploads/blog/images'
+            namer: Vich\UploaderBundle\Naming\UniqidNamer
+        blog_video:
+            uri_prefix: /uploads/blog/videos
+            upload_destination: '%kernel.project_dir%/public/uploads/blog/videos'
+            namer: Vich\UploaderBundle\Naming\UniqidNamer
+        fight_highlight:
+            uri_prefix: /uploads/fights/highlights
+            upload_destination: '%kernel.project_dir%/public/uploads/fights/highlights'
+            namer: Vich\UploaderBundle\Naming\UniqidNamer

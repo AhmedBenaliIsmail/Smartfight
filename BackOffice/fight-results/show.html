@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fight Result Detail — SmartFight Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/smartfight-admin.css" />
+</head>
+<body class="antialiased">
+<div class="wrapper">
+  <aside class="navbar navbar-vertical navbar-expand-lg" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+    <div class="container-fluid flex-column align-items-stretch p-0">
+      <div class="p-3 border-bottom" style="border-color:#27272a!important">
+        <a href="../dashboard.html" class="smartfight-logo"><div class="logo-icon"><i class="fa-solid fa-fist-raised"></i></div><div class="logo-text">Smart<span>Fight</span></div></a>
+      </div>
+      <nav class="flex-fill py-2">
+        <div class="navbar-vertical-section">Management</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../dashboard.html"><span class="nav-link-icon"><i class="fa-solid fa-chart-line fa-fw"></i></span><span class="nav-link-title">Dashboard</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../users/index.html"><span class="nav-link-icon"><i class="fa-solid fa-users fa-fw"></i></span><span class="nav-link-title">Users</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fighters/index.html"><span class="nav-link-icon"><i class="fa-solid fa-boxing-glove fa-fw"></i></span><span class="nav-link-title">Fighters</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../events/index.html"><span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span><span class="nav-link-title">Events</span></a></li>
+          <li class="nav-item"><a class="nav-link active" href="index.html"><span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span><span class="nav-link-title">Fight Results</span></a></li>
+        </ul>
+        <div class="navbar-vertical-section mt-2">Fan Experience</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../blog/index.html"><span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw"></i></span><span class="nav-link-title">Blog Articles</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../bookings/index.html"><span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw"></i></span><span class="nav-link-title">Event Bookings</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../predictions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span><span class="nav-link-title">Predictions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../reactions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-comments fa-fw"></i></span><span class="nav-link-title">Reactions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../notifications/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span><span class="nav-link-title">Notifications</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
+    <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
+      <div class="d-flex align-items-center gap-3 flex-fill">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="../dashboard.html" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+          <li class="breadcrumb-item"><a href="index.html" style="color:#a1a1aa;text-decoration:none;">Fight Results</a></li>
+          <li class="breadcrumb-item active">Jones vs Aspinall</li>
+        </ol>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="#" class="nav-link p-1 text-muted"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="../notifications/index.html" class="nav-link p-1 position-relative text-muted"><i class="fa-solid fa-bell"></i><span class="badge bg-danger rounded-pill" style="position:absolute;top:-4px;right:-4px;font-size:.6rem;padding:2px 5px;">7</span></a>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+            <div style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">A</div>
+            <span style="font-size:.875rem;color:#fafafa;">Admin</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user fa-fw me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-fill p-4" style="background:#09090b;">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Fight Result Detail</h1>
+          <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Official outcome record for UFC 312</p>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="form.html" class="btn btn-sm" style="background:#27272a;color:#fafafa;border:none;"><i class="fa-solid fa-pen me-1"></i>Edit</a>
+          <a href="index.html" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+        </div>
+      </div>
+
+      <!-- Fight Banner: Red vs Blue -->
+      <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;overflow:hidden;">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center justify-content-center gap-3">
+            <!-- Red Corner -->
+            <div class="corner-card corner-red flex-fill" style="max-width:280px;">
+              <div style="font-size:.7rem;color:#f87171;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.75rem;">RED CORNER</div>
+              <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#450a0a,#27272a);display:flex;align-items:center;justify-content:center;font-size:1.75rem;margin:0 auto .75rem;border:3px solid #dc2626;">🥊</div>
+              <div style="font-size:1.25rem;font-weight:800;color:#fafafa;">Jon Jones</div>
+              <div style="font-size:.8rem;color:#c9a227;font-style:italic;">"Bones"</div>
+              <div style="font-size:.75rem;color:#a1a1aa;margin-top:.25rem;">28-1-0 · Heavyweight</div>
+            </div>
+
+            <!-- VS -->
+            <div class="vs-badge flex-shrink-0">VS</div>
+
+            <!-- Blue Corner -->
+            <div class="corner-card corner-blue flex-fill" style="max-width:280px;">
+              <div style="font-size:.7rem;color:#60a5fa;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.75rem;">BLUE CORNER</div>
+              <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#172554,#27272a);display:flex;align-items:center;justify-content:center;font-size:1.75rem;margin:0 auto .75rem;border:3px solid #3b82f6;">🥊</div>
+              <div style="font-size:1.25rem;font-weight:800;color:#fafafa;">Tom Aspinall</div>
+              <div style="font-size:.8rem;color:#c9a227;font-style:italic;">"The Future"</div>
+              <div style="font-size:.75rem;color:#a1a1aa;margin-top:.25rem;">15-3-0 · Heavyweight</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Result Section -->
+      <div class="card mb-4" style="background:linear-gradient(135deg,#1a0a0a,#18181b);border:1px solid #7f1d1d;">
+        <div class="card-body p-4 text-center">
+          <div style="font-size:.75rem;color:#a1a1aa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;">Official Result</div>
+          <div style="font-size:2rem;font-weight:900;color:#dc2626;margin-bottom:.5rem;">Jones Wins!</div>
+          <div class="d-flex align-items-center justify-content-center gap-3 flex-wrap">
+            <span class="badge" style="background:rgba(201,162,39,.15);color:#c9a227;font-size:.875rem;padding:.5rem 1rem;">KO / TKO</span>
+            <span style="color:#a1a1aa;">Round <strong style="color:#fafafa;">2</strong></span>
+            <span style="color:#a1a1aa;">Time <strong style="color:#fafafa;">4:47</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Comparison -->
+      <div class="card" style="background:#18181b;border:1px solid #27272a;">
+        <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+          <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-chart-bar me-2" style="color:#c9a227;"></i>Fight Statistics</h3>
+        </div>
+        <div class="card-body p-4">
+          <!-- Stat Row helper: left / bar / right -->
+          <div class="mb-4">
+            <div class="d-flex justify-content-between mb-2">
+              <span style="font-size:.8rem;color:#a1a1aa;text-transform:uppercase;letter-spacing:.06em;">Significant Strikes</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+              <span style="font-size:1.25rem;font-weight:700;color:#dc2626;min-width:50px;text-align:right;">87</span>
+              <div style="flex:1;background:#27272a;height:8px;border-radius:4px;overflow:hidden;display:flex;">
+                <div style="width:58%;background:#dc2626;height:100%;"></div>
+              </div>
+              <span style="font-size:1.25rem;font-weight:700;color:#3b82f6;min-width:50px;">63</span>
+            </div>
+            <div class="d-flex justify-content-between mt-1">
+              <span style="font-size:.7rem;color:#dc2626;">Jones</span>
+              <span style="font-size:.7rem;color:#3b82f6;">Aspinall</span>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <div class="d-flex align-items-center gap-3">
+              <span style="font-size:1.25rem;font-weight:700;color:#dc2626;min-width:50px;text-align:right;">4</span>
+              <div style="flex:1;background:#27272a;height:8px;border-radius:4px;overflow:hidden;display:flex;">
+                <div style="width:67%;background:#dc2626;height:100%;"></div>
+              </div>
+              <span style="font-size:1.25rem;font-weight:700;color:#3b82f6;min-width:50px;">2</span>
+            </div>
+            <div class="d-flex justify-content-between mt-1">
+              <span style="font-size:.7rem;color:#dc2626;">Takedowns</span>
+              <span style="font-size:.7rem;color:#3b82f6;">Takedowns</span>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <div class="d-flex align-items-center gap-3">
+              <span style="font-size:1.25rem;font-weight:700;color:#dc2626;min-width:50px;text-align:right;">2</span>
+              <div style="flex:1;background:#27272a;height:8px;border-radius:4px;overflow:hidden;display:flex;">
+                <div style="width:40%;background:#dc2626;height:100%;"></div>
+              </div>
+              <span style="font-size:1.25rem;font-weight:700;color:#3b82f6;min-width:50px;">3</span>
+            </div>
+            <div class="d-flex justify-content-between mt-1">
+              <span style="font-size:.7rem;color:#dc2626;">Sub Attempts</span>
+              <span style="font-size:.7rem;color:#3b82f6;">Sub Attempts</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="d-flex align-items-center gap-3">
+              <span style="font-size:1.25rem;font-weight:700;color:#dc2626;min-width:50px;text-align:right;">72%</span>
+              <div style="flex:1;background:#27272a;height:8px;border-radius:4px;overflow:hidden;display:flex;">
+                <div style="width:72%;background:#c9a227;height:100%;"></div>
+              </div>
+              <span style="font-size:1.25rem;font-weight:700;color:#3b82f6;min-width:50px;">28%</span>
+            </div>
+            <div class="d-flex justify-content-between mt-1">
+              <span style="font-size:.7rem;color:#dc2626;">Control Time</span>
+              <span style="font-size:.7rem;color:#3b82f6;">Control Time</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fighters Roster – SmartFight</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="sf-navbar navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">SMART<span>FIGHT</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sfNavCollapse">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="sfNavCollapse">
+      <ul class="navbar-nav mx-auto gap-1">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="matches.html">Events</a></li>
+        <li class="nav-item"><a class="nav-link active" href="team.html">Fighters</a></li>
+        <li class="nav-item"><a class="nav-link" href="blog.html">News</a></li>
+        <li class="nav-item"><a class="nav-link" href="gallery.html">Gallery</a></li>
+        <li class="nav-item"><a class="nav-link live-badge-nav" href="live-stream.html">Live</a></li>
+        <li class="nav-item"><a class="nav-link" href="predictions.html">Predictions</a></li>
+        <li class="nav-item"><a class="nav-link" href="booking.html">Bookings</a></li>
+      </ul>
+      <div class="nav-actions d-flex align-items-center gap-2 mt-2 mt-lg-0">
+        <a href="#" class="btn btn-sf-ghost">Login</a>
+        <a href="#" class="btn btn-sf-primary">Register</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== PAGE HEADER ===== -->
+<div class="page-header">
+  <div class="container">
+    <div class="breadcrumb-sf">
+      <a href="index.html">Home</a><span class="sep"><i class="fa-solid fa-chevron-right" style="font-size:0.55rem;"></i></span>
+      <span>Fighters</span>
+    </div>
+    <h1>Fighter Roster</h1>
+    <p>World-class athletes competing across all weight divisions.</p>
+  </div>
+</div>
+
+<!-- ===== FILTER BAR ===== -->
+<section style="background:var(--bg-surface); border-bottom:1px solid var(--border-color); padding:20px 0;">
+  <div class="container">
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+      <span style="font-size:0.78rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted);">Division:</span>
+      <button class="btn btn-sf-primary" style="padding:6px 16px; font-size:0.78rem;">All</button>
+      <button class="btn btn-sf-outline" style="padding:6px 16px; font-size:0.78rem;">Heavyweight</button>
+      <button class="btn btn-sf-outline" style="padding:6px 16px; font-size:0.78rem;">Lt. Heavyweight</button>
+      <button class="btn btn-sf-outline" style="padding:6px 16px; font-size:0.78rem;">Middleweight</button>
+      <button class="btn btn-sf-outline" style="padding:6px 16px; font-size:0.78rem;">Welterweight</button>
+      <button class="btn btn-sf-outline" style="padding:6px 16px; font-size:0.78rem;">Lightweight</button>
+      <div class="ms-auto" style="position:relative;">
+        <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.8rem;"></i>
+        <input type="text" class="sf-input" placeholder="Search fighters..." style="padding-left:34px; width:200px; font-size:0.85rem; padding-top:9px; padding-bottom:9px;" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURED FIGHTER BANNER ===== -->
+<section style="padding:40px 0; background:linear-gradient(135deg, var(--bg-surface) 0%, rgba(220,38,38,0.08) 100%); border-bottom:1px solid var(--border-color);">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-md-3 col-sm-4 text-center">
+        <img src="https://placehold.co/220x280/18181b/dc2626?text=Marcus+Santos" alt="Marcus Santos" style="border-radius:var(--radius-xl); border:2px solid var(--primary); max-width:200px;" />
+      </div>
+      <div class="col-md-9 col-sm-8">
+        <span style="font-size:0.72rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--gold); display:block; margin-bottom:8px;"><i class="fa-solid fa-crown me-1"></i> Heavyweight Champion</span>
+        <h2 style="font-size:clamp(1.6rem,4vw,2.8rem); margin-bottom:4px;">Marcus "The Lion" Santos</h2>
+        <p style="color:var(--text-muted); margin-bottom:20px; font-size:0.95rem;">The reigning heavyweight champion with a devastating knockout record. Santos enters UFC 310 as the heavy favorite looking to make his 6th consecutive title defense.</p>
+        <div style="display:flex; gap:24px; flex-wrap:wrap; margin-bottom:20px;">
+          <div class="stat-block" style="min-width:80px;"><span class="stat-val" style="color:#22c55e;">24</span><span class="stat-key">Wins</span></div>
+          <div class="stat-block" style="min-width:80px;"><span class="stat-val" style="color:var(--primary);">3</span><span class="stat-key">Losses</span></div>
+          <div class="stat-block" style="min-width:80px;"><span class="stat-val" style="color:var(--gold);">1</span><span class="stat-key">Draws</span></div>
+          <div class="stat-block" style="min-width:80px;"><span class="stat-val">18</span><span class="stat-key">KO/TKOs</span></div>
+        </div>
+        <a href="team-details.html" class="btn btn-sf-primary"><i class="fa-solid fa-user"></i> Full Profile</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FIGHTERS GRID ===== -->
+<section class="section-pad">
+  <div class="container">
+    <!-- Heavyweight -->
+    <div class="section-heading mb-4">
+      <span class="label">265 lbs</span>
+      <h3 style="font-size:1.4rem;">Heavyweight Division</h3>
+    </div>
+
+    <div class="row g-4 mb-5">
+      <div class="col-sm-6 col-md-4 col-xl-3">
+        <a href="team-details.html" style="text-decoration:none; display:block;">
+          <div class="fighter-card">
+            <div class="fighter-card-img-wrap">
+              <img src="https://placehold.co/300x400/18181b/dc2626?text=Marcus+Santos" alt="Marcus Santos" />
+              <div class="fighter-card-overlay"></div>
+              <div style="position:absolute; top:12px; left:12px; z-index:3;">
+                <span style="background:var(--gold); color:#000; font-size:0.6rem; font-weight:700; padding:3px 8px; border-radius:99px; letter-spacing:0.08em; text-transform:uppercase;"><i class="fa-solid fa-crown me-1"></i>Champ</span>
+              </div>
+            </div>
+            <div class="fighter-card-body">
+              <div class="fighter-name">Marcus Santos</div>
+              <div class="fighter-nickname">"The Lion"</div>
+              <span class="badge-weight">Heavyweight</span>
+              <div class="fighter-record">
+                <div class="record-item wins"><span class="rec-num">24</span><span class="rec-label">Wins</span></div>
+                <div class="record-item losses"><span class="rec-num">3</span><span class="rec-label">Loss</span></div>
+                <div class="record-item draws"><span class="rec-num">1</span><span class="rec-label">Draw</span></div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-sm-6 col-md-4 col-xl-3">
+        <a href="team-details.html" style="text-decoration:none; display:block;">
+          <div class="fighter-card">
+            <div class="fighter-card-img-wrap">
+              <img src="https://placehold.co/300x400/18181b/c9a227?text=Kyle+Jensen" alt="Kyle Jensen" />
+              <div class="fighter-card-overlay"></div>
+              <div style="position:absolute; top:12px; left:12px; z-index:3;">
+                <span style="background:var(--border-light); color:var(--text-primary); font-size:0.6rem; font-weight:700; padding:3px 8px; border-radius:99px; letter-spacing:0.08em; text-transform:uppercase;">#1 Contender</span>
+              </div>
+            </div>
+            <div class="fighter-card-body">
+              <div class="fighter-name">Kyle Jensen</div>
+              <div class="fighter-nickname">"Ice Cold"</div>
+              <span class="badge-weight">Heavyweight</span>
+              <div class="fighter-record">
+                <div class="record-item wins"><span class="rec-num">19</span><span class="rec-label">Wins</span></div>
+                <div class="record-item losses"><span class="rec-num">2</span><span class="rec-label">Loss</span></div>
+                <div class="record-item draws"><span class="rec-num">0</span><span class="rec-label">Draw</span></div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-sm-6 col-md-4 col-xl-3">
+        <a href="team-details.html" style="text-decoration:none; display:block;">
+          <div class="fighter-card">
+            <div class="fighter-card-img-wrap">
+              <img src="https://placehold.co/300x400/18181b/dc2626?text=Brad+Harper" alt="Brad Harper" />
+              <div class="fighter-card-overlay"></div>
+            </div>
+            <div class="fighter-card-body">
+              <div class="fighter-name">Brad Harper</div>
+              <div class="fighter-nickname">"The Bulldozer"</div>
+              <span class="badge-weight">Heavyweight</span>
+              <div class="fighter-record">
+                <div class="record-item wins"><span class="rec-num">15</span><span class="rec-label">Wins</span></div>
+                <div class="record-item losses"><span class="rec-num">4</span><span class="rec-label">Loss</span></div>
+                <div class="record-item draws"><span class="rec-num">0</span><span class="rec-label">Draw</span></div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-sm-6 col-md-4 col-xl-3">
+        <a href="team-details.html" style="text-decoration:none; display:block;">
+          <div class="fighter-card">
+            <div class="fighter-card-img-wrap">
+              <img src="https://placehold.co/300x400/18181b/c9a227?text=Igor+Petrov" alt="Igor Petrov" />
+              <div class="fighter-card-overlay"></div>
+            </div>
+            <div class="fighter-card-body">
+              <div class="fighter-name">Igor Petrov</div>
+              <div class="fighter-nickname">"The Bear"</div>
+              <span class="badge-weight">Heavyweight</span>
+              <div class="fighter-record">
+                <div class="record-item wins"><span class="rec-num">12</span><span class="rec-label">Wins</span></div>
+                <div class="record-item losses"><span class="rec-num">6</span><span class="rec-label">Loss</span></div>
+                <div class="record-item draws"><span class="rec-num">1</span><span class="rec-label">Draw</span></div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Middleweight -->
+    <div class="section-heading mb-4">
+      <span class="label">185 lbs</span>
+      <h3 style="font-size:1.4rem;">Middleweight Division</h3>
+    </div>
+
+    <div class="row g-4 mb-5">
+      <div class="col-sm-6 col-md-4 col-xl-3">
+        <a href="team-details.html" style="text-decoration:none; display:block;">
+          <div class="fighter-card">
+            <div class="fighter-card-img-wrap">
+              <img src="https://placehold.co/300x400/18181b/dc2626?text=Rafa+Morales" alt="Rafa Morales" />
+              <div class="fighter-card-overlay"></div>
+            </div>
+            <div class="fighter-card-body">
+              <div class="fighter-name">Rafa Morales</div>
+              <div class="fighter-nickname">"El Toro"</div>
+              <span class="badge-weight">Middleweight</span>
+              <div class="fighter-record">
+                <div class="record-item wins"><span class="rec-num">21</span><span class="rec-label">Wins</span></div>
+                <div class="record-item losses"><span class="rec-num">4</span><span class="rec-label">Loss</span></div>
+                <div class="record-item draws"><span class="rec-num">0</span><span class="rec-label">Draw</span></div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-sm-6 col-md-4 col-xl-3">
+        <a href="team-details.html" style="text-decoration:none; display:block;">
+          <div class="fighter-card">
+            <div class="fighter-card-img-wrap">
+              <img src="https://placehold.co/300x400/18181b/c9a227?text=Jake+Williams" alt="Jake Williams" />
+              <div class="fighter-card-overlay"></div>
+            </div>
+            <div class="fighter-card-body">
+              <div class="fighter-name">Jake Williams</div>
+              <div class="fighter-nickname">"The Tank"</div>
+              <span class="badge-weight">Middleweight</span>
+              <div class="fighter-record">
+                <div class="record-item wins"><span class="rec-num">17</span><span class="rec-label">Wins</span></div>
+                <div class="record-item losses"><span class="rec-num">5</span><span class="rec-label">Loss</span></div>
+                <div class="record-item draws"><span class="rec-num">2</span><span class="rec-label">Draw</span></div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-sm-6 col-md-4 col-xl-3">
+        <a href="team-details.html" style="text-decoration:none; display:block;">
+          <div class="fighter-card">
+            <div class="fighter-card-img-wrap">
+              <img src="https://placehold.co/300x400/18181b/dc2626?text=Luis+Castillo" alt="Luis Castillo" />
+              <div class="fighter-card-overlay"></div>
+            </div>
+            <div class="fighter-card-body">
+              <div class="fighter-name">Luis Castillo</div>
+              <div class="fighter-nickname">"El Matador"</div>
+              <span class="badge-weight">Middleweight</span>
+              <div class="fighter-record">
+                <div class="record-item wins"><span class="rec-num">16</span><span class="rec-label">Wins</span></div>
+                <div class="record-item losses"><span class="rec-num">3</span><span class="rec-label">Loss</span></div>
+                <div class="record-item draws"><span class="rec-num">0</span><span class="rec-label">Draw</span></div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-sm-6 col-md-4 col-xl-3">
+        <a href="team-details.html" style="text-decoration:none; display:block;">
+          <div class="fighter-card">
+            <div class="fighter-card-img-wrap">
+              <img src="https://placehold.co/300x400/18181b/c9a227?text=Sam+O'Brien" alt="Sam O'Brien" />
+              <div class="fighter-card-overlay"></div>
+            </div>
+            <div class="fighter-card-body">
+              <div class="fighter-name">Sam O'Brien</div>
+              <div class="fighter-nickname">"The Surgeon"</div>
+              <span class="badge-weight">Middleweight</span>
+              <div class="fighter-record">
+                <div class="record-item wins"><span class="rec-num">13</span><span class="rec-label">Wins</span></div>
+                <div class="record-item losses"><span class="rec-num">2</span><span class="rec-label">Loss</span></div>
+                <div class="record-item draws"><span class="rec-num">0</span><span class="rec-label">Draw</span></div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Welterweight -->
+    <div class="section-heading mb-4">
+      <span class="label">170 lbs</span>
+      <h3 style="font-size:1.4rem;">Welterweight Division</h3>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-sm-6 col-md-4 col-xl-3">
+        <a href="team-details.html" style="text-decoration:none; display:block;">
+          <div class="fighter-card">
+            <div class="fighter-card-img-wrap">
+              <img src="https://placehold.co/300x400/18181b/dc2626?text=Alex+Rivera" alt="Alex Rivera" />
+              <div class="fighter-card-overlay"></div>
+            </div>
+            <div class="fighter-card-body">
+              <div class="fighter-name">Alex Rivera</div>
+              <div class="fighter-nickname">"Lightning Rod"</div>
+              <span class="badge-weight">Welterweight</span>
+              <div class="fighter-record">
+                <div class="record-item wins"><span class="rec-num">14</span><span class="rec-label">Wins</span></div>
+                <div class="record-item losses"><span class="rec-num">3</span><span class="rec-label">Loss</span></div>
+                <div class="record-item draws"><span class="rec-num">0</span><span class="rec-label">Draw</span></div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-sm-6 col-md-4 col-xl-3">
+        <a href="team-details.html" style="text-decoration:none; display:block;">
+          <div class="fighter-card">
+            <div class="fighter-card-img-wrap">
+              <img src="https://placehold.co/300x400/18181b/c9a227?text=Shin+Nakamura" alt="Shin Nakamura" />
+              <div class="fighter-card-overlay"></div>
+            </div>
+            <div class="fighter-card-body">
+              <div class="fighter-name">Shin Nakamura</div>
+              <div class="fighter-nickname">"The Samurai"</div>
+              <span class="badge-weight">Welterweight</span>
+              <div class="fighter-record">
+                <div class="record-item wins"><span class="rec-num">11</span><span class="rec-label">Wins</span></div>
+                <div class="record-item losses"><span class="rec-num">2</span><span class="rec-label">Loss</span></div>
+                <div class="record-item draws"><span class="rec-num">0</span><span class="rec-label">Draw</span></div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-sm-6 col-md-4 col-xl-3">
+        <a href="team-details.html" style="text-decoration:none; display:block;">
+          <div class="fighter-card">
+            <div class="fighter-card-img-wrap">
+              <img src="https://placehold.co/300x400/18181b/dc2626?text=Tyler+Cruz" alt="Tyler Cruz" />
+              <div class="fighter-card-overlay"></div>
+            </div>
+            <div class="fighter-card-body">
+              <div class="fighter-name">Tyler Cruz</div>
+              <div class="fighter-nickname">"Bone Crusher"</div>
+              <span class="badge-weight">Lightweight</span>
+              <div class="fighter-record">
+                <div class="record-item wins"><span class="rec-num">10</span><span class="rec-label">Wins</span></div>
+                <div class="record-item losses"><span class="rec-num">1</span><span class="rec-label">Loss</span></div>
+                <div class="record-item draws"><span class="rec-num">0</span><span class="rec-label">Draw</span></div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-sm-6 col-md-4 col-xl-3">
+        <a href="team-details.html" style="text-decoration:none; display:block;">
+          <div class="fighter-card">
+            <div class="fighter-card-img-wrap">
+              <img src="https://placehold.co/300x400/18181b/c9a227?text=Marco+Ortiz" alt="Marco Ortiz" />
+              <div class="fighter-card-overlay"></div>
+            </div>
+            <div class="fighter-card-body">
+              <div class="fighter-name">Marco Ortiz</div>
+              <div class="fighter-nickname">"The Machine"</div>
+              <span class="badge-weight">Lightweight</span>
+              <div class="fighter-record">
+                <div class="record-item wins"><span class="rec-num">9</span><span class="rec-label">Wins</span></div>
+                <div class="record-item losses"><span class="rec-num">2</span><span class="rec-label">Loss</span></div>
+                <div class="record-item draws"><span class="rec-num">0</span><span class="rec-label">Draw</span></div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="sf-footer">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-4 col-md-6">
+        <a href="index.html" class="footer-logo">SMART<span>FIGHT</span></a>
+        <p class="footer-about">The premier destination for UFC and MMA fans worldwide.</p>
+        <div class="social-links">
+          <a href="#" class="social-link"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-discord"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Home</a></li>
+          <li><a href="matches.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Events</a></li>
+          <li><a href="team.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Fighters</a></li>
+          <li><a href="blog.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> News</a></li>
+          <li><a href="contact.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Contact</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Features</div>
+        <ul class="footer-links">
+          <li><a href="live-stream.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Live Stream</a></li>
+          <li><a href="predictions.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Predictions</a></li>
+          <li><a href="leaderboard.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Leaderboard</a></li>
+          <li><a href="booking.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Book Tickets</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="footer-col-title">Newsletter</div>
+        <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:12px;">Get fight cards and results delivered to your inbox.</p>
+        <div class="newsletter-form">
+          <input type="email" placeholder="Your email address" />
+          <button type="button"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 SmartFight. All rights reserved.</p>
+      <div style="display:flex; gap:20px;"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

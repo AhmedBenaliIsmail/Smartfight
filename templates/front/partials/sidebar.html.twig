@@ -1,0 +1,139 @@
+{% set route = app.request.attributes.get('_route') %}
+<aside class="sf-sidebar sf-collapsed" id="sfSidebar">
+
+    <button class="sf-sidebar-toggle" id="sfSidebarToggle" aria-label="Toggle sidebar">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <nav class="sf-sidebar-nav">
+
+        <a href="{{ path('app_fan_dashboard') }}"
+           class="sf-sidebar-link{{ route == 'app_fan_dashboard' ? ' active' : '' }}"
+           title="Dashboard">
+            <i class="fa-solid fa-gauge-high"></i>
+            <span class="sf-sidebar-label">Dashboard</span>
+        </a>
+
+        <a href="{{ path('front_blog_index') }}"
+           class="sf-sidebar-link{{ route in ['front_blog_index', 'front_blog_show'] ? ' active' : '' }}"
+           title="Blog">
+            <i class="fa-solid fa-newspaper"></i>
+            <span class="sf-sidebar-label">Blog &amp; News</span>
+        </a>
+
+        <a href="{{ path('front_reaction_index') }}"
+           class="sf-sidebar-link{{ route == 'front_reaction_index' ? ' active' : '' }}"
+           title="Fan Reactions">
+            <i class="fa-solid fa-fire-flame-curved"></i>
+            <span class="sf-sidebar-label">Fan Reactions</span>
+        </a>
+
+        <a href="{{ path('app_predictions') }}"
+           class="sf-sidebar-link{{ route starts with 'app_prediction' ? ' active' : '' }}"
+           title="Predictions">
+            <i class="fa-solid fa-brain"></i>
+            <span class="sf-sidebar-label">Predictions</span>
+        </a>
+
+        <a href="{{ path('app_leaderboard') }}"
+           class="sf-sidebar-link{{ route == 'app_leaderboard' ? ' active' : '' }}"
+           title="Leaderboard">
+            <i class="fa-solid fa-ranking-star"></i>
+            <span class="sf-sidebar-label">Leaderboard</span>
+        </a>
+
+        <div class="sf-sidebar-sep"></div>
+
+        <a href="{{ path('app_fighters') }}"
+           class="sf-sidebar-link{{ route starts with 'app_fighter' ? ' active' : '' }}"
+           title="Boxers">
+            <i class="fa-solid fa-person-running"></i>
+            <span class="sf-sidebar-label">Boxers</span>
+        </a>
+
+        <a href="{{ path('app_events') }}"
+           class="sf-sidebar-link{{ route starts with 'app_event' ? ' active' : '' }}"
+           title="Events">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span class="sf-sidebar-label">Events</span>
+        </a>
+
+        <a href="{{ path('app_results') }}"
+           class="sf-sidebar-link{{ route starts with 'app_result' ? ' active' : '' }}"
+           title="Bout Results">
+            <i class="fa-solid fa-trophy"></i>
+            <span class="sf-sidebar-label">Bout Results</span>
+        </a>
+
+        {% if is_granted('ROLE_USER') %}
+        <div class="sf-sidebar-sep"></div>
+
+        <a href="{{ path('app_stats') }}"
+           class="sf-sidebar-link{{ route starts with 'app_stat' ? ' active' : '' }}"
+           title="Statistics">
+            <i class="fa-solid fa-chart-bar"></i>
+            <span class="sf-sidebar-label">Statistics</span>
+        </a>
+
+        <a href="{{ path('app_performance') }}"
+           class="sf-sidebar-link{{ route starts with 'app_performance' ? ' active' : '' }}"
+           title="Performance">
+            <i class="fa-solid fa-chart-line"></i>
+            <span class="sf-sidebar-label">Performance</span>
+        </a>
+
+        <a href="{{ path('app_rankings') }}"
+           class="sf-sidebar-link{{ route starts with 'app_ranking' ? ' active' : '' }}"
+           title="World Ranking">
+            <i class="fa-solid fa-medal"></i>
+            <span class="sf-sidebar-label">World Ranking</span>
+        </a>
+
+        <div class="sf-sidebar-sep"></div>
+
+        <a href="{{ path('front_booking_index') }}"
+           class="sf-sidebar-link{{ route == 'front_booking_index' ? ' active' : '' }}"
+           title="Book Tickets">
+            <i class="fa-solid fa-ticket"></i>
+            <span class="sf-sidebar-label">Book Tickets</span>
+        </a>
+
+        <a href="{{ path('front_booking_my') }}"
+           class="sf-sidebar-link{{ route == 'front_booking_my' ? ' active' : '' }}"
+           title="My Bookings">
+            <i class="fa-solid fa-calendar-check"></i>
+            <span class="sf-sidebar-label">My Bookings</span>
+        </a>
+        {% endif %}
+
+        {% if app.user %}
+        <div class="sf-sidebar-sep"></div>
+
+        <a href="{{ path('app_profile') }}"
+           class="sf-sidebar-link{{ route == 'app_profile' ? ' active' : '' }}"
+           title="Account Settings">
+            <i class="fa-solid fa-user-gear"></i>
+            <span class="sf-sidebar-label">Account Settings</span>
+        </a>
+
+        <a href="#"
+           class="sf-sidebar-link"
+           title="Notifications">
+            <i class="fa-solid fa-bell"></i>
+            <span class="sf-sidebar-label">Notifications</span>
+        </a>
+        {% endif %}
+
+    </nav>
+
+    {% if app.user %}
+    <div class="sf-sidebar-footer">
+        <div class="sf-sidebar-avatar">{{ app.user.username|first|upper }}</div>
+        <div class="sf-sidebar-user-info">
+            <div class="sf-sidebar-uname">{{ app.user.username }}</div>
+            <div class="sf-sidebar-pts">{{ app.user.predictionPoints|default(0) }} PTS</div>
+        </div>
+    </div>
+    {% endif %}
+
+</aside>

@@ -1,0 +1,155 @@
+{% extends 'front/base_front.html.twig' %}
+
+{% block title %}Fantasy Leaderboard — SmartFight{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Global Leaderboard</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Rankings for the current boxing season</p>
+    </div>
+    <div class="badge bg-yellow-lt p-2 px-3">
+        <i class="fa-solid fa-crown me-2 text-yellow"></i>Yearly Prize Active
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #27272a;">
+                            <th class="ps-4" style="width: 80px;">Rank</th>
+                            <th>User</th>
+                            <th class="text-center">Total Points</th>
+                            <th class="pe-4 text-end">Tier</th>
+                            {% if is_granted('ROLE_ADMIN') %}
+                            <th class="text-end pe-4">Actions</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            {% set rank = loop.index %}
+                            <tr style="{% if rank <= 3 %}background: rgba(201,162,39, 0.05);{% endif %} border-bottom: 1px solid #27272a;">
+                                <td class="ps-4 fw-bold">
+                                    {% if rank == 1 %}
+                                        <span class="text-yellow" style="font-size: 1.2rem;">1 <i class="fa-solid fa-medal ms-1"></i></span>
+                                    {% elseif rank == 2 %}
+                                        <span class="text-secondary-lt" style="font-size: 1.1rem;">2 <i class="fa-solid fa-medal ms-1"></i></span>
+                                    {% elseif rank == 3 %}
+                                        <span class="text-orange" style="font-size: 1rem;">3 <i class="fa-solid fa-medal ms-1"></i></span>
+                                    {% else %}
+                                        {{ rank }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar avatar-sm me-3" style="background:#27272a; color:#a1a1aa;">{{ user.username|first|upper }}</div>
+                                        <div>
+                                            <div class="fw-bold" style="color:#fafafa;">{{ user.username }}</div>
+                                            <div class="text-muted small">Joined {{ user.createdDate|date('M Y') }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-blue-lt px-3 py-2" style="font-size: 1rem;">{{ user.predictionPoints }}</span>
+                                </td>
+                                <td class="pe-4 text-end">
+                                    {% if rank <= 3 %}
+                                        <span class="badge bg-yellow-lt"><i class="fa-solid fa-star me-1"></i>VIP CONTENDER</span>
+                                    {% elseif user.predictionPoints > 500 %}
+                                        <span class="badge bg-purple-lt">PRO ANALYST</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary-lt">CONTENDER</span>
+                                    {% endif %}
+                                </td>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                <td class="pe-4 text-end">
+                                    <a href="{{ path('app_users', {q: user.username}) }}" class="btn btn-sm btn-outline-info" style="border-radius: 4px; font-size: 0.75rem;">
+                                        <i class="fa-solid fa-eye me-1"></i>Monitor
+                                    </a>
+                                </td>
+                                {% endif %}
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="{% if is_granted('ROLE_ADMIN') %}5{% else %}4{% endif %}" class="text-center p-5">No prediction data available yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card mb-4" style="background:#18181b; border: 1px solid #c9a227; box-shadow: 0 0 15px rgba(201,162,39, 0.1);">
+            <div class="card-header bg-yellow-lt border-0">
+                <h3 class="card-title mb-0" style="color:#c9a227; font-weight: 700;"><i class="fa-solid fa-gift me-2"></i>Yearly Prize Pool</h3>
+            </div>
+            <div class="card-body p-4">
+                <p class="mb-4" style="color:#fafafa; line-height: 1.6;">The top 3 performers at the end of the 2026 Season will receive exclusive rewards:</p>
+                <div class="d-flex gap-3 mb-3">
+                    <div class="bg-yellow-lt rounded d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; min-width: 48px;">
+                        <i class="fa-solid fa-ticket fa-xl text-yellow"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold" style="color:#fafafa;">VIP Front Row Seats</div>
+                        <div class="text-muted small">For the World Champions Night Event</div>
+                    </div>
+                </div>
+                <div class="d-flex gap-3 mb-3">
+                    <div class="bg-blue-lt rounded d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; min-width: 48px;">
+                        <i class="fa-solid fa-plane fa-xl text-blue"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold" style="color:#fafafa;">All-Expense Paid Trip</div>
+                        <div class="text-muted small">To Las Vegas for the Title Unification</div>
+                    </div>
+                </div>
+                <div class="d-flex gap-3">
+                    <div class="bg-purple-lt rounded d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; min-width: 48px;">
+                        <i class="fa-solid fa-user-shield fa-xl text-purple"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold" style="color:#fafafa;">Verified Analyst Badge</div>
+                        <div class="text-muted small">Special status across the platform</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header border-0">
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-circle-info me-2 text-blue"></i>How to Earn Points</h3>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span style="color:#fafafa;">Correct Winner</span>
+                        <span class="fw-bold text-success">+10 pts</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span style="color:#fafafa;">Correct Method</span>
+                        <span class="fw-bold text-success">+10 pts</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span style="color:#fafafa;">Correct Round (KO)</span>
+                        <span class="fw-bold text-success">+20 pts</span>
+                    </div>
+                </div>
+                <div class="mb-0">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span style="color:#fafafa;">Perfect Stoppage Bonus</span>
+                        <span class="fw-bold text-success">+10 pts</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

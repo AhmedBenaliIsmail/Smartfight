@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fight Predictions – SmartFight</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── Page Hero ── */
+    .page-hero {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      padding: 64px 0 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(220,38,38,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .page-hero .eyebrow {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+    .page-hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 12px; }
+    .page-hero h1 span { color: var(--primary); }
+    .page-hero p { color: var(--text-muted); max-width: 520px; }
+
+    /* ── Tab Navigation ── */
+    .sf-tab-nav {
+      display: flex;
+      gap: 4px;
+      border-bottom: 2px solid var(--border-color);
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+    .sf-tab-btn {
+      background: transparent;
+      border: none;
+      padding: 12px 22px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+    .sf-tab-btn:hover { color: var(--text-primary); }
+    .sf-tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    .sf-tab-pane { display: none; }
+    .sf-tab-pane.active { display: block; }
+
+    /* ── Leaderboard Table ── */
+    .sf-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .sf-table thead th {
+      background: var(--bg-surface);
+      padding: 12px 16px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 2px solid var(--border-color);
+      white-space: nowrap;
+    }
+    .sf-table tbody tr {
+      border-bottom: 1px solid var(--border-color);
+      transition: background 0.15s;
+    }
+    .sf-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+    .sf-table tbody td {
+      padding: 14px 16px;
+      font-size: 0.88rem;
+      vertical-align: middle;
+    }
+    .sf-table-wrap {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      overflow-x: auto;
+    }
+
+    /* Rank badges */
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+    .rank-gold   { background: #c9a227; color: #000; }
+    .rank-silver { background: #9ca3af; color: #000; }
+    .rank-bronze { background: #92400e; color: #fff; }
+    .rank-other  { background: var(--bg-dark); color: var(--text-muted); border: 1px solid var(--border-color); }
+
+    /* Accuracy bar */
+    .acc-bar-wrap { display:flex; align-items:center; gap:8px; }
+    .acc-bar-bg { flex:1; height:6px; background:var(--border-color); border-radius:3px; min-width:60px; }
+    .acc-bar-fill { height:6px; border-radius:3px; background:var(--primary); }
+    .acc-val { font-size:0.82rem; font-weight:700; color:var(--text-primary); white-space:nowrap; }
+
+    /* Result badges */
+    .badge-correct { background: rgba(5,150,105,0.15); color: #34d399; border: 1px solid rgba(5,150,105,0.3); padding: 4px 12px; border-radius: 4px; font-size:0.75rem; font-weight:700; }
+    .badge-wrong   { background: rgba(220,38,38,0.12); color: var(--primary); border: 1px solid rgba(220,38,38,0.25); padding: 4px 12px; border-radius: 4px; font-size:0.75rem; font-weight:700; }
+    .badge-pending { background: rgba(201,162,39,0.12); color: var(--gold); border: 1px solid rgba(201,162,39,0.25); padding: 4px 12px; border-radius: 4px; font-size:0.75rem; font-weight:700; }
+
+    /* ── Make a Pick ── */
+    .pick-form {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+    .pick-form h4 { font-size: 0.9rem; margin-bottom: 18px; }
+    .sf-form-label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .sf-select-pick {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-primary);
+      padding: 11px 42px 11px 14px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+      appearance: none;
+      width: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23a1a1aa' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      cursor: pointer;
+    }
+    .sf-select-pick:focus { border-color: var(--primary); }
+    .sf-select-pick option { background: var(--bg-surface); }
+
+    /* Fight pick row */
+    .fight-pick-card {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 14px;
+      transition: border-color 0.2s;
+    }
+    .fight-pick-card:hover { border-color: rgba(220,38,38,0.4); }
+    .fight-pick-header {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+    .fighter-pick-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .fighter-pick-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 120px;
+      max-width: 200px;
+    }
+    .fighter-pick-option.blue { justify-content: flex-end; flex-direction: row-reverse; }
+    .fighter-pick-option label {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .fighter-pick-option input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .vs-pick {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+    .method-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .method-btn {
+      flex: 1;
+      min-width: 80px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 12px;
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .method-btn:hover, .method-btn.selected {
+      border-color: var(--primary);
+      background: rgba(220,38,38,0.12);
+      color: var(--primary);
+    }
+
+    /* User stats bar */
+    .user-stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 767px) { .user-stats-bar { grid-template-columns: repeat(2, 1fr); } }
+    .user-stat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 18px;
+      text-align: center;
+    }
+    .user-stat-num {
+      font-size: 1.6rem;
+      font-weight: 700;
+      font-family: var(--font-heading);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .user-stat-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="sf-navbar navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">SMART<span>FIGHT</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sfNavCollapse"
+            aria-controls="sfNavCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="sfNavCollapse">
+      <ul class="navbar-nav mx-auto gap-1">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="matches.html">Events</a></li>
+        <li class="nav-item"><a class="nav-link" href="team.html">Fighters</a></li>
+        <li class="nav-item"><a class="nav-link" href="blog.html">News</a></li>
+        <li class="nav-item"><a class="nav-link" href="gallery.html">Gallery</a></li>
+        <li class="nav-item"><a class="nav-link live-badge-nav" href="live-stream.html">Live</a></li>
+        <li class="nav-item"><a class="nav-link active" href="predictions.html">Predictions</a></li>
+        <li class="nav-item"><a class="nav-link" href="booking.html">Bookings</a></li>
+      </ul>
+      <div class="nav-actions d-flex align-items-center gap-2 mt-2 mt-lg-0">
+        <a href="#" class="btn btn-sf-ghost">Login</a>
+        <a href="#" class="btn btn-sf-primary">Register</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== PAGE HERO ===== -->
+<section class="page-hero">
+  <div class="container">
+    <div class="eyebrow">Prove Your Fight IQ</div>
+    <h1>FIGHT <span>PREDICTIONS</span></h1>
+    <p>Pick the winners, climb the leaderboard, and earn points for every correct call. Can you predict the next knockout?</p>
+  </div>
+</section>
+
+<!-- ===== PREDICTIONS SECTION ===== -->
+<section class="section-pad">
+  <div class="container">
+
+    <!-- Tab Nav -->
+    <div class="sf-tab-nav">
+      <button class="sf-tab-btn active" data-tab="leaderboard"><i class="fa-solid fa-ranking-star"></i> Leaderboard</button>
+      <button class="sf-tab-btn" data-tab="my-predictions"><i class="fa-solid fa-list-check"></i> My Predictions</button>
+      <button class="sf-tab-btn" data-tab="make-pick"><i class="fa-solid fa-crosshairs"></i> Make a Pick</button>
+    </div>
+
+    <!-- TAB 1: Leaderboard -->
+    <div class="sf-tab-pane active" id="tab-leaderboard">
+      <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+        <div>
+          <span class="label">Top Predictors</span>
+          <h2 class="heading-line">PREDICTION LEADERBOARD</h2>
+        </div>
+        <a href="leaderboard.html" class="btn btn-sf-outline"><i class="fa-solid fa-trophy"></i> Full Leaderboard</a>
+      </div>
+      <div class="sf-table-wrap">
+        <table class="sf-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Username</th>
+              <th>Points</th>
+              <th>Accuracy</th>
+              <th>Predictions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="rank-badge rank-gold">1</span></td>
+              <td><strong style="color:var(--gold);">FightOracle_88</strong></td>
+              <td><span style="color:var(--gold); font-weight:700;">4,820</span></td>
+              <td>
+                <div class="acc-bar-wrap">
+                  <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:89%;background:var(--gold);"></div></div>
+                  <span class="acc-val" style="color:var(--gold);">89%</span>
+                </div>
+              </td>
+              <td style="color:var(--text-muted);">108</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge rank-silver">2</span></td>
+              <td><strong>IronFistIQ</strong></td>
+              <td style="font-weight:700;">4,615</td>
+              <td>
+                <div class="acc-bar-wrap">
+                  <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:85%;background:#9ca3af;"></div></div>
+                  <span class="acc-val">85%</span>
+                </div>
+              </td>
+              <td style="color:var(--text-muted);">97</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge rank-bronze">3</span></td>
+              <td><strong>OctagonProphet</strong></td>
+              <td style="font-weight:700;">4,390</td>
+              <td>
+                <div class="acc-bar-wrap">
+                  <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:82%;"></div></div>
+                  <span class="acc-val">82%</span>
+                </div>
+              </td>
+              <td style="color:var(--text-muted);">89</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge rank-other">4</span></td>
+              <td>KnockoutKing_24</td>
+              <td style="font-weight:700;">4,105</td>
+              <td>
+                <div class="acc-bar-wrap">
+                  <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:79%;"></div></div>
+                  <span class="acc-val">79%</span>
+                </div>
+              </td>
+              <td style="color:var(--text-muted);">91</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge rank-other">5</span></td>
+              <td>SilkFinisher</td>
+              <td style="font-weight:700;">3,880</td>
+              <td>
+                <div class="acc-bar-wrap">
+                  <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:77%;"></div></div>
+                  <span class="acc-val">77%</span>
+                </div>
+              </td>
+              <td style="color:var(--text-muted);">84</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge rank-other">6</span></td>
+              <td>CageSide_Expert</td>
+              <td style="font-weight:700;">3,720</td>
+              <td>
+                <div class="acc-bar-wrap">
+                  <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:74%;"></div></div>
+                  <span class="acc-val">74%</span>
+                </div>
+              </td>
+              <td style="color:var(--text-muted);">80</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge rank-other">7</span></td>
+              <td>SubmissionSpecialist</td>
+              <td style="font-weight:700;">3,540</td>
+              <td>
+                <div class="acc-bar-wrap">
+                  <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:72%;"></div></div>
+                  <span class="acc-val">72%</span>
+                </div>
+              </td>
+              <td style="color:var(--text-muted);">78</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge rank-other">8</span></td>
+              <td>GrappleGuru</td>
+              <td style="font-weight:700;">3,310</td>
+              <td>
+                <div class="acc-bar-wrap">
+                  <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:69%;"></div></div>
+                  <span class="acc-val">69%</span>
+                </div>
+              </td>
+              <td style="color:var(--text-muted);">72</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge rank-other">9</span></td>
+              <td>StrikeZone_Pro</td>
+              <td style="font-weight:700;">3,190</td>
+              <td>
+                <div class="acc-bar-wrap">
+                  <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:67%;"></div></div>
+                  <span class="acc-val">67%</span>
+                </div>
+              </td>
+              <td style="color:var(--text-muted);">70</td>
+            </tr>
+            <tr>
+              <td><span class="rank-badge rank-other">10</span></td>
+              <td>RingsideSage</td>
+              <td style="font-weight:700;">3,050</td>
+              <td>
+                <div class="acc-bar-wrap">
+                  <div class="acc-bar-bg"><div class="acc-bar-fill" style="width:65%;"></div></div>
+                  <span class="acc-val">65%</span>
+                </div>
+              </td>
+              <td style="color:var(--text-muted);">68</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 2: My Predictions -->
+    <div class="sf-tab-pane" id="tab-my-predictions">
+      <!-- User Stats -->
+      <div class="user-stats-bar">
+        <div class="user-stat-card">
+          <div class="user-stat-num" style="color:var(--gold);">1,240</div>
+          <div class="user-stat-label">Total Points</div>
+        </div>
+        <div class="user-stat-card">
+          <div class="user-stat-num" style="color:var(--primary);">34</div>
+          <div class="user-stat-label">Predictions Made</div>
+        </div>
+        <div class="user-stat-card">
+          <div class="user-stat-num" style="color:#34d399;">26</div>
+          <div class="user-stat-label">Correct Picks</div>
+        </div>
+        <div class="user-stat-card">
+          <div class="user-stat-num">76%</div>
+          <div class="user-stat-label">Accuracy</div>
+        </div>
+      </div>
+
+      <div class="sf-table-wrap">
+        <table class="sf-table">
+          <thead>
+            <tr>
+              <th>Fight</th>
+              <th>Event</th>
+              <th>Your Pick</th>
+              <th>Result</th>
+              <th>Points</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Thompson vs Diaz</strong><br><small style="color:var(--text-muted);">Welterweight</small></td>
+              <td style="color:var(--text-muted); font-size:0.82rem;">SmartFight 45</td>
+              <td>Thompson by TKO</td>
+              <td><span class="badge-correct"><i class="fa-solid fa-check"></i> Correct</span></td>
+              <td style="color:var(--gold); font-weight:700;">+75</td>
+            </tr>
+            <tr>
+              <td><strong>Rosa vs Park</strong><br><small style="color:var(--text-muted);">Featherweight</small></td>
+              <td style="color:var(--text-muted); font-size:0.82rem;">SmartFight 45</td>
+              <td>Park by Decision</td>
+              <td><span class="badge-wrong"><i class="fa-solid fa-xmark"></i> Wrong</span></td>
+              <td style="color:var(--text-muted);">+0</td>
+            </tr>
+            <tr>
+              <td><strong>Evans vs Carter</strong><br><small style="color:var(--text-muted);">Lightweight</small></td>
+              <td style="color:var(--text-muted); font-size:0.82rem;">SmartFight 45</td>
+              <td>Evans by Decision</td>
+              <td><span class="badge-correct"><i class="fa-solid fa-check"></i> Correct</span></td>
+              <td style="color:var(--gold); font-weight:700;">+50</td>
+            </tr>
+            <tr>
+              <td><strong>Santos vs Reyes</strong><br><small style="color:var(--text-muted);">Heavyweight</small></td>
+              <td style="color:var(--text-muted); font-size:0.82rem;">SmartFight 44</td>
+              <td>Santos by KO</td>
+              <td><span class="badge-correct"><i class="fa-solid fa-check"></i> Correct</span></td>
+              <td style="color:var(--gold); font-weight:700;">+100</td>
+            </tr>
+            <tr>
+              <td><strong>Jensen vs Hall</strong><br><small style="color:var(--text-muted);">Heavyweight</small></td>
+              <td style="color:var(--text-muted); font-size:0.82rem;">SmartFight 44</td>
+              <td>Hall by Submission</td>
+              <td><span class="badge-wrong"><i class="fa-solid fa-xmark"></i> Wrong</span></td>
+              <td style="color:var(--text-muted);">+0</td>
+            </tr>
+            <tr>
+              <td><strong>Santos vs Jensen</strong><br><small style="color:var(--text-muted);">Heavyweight Title</small></td>
+              <td style="color:var(--text-muted); font-size:0.82rem;">UFC 310</td>
+              <td>Santos by TKO</td>
+              <td><span class="badge-pending"><i class="fa-regular fa-clock"></i> Pending</span></td>
+              <td style="color:var(--text-muted);">—</td>
+            </tr>
+            <tr>
+              <td><strong>Morales vs Williams</strong><br><small style="color:var(--text-muted);">Middleweight</small></td>
+              <td style="color:var(--text-muted); font-size:0.82rem;">Grand Prix</td>
+              <td>Morales by Decision</td>
+              <td><span class="badge-pending"><i class="fa-regular fa-clock"></i> Pending</span></td>
+              <td style="color:var(--text-muted);">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 3: Make a Pick -->
+    <div class="sf-tab-pane" id="tab-make-pick">
+      <div class="pick-form">
+        <h4><i class="fa-solid fa-calendar-days" style="color:var(--primary); margin-right:8px;"></i> SELECT EVENT</h4>
+        <label class="sf-form-label" for="pickEventSelect">Choose an upcoming event</label>
+        <select class="sf-select-pick" id="pickEventSelect">
+          <option>UFC 310: Night of Champions – May 15, 2026</option>
+          <option>SmartFight Grand Prix – Jun 28, 2026</option>
+          <option>SmartFight 46 – Aug 9, 2026</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <span class="label">Fight Card</span>
+        <h2 class="heading-line" style="font-size:1.3rem;">UFC 310 – PICK YOUR WINNERS</h2>
+      </div>
+
+      <!-- Fight 1: Santos vs Jensen -->
+      <div class="fight-pick-card">
+        <div class="fight-pick-header"><i class="fa-solid fa-star" style="color:var(--gold);"></i> Main Event · Heavyweight Title</div>
+        <div class="fighter-pick-row">
+          <div class="fighter-pick-option red">
+            <input type="radio" name="fight1" id="f1red" value="Santos" />
+            <label for="f1red">Marcus Santos</label>
+          </div>
+          <span class="vs-pick">VS</span>
+          <div class="fighter-pick-option blue">
+            <input type="radio" name="fight1" id="f1blue" value="Jensen" />
+            <label for="f1blue">Kyle Jensen</label>
+          </div>
+        </div>
+        <div class="sf-form-label">Predicted Method</div>
+        <div class="method-row">
+          <button class="method-btn" data-fight="1" data-method="KO/TKO">KO / TKO</button>
+          <button class="method-btn" data-fight="1" data-method="Submission">Submission</button>
+          <button class="method-btn" data-fight="1" data-method="Decision">Decision</button>
+        </div>
+      </div>
+
+      <!-- Fight 2: Morales vs Williams -->
+      <div class="fight-pick-card">
+        <div class="fight-pick-header">Co-Main Event · Middleweight</div>
+        <div class="fighter-pick-row">
+          <div class="fighter-pick-option red">
+            <input type="radio" name="fight2" id="f2red" value="Morales" />
+            <label for="f2red">Rafa Morales</label>
+          </div>
+          <span class="vs-pick">VS</span>
+          <div class="fighter-pick-option blue">
+            <input type="radio" name="fight2" id="f2blue" value="Williams" />
+            <label for="f2blue">Jake Williams</label>
+          </div>
+        </div>
+        <div class="sf-form-label">Predicted Method</div>
+        <div class="method-row">
+          <button class="method-btn" data-fight="2" data-method="KO/TKO">KO / TKO</button>
+          <button class="method-btn" data-fight="2" data-method="Submission">Submission</button>
+          <button class="method-btn" data-fight="2" data-method="Decision">Decision</button>
+        </div>
+      </div>
+
+      <!-- Fight 3 -->
+      <div class="fight-pick-card">
+        <div class="fight-pick-header">Lightweight Bout</div>
+        <div class="fighter-pick-row">
+          <div class="fighter-pick-option red">
+            <input type="radio" name="fight3" id="f3red" value="Evans" />
+            <label for="f3red">Marcus Evans</label>
+          </div>
+          <span class="vs-pick">VS</span>
+          <div class="fighter-pick-option blue">
+            <input type="radio" name="fight3" id="f3blue" value="Park" />
+            <label for="f3blue">Jin-ho Park</label>
+          </div>
+        </div>
+        <div class="sf-form-label">Predicted Method</div>
+        <div class="method-row">
+          <button class="method-btn" data-fight="3" data-method="KO/TKO">KO / TKO</button>
+          <button class="method-btn" data-fight="3" data-method="Submission">Submission</button>
+          <button class="method-btn" data-fight="3" data-method="Decision">Decision</button>
+        </div>
+      </div>
+
+      <!-- Fight 4 -->
+      <div class="fight-pick-card">
+        <div class="fight-pick-header">Welterweight Bout</div>
+        <div class="fighter-pick-row">
+          <div class="fighter-pick-option red">
+            <input type="radio" name="fight4" id="f4red" value="Ward" />
+            <label for="f4red">Tony Ward</label>
+          </div>
+          <span class="vs-pick">VS</span>
+          <div class="fighter-pick-option blue">
+            <input type="radio" name="fight4" id="f4blue" value="Gomez" />
+            <label for="f4blue">Luis Gomez</label>
+          </div>
+        </div>
+        <div class="sf-form-label">Predicted Method</div>
+        <div class="method-row">
+          <button class="method-btn" data-fight="4" data-method="KO/TKO">KO / TKO</button>
+          <button class="method-btn" data-fight="4" data-method="Submission">Submission</button>
+          <button class="method-btn" data-fight="4" data-method="Decision">Decision</button>
+        </div>
+      </div>
+
+      <div style="margin-top:8px;">
+        <button class="btn btn-sf-primary" id="submitPicks" style="min-width:200px;">
+          <i class="fa-solid fa-crosshairs"></i> Submit Predictions
+        </button>
+        <div id="pickSuccess" style="display:none; margin-top:16px; background:rgba(5,150,105,0.12); border:1px solid rgba(5,150,105,0.3); border-radius:8px; padding:14px; color:#34d399; font-size:0.9rem;">
+          <i class="fa-solid fa-circle-check"></i> Predictions submitted! Good luck — picks lock 30 minutes before the event.
+        </div>
+      </div>
+
+    </div><!-- /tab-make-pick -->
+
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="sf-footer">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-4 col-md-6">
+        <a href="index.html" class="footer-logo">SMART<span>FIGHT</span></a>
+        <p class="footer-about">The premier destination for UFC and MMA fans. Live results, fighter profiles, event bookings, and community predictions — all in one place.</p>
+        <div class="social-links">
+          <a href="#" class="social-link" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" class="social-link" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="social-link" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" class="social-link" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#" class="social-link" aria-label="Discord"><i class="fa-brands fa-discord"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Home</a></li>
+          <li><a href="matches.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Events</a></li>
+          <li><a href="team.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Fighters</a></li>
+          <li><a href="blog.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> News</a></li>
+          <li><a href="gallery.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Gallery</a></li>
+          <li><a href="contact.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Contact</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Features</div>
+        <ul class="footer-links">
+          <li><a href="live-stream.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Live Stream</a></li>
+          <li><a href="predictions.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Predictions</a></li>
+          <li><a href="leaderboard.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Leaderboard</a></li>
+          <li><a href="booking.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Book Tickets</a></li>
+          <li><a href="notifications.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Notifications</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="footer-col-title">Newsletter</div>
+        <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:12px;">Get fight cards, results, and exclusive content delivered straight to your inbox.</p>
+        <div class="newsletter-form">
+          <input type="email" placeholder="Your email address" />
+          <button type="button"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+        <p style="font-size:0.72rem; color:var(--text-subtle); margin-top:10px;">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 SmartFight. All rights reserved.</p>
+      <div style="display:flex; gap:20px; flex-wrap:wrap;">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Settings</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/main.js"></script>
+<script>
+  // ── Tab switching ──
+  document.querySelectorAll('.sf-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sf-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.sf-tab-pane').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ── Method button toggle ──
+  document.querySelectorAll('.method-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const fight = btn.dataset.fight;
+      document.querySelectorAll(`.method-btn[data-fight="${fight}"]`).forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    });
+  });
+
+  // ── Submit picks ──
+  document.getElementById('submitPicks').addEventListener('click', () => {
+    document.getElementById('pickSuccess').style.display = 'block';
+    document.getElementById('submitPicks').disabled = true;
+    document.getElementById('submitPicks').textContent = 'Predictions Submitted';
+    window.scrollTo({ top: document.getElementById('submitPicks').offsetTop - 100, behavior: 'smooth' });
+  });
+</script>
+</body>
+</html>

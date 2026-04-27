@@ -1,0 +1,140 @@
+{% extends 'admin/base_admin.html.twig' %}
+{% set breadcrumb_title = 'Predictions' %}
+
+{% block admin_content %}
+<div class="page-header d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h2 class="page-title mb-1" style="font-family:'Oswald',sans-serif;color:#fff;">Fan Predictions</h2>
+        <p class="text-muted mb-0">{{ pagination.getTotalItemCount() }} predictions</p>
+    </div>
+    <a href="{{ path('admin_prediction_score') }}" class="btn" style="background:#dc2626;color:#fff;font-family:'Oswald',sans-serif;">
+        <i class="fa-solid fa-star me-2"></i>Score Fights
+    </a>
+</div>
+
+{# Stats #}
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-body text-center">
+                <div style="font-size:1.8rem;font-weight:700;color:#fff;">{{ stats.total_predictions|default(0) }}</div>
+                <div style="color:#71717a;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;">Total Predictions</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-body text-center">
+                <div style="font-size:1.8rem;font-weight:700;color:#16a34a;">{{ stats.correct_picks|default(0) }}</div>
+                <div style="color:#71717a;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;">Correct Picks</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-body text-center">
+                <div style="font-size:1.8rem;font-weight:700;color:#c9a227;">{{ stats.pending_count|default(0) }}</div>
+                <div style="color:#71717a;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;">Pending</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-body text-center">
+                <div style="font-size:1.8rem;font-weight:700;color:#3b82f6;">{{ stats.participating_fans|default(0) }}</div>
+                <div style="color:#71717a;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;">Fans Playing</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Filters #}
+<div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <input type="text" name="search" class="form-control" placeholder="Search fan name..."
+                       value="{{ filters.search|default('') }}" style="background:#09090b;border-color:#27272a;color:#fff;">
+            </div>
+            <div class="col-md-3">
+                <select name="event" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;">
+                    <option value="">All Events</option>
+                    {% for event in events %}
+                        <option value="{{ event.id }}" {% if filters.event|default('') == (event.id ~ '') %}selected{% endif %}>{{ event.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="result" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;">
+                    <option value="">All Results</option>
+                    <option value="correct" {% if filters.result|default('') == 'correct' %}selected{% endif %}>Correct</option>
+                    <option value="wrong" {% if filters.result|default('') == 'wrong' %}selected{% endif %}>Wrong</option>
+                    <option value="pending" {% if filters.result|default('') == 'pending' %}selected{% endif %}>Pending</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="method" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;">
+                    <option value="">All Methods</option>
+                    {% for m in ['KO','TKO','SUBMISSION','DECISION','DRAW'] %}
+                        <option value="{{ m }}" {% if filters.method|default('') == m %}selected{% endif %}>{{ m }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-secondary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Table #}
+<div class="card" style="background:#18181b;border:1px solid #27272a;">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0" style="--bs-table-bg:#18181b;">
+            <thead>
+                <tr style="border-bottom:1px solid #27272a;">
+                    <th style="color:#71717a;">Fan</th>
+                    <th style="color:#71717a;">Fight</th>
+                    <th style="color:#71717a;">Predicted Winner</th>
+                    <th style="color:#71717a;">Method</th>
+                    <th style="color:#71717a;">Result</th>
+                    <th style="color:#71717a;">Points</th>
+                    <th style="color:#71717a;">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prediction in pagination %}
+                <tr>
+                    <td style="color:#fff;">{{ prediction.fan.fullName }}</td>
+                    <td style="color:#a1a1aa;font-size:.85rem;">{{ prediction.matchProposal.fightLabel }}</td>
+                    <td style="color:#d4d4d8;">{{ prediction.predictedWinner.displayName }}</td>
+                    <td><span class="badge bg-secondary">{{ prediction.predictedMethod }}</span></td>
+                    <td>
+                        {% if not prediction.isScored %}
+                            <span class="badge" style="background:#374151;">Pending</span>
+                        {% elseif prediction.pointsEarned > 0 %}
+                            <span class="badge" style="background:#16a34a;">Correct</span>
+                        {% else %}
+                            <span class="badge" style="background:#dc2626;">Wrong</span>
+                        {% endif %}
+                    </td>
+                    <td style="color:{% if prediction.pointsEarned > 0 %}#16a34a{% else %}#71717a{% endif %};">
+                        {{ prediction.pointsEarned is not null ? '+' ~ prediction.pointsEarned : '—' }}
+                    </td>
+                    <td style="color:#71717a;font-size:.8rem;">{{ prediction.submittedAt|date('d M Y') }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-5">No predictions found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if pagination.pageCount > 1 %}
+    <div class="card-footer d-flex justify-content-center" style="border-top:1px solid #27272a;background:#18181b;">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

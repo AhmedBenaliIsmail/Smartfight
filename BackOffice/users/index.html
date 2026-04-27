@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Users — SmartFight Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/smartfight-admin.css" />
+</head>
+<body class="antialiased">
+<div class="wrapper">
+
+  <!-- Sidebar -->
+  <aside class="navbar navbar-vertical navbar-expand-lg" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+    <div class="container-fluid flex-column align-items-stretch p-0">
+      <div class="p-3 border-bottom" style="border-color:#27272a!important">
+        <a href="../dashboard.html" class="smartfight-logo">
+          <div class="logo-icon"><i class="fa-solid fa-fist-raised"></i></div>
+          <div class="logo-text">Smart<span>Fight</span></div>
+        </a>
+      </div>
+      <nav class="flex-fill py-2">
+        <div class="navbar-vertical-section">Management</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../dashboard.html"><span class="nav-link-icon"><i class="fa-solid fa-chart-line fa-fw"></i></span><span class="nav-link-title">Dashboard</span></a></li>
+          <li class="nav-item"><a class="nav-link active" href="index.html"><span class="nav-link-icon"><i class="fa-solid fa-users fa-fw"></i></span><span class="nav-link-title">Users</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fighters/index.html"><span class="nav-link-icon"><i class="fa-solid fa-boxing-glove fa-fw"></i></span><span class="nav-link-title">Fighters</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../events/index.html"><span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span><span class="nav-link-title">Events</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fight-results/index.html"><span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span><span class="nav-link-title">Fight Results</span></a></li>
+        </ul>
+        <div class="navbar-vertical-section mt-2">Fan Experience</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../blog/index.html"><span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw"></i></span><span class="nav-link-title">Blog Articles</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../bookings/index.html"><span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw"></i></span><span class="nav-link-title">Event Bookings</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../predictions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span><span class="nav-link-title">Predictions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../reactions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-comments fa-fw"></i></span><span class="nav-link-title">Reactions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../notifications/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span><span class="nav-link-title">Notifications</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
+    <!-- Topbar -->
+    <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
+      <div class="d-flex align-items-center gap-3 flex-fill">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="../dashboard.html" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+          <li class="breadcrumb-item active">Users</li>
+        </ol>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="#" class="nav-link p-1 text-muted"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="../notifications/index.html" class="nav-link p-1 position-relative text-muted">
+          <i class="fa-solid fa-bell"></i>
+          <span class="badge bg-danger rounded-pill" style="position:absolute;top:-4px;right:-4px;font-size:.6rem;padding:2px 5px;">7</span>
+        </a>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+            <div style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">A</div>
+            <span style="font-size:.875rem;color:#fafafa;">Admin</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user fa-fw me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-fill p-4" style="background:#09090b;">
+      <!-- Page Header -->
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Users</h1>
+          <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Manage all registered members</p>
+        </div>
+        <a href="form.html" class="btn btn-danger">
+          <i class="fa-solid fa-plus me-2"></i>Add User
+        </a>
+      </div>
+
+      <!-- Filters -->
+      <div class="card mb-3" style="background:#18181b;border:1px solid #27272a;">
+        <div class="card-body py-3">
+          <div class="row g-2 align-items-center">
+            <div class="col-md-5">
+              <div class="input-group">
+                <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <input type="text" class="form-control" placeholder="Search by name or email..." />
+              </div>
+            </div>
+            <div class="col-md-3">
+              <select class="form-select">
+                <option value="">All Roles</option>
+                <option>Admin</option>
+                <option>Fighter</option>
+                <option>Fan</option>
+                <option>Coach</option>
+                <option>Organizer</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <select class="form-select">
+                <option value="">All Status</option>
+                <option>Active</option>
+                <option>Inactive</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <button class="btn w-100" style="background:#dc2626;color:#fff;border:none;">
+                <i class="fa-solid fa-filter me-1"></i>Filter
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card" style="background:#18181b;border:1px solid #27272a;">
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th style="padding:.75rem 1.25rem;width:60px;">#ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Joined</th>
+                <th class="text-end" style="padding-right:1.25rem;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#1001</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width:32px;height:32px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:#a1a1aa;flex-shrink:0;">MJ</div>
+                    <span style="font-size:.875rem;font-weight:500;">Marcus Johnson</span>
+                  </div>
+                </td>
+                <td style="font-size:.875rem;color:#a1a1aa;">marcus.j@email.com</td>
+                <td><span class="badge" style="background:rgba(59,130,246,.15);color:#3b82f6;">Fan</span></td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Active</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Jan 12, 2025</td>
+                <td class="text-end" style="padding-right:1.25rem;">
+                  <a href="show.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;" title="View"><i class="fa-solid fa-eye"></i></a>
+                  <a href="form.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;" title="Edit"><i class="fa-solid fa-pen"></i></a>
+                  <button class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#1002</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width:32px;height:32px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:#a1a1aa;flex-shrink:0;">SB</div>
+                    <span style="font-size:.875rem;font-weight:500;">Sandra Burke</span>
+                  </div>
+                </td>
+                <td style="font-size:.875rem;color:#a1a1aa;">s.burke@fmail.com</td>
+                <td><span class="badge" style="background:rgba(201,162,39,.15);color:#c9a227;">Fighter</span></td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Active</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Mar 3, 2025</td>
+                <td class="text-end" style="padding-right:1.25rem;">
+                  <a href="show.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-eye"></i></a>
+                  <a href="form.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-pen"></i></a>
+                  <button class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#1003</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width:32px;height:32px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:#a1a1aa;flex-shrink:0;">RC</div>
+                    <span style="font-size:.875rem;font-weight:500;">Rafael Costa</span>
+                  </div>
+                </td>
+                <td style="font-size:.875rem;color:#a1a1aa;">r.costa@sportmail.com</td>
+                <td><span class="badge" style="background:rgba(220,38,38,.15);color:#dc2626;">Admin</span></td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Active</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Dec 1, 2024</td>
+                <td class="text-end" style="padding-right:1.25rem;">
+                  <a href="show.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-eye"></i></a>
+                  <a href="form.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-pen"></i></a>
+                  <button class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#1004</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width:32px;height:32px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:#a1a1aa;flex-shrink:0;">AM</div>
+                    <span style="font-size:.875rem;font-weight:500;">Aisha Mensah</span>
+                  </div>
+                </td>
+                <td style="font-size:.875rem;color:#a1a1aa;">aisha.m@promail.com</td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Coach</span></td>
+                <td><span class="badge" style="background:rgba(161,161,170,.15);color:#a1a1aa;">Inactive</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Feb 18, 2025</td>
+                <td class="text-end" style="padding-right:1.25rem;">
+                  <a href="show.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-eye"></i></a>
+                  <a href="form.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-pen"></i></a>
+                  <button class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#1005</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width:32px;height:32px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:#a1a1aa;flex-shrink:0;">DL</div>
+                    <span style="font-size:.875rem;font-weight:500;">David Leung</span>
+                  </div>
+                </td>
+                <td style="font-size:.875rem;color:#a1a1aa;">d.leung@fights.io</td>
+                <td><span class="badge" style="background:rgba(168,85,247,.15);color:#a855f7;">Organizer</span></td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Active</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Apr 1, 2025</td>
+                <td class="text-end" style="padding-right:1.25rem;">
+                  <a href="show.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-eye"></i></a>
+                  <a href="form.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-pen"></i></a>
+                  <button class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#a1a1aa;font-size:.8rem;">#1006</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width:32px;height:32px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:#a1a1aa;flex-shrink:0;">PS</div>
+                    <span style="font-size:.875rem;font-weight:500;">Priya Singh</span>
+                  </div>
+                </td>
+                <td style="font-size:.875rem;color:#a1a1aa;">priya.s@fanzone.com</td>
+                <td><span class="badge" style="background:rgba(59,130,246,.15);color:#3b82f6;">Fan</span></td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Active</span></td>
+                <td style="font-size:.8rem;color:#a1a1aa;">Mar 22, 2025</td>
+                <td class="text-end" style="padding-right:1.25rem;">
+                  <a href="show.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-eye"></i></a>
+                  <a href="form.html" class="btn btn-sm me-1" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-pen"></i></a>
+                  <button class="btn btn-sm" style="background:rgba(220,38,38,.15);color:#dc2626;border:none;"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer" style="background:#18181b;border-top:1px solid #27272a;">
+          <div class="d-flex align-items-center justify-content-between">
+            <span style="font-size:.8125rem;color:#a1a1aa;">Showing 1–6 of 1,284 users</span>
+            <nav>
+              <ul class="pagination pagination-sm mb-0 gap-1">
+                <li class="page-item disabled"><a class="page-link" href="#">‹</a></li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#">…</a></li>
+                <li class="page-item"><a class="page-link" href="#">214</a></li>
+                <li class="page-item"><a class="page-link" href="#">›</a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+</body>
+</html>

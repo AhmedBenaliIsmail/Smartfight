@@ -1,0 +1,160 @@
+{% extends 'front/base_front.html.twig' %}
+{% block title %}Book Tickets — SmartFight{% endblock %}
+
+{% block content %}
+<section class="py-5" style="background:#09090b;min-height:100vh;">
+    <div class="container">
+        <div class="mb-4">
+            <h1 style="font-family:'Oswald',sans-serif;color:#fff;font-size:2.4rem;">BOOK TICKETS</h1>
+            <p class="text-muted mb-0">Pick your event, ticket type, and quantity. Capacity is updated from confirmed bookings.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card" style="background:#18181b;border:1px solid #27272a;border-radius:10px;">
+                    <div class="card-body p-4">
+                        <form method="post" id="bookingForm">
+                            <div class="mb-4">
+                                <label class="form-label" style="color:#a1a1aa;">Event</label>
+                                <select name="event_id" id="eventSelect" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;" required>
+                                    <option value="">Choose an event...</option>
+                                    {% for event in events %}
+                                        <option value="{{ event.id }}" data-remaining="{{ remainingByEvent[event.id] ?? 0 }}" data-name="{{ event.name }}" data-date="{{ event.startDate|date('d M Y') }}">
+                                            {{ event.name }} — {{ event.startDate|date('d M Y') }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label" style="color:#a1a1aa;">Ticket Type</label>
+                                <div class="row g-3">
+                                    {% for type, price in priceMap %}
+                                        <div class="col-md-4">
+                                            <label class="w-100">
+                                                <input type="radio" name="ticket_type" value="{{ type }}" class="d-none ticket-type-radio" {% if type == 'REGULAR' %}checked{% endif %}>
+                                                <div class="p-3 h-100 ticket-type-card" data-type="{{ type }}" style="border:1px solid #27272a;border-radius:8px;background:#09090b;cursor:pointer;">
+                                                    <div style="font-size:.75rem;letter-spacing:.08em;color:#71717a;">{{ type }}</div>
+                                                    <div style="font-size:1.4rem;font-family:'Oswald',sans-serif;color:#fff;">{{ price|number_format(2, '.', '') }} TND</div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-4">
+                                    <label class="form-label" style="color:#a1a1aa;">Quantity</label>
+                                    <input type="number" name="quantity" id="quantityInput" class="form-control" min="1" max="4" value="1" required style="background:#09090b;border-color:#27272a;color:#fff;">
+                                </div>
+                                <div class="col-md-8">
+                                    <button type="submit" class="btn btn-sf-primary w-100" style="height:38px;">Confirm Booking</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card" style="background:#18181b;border:1px solid #27272a;border-radius:10px;position:sticky;top:90px;">
+                    <div class="card-body p-4">
+                        <h6 style="color:#fff;font-family:'Oswald',sans-serif;">Order Summary</h6>
+                        <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid #27272a;">
+                            <span style="color:#71717a;">Selected Event</span>
+                            <span id="sumEvent" style="color:#fff;font-size:.9rem;">—</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid #27272a;">
+                            <span style="color:#71717a;">Date</span>
+                            <span id="sumDate" style="color:#fff;">—</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid #27272a;">
+                            <span style="color:#71717a;">Remaining Seats</span>
+                            <span id="sumRemaining" style="color:#c9a227;">—</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid #27272a;">
+                            <span style="color:#71717a;">Ticket</span>
+                            <span id="sumType" style="color:#fff;">REGULAR</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid #27272a;">
+                            <span style="color:#71717a;">Quantity</span>
+                            <span id="sumQty" style="color:#fff;">1</span>
+                        </div>
+                        <div class="d-flex justify-content-between pt-3">
+                            <span style="font-family:'Oswald',sans-serif;color:#fff;font-size:1.1rem;">TOTAL</span>
+                            <span id="sumTotal" style="font-family:'Oswald',sans-serif;color:#c9a227;font-size:1.35rem;">25.00 TND</span>
+                        </div>
+                        <div class="mt-3" style="font-size:.8rem;color:#71717a;">One booking row per fan/event. Cancel anytime from My Bookings.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    const prices = {
+        VIP: {{ priceMap['VIP']|default(50)|json_encode|raw }},
+        REGULAR: {{ priceMap['REGULAR']|default(25)|json_encode|raw }},
+        STANDING: {{ priceMap['STANDING']|default(10)|json_encode|raw }}
+    };
+
+    const eventSelect = document.getElementById('eventSelect');
+    const qtyInput = document.getElementById('quantityInput');
+    const typeRadios = document.querySelectorAll('.ticket-type-radio');
+    const typeCards = document.querySelectorAll('.ticket-type-card');
+
+    const sumEvent = document.getElementById('sumEvent');
+    const sumDate = document.getElementById('sumDate');
+    const sumRemaining = document.getElementById('sumRemaining');
+    const sumType = document.getElementById('sumType');
+    const sumQty = document.getElementById('sumQty');
+    const sumTotal = document.getElementById('sumTotal');
+
+    function selectedType() {
+        const checked = document.querySelector('.ticket-type-radio:checked');
+        return checked ? checked.value : 'REGULAR';
+    }
+
+    function highlightCards() {
+        const type = selectedType();
+        typeCards.forEach((card) => {
+            if (card.dataset.type === type) {
+                card.style.borderColor = '#dc2626';
+                card.style.boxShadow = '0 0 0 1px #dc2626 inset';
+            } else {
+                card.style.borderColor = '#27272a';
+                card.style.boxShadow = 'none';
+            }
+        });
+    }
+
+    function updateSummary() {
+        const option = eventSelect.options[eventSelect.selectedIndex];
+        const qty = Math.max(1, Math.min(4, parseInt(qtyInput.value || '1', 10)));
+        qtyInput.value = qty;
+
+        const type = selectedType();
+        const price = prices[type] || 0;
+
+        sumEvent.textContent = option && option.value ? option.dataset.name : '—';
+        sumDate.textContent = option && option.value ? option.dataset.date : '—';
+        sumRemaining.textContent = option && option.value ? (option.dataset.remaining + ' seats') : '—';
+        sumType.textContent = type;
+        sumQty.textContent = String(qty);
+        sumTotal.textContent = (price * qty).toFixed(2) + ' TND';
+
+        highlightCards();
+    }
+
+    eventSelect.addEventListener('change', updateSummary);
+    qtyInput.addEventListener('input', updateSummary);
+    typeRadios.forEach((radio) => radio.addEventListener('change', updateSummary));
+    updateSummary();
+})();
+</script>
+{% endblock %}
