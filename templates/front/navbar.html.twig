@@ -15,10 +15,10 @@
                     <a class="nav-link" href="{{ path('front_reaction_index') }}">Reactions</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ path('front_prediction_index') }}">Predictions</a>
+                    <a class="nav-link" href="{{ path('app_predictions') }}">Predictions</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ path('front_leaderboard_index') }}">Leaderboard</a>
+                    <a class="nav-link" href="{{ path('app_leaderboard') }}">Leaderboard</a>
                 </li>
                 {% if app.user %}
                     {% if is_granted('ROLE_USER') %}
@@ -32,7 +32,7 @@
                     <li class="nav-item">
                         <a
                             class="nav-link notif-bell-link"
-                            href="{{ path('front_notification_index') }}"
+                            href="#"
                             data-notif-bell="true"
                             data-notif-snapshot-url="{{ path('front_notification_snapshot') }}"
                             aria-label="Notifications"

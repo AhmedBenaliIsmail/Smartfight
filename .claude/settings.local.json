@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 *)",
+      "Bash(php -S localhost:8001 -t public/)",
+      "Bash(composer install *)",
+      "Bash(where php *)",
+      "Bash(php -v)",
+      "Bash(php *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8000/)",
+      "Bash(pkill -f \"php -S localhost:8000\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8001/)",
+      "Bash(xargs grep *)",
+      "Bash(composer show *)",
+      "Bash(git config *)",
+      "Bash(git checkout *)",
+      "Bash(git add *)"
+    ]
+  }
+}

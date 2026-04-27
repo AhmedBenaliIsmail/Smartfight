@@ -305,23 +305,31 @@ class AIService
 
     private function buildMatchmakingPrompt(array $fighters): string
     {
-        $prompt = "I have these available fighters and need matchmaking suggestions:\n\n";
-        
+        $prompt = "You are an expert MMA matchmaker. Suggest competitive, balanced fights using ALL metrics below.\n\n";
+        $prompt .= "FIGHTERS:\n\n";
+
         foreach ($fighters as $f) {
             $prompt .= "Fighter ID {$f['id']}: {$f['name']}\n";
-            $prompt .= "- Weight: {$f['weight']} lbs, Division: {$f['division']}\n";
-            $prompt .= "- Record: {$f['wins']}-{$f['losses']}-{$f['draws']}\n";
-            $prompt .= "- Win Rate: {$f['win_rate']}%\n";
-            $prompt .= "- ELO: {$f['elo']}\n";
-            $prompt .= "- Style: {$f['style']}\n";
-            $prompt .= "- Recent Form: {$f['form']}\n\n";
+            $prompt .= "  Division : {$f['division']} | Actual weight: {$f['weight']} lbs\n";
+            $prompt .= "  Record   : {$f['wins']}W-{$f['losses']}L-{$f['draws']}D | Win rate: {$f['win_rate']}%\n";
+            $prompt .= "  ELO      : {$f['elo']} | Form: {$f['form']} | Style: {$f['style']}\n";
+            $prompt .= "  KO rate  : " . ($f['ko_rate'] ?? 'N/A') . "% | Strike accuracy: " . ($f['accuracy'] ?? 'N/A') . "%\n";
+            $prompt .= "  Height   : " . ($f['height'] ?? 'N/A') . " cm | Reach: " . ($f['reach'] ?? 'N/A') . " cm\n\n";
         }
 
-        $prompt .= "Return a JSON object with suggested matches:\n";
+        $prompt .= "MATCHING CRITERIA (in priority order):\n";
+        $prompt .= "1. Same weight division (mandatory when possible)\n";
+        $prompt .= "2. Similar ELO ratings (competitive parity)\n";
+        $prompt .= "3. Similar win rates (record parity)\n";
+        $prompt .= "4. Similar KO/finishing rates (lethality match)\n";
+        $prompt .= "5. Similar strike accuracy (technical alignment)\n";
+        $prompt .= "6. Comparable height and reach (physicality balance)\n";
+        $prompt .= "7. Diverse weight classes across the card (no repeat divisions)\n\n";
+
+        $prompt .= "Return ONLY raw JSON, no markdown:\n";
         $prompt .= "{\n";
         $prompt .= "  \"matches\": [\n";
-        $prompt .= "    { \"fighter1_id\": <id>, \"fighter2_id\": <id>, \"reason\": \"Why this is a great matchup\", \"excitement_level\": \"high/medium/low\" },\n";
-        $prompt .= "    ...\n";
+        $prompt .= "    { \"fighter1_id\": <id>, \"fighter2_id\": <id>, \"reason\": \"Specific data-driven reason citing the metrics above\", \"excitement_level\": \"high/medium/low\" }\n";
         $prompt .= "  ]\n";
         $prompt .= "}";
 

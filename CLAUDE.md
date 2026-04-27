@@ -4,94 +4,122 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**SmartFight** is a UFC/MMA web application template with two distinct interfaces — a public-facing FrontOffice and an admin BackOffice. This is a static HTML/CSS/JS template (no build system, no package manager, no server).
+**SmartFight** is a Symfony 7.1 UFC/MMA management application with two interfaces: an admin dashboard and a public fan-facing site. It manages fighters, events, bookings, fight results, predictions, rankings, blog content, and notifications.
 
-The project is part of a PIDEV 3A 2025-2026 student project. A companion SQL database schema (`smartfight (1).sql`) defines the backend data model.
+## Development Commands
 
-## Structure
+All commands run from the repo root (where `composer.json` lives). The root Symfony app is the **primary** one — ignore the `smartfight/` subdirectory (it is a legacy/alternate version).
 
-```
-template/
-├── FrontOffice/        # Public-facing user interface
-│   ├── index.html      # Homepage / hero
-│   ├── matches.html    # Events listing
-│   ├── team.html       # Fighters listing
-│   ├── team-details.html
-│   ├── match-details.html
-│   ├── live-stream.html
-│   ├── predictions.html
-│   ├── booking.html
-│   ├── leaderboard.html
-│   ├── blog.html / blog-details.html
-│   ├── gallery.html
-│   ├── notifications.html
-│   ├── contact.html
-│   ├── css/
-│   │   ├── smartfight.css   # Design tokens / CSS variables (source of truth for brand colors)
-│   │   └── style.css        # Main stylesheet (imports smartfight.css)
-│   └── js/main.js           # Countdown timers, tab switching, filter logic
-│
-└── BackOffice/         # Admin dashboard
-    ├── dashboard.html  # Main admin entry point
-    ├── css/
-    │   └── smartfight-admin.css  # Tabler overrides for dark theme
-    ├── users/          # index.html, form.html, show.html
-    ├── fighters/       # index.html, form.html, show.html
-    ├── events/         # index.html, form.html, show.html
-    ├── bookings/       # index.html, show.html
-    ├── fight-results/  # index.html, form.html, show.html
-    ├── blog/           # index.html, form.html, show.html
-    ├── predictions/    # index.html, score.html
-    ├── reactions/      # index.html
-    └── notifications/  # index.html, broadcast.html
+```bash
+# Start dev server
+symfony server:start
+
+# Clear cache (required after config changes or entity changes in prod)
+php bin/console cache:clear
+
+# Database migrations
+php bin/console doctrine:migrations:diff    # generate migration from entity changes
+php bin/console doctrine:migrations:migrate # apply pending migrations
+
+# Code generation
+php bin/console make:entity
+php bin/console make:controller
+php bin/console make:form
+
+# Create admin user
+php bin/console app:create-admin
+
+# Docker (PostgreSQL for local dev alternative)
+docker compose up -d
 ```
 
-## Tech Stack
+The `.env` file (not committed) must be created from `.env.example`. The app defaults to MySQL; Docker spins up PostgreSQL.
 
-**FrontOffice:**
-- Bootstrap 5.3.3 (CDN)
-- Font Awesome 6.5.1 (CDN)
-- Google Fonts: Oswald (headings) + Inter (body)
-- Vanilla JS (no framework)
+## Architecture
 
-**BackOffice:**
-- Tabler UI v1.0.0-beta17 (CDN) — Bootstrap-based admin framework
-- Font Awesome 6.5.0 (CDN)
-- Dark theme forced via `data-bs-theme="dark"` on `<html>`
+### Two Parallel Codebases (Important)
 
-**No build step** — open HTML files directly in a browser or serve with any static file server (e.g., `npx serve .` or VS Code Live Server).
+1. **Root Symfony app** (`src/`, `templates/`, `config/`) — the live, working application.
+2. **Static HTML prototypes** (`FrontOffice/`, `BackOffice/`) — design reference only, not served by Symfony.
+3. **`smartfight/` subdirectory** — a separate, older Symfony project. Not the active codebase.
 
-## Design System
+### Request Flow
 
-All brand tokens live in `FrontOffice/css/smartfight.css`. The admin overrides them in `BackOffice/css/smartfight-admin.css`. Key values:
+Routes are defined via PHP attributes on controllers in `src/Controller/`. All routes load from `config/routes.yaml` via attribute scanning of `src/Controller/`.
 
-| Token | Value | Use |
-|---|---|---|
-| `--primary` | `#dc2626` | Red — primary actions, CTAs |
-| `--gold` | `#c9a227` | Gold — rankings, achievements |
-| `--bg-dark` | `#09090b` | Page background |
-| `--bg-surface` | `#18181b` | Card / panel background |
-| `--border-color` | `#27272a` | Dividers, card borders |
+The entry point `/` (`app_dashboard`) checks `ROLE_ADMIN` and redirects non-admins to `app_fan_dashboard` (front-facing dashboard).
 
-Headings use `font-family: Oswald` (uppercase). Body uses `Inter`.
+### Controller Layout
 
-## Sidebar Pattern (BackOffice)
+```
+src/Controller/
+├── Admin/          # Admin-only: BlogController, BookingAdminController, MatchProposalAdminController, ReactionController, AdminContractController
+├── Front/          # Fan-facing: BlogController, BookingController, FanDashboardController, ReactionController
+├── AIController    # POST /api/ai/* — stat suggestions + matchmaking (ROLE_ADMIN only)
+├── DashboardController   # / — redirects based on role
+├── SecurityController    # /login, /register, /forgot-password, /reset-password, /verify-email
+├── FaceIdController      # /face-id/* — WebAuthn/Face ID registration + authentication
+├── GoogleController      # /connect/google/* — OAuth2 Google login
+└── ... (EventController, FighterController, ResultController, PredictionController, etc.)
+```
 
-The sidebar is **duplicated inline** in every BackOffice page — there is no include/template system. When adding a new admin module or changing navigation, update the sidebar in every affected HTML file. The active link is indicated by adding `class="nav-link active"` to the current page's `<a>` tag.
+### Template Hierarchy
 
-## Page Patterns
+```
+templates/base.html.twig
+├── templates/admin/base_admin.html.twig    → all admin views
+└── templates/front/base_front.html.twig   → all fan-facing views
+```
 
-Each BackOffice module follows a 3-page pattern:
-- `index.html` — data table with search/filter and action buttons
-- `form.html` — create/edit form (shared for both operations)
-- `show.html` — read-only detail view
+Admin sidebar and navbar are **Twig partials** (`templates/admin/partials/sidebar.html.twig`, `navbar.html.twig`) — unlike the static prototypes, they are included once, not duplicated per page.
 
-Exceptions: `bookings` has no form (read-only + status actions), `predictions` has `score.html` instead of `form.html`, `notifications` has `broadcast.html`, `reactions` is index-only.
+### Role System
 
-## JavaScript
+Roles use a custom `Role` entity (table `role`, field `roleName`) mapped many-to-many to `User` via `user_roles`. Symfony's `getRoles()` on `User` maps these to `ROLE_<UPPERCASE_ROLENAME>` strings (e.g., `ROLE_ADMIN`, `ROLE_USER`). The security provider loads users by `username` (not email).
 
-`FrontOffice/js/main.js` is the only JS file. It handles:
-- **Countdown timers** — reads `data-event-date="YYYY-MM-DD"` attributes on `.sf-countdown` elements; fires at 20:00 event time
-- **Tab/filter UI** — fighter category tabs, fight card tabs, prediction filter buttons
+Password recovery and registration both accept username **or** email as identifier.
 
-The BackOffice has no custom JS — relies entirely on Tabler's built-in Bootstrap JS (loaded from CDN).
+### AI Features
+
+`AIService` (`src/Service/AIService.php`) calls the DeepSeek API (`deepseek-chat` model) for:
+- `POST /api/ai/stat-suggestions` — auto-fill round fight stats
+- `POST /api/ai/matchmaking-suggestions` — suggest balanced fighter pairings
+
+`MatchmakingService` wraps `AIService` with an algorithmic fallback (ELO ±150 tolerance, same weight class). Requires `DEEPSEEK_API_KEY` in `.env`.
+
+### Key Services
+
+| Service | Responsibility |
+|---|---|
+| `AIService` | DeepSeek API calls for stats + matchmaking |
+| `MatchmakingService` | Matchmaking with AI + algorithmic fallback |
+| `BookingService` | Event ticket booking logic |
+| `PredictionService` | Fan fight prediction logic |
+| `RankingService` | Fighter ranking calculation |
+| `NotificationService` | Fan notification dispatch |
+| `QrCodeService` | QR code generation for bookings |
+
+### Authentication Methods
+
+1. **Form login** — username + password, CSRF-protected
+2. **Google OAuth** — via `GoogleAuthenticator` (`src/Security/GoogleAuthenticator.php`) + KnpU OAuth2 bundle
+3. **Face ID** — browser WebAuthn API + `face-api.js` loaded via CDN; credential stored on `User.webauthnCredentialId` / `webauthnPublicKey`
+
+Email verification is required after registration (token in `User.verificationToken`).
+
+### Database
+
+Doctrine ORM with attribute-based mapping on entities in `src/Entity/`. Column names use camelCase (`fighterId`, `userId`, `firstName`) while Doctrine's underscore naming strategy applies to auto-generated tables. Custom `@ORM\Column(name: ...)` overrides are common — check entity definitions before querying raw SQL.
+
+Primary key pattern: `userId`, `fighterId`, etc. (not `id`).
+
+## Environment Variables
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | MySQL or PostgreSQL connection string |
+| `APP_SECRET` | Symfony app secret (32 chars) |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth |
+| `MAILER_DSN` | SMTP mailer (Gmail TLS port 587 recommended) |
+| `DEEPSEEK_API_KEY` | AI features (optional; fallback works without it) |
+| `DEFAULT_URI` | Base URL for absolute link generation in emails |

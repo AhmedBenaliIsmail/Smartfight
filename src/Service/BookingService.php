@@ -91,29 +91,35 @@ class BookingService
         );
 
         try {
-            // Use a public QR API for the email to ensure Gmail displays it correctly
-            $qrData = urlencode($this->qrCodeService->buildFanQrData($booking));
-            $qrImageUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $qrData;
+            try {
+                $qrSrc = $this->qrCodeService->generateQrPngBase64(
+                    $this->qrCodeService->buildFanQrData($booking), 250
+                );
+            } catch (\Throwable $gdError) {
+                // GD extension not available — fall back to external QR API
+                $qrSrc = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data="
+                    . urlencode($this->qrCodeService->buildFanQrData($booking));
+            }
 
             $email = (new Email())
                 ->from('mahdidaly24@gmail.com')
                 ->to($user->getEmail())
                 ->subject('Your SmartFight Ticket: ' . $event->getName())
                 ->html(sprintf(
-                    '<h1>🏆 Booking Confirmed!</h1>
+                    '<h1>&#127942; Booking Confirmed!</h1>
                      <p>Hello %s, your ticket is ready for <strong>%s</strong>.</p>
                      <div style="background:#f4f4f4;padding:20px;border-radius:10px;text-align:center;">
                         <h2>TICKET QR CODE</h2>
-                        <img src="%s" alt="Ticket QR" style="width:250px;height:250px;border:10px solid white;background:white;">
+                        <img src="%s" alt="Ticket QR" style="width:250px;height:250px;border:10px solid white;background:white;display:block;margin:0 auto;">
                         <p><strong>Reference:</strong> %s</p>
                         <p><strong>Type:</strong> %s | <strong>Qty:</strong> %d</p>
                      </div>
                      <p>Show this QR code at the venue entrance.</p>',
-                    $user->getUsername(),
-                    $event->getName(),
-                    $qrImageUrl,
-                    $booking->getBookingReference(),
-                    str_replace('_', ' ', $booking->getTicketType()),
+                    htmlspecialchars($user->getUsername()),
+                    htmlspecialchars($event->getName()),
+                    $qrSrc,
+                    htmlspecialchars($booking->getBookingReference()),
+                    htmlspecialchars(str_replace('_', ' ', $booking->getTicketType())),
                     $booking->getTicketQuantity()
                 ));
 

@@ -93,12 +93,7 @@
 
             <div class="hr-text" style="color: #52525b; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Or continue with</div>
             <div class="row g-2">
-                <div class="col-6">
-                    <button type="button" id="faceIdLoginBtn" class="btn w-100 py-2 btn-dark border-secondary">
-                        <i class="fa-solid fa-fingerprint me-2 text-info"></i> Passkey
-                    </button>
-                </div>
-                <div class="col-6">
+                <div class="col-12">
                     <button type="button" id="btn-face-scan-toggle" class="btn w-100 py-2 btn-dark border-secondary disabled">
                         <i class="fa-solid fa-spinner fa-spin me-2 text-primary" id="ai-loader-icon"></i>
                         <span id="ai-loader-text">Loading AI...</span>
@@ -162,7 +157,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const loaderText = document.getElementById('ai-loader-text');
     const loaderIcon = document.getElementById('ai-loader-icon');
     const toggleBtn = document.getElementById('btn-face-scan-toggle');
-    const faceIdBtn = document.getElementById('faceIdLoginBtn');
     const container = document.getElementById('login-camera-container');
     const video = document.getElementById('login-webcam');
     const canvas = document.getElementById('login-canvas');
@@ -213,8 +207,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     video.srcObject = stream;
                     container.classList.remove('d-none');
                     toggleBtn.style.display = 'none';
-                    if (faceIdBtn) faceIdBtn.style.display = 'none';
-
                     video.onplay = () => {
                         const overlay = faceapi.createCanvasFromMedia(video);
                         overlay.style.position = 'absolute';
@@ -291,35 +283,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Standard Passkey Handler (WebAuthn)
-    if (faceIdBtn) {
-        faceIdBtn.addEventListener('click', async () => {
-            if (!window.PublicKeyCredential) {
-                alert('Passkey not supported on this browser.');
-                return;
-            }
-            try {
-                const challenge = new Uint8Array(32);
-                window.crypto.getRandomValues(challenge);
-                const assertion = await navigator.credentials.get({
-                    publicKey: { challenge: challenge, timeout: 60000, userVerification: 'preferred' }
-                });
-                if (assertion) {
-                    const credentialId = btoa(String.fromCharCode.apply(null, new Uint8Array(assertion.rawId)));
-                    const response = await fetch('{{ path('app_face_id_login') }}', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ credentialId: credentialId })
-                    });
-                    const result = await response.json();
-                    if (result.success) window.location.href = result.redirect;
-                    else alert(result.error);
-                }
-            } catch (err) {
-                alert('Passkey verification failed.');
-            }
-        });
-    }
 });
 </script>
 </body>

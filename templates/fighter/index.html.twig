@@ -1,9 +1,8 @@
-{% extends 'base.html.twig' %}
+{% extends 'front/base_front.html.twig' %}
 
 {% block title %}SmartFight — Professional Roster{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
+{% block extra_css %}
     <style>
         .fighter-card-pro {
             background: #09090b;
@@ -115,11 +114,6 @@
             border-color: #ef4444;
         }
     </style>
-{% endblock %}
-
-{% block breadcrumb %}
-    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
-    <li class="breadcrumb-item active">Professional Roster</li>
 {% endblock %}
 
 {% block content %}
