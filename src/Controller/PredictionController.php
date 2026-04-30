@@ -6,6 +6,7 @@ use App\Repository\FightResultRepository;
 use App\Repository\FighterRepository;
 use App\Repository\PredictionRepository;
 use App\Repository\UserRepository;
+use App\Service\PredictionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,23 +16,32 @@ use Symfony\Component\Routing\Annotation\Route;
 class PredictionController extends AbstractController
 {
     #[Route('/predictions', name: 'app_predictions')]
-    public function index(FightResultRepository $resultRepo, PredictionRepository $predictionRepo): Response
+    public function index(FightResultRepository $resultRepo, PredictionRepository $predictionRepo, PredictionService $predictionService): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
         $user = $this->getUser();
-        
+
         $upcomingFights = $resultRepo->findBy(['status' => 'SCHEDULED'], ['fightDate' => 'ASC']);
         $myPredictions = $predictionRepo->findByUser($user->getUserId());
-        
+
         $predictionMap = [];
         foreach ($myPredictions as $p) {
             $predictionMap[$p->getFight()->getResultId()] = $p;
         }
 
+        $fightProbabilities = [];
+        foreach ($upcomingFights as $fight) {
+            $fightProbabilities[$fight->getResultId()] = $predictionService->calculateWinProbability(
+                $fight->getFighter1(),
+                $fight->getFighter2()
+            );
+        }
+
         return $this->render('prediction/index.html.twig', [
-            'upcomingFights' => $upcomingFights,
-            'predictionMap' => $predictionMap,
-            'myPredictions' => $myPredictions,
+            'upcomingFights'      => $upcomingFights,
+            'predictionMap'       => $predictionMap,
+            'myPredictions'       => $myPredictions,
+            'fightProbabilities'  => $fightProbabilities,
         ]);
     }
 

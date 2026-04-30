@@ -7,6 +7,7 @@ use App\Repository\FightResultRepository;
 use App\Entity\FightStatistic;
 use App\Service\FightResultService;
 use App\Service\FightStatisticService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -160,7 +161,7 @@ class ResultController extends AbstractController
     }
 
     #[Route('/{id}/stats', name: 'app_result_stats', methods: ['GET', 'POST'])]
-    public function stats(int $id, Request $request, FightResultRepository $resultRepo, FightStatisticService $statService): Response
+    public function stats(int $id, Request $request, FightResultRepository $resultRepo, FightStatisticService $statService, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $fr = $resultRepo->find($id);
@@ -168,11 +169,16 @@ class ResultController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $statsData = $request->request->all('stats');
-            $fr->setInsideTheNumbers($request->request->get('insideTheNumbers'));
-            
+            $text = $request->request->get('insideTheNumbers');
+            $fr->setInsideTheNumbers($text !== '' ? $text : null);
+            // Explicit persist ensures VichUploader's preFlush recomputeSingleEntityChangeSet
+            // cannot discard this change when it re-hydrates the upload fields.
+            $em->persist($fr);
+            $em->flush();
+
             // Clear existing stats for this fight to avoid duplicates
             $statService->clearStatsForFight($fr);
-            $endRound = $fr->getRoundNumber() ?: 12;
+            $endRound = $fr->getRoundNumber() ?: $fr->getScheduledRounds();
 
             foreach ($statsData as $roundNum => $data) {
                 if ($roundNum > $endRound) continue; // Safety check: No stats after the fight ended
@@ -255,6 +261,7 @@ class ResultController extends AbstractController
         // Group stats by fighter and round
         $fighterStats = [];
         foreach ($stats as $s) {
+            if ($s->getRound() === null) continue;
             $fid = $s->getFighter()->getFighterId();
             $fighterStats[$fid][$s->getRound()] = $s;
         }
@@ -262,7 +269,7 @@ class ResultController extends AbstractController
         return $this->render('result/show.html.twig', [
             'result' => $fr,
             'fighterStats' => $fighterStats,
-            'rounds' => $fr->getRoundNumber() ?: 12
+            'rounds' => $fr->getRoundNumber() ?: $fr->getScheduledRounds()
         ]);
     }
 
@@ -318,7 +325,7 @@ class ResultController extends AbstractController
     }
 
     #[Route('/{id}/generate-ai-stats', name: 'app_result_generate_ai_stats', methods: ['POST'])]
-    public function generateAIStats(int $id, FightResultRepository $resultRepo, \App\Service\AIService $aiService, Request $request): Response
+    public function generateAIStats(int $id, FightResultRepository $resultRepo, \App\Service\AIService $aiService, Request $request, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $fr = $resultRepo->find($id);
@@ -380,10 +387,15 @@ class ResultController extends AbstractController
             if ($aiResponse) $insideTheNumbers = $aiResponse;
         } catch (\Exception $e) {}
 
+        $insideTheNumbers = trim($insideTheNumbers);
+        $fr->setInsideTheNumbers($insideTheNumbers);
+        $em->persist($fr);
+        $em->flush();
+
         return $this->json([
             'success' => true,
             'rounds' => $rounds,
-            'insideTheNumbers' => trim($insideTheNumbers)
+            'insideTheNumbers' => $insideTheNumbers
         ]);
     }
 }

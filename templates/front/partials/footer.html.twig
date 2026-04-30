@@ -9,15 +9,15 @@
                 <h6 class="text-uppercase mb-3" style="color:#dc2626;font-family:'Oswald',sans-serif;letter-spacing:1px;">Fan Zone</h6>
                 <ul class="list-unstyled">
                     <li><a href="{{ path('front_blog_index') }}" class="text-muted text-decoration-none">Blog & News</a></li>
-                    <li><a href="{{ path('front_prediction_index') }}" class="text-muted text-decoration-none">Predictions</a></li>
-                    <li><a href="{{ path('front_leaderboard_index') }}" class="text-muted text-decoration-none">Leaderboard</a></li>
+                    <li><a href="{{ path('app_predictions') }}" class="text-muted text-decoration-none">Predictions</a></li>
+                    <li><a href="{{ path('app_leaderboard') }}" class="text-muted text-decoration-none">Leaderboard</a></li>
                 </ul>
             </div>
             <div class="col-md-4 mb-4">
                 <h6 class="text-uppercase mb-3" style="color:#dc2626;font-family:'Oswald',sans-serif;letter-spacing:1px;">Account</h6>
                 <ul class="list-unstyled">
                     {% if app.user %}
-                        <li><a href="{{ path('front_notification_index') }}" class="text-muted text-decoration-none">Notifications</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none">Notifications</a></li>
                         <li><a href="{{ path('app_logout') }}" class="text-muted text-decoration-none">Logout</a></li>
                     {% else %}
                         <li><a href="{{ path('app_login') }}" class="text-muted text-decoration-none">Login</a></li>

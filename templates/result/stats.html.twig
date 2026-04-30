@@ -137,12 +137,13 @@
         <div class="stats-card-premium">
             <div class="nav-stats-tabs">
                 <ul class="nav nav-tabs border-0" id="roundTabs" role="tablist">
-                    {% for r in 1..result.roundNumber %}
+                    {% set totalRounds = result.roundNumber|default(result.scheduledRounds|default(12)) %}
+                    {% for r in 1..totalRounds %}
                     <li class="nav-item" role="presentation">
                         <button class="nav-link {% if r == 1 %}active{% endif %}" id="round-{{ r }}-tab" data-bs-toggle="tab" data-bs-target="#round-{{ r }}" type="button" role="tab">ROUND {{ r }}</button>
                     </li>
                     {% endfor %}
-                    {% if result.roundNumber < (result.scheduledRounds|default(12)) %}
+                    {% if result.roundNumber and result.roundNumber < (result.scheduledRounds|default(12)) %}
                         <li class="nav-item ms-auto d-flex align-items-center pe-3">
                             <span class="badge bg-danger-lt" style="font-size: 10px; letter-spacing: 1px;">
                                 <i class="fa-solid fa-stopwatch me-1"></i> FINISHED IN R{{ result.roundNumber }}
@@ -153,7 +154,7 @@
             </div>
 
             <div class="tab-content p-5" id="roundTabsContent">
-                {% for r in 1..result.roundNumber %}
+                {% for r in 1..totalRounds %}
                 <div class="tab-pane fade {% if r == 1 %}show active{% endif %}" id="round-{{ r }}" role="tabpanel">
                     <div class="row g-5">
                         {# Red Corner #}
@@ -314,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i>AI SYNTHESIZING...';
             this.disabled = true;
 
-            const totalRounds = {{ result.roundNumber }};
+            const totalRounds = {{ result.roundNumber|default(result.scheduledRounds|default(12)) }};
 
             fetch('{{ path('app_result_generate_ai_stats', {'id': result.resultId}) }}', {
                 method: 'POST',

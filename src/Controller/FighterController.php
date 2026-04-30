@@ -71,6 +71,8 @@ class FighterController extends AbstractController
         return $this->redirectToRoute('app_fighters');
     }
 
+
+
     #[Route('/recalc-rankings', name: 'app_fighter_recalc', methods: ['POST'])]
     public function recalcRankings(RankingService $rankingService): Response
     {

@@ -5,6 +5,7 @@ use App\Entity\MatchProposal;
 use App\Repository\FighterRepository;
 use App\Repository\FightResultRepository;
 use App\Service\AIService;
+use App\Service\MatchmakingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -71,108 +72,76 @@ class AIController extends AbstractController
     #[Route('/matchmaking-suggestions', name: 'api_ai_matchmaking', methods: ['POST'])]
     public function suggestMatches(
         Request $request,
-        AIService $aiService,
-        FighterRepository $fighterRepo
+        MatchmakingService $matchmakingService
     ): JsonResponse {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        $data = json_decode($request->getContent(), true);
-        $count = $data['count'] ?? 5;
+        $data  = json_decode($request->getContent(), true);
+        $count = (int) ($data['count'] ?? 5);
 
-        $fighters = $fighterRepo->findAll();
-
-        if (count($fighters) < 2) {
-            return $this->json([
-                'success' => false,
-                'error' => 'Not enough fighters',
-                'matches' => []
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        $fighterData = [];
-        foreach ($fighters as $f) {
-            $wins = $f->getWins() + $f->getLosses() > 0 
-                ? round(($f->getWins() / ($f->getWins() + $f->getLosses())) * 100, 1)
-                : 0;
-
-            $fighterData[] = [
-                'id' => $f->getFighterId(),
-                'name' => $f->getFullName(),
-                'weight' => $f->getWeight() ?? 0,
-                'division' => $f->getWeightDivision() ? $f->getWeightDivision()->getName() : 'N/A',
-                'wins' => $f->getWins(),
-                'losses' => $f->getLosses(),
-                'draws' => $f->getDraws(),
-                'win_rate' => $wins,
-                'elo' => $f->getEloRating(),
-                'style' => $f->getCalculatedFightingStyle(),
-                'form' => 'Good'
-            ];
-        }
-
-        $result = $aiService->suggestMatches($fighterData);
+        $result = $matchmakingService->suggestMatches($count);
 
         return $this->json(array_merge($result, ['count_returned' => count($result['matches'] ?? [])]));
     }
 
     #[Route('/generate-proposals', name: 'api_ai_generate_proposals', methods: ['POST'])]
     public function generateProposals(
-        AIService $aiService,
+        Request $request,
+        MatchmakingService $matchmakingService,
         FighterRepository $fighterRepo,
         EntityManagerInterface $em
     ): JsonResponse {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        $fighters = $fighterRepo->findAll();
-        $fighterData = [];
-        foreach ($fighters as $f) {
-            $fighterData[] = [
-                'id' => $f->getFighterId(),
-                'name' => $f->getFullName(),
-                'weight' => $f->getWeight() ?? 0,
-                'division' => $f->getWeightDivision() ? $f->getWeightDivision()->getName() : 'N/A',
-                'wins' => $f->getWins(),
-                'losses' => $f->getLosses(),
-                'draws' => $f->getDraws(),
-                'win_rate' => ($f->getWins() + $f->getLosses() > 0) ? round(($f->getWins() / ($f->getWins() + $f->getLosses())) * 100, 1) : 0,
-                'elo' => $f->getEloRating(),
-                'style' => $f->getCalculatedFightingStyle(),
-                'form' => 'Active'
-            ];
-        }
+        $data  = json_decode($request->getContent(), true);
+        $count = (int) ($data['count'] ?? 5);
 
-        $result = $aiService->suggestMatches($fighterData);
-        
-        if (!$result['success']) {
-            return $this->json($result, Response::HTTP_INTERNAL_SERVER_ERROR);
+        $matches = $matchmakingService->generateProposalsLocal($count);
+
+        if (empty($matches)) {
+            return $this->json([
+                'success' => false,
+                'message' => 'No valid matchups found (insufficient fighters or all fought recently).',
+                'count'   => 0,
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         $created = 0;
-        foreach ($result['matches'] as $m) {
+        foreach ($matches as $m) {
             $f1 = $fighterRepo->find($m['fighter1_id']);
             $f2 = $fighterRepo->find($m['fighter2_id']);
 
-            if ($f1 && $f2) {
-                $proposal = new MatchProposal();
-                $proposal->setFighter1($f1);
-                $proposal->setFighter2($f2);
-                $proposal->setCompatibility($m['excitement_level'] === 'high' ? "95.00" : "80.00");
-                $proposal->setNotes($m['reason']);
-                $proposal->setProposedAt(new \DateTime());
-                $proposal->setStatus('PENDING');
-                $proposal->setVoteCount(0);
-                
-                $em->persist($proposal);
-                $created++;
+            if (!$f1 || !$f2) {
+                continue;
             }
+
+            $proposal = new MatchProposal();
+            $proposal->setFighter1($f1);
+            $proposal->setFighter2($f2);
+            $proposal->setCompatibility((string) number_format($m['score_ia'], 2, '.', ''));
+            $proposal->setNotes($m['reason']);
+            $proposal->setProposedAt(new \DateTime());
+            $proposal->setStatus('PENDING');
+            $proposal->setVoteCount(0);
+
+            // Carry over weight division from the pairing when both fighters share one
+            if ($f1->getWeightDivision()
+                && $f2->getWeightDivision()
+                && $f1->getWeightDivision()->getId() === $f2->getWeightDivision()->getId()) {
+                $proposal->setWeightDivision($f1->getWeightDivision());
+            }
+
+            $em->persist($proposal);
+            $created++;
         }
 
         $em->flush();
 
         return $this->json([
             'success' => true,
-            'message' => "Successfully generated $created AI match proposals.",
-            'count' => $created
+            'message' => "Generated {$created} proposals via 7-vector Score IA algorithm.",
+            'count'   => $created,
+            'matches' => $matches,
         ]);
     }
 

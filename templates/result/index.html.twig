@@ -1,14 +1,8 @@
-{% extends 'base.html.twig' %}
+{% extends 'front/base_front.html.twig' %}
 
-{% block title %}Fight Results — SmartFight Admin{% endblock %}
+{% block title %}Fight Results — SmartFight{% endblock %}
 
-{% block breadcrumb %}
-    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
-    <li class="breadcrumb-item active">Fight Results</li>
-{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
+{% block extra_css %}
     <style>
         .event-card-ultra {
             background: linear-gradient(145deg, #18181b, #09090b);
