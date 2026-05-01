@@ -116,15 +116,43 @@
 <div class="card mb-4" style="background:#18181b;border:1px solid #27272a; border-radius: 15px;">
     <div class="card-body py-3">
         <form onsubmit="return false;">
-            <div class="row g-2 align-items-center">
-                <div class="col-md-6">
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent border-end-0" style="border-color:#3f3f46;"><i class="fa-solid fa-magnifying-glass" style="color:#71717a;"></i></span>
-                        <input type="text" id="eventSearchInput" class="form-control border-start-0" placeholder="Search by Event Name, Venue or Fighter..." style="background:#27272a;border-color:#3f3f46;color:#fafafa;" />
+            <div class="row g-3 align-items-center">
+                <div class="col-md-4">
+                    <div class="position-relative sf-search-wrapper">
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0" style="border-color:#3f3f46;"><i class="fa-solid fa-magnifying-glass" style="color:#71717a;"></i></span>
+                            <input type="text" id="resultSearchInput" class="form-control border-start-0" placeholder="Search events or fighters..." style="background:#27272a;border-color:#3f3f46;color:#fafafa;" />
+                        </div>
+                        <div id="resultSearchDropdown" class="sf-search-dropdown d-none">
+                            <div class="p-2 text-muted xsmall fw-bold border-bottom border-secondary mb-2" style="letter-spacing:1px;">EVENT DISCOVERY</div>
+                            <div id="resultSearchResults"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-6 text-end">
-                    <span class="badge bg-blue-lt"><i class="fa-solid fa-bolt me-1"></i>High-Velocity Real-time Filtering</span>
+                <div class="col-md-3">
+                    <select class="form-select bg-dark border-secondary text-white" onchange="document.getElementById('eventSearchInput')._sfFilter.filter('org', this.value)">
+                        <option value="all">All Organizations</option>
+                        <option value="INDEPENDENT">Independent</option>
+                        {% set orgs = [] %}
+                        {% for e in events %}
+                            {% if e.organization != 'INDEPENDENT' and e.organization not in orgs %}
+                                <option value="{{ e.organization }}">{{ e.organization }}</option>
+                                {% set orgs = orgs|merge([e.organization]) %}
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select bg-dark border-secondary text-white" onchange="document.getElementById('eventSearchInput')._sfFilter.filter('status', this.value)">
+                        <option value="all">All Statuses</option>
+                        <option value="completed">Completed</option>
+                        <option value="progress">In Progress</option>
+                        <option value="empty">Scheduled</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-1">
+                    <button class="btn btn-dark border-secondary w-100" title="Sort by Date" onclick="document.getElementById('eventSearchInput')._sfFilter.sort('date', 'number', 'desc')"><i class="fa-solid fa-calendar-days"></i></button>
+                    <button class="btn btn-dark border-secondary w-100" title="Sort A-Z" onclick="document.getElementById('eventSearchInput')._sfFilter.sort('name', 'string', 'asc')"><i class="fa-solid fa-arrow-down-a-z"></i></button>
                 </div>
             </div>
         </form>
@@ -136,7 +164,11 @@
         {% set stats = eventStats[event.eventId] %}
         {% set fighters = eventFighters[event.eventId]|default('') %}
         <div class="col-lg-4 col-md-6 event-search-item" 
-             data-search-content="{{ event.eventName|lower }} {{ event.venue|lower }} {{ event.city|lower }} {{ fighters|lower }}">
+             data-search-content="{{ event.eventName|lower }} {{ event.venue|lower }} {{ event.city|lower }} {{ fighters|lower }}"
+             data-filter-org="{{ event.organization }}"
+             data-filter-status="{% if stats.total == 0 %}empty{% elseif stats.isFullyCompleted %}completed{% else %}progress{% endif %}"
+             data-sort-date="{{ event.eventDate ? event.eventDate|date('U') : 0 }}"
+             data-sort-name="{{ event.eventName }}">
             <div class="event-card-ultra {% if event.organization != 'INDEPENDENT' %}sanctioned{% endif %}">
                 {% if event.organization != 'INDEPENDENT' %}
                     <div class="org-tag-top">
@@ -191,24 +223,93 @@
     {% endfor %}
 </div>
 
+{% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('eventSearchInput');
+    const searchInput = document.getElementById('resultSearchInput');
+    const dropdown = document.getElementById('resultSearchDropdown');
+    const results = document.getElementById('resultSearchResults');
     const cards = document.querySelectorAll('.event-search-item');
 
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const query = this.value.toLowerCase();
-            cards.forEach(card => {
-                const content = card.getAttribute('data-search-content');
-                if (content.includes(query)) {
-                    card.classList.remove('search-hidden');
-                } else {
-                    card.classList.add('search-hidden');
-                }
-            });
+    searchInput.addEventListener('input', function(e) {
+        const q = e.target.value.toLowerCase().trim();
+        if (q.length < 1) {
+            dropdown.classList.add('d-none');
+            return;
+        }
+
+        results.innerHTML = '';
+        let found = 0;
+
+        cards.forEach(card => {
+            const content = card.getAttribute('data-search-content');
+            if (content.includes(q)) {
+                found++;
+                const div = document.createElement('div');
+                div.className = 'sf-search-item p-2 rounded-3 mb-1';
+                div.style.cursor = 'pointer';
+                
+                const title = card.querySelector('.event-title-pro').innerText;
+                const location = card.querySelector('.info-row:nth-child(3) span').innerText;
+                
+                div.innerHTML = `
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div style="flex: 1;">
+                            <div class="text-white fw-bold" style="font-size:0.85rem;">${title}</div>
+                            <div class="text-muted xsmall" style="font-size:0.65rem;">${location}</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-muted" style="font-size:0.6rem;"></i>
+                    </div>
+                `;
+                div.onclick = () => {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    card.querySelector('.event-card-ultra').classList.add('sf-highlight-pulse');
+                    setTimeout(() => card.querySelector('.event-card-ultra').classList.remove('sf-highlight-pulse'), 3000);
+                    dropdown.classList.add('d-none');
+                    searchInput.value = title;
+                };
+                results.appendChild(div);
+            }
         });
-    }
+
+        if (found > 0) {
+            dropdown.classList.remove('d-none');
+        } else {
+            dropdown.classList.add('d-none');
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.sf-search-wrapper')) {
+            dropdown.classList.add('d-none');
+        }
+    });
 });
 </script>
+<style>
+.sf-search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #121214;
+    border: 1px solid #27272a;
+    border-radius: 12px;
+    margin-top: 8px;
+    z-index: 1050;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    max-height: 350px;
+    overflow-y: auto;
+    padding: 10px;
+}
+.sf-search-item:hover { background: rgba(220, 38, 38, 0.08); }
+.sf-highlight-pulse { animation: highlightPulse 2s ease-in-out; }
+@keyframes highlightPulse {
+    0% { border-color: rgba(220, 38, 38, 0.5); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+    50% { border-color: #dc2626; box-shadow: 0 0 20px 5px rgba(220, 38, 38, 0.2); }
+    100% { border-color: rgba(255,255,255,0.05); box-shadow: none; }
+}
+.xsmall { font-size: 0.65rem; }
+</style>
+{% endblock %}
 {% endblock %}

@@ -16,6 +16,7 @@ class FightResultService
         private FighterRepository $fighterRepo,
         private RankingService $rankingService,
         private FighterContractRepository $contractRepo,
+        private ContractService $contractService,
     ) {}
 
     public function getAllFightResults(): array
@@ -136,28 +137,18 @@ class FightResultService
             // Process rankings only on first completion
             $this->rankingService->processCompletedFight($fr);
 
-            // Calculate Purses
+            // Calculate Purses via Advanced Contract Metier
             if ($fr->getFighter1()) {
                 $f1Contract = $this->contractRepo->findOneBy(['fighter' => $fr->getFighter1(), 'event' => $fr->getEvent()]);
                 if ($f1Contract && !$f1Contract->isPaid()) {
-                    $payout = $f1Contract->getBasePay();
-                    if ($fr->getWinner() && $fr->getWinner()->getFighterId() === $fr->getFighter1()->getFighterId()) {
-                        $payout += $f1Contract->getWinBonus();
-                    }
-                    $f1Contract->setCalculatedPayout($payout);
-                    $this->em->persist($f1Contract);
+                    $this->contractService->calculateFinalPurse($f1Contract, $fr);
                 }
             }
 
             if ($fr->getFighter2()) {
                 $f2Contract = $this->contractRepo->findOneBy(['fighter' => $fr->getFighter2(), 'event' => $fr->getEvent()]);
                 if ($f2Contract && !$f2Contract->isPaid()) {
-                    $payout = $f2Contract->getBasePay();
-                    if ($fr->getWinner() && $fr->getWinner()->getFighterId() === $fr->getFighter2()->getFighterId()) {
-                        $payout += $f2Contract->getWinBonus();
-                    }
-                    $f2Contract->setCalculatedPayout($payout);
-                    $this->em->persist($f2Contract);
+                    $this->contractService->calculateFinalPurse($f2Contract, $fr);
                 }
             }
             

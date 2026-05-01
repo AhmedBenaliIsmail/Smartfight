@@ -48,6 +48,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb->where($qb->expr()->notIn('u.userId', $adminSubquery->getDQL()))
             ->setParameter('adminRole', 'ADMIN')
             ->orderBy('u.predictionPoints', 'DESC')
+            ->addOrderBy('u.userId', 'ASC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();

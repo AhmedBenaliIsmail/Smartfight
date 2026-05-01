@@ -61,6 +61,11 @@
         <span class="stat-badge-premium mb-3 d-inline-block">OFFICIAL COMPUBOX DATA</span>
         <h1 class="display-5 fw-bold text-white mb-2" style="font-family: 'Oswald', sans-serif; letter-spacing: 2px;">{{ result.fighter1.fullName }} vs {{ result.fighter2.fullName }}</h1>
         <p class="text-muted fs-5">{{ result.event.eventName }} — {{ result.event.eventDate|date('M d, Y') }}</p>
+        <div class="mt-3">
+            <a href="{{ path('app_result_pdf', {id: result.resultId}) }}" class="btn btn-danger rounded-pill px-4 fw-bold">
+                <i class="fa-solid fa-file-pdf me-2"></i>EXPORT OFFICIAL REPORT
+            </a>
+        </div>
     </div>
 
     <div class="analytics-card p-5">
@@ -88,6 +93,34 @@
             {% if s2 %}{% set f2_total_thrown = f2_total_thrown + s2.punchesThrown %}{% set f2_total_landed = f2_total_landed + s2.punchesLanded %}{% endif %}
         {% endfor %}
 
+        {# Efficiency & Momentum Metier Section #}
+        <div class="row g-4 mb-5">
+            <div class="col-md-6">
+                <div class="p-3 rounded-4" style="background:rgba(220,38,38,0.05); border: 1px solid rgba(220,38,38,0.1);">
+                    <div class="d-flex justify-content-between align-items-end mb-2">
+                        <span class="text-muted small fw-bold">EFFICIENCY SCORE</span>
+                        <span class="badge {{ analysis.f1_momentum == 'SCORCHING' ? 'bg-orange' : 'bg-red' }}-lt">{{ analysis.f1_momentum }}</span>
+                    </div>
+                    <div class="h2 fw-bold text-white mb-0">{{ analysis.f1_efficiency }}%</div>
+                    <div class="progress mt-2" style="height: 6px; background: rgba(0,0,0,0.3);">
+                        <div class="progress-bar bg-danger" style="width: {{ analysis.f1_efficiency }}%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="p-3 rounded-4" style="background:rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.1);">
+                    <div class="d-flex justify-content-between align-items-end mb-2">
+                        <span class="text-muted small fw-bold">EFFICIENCY SCORE</span>
+                        <span class="badge {{ analysis.f2_momentum == 'SCORCHING' ? 'bg-orange' : 'bg-blue' }}-lt">{{ analysis.f2_momentum }}</span>
+                    </div>
+                    <div class="h2 fw-bold text-white mb-0">{{ analysis.f2_efficiency }}%</div>
+                    <div class="progress mt-2" style="height: 6px; background: rgba(0,0,0,0.3);">
+                        <div class="progress-bar bg-primary" style="width: {{ analysis.f2_efficiency }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="mb-5">
             <div class="stat-grid-row">
                 <div class="text-end">
@@ -101,46 +134,91 @@
                 </div>
             </div>
 
-            {# Power Punches, Jabs, etc. (Can add more here) #}
-        </div>
-
-        {% if result.videoPath or result.highlightVideoUrl %}
-        <div class="mb-5 p-4 rounded-3" style="background:rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
-            <h4 class="text-white mb-3" style="font-family:'Oswald',sans-serif;"><i class="fa-solid fa-play me-2 text-danger"></i>High-Impact Highlights</h4>
-            <div class="ratio ratio-21x9 rounded-4 overflow-hidden border border-secondary" style="background:#000; box-shadow: 0 15px 50px rgba(0,0,0,0.6);">
-                {% if result.videoPath %}
-                    <video controls style="width:100%;height:100%;object-fit:contain;">
-                        <source src="{{ asset('uploads/fights/highlights/' ~ result.videoPath) }}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                {% else %}
-                    {% set isYouTube = 'youtube.com' in result.highlightVideoUrl or 'youtu.be' in result.highlightVideoUrl %}
-                    {% set isVimeo = 'vimeo.com' in result.highlightVideoUrl %}
-                    
-                    {% if isYouTube %}
-                        {% set videoId = result.highlightVideoUrl|split('v=')|last|split('&')|first|split('?')|first %}
-                        {% if '/' in videoId %}{% set videoId = videoId|split('/')|last %}{% endif %}
-                        <iframe src="https://www.youtube.com/embed/{{ videoId }}?autoplay=0&rel=0&modestbranding=1" 
-                                title="Fight Highlights" allowfullscreen style="border:none;"></iframe>
-                    {% elseif isVimeo %}
-                        {% set videoId = result.highlightVideoUrl|split('/')|last|split('?')|first %}
-                        <iframe src="https://player.vimeo.com/video/{{ videoId }}?badge=0&autopause=0&player_id=0&app_id=58479" 
-                                title="Fight Highlights" allowfullscreen style="border:none;"></iframe>
-                    {% else %}
-                        <div class="d-flex align-items-center justify-content-center h-100 text-muted">
-                            <a href="{{ result.highlightVideoUrl }}" target="_blank" class="btn btn-outline-danger btn-lg rounded-pill fw-bold">
-                                Watch Highlights on External Player <i class="fa-solid fa-external-link ms-2"></i>
-                            </a>
-                        </div>
-                    {% endif %}
-                {% endif %}
+            {# Stylistic Matchup Analysis #}
+            <div class="mt-4 p-4 rounded-4" style="background: linear-gradient(135deg, #1e1b4b 0%, #09090b 100%); border: 1px solid #312e81;">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div style="width: 40px; height: 40px; background: #3730a3; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fa-solid fa-bolt-lightning text-white"></i>
+                    </div>
+                    <div>
+                        <h5 class="text-white mb-0 fw-bold">Tactical Matchup Profile: {{ analysis.matchup.compatibility }}</h5>
+                        <span class="text-muted xsmall">{{ analysis.matchup.f1_style }} vs {{ analysis.matchup.f2_style }}</span>
+                    </div>
+                </div>
+                <p class="text-white opacity-75 mb-0" style="font-size: 1rem; line-height: 1.6;">
+                    {{ analysis.matchup.tactical_note ?: "Standard stylistic clash. Both fighters rely on their core technical foundations." }}
+                </p>
+            </div>
+        </div>        {# Detailed Round-by-Round Breakdown #}
+        <div class="mt-5">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h3 class="h4 fw-bold text-white mb-0" style="font-family:'Oswald',sans-serif;">ROUND-BY-ROUND TECHNICAL BREAKDOWN</h3>
+                <span class="badge bg-dark border border-secondary text-muted rounded-pill px-3 py-2" style="font-size: 0.7rem;">LIVE ANALYTICS DATA</span>
+            </div>
+            
+            <div class="table-responsive rounded-4 overflow-hidden border border-secondary">
+                <table class="table table-dark table-hover mb-0">
+                    <thead>
+                        <tr style="background: rgba(255,255,255,0.03); border-bottom: 2px solid #27272a;">
+                            <th class="ps-4 py-3 text-muted xsmall fw-bold">ROUND</th>
+                            <th class="text-center py-3 text-danger fw-bold" style="letter-spacing: 1px;">{{ result.fighter1.lastName|upper }} (RED)</th>
+                            <th class="text-center py-3 text-muted xsmall fw-bold">STATISTIC</th>
+                            <th class="text-center py-3 text-primary fw-bold" style="letter-spacing: 1px;">{{ result.fighter2.lastName|upper }} (BLUE)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in 1..rounds %}
+                            {% set s1 = fighterStats[result.fighter1.fighterId][r]|default(null) %}
+                            {% set s2 = fighterStats[result.fighter2.fighterId][r]|default(null) %}
+                            
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                                <td class="ps-4 py-3 align-middle">
+                                    <div class="display-6 fw-bold text-muted opacity-25" style="font-size: 1.5rem;">{{ r }}</div>
+                                </td>
+                                <td class="text-center py-3">
+                                    <div class="text-white fw-bold">{{ s1 ? s1.punchesLanded ~ '/' ~ s1.punchesThrown : '--' }}</div>
+                                    <div class="xsmall text-muted">{{ s1 ? s1.punchAccuracy|round(1) ~ '%' : '0%' }}</div>
+                                </td>
+                                <td class="text-center py-3 align-middle">
+                                    <div class="xsmall text-muted fw-bold" style="letter-spacing: 1px;">TOTAL PUNCHES</div>
+                                    <div class="progress-stat-bar mt-2 mx-auto" style="width: 120px;">
+                                        {% set total_landed = (s1.punchesLanded|default(0) + s2.punchesLanded|default(0)) %}
+                                        <div class="red-fill" style="width: {{ s1 ? (s1.punchesLanded / max(1, total_landed) * 100) : 50 }}%"></div>
+                                        <div class="blue-fill" style="width: {{ s2 ? (s2.punchesLanded / max(1, total_landed) * 100) : 50 }}%"></div>
+                                    </div>
+                                </td>
+                                <td class="text-center py-3">
+                                    <div class="text-white fw-bold">{{ s2 ? s2.punchesLanded ~ '/' ~ s2.punchesThrown : '--' }}</div>
+                                    <div class="xsmall text-muted">{{ s2 ? s2.punchAccuracy|round(1) ~ '%' : '0%' }}</div>
+                                </td>
+                            </tr>
+                            
+                            <tr style="background: rgba(255,255,255,0.01); border-bottom: 1px solid rgba(255,255,255,0.03);">
+                                <td class="ps-4 py-2"></td>
+                                <td class="text-center py-2">
+                                    <div class="text-white small">{{ s1 ? s1.powerPunchesLanded : '0' }}</div>
+                                </td>
+                                <td class="text-center py-2 align-middle">
+                                    <div class="xsmall text-muted fw-bold" style="letter-spacing: 1px; font-size: 0.6rem;">POWER IMPACT</div>
+                                </td>
+                                <td class="text-center py-2">
+                                    <div class="text-white small">{{ s2 ? s2.powerPunchesLanded : '0' }}</div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
-        {% endif %}
 
-        <div class="mt-5 p-4 rounded-3" style="background:rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
-            <h4 class="text-white mb-3" style="font-family:'Oswald',sans-serif;"><i class="fa-solid fa-brain me-2 text-warning"></i>Inside The Numbers</h4>
-            <div class="text-muted" style="line-height:1.8; font-size:1.1rem;">
+        <div class="mt-5 p-4 rounded-4" style="background:rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div style="width: 40px; height: 40px; background: rgba(234, 179, 8, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-brain text-warning"></i>
+                </div>
+                <h4 class="text-white mb-0" style="font-family:'Oswald',sans-serif;">INSIDE THE NUMBERS — AI TACTICAL SYNTHESIS</h4>
+            </div>
+            <div class="text-muted" style="line-height:1.8; font-size:1.1rem; border-left: 2px solid #ea7608; padding-left: 1.5rem;">
                 {{ result.insideTheNumbers|default('Detailed tactical analysis pending AI synthesis.')|nl2br }}
             </div>
         </div>
@@ -152,4 +230,9 @@
         </div>
     </div>
 </div>
+
+<style>
+.xsmall { font-size: 0.65rem; }
+.fw-black { font-weight: 900; }
+</style>
 {% endblock %}

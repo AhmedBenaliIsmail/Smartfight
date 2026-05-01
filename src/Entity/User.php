@@ -144,7 +144,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $symRoles = ['ROLE_USER'];
         foreach ($this->roles as $role) {
-            $symRoles[] = 'ROLE_' . strtoupper($role->getRoleName());
+            $name = strtoupper($role->getRoleName());
+            if (str_starts_with($name, 'ROLE_')) {
+                $symRoles[] = $name;
+            } else {
+                $symRoles[] = 'ROLE_' . $name;
+            }
         }
         return array_unique($symRoles);
     }

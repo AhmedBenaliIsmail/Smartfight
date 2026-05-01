@@ -33,6 +33,12 @@ class FighterContract
     #[ORM\Column(options: ["default" => false])]
     private bool $isPaid = false;
 
+    #[ORM\Column(options: ["default" => false])]
+    private bool $missedWeight = false;
+
+    #[ORM\Column(options: ["default" => 0.1])]
+    private float $managerFeePercent = 0.1; // Default 10%
+
     public function getId(): ?int
     {
         return $this->id;
@@ -106,6 +112,30 @@ class FighterContract
     public function setIsPaid(bool $isPaid): static
     {
         $this->isPaid = $isPaid;
+
+        return $this;
+    }
+
+    public function isMissedWeight(): bool
+    {
+        return $this->missedWeight;
+    }
+
+    public function setMissedWeight(bool $missedWeight): static
+    {
+        $this->missedWeight = $missedWeight;
+
+        return $this;
+    }
+
+    public function getManagerFeePercent(): float
+    {
+        return $this->managerFeePercent;
+    }
+
+    public function setManagerFeePercent(float $managerFeePercent): static
+    {
+        $this->managerFeePercent = $managerFeePercent;
 
         return $this;
     }

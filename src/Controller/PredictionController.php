@@ -49,10 +49,6 @@ class PredictionController extends AbstractController
     public function submit(int $fightId, Request $request, FightResultRepository $resultRepo, FighterRepository $fighterRepo, PredictionRepository $predictionRepo, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
-        if ($this->isGranted('ROLE_ADMIN')) {
-            $this->addFlash('error', 'Admins cannot submit predictions.');
-            return $this->redirectToRoute('app_dashboard');
-        }
         $user = $this->getUser();
         $fight = $resultRepo->find($fightId);
 

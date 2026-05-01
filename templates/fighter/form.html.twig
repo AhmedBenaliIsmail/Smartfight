@@ -52,13 +52,24 @@
                             <label class="form-label">Reach (cm)</label>
                             <input type="number" name="reach" class="form-control" value="{{ fighter ? fighter.reach : '' }}" />
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <label class="form-label">Weight Division <span style="color:#dc2626;">*</span></label>
                             <select name="weightDivision" class="form-select" required>
                                 <option value="" {{ fighter and not fighter.weightDivision ? 'selected' : '' }} disabled>Select division...</option>
                                 {% for wd in weightDivisions %}
                                     <option value="{{ wd.id }}" {{ fighter and fighter.weightDivision and fighter.weightDivision.id == wd.id ? 'selected' : '' }}>
                                         {{ wd.name }} (Up to {{ wd.maxWeightLbs }} lbs)
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Manager / Agent</label>
+                            <select name="manager_id" class="form-select">
+                                <option value="">No Manager Assigned</option>
+                                {% for user in users %}
+                                    <option value="{{ user.userId }}" {{ fighter and fighter.manager and fighter.manager.userId == user.userId ? 'selected' : '' }}>
+                                        {{ user.username }} ({{ user.rolesAsString }})
                                     </option>
                                 {% endfor %}
                             </select>

@@ -238,6 +238,13 @@
                     <i class="fa-solid fa-file-invoice-dollar fa-fw" style="color:#22c55e;"></i>
                     <span class="sf-sidebar-label">Purses &amp; Contracts</span>
                 </a>
+
+                <a href="{{ path('admin_finance_index') }}"
+                   class="sf-sidebar-link{{ route starts with 'admin_finance' ? ' active' : '' }}"
+                   title="Finance Department">
+                    <i class="fa-solid fa-vault fa-fw" style="color:#fbbf24;"></i>
+                    <span class="sf-sidebar-label">Finance Department</span>
+                </a>
                 {% endif %}
 
                 <a href="{{ path('app_stats') }}"
@@ -291,7 +298,7 @@
                     <span class="sf-sidebar-label">{{ is_granted('ROLE_ADMIN') ? 'Voting Pool Admin' : 'Matchmaking Voting' }}</span>
                 </a>
 
-                {% if is_granted('ROLE_USER') and not is_granted('ROLE_ADMIN') %}
+                {% if is_granted('ROLE_USER') %}
                 <div class="sf-sidebar-section">Fantasy League</div>
                 <a href="{{ path('app_predictions') }}"
                    class="sf-sidebar-link{{ route starts with 'app_prediction' ? ' active' : '' }}"
@@ -357,27 +364,117 @@
             });
         }
 
-        // Live Search / Instant Narrowing Logic
-        const searchInputs = document.querySelectorAll('[data-live-search]');
-        searchInputs.forEach(input => {
-            const targetSelector = input.getAttribute('data-live-search');
-            const itemSelector = input.getAttribute('data-live-search-item') || 'tbody tr';
-            const container = document.querySelector(targetSelector);
-            if (!container) return;
+        // ── Advanced Reusable Filter & Sort System ───────────────────────────────
+        class AdvancedFilter {
+            constructor(containerSelector, itemSelector) {
+                this.container = document.querySelector(containerSelector);
+                this.itemSelector = itemSelector;
+                if (!this.container) return;
+                
+                this.items = Array.from(this.container.querySelectorAll(itemSelector));
+                this.activeFilters = {};
+                this.activeSort = { key: null, order: 'asc' };
+                this.searchQuery = '';
+            }
 
-            input.addEventListener('input', function() {
-                const query = this.value.toLowerCase().trim();
-                const items = container.querySelectorAll(itemSelector);
+            filter(key, value) {
+                if (value === '' || value === 'all') {
+                    delete this.activeFilters[key];
+                } else {
+                    this.activeFilters[key] = value.toLowerCase();
+                }
+                this.apply();
+            }
 
-                items.forEach(item => {
-                    if (item.tagName === 'TR' && item.cells.length === 1 && item.cells[0].colSpan > 1) return;
-                    let text = item.innerText.toLowerCase();
-                    item.style.display = text.includes(query) ? '' : 'none';
+            search(query) {
+                this.searchQuery = query.toLowerCase().trim();
+                this.apply();
+            }
+
+            sort(key, type = 'string', order = 'asc') {
+                if (this.activeSort.key === key) {
+                    this.activeSort.order = this.activeSort.order === 'asc' ? 'desc' : 'asc';
+                } else {
+                    this.activeSort = { key, type, order };
+                }
+                this.apply();
+            }
+
+            apply() {
+                if (!this.container) return;
+
+                // 1. Filter
+                let visibleItems = this.items.filter(item => {
+                    // Text Search check
+                    const textMatch = item.innerText.toLowerCase().includes(this.searchQuery) || 
+                                     (item.getAttribute('data-search-content') && item.getAttribute('data-search-content').toLowerCase().includes(this.searchQuery));
+                    
+                    if (!textMatch) return false;
+
+                    // Attribute Filters check
+                    for (const [key, value] of Object.entries(this.activeFilters)) {
+                        const attrVal = item.getAttribute(`data-filter-${key}`);
+                        if (attrVal && attrVal.toLowerCase() !== value) return false;
+                    }
+
+                    return true;
                 });
-            });
+
+                // 2. Sort
+                if (this.activeSort.key) {
+                    visibleItems.sort((a, b) => {
+                        let valA = a.getAttribute(`data-sort-${this.activeSort.key}`) || '';
+                        let valB = b.getAttribute(`data-sort-${this.activeSort.key}`) || '';
+
+                        if (this.activeSort.type === 'number') {
+                            valA = parseFloat(valA) || 0;
+                            valB = parseFloat(valB) || 0;
+                        }
+
+                        if (valA < valB) return this.activeSort.order === 'asc' ? -1 : 1;
+                        if (valA > valB) return this.activeSort.order === 'asc' ? 1 : -1;
+                        return 0;
+                    });
+                }
+
+                // 3. Render
+                this.container.innerHTML = '';
+                this.items.forEach(item => item.style.display = 'none');
+                visibleItems.forEach(item => {
+                    item.style.display = '';
+                    this.container.appendChild(item);
+                });
+
+                // Handle empty state
+                const emptyMsg = this.container.querySelector('.sf-empty-msg');
+                if (visibleItems.length === 0) {
+                    if (!emptyMsg) {
+                        const div = document.createElement('div');
+                        div.className = 'col-12 text-center py-5 text-muted sf-empty-msg';
+                        div.innerHTML = '<i class="fa-solid fa-magnifying-glass fa-3x mb-3 opacity-25"></i><p>No matches found for your criteria.</p>';
+                        this.container.appendChild(div);
+                    }
+                } else if (emptyMsg) {
+                    emptyMsg.remove();
+                }
+            }
+        }
+
+        window.AdvancedFilter = AdvancedFilter;
+
+        // Auto-init search inputs with data-live-search
+        document.querySelectorAll('[data-live-search]').forEach(input => {
+            const containerSelector = input.getAttribute('data-live-search');
+            const itemSelector = input.getAttribute('data-live-search-item') || 'tr';
+            const filter = new AdvancedFilter(containerSelector, itemSelector);
+            
+            input.addEventListener('input', (e) => filter.search(e.target.value));
+            
+            // Expose for external control (dropdowns etc)
+            input._sfFilter = filter;
         });
 
-        // Global Search Logic
+        // Global Search Logic (remains same)
         const gSearchInput = document.getElementById('globalSearchInput');
         const gSearchResults = document.getElementById('globalSearchResults');
         const gSearchSpinner = document.getElementById('globalSearchSpinner');

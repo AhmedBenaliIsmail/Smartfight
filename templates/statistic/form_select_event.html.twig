@@ -1,47 +1,179 @@
-{% extends 'base.html.twig' %}
+{% extends 'front/base_front.html.twig' %}
 
-{% block title %}Select Event — SmartFight Admin{% endblock %}
-
-{% block breadcrumb %}
-    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
-    <li class="breadcrumb-item"><a href="{{ path('app_stats') }}" style="color:#a1a1aa;text-decoration:none;">Statistics</a></li>
-    <li class="breadcrumb-item active">Add Statistics</li>
-{% endblock %}
+{% block title %}Select Event — SmartFight Statistics{% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-4">
-    <div>
-        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Step 1: Select Finished Event</h1>
-        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Choose an event to record fight statistics</p>
+<div class="sf-broadcast-container py-5">
+    <div class="container mb-5">
+        <div class="header-console">
+            <div class="path-indicator mb-2">
+                <span class="active">EVENT</span>
+                <span class="sep">/</span>
+                <span>BOUT</span>
+                <span class="sep">/</span>
+                <span>ANALYTICS</span>
+            </div>
+            <h1 class="display-4 fw-bold text-white mb-2" style="font-family: 'Oswald', sans-serif; letter-spacing: 3px;">PHASE 1: BATTLEGROUND SELECTION</h1>
+            <p class="text-muted fs-5">Identify the event to unlock specific performance intelligence and tactical logs.</p>
+        </div>
     </div>
-</div>
 
-<div class="row g-4">
-    {% for event in events %}
-    <div class="col-md-4">
-        <a href="{{ path('app_stat_new', {'eventId': event.eventId}) }}" style="text-decoration:none;">
-            <div class="card card-link" style="background:#18181b;border:1px solid #27272a;transition:transform 0.2s;">
-                <div class="card-body p-4 text-center">
-                    <div class="mb-3">
-                        <i class="fa-solid fa-calendar-check fa-3x" style="color:#3b82f6;"></i>
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            {% for event in events %}
+            <div class="col-lg-4 col-md-6">
+                <a href="{{ path('app_stat_selection', {'eventId': event.eventId}) }}" class="sf-event-panel">
+                    <div class="panel-bg"></div>
+                    <div class="panel-content">
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div class="event-id">KO-{{ event.eventId + 1000 }}</div>
+                            <div class="status-tag">FINALIZED</div>
+                        </div>
+                        
+                        <h3 class="event-title">{{ event.eventName|upper }}</h3>
+                        
+                        <div class="event-details mb-4">
+                            <div class="detail-item">
+                                <i class="fa-solid fa-calendar"></i>
+                                <span>{{ event.eventDate|date('D, M d, Y') }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <span>{{ event.venue }}, {{ event.city }}</span>
+                            </div>
+                        </div>
+
+                        <div class="panel-action">
+                            <span>INITIALIZE DECRYPT</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </div>
                     </div>
-                    <h3 class="mb-1 fw-bold" style="color:#fafafa;">{{ event.eventName }}</h3>
-                    <div class="text-muted small">{{ event.eventDate|date('Y-m-d') }}</div>
-                    <div class="mt-2 text-muted small"><i class="fa-solid fa-location-dot me-1"></i>{{ event.venue }}, {{ event.city }}</div>
+                    <div class="panel-border-glow"></div>
+                </a>
+            </div>
+            {% else %}
+            <div class="col-12 text-center py-5">
+                <div class="empty-state-console">
+                    <i class="fa-solid fa-database-slash mb-4"></i>
+                    <h2>NO ARCHIVED EVENTS</h2>
+                    <p>Statistical intelligence is only available for bouts that have reached their conclusion.</p>
                 </div>
             </div>
-        </a>
+            {% endfor %}
+        </div>
     </div>
-    {% else %}
-    <div class="col-12 text-center py-5">
-        <i class="fa-solid fa-calendar-xmark fa-4x mb-3 text-muted"></i>
-        <h3 class="text-muted">No finished events found.</h3>
-        <p class="text-muted">Statistics can only be added for events that are in the past.</p>
-    </div>
-    {% endfor %}
 </div>
 
 <style>
-.card-link:hover { transform: translateY(-5px); border-color: #3b82f6 !important; }
+.sf-broadcast-container { min-vh: 100vh; }
+
+.header-console { border-left: 4px solid #dc2626; padding-left: 25px; }
+.path-indicator { font-size: 0.65rem; font-weight: 900; color: #52525b; letter-spacing: 2px; }
+.path-indicator .active { color: #dc2626; }
+.path-indicator .sep { margin: 0 8px; color: #27272a; }
+
+.sf-event-panel {
+    display: block;
+    position: relative;
+    background: #121214;
+    border-radius: 24px;
+    padding: 35px;
+    text-decoration: none !important;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.panel-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.05) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.sf-event-panel:hover {
+    transform: translateY(-10px);
+    border-color: rgba(220, 38, 38, 0.3);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+}
+
+.sf-event-panel:hover .panel-bg { opacity: 1; }
+
+.panel-content { position: relative; z-index: 2; }
+
+.event-id {
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: #52525b;
+    letter-spacing: 2px;
+}
+
+.status-tag {
+    font-size: 0.6rem;
+    font-weight: 900;
+    color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.event-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.75rem;
+    color: #fff;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #71717a;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
+
+.detail-item i { color: #dc2626; width: 16px; text-align: center; }
+
+.panel-action {
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    opacity: 0.4;
+    transition: all 0.3s ease;
+}
+
+.sf-event-panel:hover .panel-action {
+    opacity: 1;
+    color: #dc2626;
+}
+
+.panel-border-glow {
+    position: absolute;
+    bottom: 0; left: 0; right: 0; height: 3px;
+    background: #dc2626;
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+}
+
+.sf-event-panel:hover .panel-border-glow {
+    transform: scaleX(1);
+}
+
+.empty-state-console {
+    padding: 100px 0;
+    opacity: 0.3;
+}
+
+.empty-state-console i { font-size: 5rem; color: #52525b; }
+.empty-state-console h2 { font-family: 'Oswald', sans-serif; color: #fff; letter-spacing: 3px; margin-top: 20px; }
 </style>
 {% endblock %}

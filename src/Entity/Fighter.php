@@ -100,6 +100,10 @@ class Fighter
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $weight = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: "manager_id", referencedColumnName: "userId", nullable: true)]
+    private ?User $manager = null;
+
     // Getters and Setters
     public function getFighterId(): ?int { return $this->fighterId; }
     public function setFighterId(int $id): self { $this->fighterId = $id; return $this; }
@@ -202,6 +206,9 @@ class Fighter
 
     public function getWeight(): ?int { return $this->weight; }
     public function setWeight(?int $v): self { $this->weight = $v; return $this; }
+
+    public function getManager(): ?User { return $this->manager; }
+    public function setManager(?User $manager): self { $this->manager = $manager; return $this; }
 
     public function getStrikeAccuracy(): float
     {

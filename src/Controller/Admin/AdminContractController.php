@@ -8,6 +8,7 @@ use App\Repository\FighterContractRepository;
 use App\Repository\FighterRepository;
 use App\Repository\FightResultRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Service\PdfService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -134,9 +135,67 @@ class AdminContractController extends AbstractController
         if ($contract) {
             $em->remove($contract);
             $em->flush();
-            $this->addFlash('success', 'Contract deleted.');
+            $this->addFlash('success', 'Contract revoked/deleted.');
         }
 
         return $this->redirectToRoute('admin_contract_index');
     }
+
+    #[Route('/{id}/toggle-weight', name: 'admin_contract_toggle_weight', methods: ['POST'])]
+    public function toggleWeight(int $id, FighterContractRepository $contractRepo, EntityManagerInterface $em, \App\Service\ContractService $contractService, FightResultRepository $resultRepo): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $contract = $contractRepo->find($id);
+        if (!$contract) throw $this->createNotFoundException();
+
+        $contract->setMissedWeight(!$contract->isMissedWeight());
+        
+        // If result already exists, recalculate purse
+        $result = $resultRepo->findOneBy(['event' => $contract->getEvent(), 'fighter1' => $contract->getFighter()]);
+        if (!$result) {
+            $result = $resultRepo->findOneBy(['event' => $contract->getEvent(), 'fighter2' => $contract->getFighter()]);
+        }
+
+        if ($result && $result->getStatus() === 'COMPLETED') {
+            $contractService->calculateFinalPurse($contract, $result);
+        }
+
+        $em->flush();
+
+        $this->addFlash('info', 'Weight miss status updated.');
+        return $this->redirectToRoute('admin_contract_index');
+    }
+
+    #[Route('/{id}/pdf', name: 'admin_contract_pdf', methods: ['GET'])]
+    public function pdf(int $id, FighterContractRepository $contractRepo, PdfService $pdfService): void
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $contract = $contractRepo->find($id);
+        if (!$contract) {
+            throw $this->createNotFoundException('Contract not found');
+        }
+
+        $html = $this->renderView('admin/contract/pdf.html.twig', [
+            'contract' => $contract,
+        ]);
+
+        $pdfService->showPdfFile($html, "Contract_" . $contract->getFighter()->getLastName());
+    }
+
+    #[Route('/pdf-list', name: 'admin_contract_pdf_list', methods: ['GET'])]
+    public function pdfList(FighterContractRepository $contractRepo, PdfService $pdfService): void
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $contracts = $contractRepo->findBy([], ['id' => 'DESC']);
+
+        $html = $this->renderView('admin/contract/pdf_list.html.twig', [
+            'contracts' => $contracts,
+        ]);
+
+        $pdfService->showPdfFile($html, "Contract_List_" . date('Y-m-d'));
+    }
+
 }
