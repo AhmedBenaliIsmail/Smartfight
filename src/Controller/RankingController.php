@@ -41,12 +41,12 @@ class RankingController extends AbstractController
 
         $lastUpdated = new \DateTime();
 
-        // QR → mobile-friendly public page (no login needed on phone)
+        // QR → opens PDF directly
         $rankingUrl = sprintf(
             'http://%s:%s%s',
             self::LAN_IP,
             self::LAN_PORT,
-            $this->generateUrl('app_ranking_mobile')
+            $this->generateUrl('app_ranking_pdf')
         );
         $qrSvg = $this->buildQrSvg($rankingUrl);
 
