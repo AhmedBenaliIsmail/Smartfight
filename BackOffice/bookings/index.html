@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Event Bookings — SmartFight Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/smartfight-admin.css" />
+</head>
+<body class="antialiased">
+<div class="wrapper">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────── -->
+  <aside class="navbar navbar-vertical navbar-expand-lg" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+    <div class="container-fluid flex-column align-items-stretch p-0">
+      <div class="p-3 border-bottom" style="border-color:#27272a!important">
+        <a href="../dashboard.html" class="smartfight-logo">
+          <div class="logo-icon"><i class="fa-solid fa-fist-raised"></i></div>
+          <div class="logo-text">Smart<span>Fight</span></div>
+        </a>
+      </div>
+      <nav class="flex-fill py-2">
+        <div class="navbar-vertical-section">Management</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../dashboard.html"><span class="nav-link-icon"><i class="fa-solid fa-chart-line fa-fw"></i></span><span class="nav-link-title">Dashboard</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../users/index.html"><span class="nav-link-icon"><i class="fa-solid fa-users fa-fw"></i></span><span class="nav-link-title">Users</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fighters/index.html"><span class="nav-link-icon"><i class="fa-solid fa-boxing-glove fa-fw"></i></span><span class="nav-link-title">Fighters</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../events/index.html"><span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span><span class="nav-link-title">Events</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fight-results/index.html"><span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span><span class="nav-link-title">Fight Results</span></a></li>
+        </ul>
+        <div class="navbar-vertical-section mt-2">Fan Experience</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../blog/index.html"><span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw"></i></span><span class="nav-link-title">Blog Articles</span></a></li>
+          <li class="nav-item"><a class="nav-link active" href="index.html"><span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw"></i></span><span class="nav-link-title">Event Bookings</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../predictions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span><span class="nav-link-title">Predictions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../reactions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-comments fa-fw"></i></span><span class="nav-link-title">Reactions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../notifications/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span><span class="nav-link-title">Notifications</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- ── Main ─────────────────────────────────────────────────── -->
+  <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
+    <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
+      <div class="d-flex align-items-center gap-3 flex-fill">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="../dashboard.html" style="color:#a1a1aa;text-decoration:none;">Dashboard</a></li>
+          <li class="breadcrumb-item active">Event Bookings</li>
+        </ol>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="../notifications/index.html" class="nav-link p-1 position-relative text-muted">
+          <i class="fa-solid fa-bell"></i>
+          <span class="badge bg-danger rounded-pill" style="position:absolute;top:-4px;right:-4px;font-size:.6rem;padding:2px 5px;">7</span>
+        </a>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+            <div class="avatar avatar-sm" style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">A</div>
+            <span style="font-size:.875rem;color:#fafafa;">Admin</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user fa-fw me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-fill p-4" style="background:#09090b;">
+      <!-- Page Header -->
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Event Bookings</h1>
+          <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Manage ticket bookings across all SmartFight events.</p>
+        </div>
+        <button class="btn btn-outline-secondary"><i class="fa-solid fa-file-csv me-2"></i>Export CSV</button>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+        <div class="card-body py-3">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+              <label class="form-label">Event</label>
+              <select class="form-select">
+                <option value="">All Events</option>
+                <option>UFC 310</option>
+                <option>SmartFight Grand Prix</option>
+                <option>SmartFight 45</option>
+                <option>Bellator 302</option>
+                <option>ONE FC 2026</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Status</label>
+              <select class="form-select">
+                <option value="">All Status</option>
+                <option>Confirmed</option>
+                <option>Pending</option>
+                <option>Cancelled</option>
+                <option>Refunded</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Date From</label>
+              <input type="date" class="form-control" value="2026-04-01" />
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Date To</label>
+              <input type="date" class="form-control" value="2026-04-07" />
+            </div>
+            <div class="col-md-3 d-flex gap-2 align-items-end">
+              <button class="btn btn-danger flex-fill">Filter</button>
+              <button class="btn btn-outline-secondary">Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card" style="background:#18181b;border:1px solid #27272a;">
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th style="padding:.75rem 1.25rem;">#</th>
+                <th>Booking ID</th>
+                <th>Fan Name</th>
+                <th>Event</th>
+                <th>Ticket Type</th>
+                <th>Qty</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#52525b;">1</td>
+                <td style="font-weight:600;color:#fafafa;">#BK-1234</td>
+                <td style="color:#d4d4d8;">Marcus Johnson</td>
+                <td style="color:#a1a1aa;">UFC 310</td>
+                <td style="color:#a1a1aa;">VIP</td>
+                <td style="color:#fafafa;font-weight:600;">2</td>
+                <td style="color:#22c55e;font-weight:600;">$600.00</td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Confirmed</span></td>
+                <td style="color:#a1a1aa;font-size:.8rem;">Apr 5, 2026</td>
+                <td>
+                  <div class="d-flex gap-1">
+                    <a href="show.html" class="btn btn-sm btn-outline-secondary" title="View"><i class="fa-solid fa-eye"></i></a>
+                    <button class="btn btn-sm btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#52525b;">2</td>
+                <td style="font-weight:600;color:#fafafa;">#BK-1235</td>
+                <td style="color:#d4d4d8;">Sandra Browning</td>
+                <td style="color:#a1a1aa;">Bellator 302</td>
+                <td style="color:#a1a1aa;">General</td>
+                <td style="color:#fafafa;font-weight:600;">4</td>
+                <td style="color:#eab308;font-weight:600;">$200.00</td>
+                <td><span class="badge" style="background:rgba(234,179,8,.15);color:#eab308;">Pending</span></td>
+                <td style="color:#a1a1aa;font-size:.8rem;">Apr 5, 2026</td>
+                <td>
+                  <div class="d-flex gap-1">
+                    <a href="show.html" class="btn btn-sm btn-outline-secondary" title="View"><i class="fa-solid fa-eye"></i></a>
+                    <button class="btn btn-sm btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#52525b;">3</td>
+                <td style="font-weight:600;color:#fafafa;">#BK-1236</td>
+                <td style="color:#d4d4d8;">Kevin Torres</td>
+                <td style="color:#a1a1aa;">UFC 310</td>
+                <td style="color:#a1a1aa;">Ringside</td>
+                <td style="color:#fafafa;font-weight:600;">1</td>
+                <td style="color:#22c55e;font-weight:600;">$850.00</td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Confirmed</span></td>
+                <td style="color:#a1a1aa;font-size:.8rem;">Apr 4, 2026</td>
+                <td>
+                  <div class="d-flex gap-1">
+                    <a href="show.html" class="btn btn-sm btn-outline-secondary" title="View"><i class="fa-solid fa-eye"></i></a>
+                    <button class="btn btn-sm btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#52525b;">4</td>
+                <td style="font-weight:600;color:#fafafa;">#BK-1237</td>
+                <td style="color:#d4d4d8;">Aisha Mohammed</td>
+                <td style="color:#a1a1aa;">PFL 2026</td>
+                <td style="color:#a1a1aa;">General</td>
+                <td style="color:#fafafa;font-weight:600;">2</td>
+                <td style="color:#dc2626;font-weight:600;">$100.00</td>
+                <td><span class="badge" style="background:rgba(220,38,38,.15);color:#dc2626;">Cancelled</span></td>
+                <td style="color:#a1a1aa;font-size:.8rem;">Apr 4, 2026</td>
+                <td>
+                  <div class="d-flex gap-1">
+                    <a href="show.html" class="btn btn-sm btn-outline-secondary" title="View"><i class="fa-solid fa-eye"></i></a>
+                    <button class="btn btn-sm btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#52525b;">5</td>
+                <td style="font-weight:600;color:#fafafa;">#BK-1238</td>
+                <td style="color:#d4d4d8;">Ryan Fletcher</td>
+                <td style="color:#a1a1aa;">ONE FC 2026</td>
+                <td style="color:#a1a1aa;">VIP</td>
+                <td style="color:#fafafa;font-weight:600;">3</td>
+                <td style="color:#22c55e;font-weight:600;">$750.00</td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Confirmed</span></td>
+                <td style="color:#a1a1aa;font-size:.8rem;">Apr 3, 2026</td>
+                <td>
+                  <div class="d-flex gap-1">
+                    <a href="show.html" class="btn btn-sm btn-outline-secondary" title="View"><i class="fa-solid fa-eye"></i></a>
+                    <button class="btn btn-sm btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#52525b;">6</td>
+                <td style="font-weight:600;color:#fafafa;">#BK-1239</td>
+                <td style="color:#d4d4d8;">Priya Sharma</td>
+                <td style="color:#a1a1aa;">SmartFight Grand Prix</td>
+                <td style="color:#a1a1aa;">VIP</td>
+                <td style="color:#fafafa;font-weight:600;">2</td>
+                <td style="color:#a1a1aa;font-weight:600;">$500.00</td>
+                <td><span class="badge" style="background:rgba(113,113,122,.15);color:#71717a;">Refunded</span></td>
+                <td style="color:#a1a1aa;font-size:.8rem;">Apr 3, 2026</td>
+                <td>
+                  <div class="d-flex gap-1">
+                    <a href="show.html" class="btn btn-sm btn-outline-secondary" title="View"><i class="fa-solid fa-eye"></i></a>
+                    <button class="btn btn-sm btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:.75rem 1.25rem;color:#52525b;">7</td>
+                <td style="font-weight:600;color:#fafafa;">#BK-1240</td>
+                <td style="color:#d4d4d8;">Lucas Pereira</td>
+                <td style="color:#a1a1aa;">SmartFight 45</td>
+                <td style="color:#a1a1aa;">General</td>
+                <td style="color:#fafafa;font-weight:600;">5</td>
+                <td style="color:#22c55e;font-weight:600;">$375.00</td>
+                <td><span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;">Confirmed</span></td>
+                <td style="color:#a1a1aa;font-size:.8rem;">Apr 2, 2026</td>
+                <td>
+                  <div class="d-flex gap-1">
+                    <a href="show.html" class="btn btn-sm btn-outline-secondary" title="View"><i class="fa-solid fa-eye"></i></a>
+                    <button class="btn btn-sm btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr style="background:#09090b;">
+                <td colspan="6" style="padding:.75rem 1.25rem;font-size:.8rem;color:#a1a1aa;font-weight:600;">7 bookings — Page total</td>
+                <td style="padding:.75rem 1.25rem;font-size:.9rem;color:#fafafa;font-weight:700;">$3,375.00</td>
+                <td colspan="3"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div class="card-footer d-flex align-items-center justify-content-between" style="background:#18181b;border-top:1px solid #27272a;padding:.75rem 1.25rem;">
+          <span style="font-size:.8rem;color:#a1a1aa;">Showing 7 of 847 bookings</span>
+          <nav>
+            <ul class="pagination mb-0 pagination-sm">
+              <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+              <li class="page-item active"><a class="page-link" href="#">1</a></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item"><a class="page-link" href="#">Next</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+</body>
+</html>

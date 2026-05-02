@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}SmartFight Admin{% endblock %}</title>
+    {% block stylesheets %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+    <link rel="stylesheet" href="{{ asset('backoffice/css/smartfight-admin.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/smartfight-admin.css') }}" />
+    {% endblock %}
+</head>
+<body class="antialiased">
+
+<style>
+/* ── Admin sf-sidebar ───────────────────────────────────────── */
+.sf-sidebar {
+  width: 240px; background: #09090b;
+  border-right: 1px solid #27272a;
+  display: flex; flex-direction: column; flex-shrink: 0;
+  height: 100%; overflow: hidden;
+  transition: width .25s ease; z-index: 100;
+}
+.sf-sidebar.sf-collapsed { width: 64px; }
+.sf-sidebar-toggle {
+  width: 36px; height: 36px; margin: 14px;
+  background: #1f1f23; border: 1px solid #27272a; border-radius: 6px;
+  color: #a1a1aa; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: background .15s, color .15s, border-color .15s, margin .25s;
+}
+.sf-sidebar.sf-collapsed .sf-sidebar-toggle { margin-left: auto; margin-right: auto; }
+.sf-sidebar-toggle:hover { background: rgba(220,38,38,.15); color: #dc2626; border-color: #dc2626; }
+.sf-sidebar-nav {
+  flex: 1; display: flex; flex-direction: column;
+  padding: 0 8px; gap: 2px;
+  overflow-y: auto; overflow-x: hidden;
+}
+.sf-sidebar-link {
+  display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 6px;
+  color: #a1a1aa; text-decoration: none; font-size: .875rem; font-weight: 500;
+  white-space: nowrap; transition: background .15s, color .15s, padding .25s, gap .25s;
+}
+.sf-sidebar-link i { width: 20px; text-align: center; font-size: 1rem; flex-shrink: 0; }
+.sf-sidebar-link:hover { background: #1f1f23; color: #fafafa; }
+.sf-sidebar-link.active { background: rgba(220,38,38,.15); color: #dc2626; font-weight: 600; }
+.sf-sidebar.sf-collapsed .sf-sidebar-link { padding-left: 0; padding-right: 0; justify-content: center; gap: 0; }
+.sf-sidebar-label { overflow: hidden; max-width: 200px; opacity: 1; transition: max-width .25s ease, opacity .15s; }
+.sf-sidebar.sf-collapsed .sf-sidebar-label { max-width: 0; opacity: 0; }
+.sf-sidebar-section {
+  font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+  color: #52525b; padding: 1.2rem 12px .4rem; white-space: nowrap;
+  overflow: hidden; max-height: 3rem;
+  transition: max-height .25s ease, opacity .15s, padding .25s;
+}
+.sf-sidebar.sf-collapsed .sf-sidebar-section { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; }
+.sf-sidebar-sep { height: 1px; background: #27272a; margin: 6px 10px; flex-shrink: 0; }
+.sf-sidebar-footer {
+  display: flex; align-items: center; gap: 10px; padding: 14px;
+  border-top: 1px solid #27272a; overflow: hidden; flex-shrink: 0; transition: padding .25s;
+}
+.sf-sidebar.sf-collapsed .sf-sidebar-footer { justify-content: center; padding: 14px 0; }
+.sf-sidebar-avatar {
+  width: 32px; height: 32px; border-radius: 50%; background: #dc2626; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: .8rem; flex-shrink: 0;
+}
+.sf-sidebar-user-info { overflow: hidden; max-width: 160px; opacity: 1; transition: max-width .25s ease, opacity .15s; }
+.sf-sidebar.sf-collapsed .sf-sidebar-user-info { max-width: 0; opacity: 0; }
+.sf-sidebar-uname { font-size: .82rem; font-weight: 600; color: #fafafa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sf-sidebar-role { font-size: .72rem; color: #dc2626; font-weight: 700; white-space: nowrap; }
+.sf-sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 99; }
+.sf-sidebar-backdrop.sf-active { display: block; }
+/* Layout wrappers */
+.sf-admin-wrap { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: #09090b; }
+.sf-admin-body { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+.sf-admin-content { flex: 1; min-width: 0; overflow-y: auto; background: #09090b; }
+/* Responsive — tablet: icon-only */
+@media (max-width: 991.98px) {
+  .sf-sidebar { width: 64px !important; }
+  .sf-sidebar .sf-sidebar-label,.sf-sidebar .sf-sidebar-user-info { max-width: 0 !important; opacity: 0 !important; }
+  .sf-sidebar .sf-sidebar-toggle { margin-left: auto !important; margin-right: auto !important; }
+  .sf-sidebar .sf-sidebar-link { padding-left: 0 !important; padding-right: 0 !important; justify-content: center !important; gap: 0 !important; }
+  .sf-sidebar .sf-sidebar-footer { justify-content: center !important; padding: 14px 0 !important; }
+  .sf-sidebar .sf-sidebar-section { max-height: 0 !important; opacity: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; }
+}
+/* Responsive — mobile: off-canvas overlay */
+@media (max-width: 767.98px) {
+  .sf-sidebar {
+    position: fixed !important; top: 0 !important; left: 0 !important;
+    height: 100vh !important; width: 240px !important; z-index: 1050 !important;
+    transform: translateX(-100%); transition: transform .25s ease !important;
+  }
+  .sf-sidebar .sf-sidebar-label,.sf-sidebar .sf-sidebar-user-info { max-width: 160px !important; opacity: 1 !important; }
+  .sf-sidebar .sf-sidebar-toggle { margin: 14px !important; }
+  .sf-sidebar .sf-sidebar-link { padding: 10px !important; justify-content: flex-start !important; gap: 10px !important; }
+  .sf-sidebar .sf-sidebar-footer { padding: 14px !important; justify-content: flex-start !important; }
+  .sf-sidebar .sf-sidebar-section { max-height: 3rem !important; opacity: 1 !important; padding: 1.2rem 12px .4rem !important; }
+  .sf-sidebar.sf-mobile-open { transform: translateX(0); }
+  .sf-sidebar-backdrop { z-index: 1049; }
+}
+</style>
+
+<div class="sf-admin-wrap">
+
+    <!-- ── Topbar (unchanged) ─────────────────────────────── -->
+    <header class="navbar navbar-expand-md" style="background:#09090b; border-bottom:1px solid #27272a; padding: 0.75rem 1.5rem; position:sticky; top:0; z-index:99; height: 64px; flex-shrink:0;">
+        <div class="container-fluid p-0 d-flex align-items-center justify-content-between">
+
+            <!-- Left: Breadcrumb -->
+            <div class="d-flex align-items-center" style="min-width: 200px;">
+                <ol class="breadcrumb mb-0 d-none d-xl-flex">
+                    {% block breadcrumb %}
+                    <li class="breadcrumb-item active">Dashboard</li>
+                    {% endblock %}
+                </ol>
+            </div>
+
+            <!-- Center: Global Search Bar -->
+            <div class="position-relative d-flex justify-content-center flex-grow-1 px-4">
+                <div class="input-group input-group-flat shadow-sm" style="max-width: 500px; border-radius: 8px; overflow: hidden; border: 1px solid #27272a;">
+                    <span class="input-group-text bg-dark border-0 px-3">
+                        <i class="fa-solid fa-magnifying-glass text-muted" style="font-size: 0.85rem;"></i>
+                    </span>
+                    <input type="text" id="globalSearchInput" class="form-control bg-dark border-0 text-white ps-0" placeholder="Search Boxers, Events, or News..." autocomplete="off" style="font-size: 0.85rem; height: 38px;">
+                    <span class="input-group-text bg-dark border-0 pe-3 d-none" id="globalSearchSpinner">
+                        <i class="fa-solid fa-circle-notch fa-spin text-muted" style="font-size: 0.85rem;"></i>
+                    </span>
+                </div>
+
+                <!-- Search Results Dropdown -->
+                <div id="globalSearchResults" class="position-absolute mt-2 shadow-lg d-none" style="background:#18181b; border: 1px solid #27272a; border-radius: 8px; z-index: 1000; width: 500px; max-height: 400px; overflow-y: auto; backdrop-filter: blur(10px); top: 100%;">
+                    <!-- Results will be injected here -->
+                </div>
+            </div>
+
+            <!-- Right: Notifications & User -->
+            <div class="d-flex align-items-center gap-3" style="min-width: 200px; justify-content: flex-end;">
+            {% if app.user %}
+                {{ render(controller('App\\Controller\\NotificationController::list')) }}
+
+                {% if not is_granted('ROLE_ADMIN') %}
+                <div class="d-none d-md-flex align-items-center gap-2 me-2">
+                    <span class="badge bg-blue-lt" title="Fantasy Points"><i class="fa-solid fa-star me-1 text-blue"></i>{{ app.user.predictionPoints|default(0) }} PTS</span>
+                </div>
+                {% endif %}
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+                    <div class="avatar avatar-sm" style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">
+                        {{ app.user.username|first|upper }}
+                    </div>
+                    <span style="font-size:.875rem;color:#fafafa;">{{ app.user.username }}</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="background:#18181b; border: 1px solid #27272a;">
+                    <li><a class="dropdown-item text-white" href="{{ path('app_profile') }}"><i class="fa-solid fa-user-gear fa-fw me-2 text-blue"></i>Profile & Security</a></li>
+                    <li><hr class="dropdown-divider" style="border-color:#27272a;"></li>
+                    {% if is_granted('ROLE_USER') and not is_granted('ROLE_ADMIN') %}
+                        <li><a class="dropdown-item text-white" href="{{ path('front_booking_index') }}"><i class="fa-solid fa-cart-plus fa-fw me-2 text-danger"></i>Book Tickets</a></li>
+                        <li><a class="dropdown-item text-white" href="{{ path('front_booking_my') }}"><i class="fa-solid fa-ticket fa-fw me-2 text-danger"></i>My Bookings</a></li>
+                        <li><hr class="dropdown-divider" style="border-color:#27272a;"></li>
+                    {% endif %}
+                    <li><a class="dropdown-item text-danger" href="{{ path('app_logout') }}"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+                </ul>
+            </div>
+            {% else %}
+            <a href="{{ path('app_login') }}" class="btn btn-sm btn-outline-danger">Login</a>
+            {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- ── Body row: sidebar + content ───────────────────── -->
+    <div class="sf-admin-body">
+
+        <!-- Sidebar -->
+        <aside class="sf-sidebar sf-collapsed" id="sfSidebar">
+            <button class="sf-sidebar-toggle" id="sfSidebarToggle" aria-label="Toggle sidebar">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <nav class="sf-sidebar-nav">
+                {% set route = app.request.attributes.get('_route') %}
+
+                <div class="sf-sidebar-section">Management</div>
+
+                <a href="{{ path('app_dashboard') }}"
+                   class="sf-sidebar-link{{ route == 'app_dashboard' ? ' active' : '' }}"
+                   title="Dashboard">
+                    <i class="fa-solid fa-chart-line fa-fw"></i>
+                    <span class="sf-sidebar-label">Dashboard</span>
+                </a>
+
+                <a href="{{ path('app_users') }}"
+                   class="sf-sidebar-link{{ (route starts with 'app_users' and route != 'app_profile') ? ' active' : '' }}"
+                   title="{{ is_granted('ROLE_ADMIN') ? 'Users Management' : 'Community' }}">
+                    <i class="fa-solid {{ is_granted('ROLE_ADMIN') ? 'fa-users' : 'fa-user-group' }} fa-fw"></i>
+                    <span class="sf-sidebar-label">{{ is_granted('ROLE_ADMIN') ? 'Users Management' : 'Community' }}</span>
+                </a>
+
+                <a href="{{ path('app_fighters') }}"
+                   class="sf-sidebar-link{{ route starts with 'app_fighter' ? ' active' : '' }}"
+                   title="Boxers">
+                    <i class="fa-solid fa-mitten fa-fw"></i>
+                    <span class="sf-sidebar-label">Boxers</span>
+                </a>
+
+                <a href="{{ path('app_events') }}"
+                   class="sf-sidebar-link{{ (route starts with 'app_event' and route != 'app_event_champions_new') ? ' active' : '' }}"
+                   title="Events">
+                    <i class="fa-solid fa-calendar-days fa-fw"></i>
+                    <span class="sf-sidebar-label">Events</span>
+                </a>
+
+                {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_event_champions_new') }}"
+                   class="sf-sidebar-link{{ route == 'app_event_champions_new' ? ' active' : '' }}"
+                   title="Champions Event" style="{{ route == 'app_event_champions_new' ? '' : 'color:#fbbf24;' }}">
+                    <i class="fa-solid fa-crown fa-fw" style="color:#fbbf24;"></i>
+                    <span class="sf-sidebar-label" style="color:inherit;">Champions Event</span>
+                </a>
+                {% endif %}
+
+                <a href="{{ path('app_results') }}"
+                   class="sf-sidebar-link{{ route starts with 'app_result' ? ' active' : '' }}"
+                   title="Bout Results">
+                    <i class="fa-solid fa-trophy fa-fw"></i>
+                    <span class="sf-sidebar-label">Bout Results</span>
+                </a>
+
+                {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('admin_contract_index') }}"
+                   class="sf-sidebar-link{{ route starts with 'admin_contract' ? ' active' : '' }}"
+                   title="Purses & Contracts">
+                    <i class="fa-solid fa-file-invoice-dollar fa-fw" style="color:#22c55e;"></i>
+                    <span class="sf-sidebar-label">Purses &amp; Contracts</span>
+                </a>
+                {% endif %}
+
+                <a href="{{ path('app_stats') }}"
+                   class="sf-sidebar-link{{ route starts with 'app_stats' ? ' active' : '' }}"
+                   title="Statistics">
+                    <i class="fa-solid fa-chart-simple fa-fw"></i>
+                    <span class="sf-sidebar-label">Statistics</span>
+                </a>
+
+                <a href="{{ path('app_performance') }}"
+                   class="sf-sidebar-link{{ route starts with 'app_performance' ? ' active' : '' }}"
+                   title="Performance">
+                    <i class="fa-solid fa-bolt fa-fw"></i>
+                    <span class="sf-sidebar-label">Performance</span>
+                </a>
+
+                <a href="{{ path('app_rankings') }}"
+                   class="sf-sidebar-link{{ route starts with 'app_ranking' ? ' active' : '' }}"
+                   title="World Rankings">
+                    <i class="fa-solid fa-list-ol fa-fw"></i>
+                    <span class="sf-sidebar-label">World Rankings</span>
+                </a>
+
+                <div class="sf-sidebar-section">Fan Experience</div>
+
+                <a href="{{ is_granted('ROLE_ADMIN') ? path('admin_blog_index') : path('front_blog_index') }}"
+                   class="sf-sidebar-link{{ (route starts with 'admin_blog' or route starts with 'front_blog') ? ' active' : '' }}"
+                   title="Blog / News">
+                    <i class="fa-solid fa-newspaper fa-fw" style="color:#f97316;"></i>
+                    <span class="sf-sidebar-label">Blog / News</span>
+                </a>
+
+                <a href="{{ is_granted('ROLE_ADMIN') ? path('admin_booking_index') : path('front_booking_index') }}"
+                   class="sf-sidebar-link{{ (route starts with 'admin_booking' or route == 'front_booking_index') ? ' active' : '' }}"
+                   title="{{ is_granted('ROLE_ADMIN') ? 'Event Bookings' : 'Book Tickets' }}">
+                    <i class="fa-solid fa-ticket fa-fw" style="color:#a855f7;"></i>
+                    <span class="sf-sidebar-label">{{ is_granted('ROLE_ADMIN') ? 'Event Bookings' : 'Book Tickets' }}</span>
+                </a>
+
+                {% if not is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('front_booking_my') }}"
+                   class="sf-sidebar-link{{ route == 'front_booking_my' ? ' active' : '' }}"
+                   title="My Bookings">
+                    <i class="fa-solid fa-calendar-check fa-fw" style="color:#a855f7;"></i>
+                    <span class="sf-sidebar-label">My Bookings</span>
+                </a>
+                {% endif %}
+
+                <a href="{{ is_granted('ROLE_ADMIN') ? path('admin_reaction_index') : path('front_reaction_index') }}"
+                   class="sf-sidebar-link{{ (route starts with 'admin_reaction' or route starts with 'front_reaction') ? ' active' : '' }}"
+                   title="Fan Reactions">
+                    <i class="fa-solid fa-fire fa-fw" style="color:#ef4444;"></i>
+                    <span class="sf-sidebar-label">Fan Reactions</span>
+                </a>
+
+                <a href="{{ is_granted('ROLE_ADMIN') ? path('app_match_proposal_index') : path('app_fan_dashboard') }}"
+                   class="sf-sidebar-link{{ (route == 'app_match_proposal_index' or route == 'app_fan_dashboard') ? ' active' : '' }}"
+                   title="{{ is_granted('ROLE_ADMIN') ? 'Voting Pool Admin' : 'Matchmaking Voting' }}">
+                    <i class="fa-solid fa-square-poll-vertical fa-fw" style="color:#6366f1;"></i>
+                    <span class="sf-sidebar-label">{{ is_granted('ROLE_ADMIN') ? 'Voting Pool Admin' : 'Matchmaking Voting' }}</span>
+                </a>
+
+                {% if is_granted('ROLE_USER') and not is_granted('ROLE_ADMIN') %}
+                <div class="sf-sidebar-section">Fantasy League</div>
+                <a href="{{ path('app_predictions') }}"
+                   class="sf-sidebar-link{{ route starts with 'app_prediction' and route != 'app_leaderboard' ? ' active' : '' }}"
+                   title="Predictions">
+                    <i class="fa-solid fa-crystal-ball fa-fw" style="color:#60a5fa;"></i>
+                    <span class="sf-sidebar-label">Predictions</span>
+                </a>
+
+                <a href="{{ path('app_leaderboard') }}"
+                   class="sf-sidebar-link{{ route == 'app_leaderboard' ? ' active' : '' }}"
+                   title="Leaderboard">
+                    <i class="fa-solid fa-ranking-star fa-fw" style="color:#60a5fa;"></i>
+                    <span class="sf-sidebar-label">Leaderboard</span>
+                </a>
+                {% endif %}
+
+            </nav>
+
+            {% if app.user %}
+            <div class="sf-sidebar-footer">
+                <div class="sf-sidebar-avatar">{{ app.user.username|first|upper }}</div>
+                <div class="sf-sidebar-user-info">
+                    <div class="sf-sidebar-uname">{{ app.user.username }}</div>
+                    <div class="sf-sidebar-role">{{ is_granted('ROLE_ADMIN') ? 'Admin' : 'Fan' }}</div>
+                </div>
+            </div>
+            {% endif %}
+        </aside>
+
+        <!-- Main content -->
+        <div class="sf-admin-content">
+            <main class="p-4">
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible" role="alert">
+                            <div class="d-flex">
+                                <div>
+                                    <i class="fa-solid fa-{{ label == 'error' ? 'circle-exclamation' : 'circle-check' }} fa-fw me-2"></i>
+                                </div>
+                                <div>
+                                    {{ message }}
+                                </div>
+                            </div>
+                            <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
+                {% block content %}{% endblock %}
+                {% block after_content %}{% endblock %}
+            </main>
+        </div>
+
+    </div>{# /.sf-admin-body #}
+
+</div>{# /.sf-admin-wrap #}
+
+<div class="sf-sidebar-backdrop" id="sfSidebarBackdrop"></div>
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Flatpickr Init
+        if (typeof flatpickr !== 'undefined') {
+            flatpickr(".datepicker", {
+                dateFormat: "Y-m-d",
+                theme: "dark",
+                allowInput: true
+            });
+        }
+
+        // Live Search / Instant Narrowing Logic
+        const searchInputs = document.querySelectorAll('[data-live-search]');
+        searchInputs.forEach(input => {
+            const targetSelector = input.getAttribute('data-live-search');
+            const itemSelector = input.getAttribute('data-live-search-item') || 'tbody tr';
+            const container = document.querySelector(targetSelector);
+            if (!container) return;
+
+            input.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                const items = container.querySelectorAll(itemSelector);
+
+                items.forEach(item => {
+                    if (item.tagName === 'TR' && item.cells.length === 1 && item.cells[0].colSpan > 1) return;
+                    let text = item.innerText.toLowerCase();
+                    item.style.display = text.includes(query) ? '' : 'none';
+                });
+            });
+        });
+
+        // Global Search Logic
+        const gSearchInput = document.getElementById('globalSearchInput');
+        const gSearchResults = document.getElementById('globalSearchResults');
+        const gSearchSpinner = document.getElementById('globalSearchSpinner');
+        let searchTimeout;
+
+        if (gSearchInput) {
+            gSearchInput.addEventListener('input', function() {
+                const q = this.value.trim();
+                clearTimeout(searchTimeout);
+
+                if (q.length < 2) {
+                    gSearchResults.classList.add('d-none');
+                    return;
+                }
+
+                gSearchSpinner.classList.remove('d-none');
+
+                searchTimeout = setTimeout(async () => {
+                    try {
+                        const response = await fetch(`/api/global-search?q=${encodeURIComponent(q)}`);
+                        const data = await response.json();
+
+                        gSearchSpinner.classList.add('d-none');
+                        gSearchResults.innerHTML = '';
+
+                        if (data.results.length > 0) {
+                            data.results.forEach(res => {
+                                const item = document.createElement('a');
+                                item.href = res.url;
+                                item.className = 'd-flex align-items-center gap-3 p-3 text-decoration-none border-bottom hover-bg-dark';
+                                item.style.borderColor = '#27272a';
+                                item.innerHTML = `
+                                    <div style="width:32px; height:32px; background:rgba(220,38,38,0.1); border-radius:6px; display:flex; align-items:center; justify-content:center; color:#dc2626;">
+                                        <i class="fa-solid ${res.icon}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-white fw-bold small">${res.title}</div>
+                                        <div class="text-muted" style="font-size:0.7rem;">${res.type} • ${res.subtitle}</div>
+                                    </div>
+                                `;
+                                gSearchResults.appendChild(item);
+                            });
+                            gSearchResults.classList.remove('d-none');
+                        } else {
+                            gSearchResults.innerHTML = '<div class="p-4 text-center text-muted small"><i class="fa-solid fa-face-frown mb-2 d-block fa-2x opacity-25"></i>No matches found for "' + q + '"</div>';
+                            gSearchResults.classList.remove('d-none');
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        gSearchSpinner.classList.add('d-none');
+                    }
+                }, 300);
+            });
+
+            // Close search results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!gSearchInput.contains(e.target) && !gSearchResults.contains(e.target)) {
+                    gSearchResults.classList.add('d-none');
+                }
+            });
+        }
+    });
+</script>
+<style>
+    .hover-bg-dark:hover { background: rgba(255,255,255,0.05); }
+    .breadcrumb-item + .breadcrumb-item::before { color: #52525b; }
+</style>
+
+<script>
+(function () {
+    var sidebar  = document.getElementById('sfSidebar');
+    var toggle   = document.getElementById('sfSidebarToggle');
+    var backdrop = document.getElementById('sfSidebarBackdrop');
+    if (!sidebar || !toggle) return;
+
+    var STORAGE_KEY = 'sf_admin_sidebar_collapsed';
+
+    function isMobile() { return window.innerWidth < 768; }
+    function isTablet() { return window.innerWidth >= 768 && window.innerWidth < 992; }
+
+    function applyDesktopState() {
+        if (localStorage.getItem(STORAGE_KEY) === '0') {
+            sidebar.classList.remove('sf-collapsed');
+        } else {
+            sidebar.classList.add('sf-collapsed');
+        }
+    }
+
+    if (!isMobile() && !isTablet()) {
+        applyDesktopState();
+    }
+
+    toggle.addEventListener('click', function () {
+        if (isMobile()) {
+            sidebar.classList.toggle('sf-mobile-open');
+            if (backdrop) backdrop.classList.toggle('sf-active');
+        } else {
+            sidebar.classList.toggle('sf-collapsed');
+            if (!isTablet()) {
+                localStorage.setItem(STORAGE_KEY, sidebar.classList.contains('sf-collapsed') ? '1' : '0');
+            }
+        }
+    });
+
+    if (backdrop) {
+        backdrop.addEventListener('click', function () {
+            sidebar.classList.remove('sf-mobile-open');
+            backdrop.classList.remove('sf-active');
+        });
+    }
+
+    window.addEventListener('resize', function () {
+        if (isMobile()) {
+            sidebar.classList.remove('sf-collapsed');
+        } else if (isTablet()) {
+            sidebar.classList.remove('sf-mobile-open');
+            if (backdrop) backdrop.classList.remove('sf-active');
+        } else {
+            sidebar.classList.remove('sf-mobile-open');
+            if (backdrop) backdrop.classList.remove('sf-active');
+            applyDesktopState();
+        }
+    });
+})();
+</script>
+{% endblock %}
+</body>
+</html>

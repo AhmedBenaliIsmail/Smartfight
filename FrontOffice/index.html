@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartFight – The Ultimate Fight Experience</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="sf-navbar navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">SMART<span>FIGHT</span></a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sfNavCollapse"
+            aria-controls="sfNavCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="sfNavCollapse">
+      <ul class="navbar-nav mx-auto gap-1">
+        <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="matches.html">Events</a></li>
+        <li class="nav-item"><a class="nav-link" href="team.html">Fighters</a></li>
+        <li class="nav-item"><a class="nav-link" href="blog.html">News</a></li>
+        <li class="nav-item"><a class="nav-link" href="gallery.html">Gallery</a></li>
+        <li class="nav-item"><a class="nav-link live-badge-nav" href="live-stream.html">Live</a></li>
+        <li class="nav-item"><a class="nav-link" href="predictions.html">Predictions</a></li>
+        <li class="nav-item"><a class="nav-link" href="booking.html">Bookings</a></li>
+      </ul>
+      <div class="nav-actions d-flex align-items-center gap-2 mt-2 mt-lg-0">
+        <a href="#" class="btn btn-sf-ghost">Login</a>
+        <a href="#" class="btn btn-sf-primary">Register</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="sf-hero">
+  <div class="sf-hero-bg"></div>
+  <div class="sf-hero-grid-overlay"></div>
+  <div class="container py-5">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 sf-hero-content">
+        <div class="hero-eyebrow">UFC / MMA</div>
+        <h1>THE ULTIMATE<br /><span class="accent">FIGHT EXPERIENCE</span></h1>
+        <p class="hero-sub">
+          Your front row seat to the world's most electrifying combat sports events.
+          Book tickets, track fighters, make predictions, and watch it all unfold.
+        </p>
+        <div class="hero-cta-group">
+          <a href="booking.html" class="btn btn-sf-primary"><i class="fa-solid fa-ticket"></i> Book Tickets</a>
+          <a href="match-details.html" class="btn btn-sf-outline"><i class="fa-solid fa-list-ol"></i> View Fight Card</a>
+        </div>
+
+        <!-- Countdown -->
+        <div class="countdown-label">Next Event: UFC 310 · T-Mobile Arena, Las Vegas</div>
+        <div class="countdown-block" data-event-date="2026-05-15">
+          <div class="countdown-item">
+            <span class="count-num" data-unit="days">00</span>
+            <span class="count-label">Days</span>
+          </div>
+          <div class="countdown-item">
+            <span class="count-num" data-unit="hours">00</span>
+            <span class="count-label">Hours</span>
+          </div>
+          <div class="countdown-item">
+            <span class="count-num" data-unit="minutes">00</span>
+            <span class="count-label">Mins</span>
+          </div>
+          <div class="countdown-item">
+            <span class="count-num" data-unit="seconds">00</span>
+            <span class="count-label">Secs</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 d-none d-lg-block">
+        <div class="hero-fighter-showcase">
+          <div class="hero-glow"></div>
+          <div class="hero-fighter-img" style="max-width:420px; margin:0 auto;">
+            <img src="https://placehold.co/420x560/18181b/dc2626?text=UFC+310" alt="UFC 310 Main Event" style="border-radius:12px;" />
+          </div>
+          <!-- Floating stat cards -->
+          <div style="position:absolute; top:30px; left:0; z-index:5;">
+            <div class="sf-card" style="padding:12px 18px; min-width:140px;">
+              <div style="font-size:0.65rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-muted); margin-bottom:4px;">Upcoming</div>
+              <div style="font-size:0.9rem; font-weight:700; color:var(--text-primary);">UFC 310</div>
+              <div style="font-size:0.75rem; color:var(--gold); font-weight:600;">May 15, 2026</div>
+            </div>
+          </div>
+          <div style="position:absolute; bottom:60px; right:0; z-index:5;">
+            <div class="sf-card" style="padding:12px 18px; min-width:160px;">
+              <div style="font-size:0.65rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;">Main Event</div>
+              <div style="font-size:0.85rem; font-weight:700; color:var(--text-primary);">Santos <span style="color:var(--primary);">vs</span> Jensen</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);">Heavyweight Title</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== STATS BAR ===== -->
+<section style="background:var(--bg-surface); border-top:1px solid var(--border-color); border-bottom:1px solid var(--border-color); padding:24px 0;">
+  <div class="container">
+    <div class="row g-4 text-center">
+      <div class="col-6 col-md-3">
+        <div class="num-stat" style="text-align:center;">
+          <span class="num">240+</span>
+          <span class="num-label">Events Hosted</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="num-stat" style="text-align:center;">
+          <span class="num" style="color:var(--gold);">180</span>
+          <span class="num-label">Active Fighters</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="num-stat" style="text-align:center;">
+          <span class="num">2.4M</span>
+          <span class="num-label">Fans Worldwide</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="num-stat" style="text-align:center;">
+          <span class="num" style="color:var(--gold);">18</span>
+          <span class="num-label">Weight Classes</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== UPCOMING EVENTS ===== -->
+<section class="section-pad">
+  <div class="container">
+    <div class="section-heading d-flex justify-content-between align-items-end flex-wrap gap-3">
+      <div>
+        <span class="label">Schedule</span>
+        <h2 class="heading-line">Upcoming Events</h2>
+        <p>Don't miss the biggest fights on the calendar. Book your seats now.</p>
+      </div>
+      <a href="matches.html" class="btn btn-sf-outline"><i class="fa-solid fa-calendar-days"></i> All Events</a>
+    </div>
+
+    <div class="row g-4">
+      <!-- Event Card 1 -->
+      <div class="col-md-6 col-xl-4">
+        <div class="event-card">
+          <div class="event-card-header">
+            <div class="event-date-block">
+              <span class="day">15</span>
+              <span class="month-year">May 2026</span>
+            </div>
+            <span class="badge-status badge-upcoming">Upcoming</span>
+          </div>
+          <div class="event-card-body">
+            <div class="event-name">UFC 310: Night of Champions</div>
+            <div class="event-venue"><i class="fa-solid fa-location-dot"></i> T-Mobile Arena, Las Vegas</div>
+            <div class="event-main-bout">
+              <div class="bout-label">Main Event · Heavyweight</div>
+              <div class="bout-fighters">Santos <span class="vs">vs</span> Jensen</div>
+            </div>
+          </div>
+          <div class="event-card-footer">
+            <a href="match-details.html" class="btn btn-sf-primary w-100"><i class="fa-solid fa-eye"></i> View Fight Card</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event Card 2 -->
+      <div class="col-md-6 col-xl-4">
+        <div class="event-card">
+          <div class="event-card-header">
+            <div class="event-date-block">
+              <span class="day">28</span>
+              <span class="month-year">Jun 2026</span>
+            </div>
+            <span class="badge-status badge-upcoming">Upcoming</span>
+          </div>
+          <div class="event-card-body">
+            <div class="event-name">SmartFight Grand Prix</div>
+            <div class="event-venue"><i class="fa-solid fa-location-dot"></i> Madison Square Garden, New York</div>
+            <div class="event-main-bout">
+              <div class="bout-label">Main Event · Middleweight</div>
+              <div class="bout-fighters">Morales <span class="vs">vs</span> Williams</div>
+            </div>
+          </div>
+          <div class="event-card-footer">
+            <a href="match-details.html" class="btn btn-sf-primary w-100"><i class="fa-solid fa-eye"></i> View Fight Card</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event Card 3 (Live) -->
+      <div class="col-md-6 col-xl-4">
+        <div class="event-card" style="border-color: var(--primary);">
+          <div class="event-card-header">
+            <div class="event-date-block">
+              <span class="day">07</span>
+              <span class="month-year">Apr 2026</span>
+            </div>
+            <span class="badge-status badge-live">Live</span>
+          </div>
+          <div class="event-card-body">
+            <div class="event-name">SmartFight 45</div>
+            <div class="event-venue"><i class="fa-solid fa-location-dot"></i> Barclays Center, Brooklyn</div>
+            <div class="event-main-bout">
+              <div class="bout-label">Co-Main Event · Welterweight</div>
+              <div class="bout-fighters">Thompson <span class="vs">vs</span> Diaz</div>
+            </div>
+          </div>
+          <div class="event-card-footer">
+            <a href="live-stream.html" class="btn btn-sf-primary w-100" style="background:var(--primary);"><i class="fa-solid fa-satellite-dish"></i> Watch Live</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURED FIGHTERS ===== -->
+<section class="section-pad" style="background:var(--bg-surface); border-top:1px solid var(--border-color); border-bottom:1px solid var(--border-color);">
+  <div class="container">
+    <div class="section-heading d-flex justify-content-between align-items-end flex-wrap gap-3">
+      <div>
+        <span class="label">Roster</span>
+        <h2 class="heading-line">Featured Fighters</h2>
+        <p>Elite athletes competing at the highest level of mixed martial arts.</p>
+      </div>
+      <a href="team.html" class="btn btn-sf-outline"><i class="fa-solid fa-users"></i> Full Roster</a>
+    </div>
+
+    <div class="row g-4">
+      <!-- Fighter 1 -->
+      <div class="col-sm-6 col-xl-3">
+        <div class="fighter-card">
+          <div class="fighter-card-img-wrap">
+            <img src="https://placehold.co/300x400/18181b/dc2626?text=Marcus+Santos" alt="Marcus Santos" />
+            <div class="fighter-card-overlay"></div>
+          </div>
+          <div class="fighter-card-body">
+            <div class="fighter-name">Marcus Santos</div>
+            <div class="fighter-nickname">"The Lion"</div>
+            <span class="badge-weight">Heavyweight</span>
+            <div class="fighter-record">
+              <div class="record-item wins">
+                <span class="rec-num">24</span>
+                <span class="rec-label">Wins</span>
+              </div>
+              <div class="record-item losses">
+                <span class="rec-num">3</span>
+                <span class="rec-label">Losses</span>
+              </div>
+              <div class="record-item draws">
+                <span class="rec-num">1</span>
+                <span class="rec-label">Draws</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fighter 2 -->
+      <div class="col-sm-6 col-xl-3">
+        <div class="fighter-card">
+          <div class="fighter-card-img-wrap">
+            <img src="https://placehold.co/300x400/18181b/c9a227?text=Kyle+Jensen" alt="Kyle Jensen" />
+            <div class="fighter-card-overlay"></div>
+          </div>
+          <div class="fighter-card-body">
+            <div class="fighter-name">Kyle Jensen</div>
+            <div class="fighter-nickname">"Ice Cold"</div>
+            <span class="badge-weight">Heavyweight</span>
+            <div class="fighter-record">
+              <div class="record-item wins">
+                <span class="rec-num">19</span>
+                <span class="rec-label">Wins</span>
+              </div>
+              <div class="record-item losses">
+                <span class="rec-num">2</span>
+                <span class="rec-label">Losses</span>
+              </div>
+              <div class="record-item draws">
+                <span class="rec-num">0</span>
+                <span class="rec-label">Draws</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fighter 3 -->
+      <div class="col-sm-6 col-xl-3">
+        <div class="fighter-card">
+          <div class="fighter-card-img-wrap">
+            <img src="https://placehold.co/300x400/18181b/dc2626?text=Rafa+Morales" alt="Rafa Morales" />
+            <div class="fighter-card-overlay"></div>
+          </div>
+          <div class="fighter-card-body">
+            <div class="fighter-name">Rafa Morales</div>
+            <div class="fighter-nickname">"El Toro"</div>
+            <span class="badge-weight">Middleweight</span>
+            <div class="fighter-record">
+              <div class="record-item wins">
+                <span class="rec-num">21</span>
+                <span class="rec-label">Wins</span>
+              </div>
+              <div class="record-item losses">
+                <span class="rec-num">4</span>
+                <span class="rec-label">Losses</span>
+              </div>
+              <div class="record-item draws">
+                <span class="rec-num">0</span>
+                <span class="rec-label">Draws</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fighter 4 -->
+      <div class="col-sm-6 col-xl-3">
+        <div class="fighter-card">
+          <div class="fighter-card-img-wrap">
+            <img src="https://placehold.co/300x400/18181b/c9a227?text=Jake+Williams" alt="Jake Williams" />
+            <div class="fighter-card-overlay"></div>
+          </div>
+          <div class="fighter-card-body">
+            <div class="fighter-name">Jake Williams</div>
+            <div class="fighter-nickname">"The Tank"</div>
+            <span class="badge-weight">Welterweight</span>
+            <div class="fighter-record">
+              <div class="record-item wins">
+                <span class="rec-num">17</span>
+                <span class="rec-label">Wins</span>
+              </div>
+              <div class="record-item losses">
+                <span class="rec-num">5</span>
+                <span class="rec-label">Losses</span>
+              </div>
+              <div class="record-item draws">
+                <span class="rec-num">2</span>
+                <span class="rec-label">Draws</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== LATEST NEWS ===== -->
+<section class="section-pad">
+  <div class="container">
+    <div class="section-heading d-flex justify-content-between align-items-end flex-wrap gap-3">
+      <div>
+        <span class="label">Media</span>
+        <h2 class="heading-line">Latest News</h2>
+        <p>Breaking news, fighter interviews, and in-depth fight analysis.</p>
+      </div>
+      <a href="blog.html" class="btn btn-sf-outline"><i class="fa-solid fa-newspaper"></i> All Articles</a>
+    </div>
+
+    <div class="row g-4">
+      <!-- Blog Card 1 -->
+      <div class="col-md-6 col-xl-4">
+        <div class="blog-card">
+          <div class="blog-card-img-wrap">
+            <img src="https://placehold.co/600x340/18181b/dc2626?text=UFC+310+Preview" alt="UFC 310 Preview" class="blog-card-img" />
+          </div>
+          <div class="blog-card-body">
+            <div class="blog-card-meta">
+              <span class="badge-category">Event Preview</span>
+              <span class="blog-date"><i class="fa-regular fa-calendar"></i> Apr 5, 2026</span>
+            </div>
+            <h3 class="blog-card-title">UFC 310: Everything You Need to Know Before Fight Night</h3>
+            <p class="blog-card-excerpt">Marcus Santos enters the octagon as a heavy favorite, but Kyle Jensen's unorthodox striking style could be the great equalizer on fight night.</p>
+            <a href="blog-details.html" class="blog-read-more">Read More <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blog Card 2 -->
+      <div class="col-md-6 col-xl-4">
+        <div class="blog-card">
+          <div class="blog-card-img-wrap">
+            <img src="https://placehold.co/600x340/18181b/c9a227?text=Morales+Training" alt="Morales Training Camp" class="blog-card-img" />
+          </div>
+          <div class="blog-card-body">
+            <div class="blog-card-meta">
+              <span class="badge-category">Fighter News</span>
+              <span class="blog-date"><i class="fa-regular fa-calendar"></i> Apr 3, 2026</span>
+            </div>
+            <h3 class="blog-card-title">Inside El Toro's Training Camp: Morales Prepares for Grand Prix</h3>
+            <p class="blog-card-excerpt">Rafa "El Toro" Morales opens up his training facility to cameras, revealing the grueling preparation behind his explosive fighting style.</p>
+            <a href="blog-details.html" class="blog-read-more">Read More <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blog Card 3 -->
+      <div class="col-md-6 col-xl-4">
+        <div class="blog-card">
+          <div class="blog-card-img-wrap">
+            <img src="https://placehold.co/600x340/18181b/dc2626?text=Rankings+Update" alt="Rankings Update" class="blog-card-img" />
+          </div>
+          <div class="blog-card-body">
+            <div class="blog-card-meta">
+              <span class="badge-category">Rankings</span>
+              <span class="blog-date"><i class="fa-regular fa-calendar"></i> Apr 1, 2026</span>
+            </div>
+            <h3 class="blog-card-title">April Rankings Drop: Three Weight Classes See Major Reshuffling</h3>
+            <p class="blog-card-excerpt">Following a blockbuster month of fights, the pound-for-pound list sees dramatic changes as contenders make their case for title shots.</p>
+            <a href="blog-details.html" class="blog-read-more">Read More <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA BANNER ===== -->
+<section style="background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(220,38,38,0.1) 100%); border-top:1px solid var(--border-color); border-bottom:1px solid var(--border-color); padding: 64px 0;">
+  <div class="container text-center">
+    <div style="max-width:580px; margin:0 auto;">
+      <span style="font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--primary); display:block; margin-bottom:12px;">Don't Miss Out</span>
+      <h2 style="font-size:clamp(1.6rem,4vw,2.6rem); margin-bottom:16px;">MAKE YOUR PREDICTION.<br />WIN BIG PRIZES.</h2>
+      <p style="color:var(--text-muted); margin-bottom:32px; font-size:1rem;">Join thousands of fans competing in SmartFight's prediction leaderboard. Climb the ranks and prove your fight IQ.</p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <a href="predictions.html" class="btn btn-sf-primary"><i class="fa-solid fa-trophy"></i> Make Predictions</a>
+        <a href="leaderboard.html" class="btn btn-sf-outline"><i class="fa-solid fa-ranking-star"></i> View Leaderboard</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="sf-footer">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-4 col-md-6">
+        <a href="index.html" class="footer-logo">SMART<span>FIGHT</span></a>
+        <p class="footer-about">The premier destination for UFC and MMA fans. Live results, fighter profiles, event bookings, and community predictions — all in one place.</p>
+        <div class="social-links">
+          <a href="#" class="social-link" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" class="social-link" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="social-link" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" class="social-link" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#" class="social-link" aria-label="Discord"><i class="fa-brands fa-discord"></i></a>
+        </div>
+      </div>
+
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Home</a></li>
+          <li><a href="matches.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Events</a></li>
+          <li><a href="team.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Fighters</a></li>
+          <li><a href="blog.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> News</a></li>
+          <li><a href="gallery.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Gallery</a></li>
+          <li><a href="contact.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-2 col-md-6 col-6">
+        <div class="footer-col-title">Features</div>
+        <ul class="footer-links">
+          <li><a href="live-stream.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Live Stream</a></li>
+          <li><a href="predictions.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Predictions</a></li>
+          <li><a href="leaderboard.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Leaderboard</a></li>
+          <li><a href="booking.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Book Tickets</a></li>
+          <li><a href="notifications.html"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem;"></i> Notifications</a></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="footer-col-title">Newsletter</div>
+        <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:12px;">Get fight cards, results, and exclusive content delivered straight to your inbox.</p>
+        <div class="newsletter-form">
+          <input type="email" placeholder="Your email address" />
+          <button type="button"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+        <p style="font-size:0.72rem; color:var(--text-subtle); margin-top:10px;">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 SmartFight. All rights reserved.</p>
+      <div style="display:flex; gap:20px; flex-wrap:wrap;">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Settings</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

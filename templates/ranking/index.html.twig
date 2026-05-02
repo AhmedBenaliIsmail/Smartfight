@@ -1,0 +1,588 @@
+{% extends 'front/base_front.html.twig' %}
+
+{% block title %}World Rankings — SmartFight{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ─── Variables ──────────────────────── */
+:root {
+    --gold:   #fbbf24;
+    --silver: #94a3b8;
+    --bronze: #c2855a;
+    --red:    #dc2626;
+    --dark0:  #09090b;
+    --dark1:  #18181b;
+    --dark2:  #27272a;
+    --dark3:  #3f3f46;
+    --muted:  #71717a;
+    --text:   #fafafa;
+}
+/* Inline QR SVG sizing */
+.qr-panel svg { width: 100%; height: auto; display: block; border-radius: 10px; }
+
+/* ─── Layout ─────────────────────────── */
+.rankings-layout {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 2rem;
+    align-items: start;
+}
+@media (max-width: 991px) {
+    .rankings-layout { grid-template-columns: 1fr; }
+    .qr-sidebar { order: -1; }
+}
+
+/* ─── QR Sidebar ─────────────────────── */
+.qr-panel {
+    background: var(--dark1);
+    border: 1px solid var(--dark3);
+    border-radius: 20px;
+    padding: 1.5rem;
+    text-align: center;
+    position: sticky;
+    top: 80px;
+}
+.qr-panel img {
+    border-radius: 12px;
+    width: 100%;
+    max-width: 180px;
+    display: block;
+    margin: 0 auto 1rem;
+}
+.qr-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+}
+.qr-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid var(--dark3);
+    background: var(--dark2);
+    color: #d4d4d8;
+    margin-bottom: 8px;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+.qr-btn:hover { background: var(--dark3); color: #fff; }
+.qr-btn.primary { background: var(--red); border-color: var(--red); color: #fff; }
+.qr-btn.primary:hover { background: #ef4444; }
+
+/* ─── Header ─────────────────────────── */
+.rank-header { margin-bottom: 2rem; }
+.rank-title { font-family: 'Oswald', sans-serif; font-size: 2rem; font-weight: 700; color: var(--text); letter-spacing: 1px; }
+.rank-subtitle { color: var(--muted); font-size: 0.85rem; }
+.last-updated { font-size: 0.72rem; color: var(--muted); display: flex; align-items: center; gap: 5px; margin-top: 4px; }
+.last-updated .dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ─── Search + Controls ──────────────── */
+.controls-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+.rank-search {
+    flex: 1;
+    min-width: 200px;
+    background: var(--dark1);
+    border: 1px solid var(--dark3);
+    border-radius: 12px;
+    padding: 10px 16px 10px 40px;
+    color: var(--text);
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.rank-search:focus { border-color: var(--red); }
+.search-wrap { position: relative; flex: 1; min-width: 200px; }
+.search-wrap i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 0.8rem; }
+
+.sort-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.sort-btn {
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: var(--dark1);
+    border: 1px solid var(--dark3);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.sort-btn:hover { background: var(--dark2); color: var(--text); }
+.sort-btn.active { background: var(--red); border-color: var(--red); color: #fff; }
+
+/* ─── Division heading ───────────────── */
+.division-heading {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gold);
+    border-bottom: 2px solid rgba(251,191,36,0.3);
+    padding-bottom: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ─── Table ──────────────────────────── */
+.rank-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.rank-table thead th {
+    background: var(--dark0);
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 12px 16px;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+.rank-table thead th:hover { color: var(--text); }
+.rank-table thead th .sort-arrow { margin-left: 4px; opacity: 0.4; }
+.rank-table thead th.asc .sort-arrow::after  { content: '▲'; opacity: 1; }
+.rank-table thead th.desc .sort-arrow::after { content: '▼'; opacity: 1; }
+.rank-table thead th:not(.asc):not(.desc) .sort-arrow::after { content: '↕'; }
+
+.rank-table tbody tr {
+    border-bottom: 1px solid var(--dark2);
+    transition: background 0.15s;
+}
+.rank-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+.rank-table td { padding: 14px 16px; vertical-align: middle; }
+
+/* ─── Rank badges ────────────────────── */
+.rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    padding: 5px 11px;
+    white-space: nowrap;
+    gap: 5px;
+}
+.rank-badge.gold   { background: rgba(251,191,36,0.15); color: var(--gold);   border: 1px solid rgba(251,191,36,0.4); }
+.rank-badge.silver { background: rgba(148,163,184,0.15); color: var(--silver); border: 1px solid rgba(148,163,184,0.4); }
+.rank-badge.bronze { background: rgba(194,133,90,0.15); color: var(--bronze); border: 1px solid rgba(194,133,90,0.4); }
+.rank-badge.normal { background: var(--dark2); color: var(--muted); border: 1px solid var(--dark3); }
+
+/* Row left border for top 3 */
+.rank-row-1 td:first-child { border-left: 3px solid var(--gold); }
+.rank-row-2 td:first-child { border-left: 3px solid var(--silver); }
+.rank-row-3 td:first-child { border-left: 3px solid var(--bronze); }
+
+/* ─── Avatar ─────────────────────────── */
+.rank-avatar {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--dark3);
+    background: var(--dark2);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    flex-shrink: 0;
+    font-size: 0.9rem;
+    overflow: hidden;
+}
+.rank-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ─── Points highlight ───────────────── */
+.points-cell { font-family: 'Oswald', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--gold); }
+.streak-hot { color: #ef4444; font-weight: 700; }
+
+/* ─── Mobile cards ───────────────────── */
+.mobile-cards { display: none; }
+@media (max-width: 767px) {
+    .desktop-table { display: none; }
+    .mobile-cards  { display: block; }
+}
+.rank-card {
+    background: var(--dark1);
+    border: 1px solid var(--dark2);
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: border-color 0.2s;
+}
+.rank-card:hover { border-color: var(--red); }
+.rank-card.gold-card   { border-left: 4px solid var(--gold); }
+.rank-card.silver-card { border-left: 4px solid var(--silver); }
+.rank-card.bronze-card { border-left: 4px solid var(--bronze); }
+.rank-card-info { flex: 1; min-width: 0; }
+.rank-card-name { font-weight: 700; color: var(--text); font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rank-card-sub  { font-size: 0.72rem; color: var(--muted); }
+.rank-card-pts  { font-family: 'Oswald', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--gold); text-align: right; flex-shrink: 0; }
+
+/* ─── Toast ──────────────────────────── */
+.sf-toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: #22c55e; color: #fff;
+    padding: 10px 20px; border-radius: 10px;
+    font-size: 0.85rem; font-weight: 600;
+    z-index: 9999; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    animation: toastIn 0.3s ease;
+}
+@keyframes toastIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+/* ─── Empty state ─────────────────────── */
+.rank-empty { text-align: center; padding: 4rem 0; color: var(--muted); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{# ── Header ─────────────────────────────────────────── #}
+<div class="rank-header">
+    <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-3">
+        <div>
+            <h1 class="rank-title"><i class="fa-solid fa-trophy me-2" style="color:var(--gold)"></i>WORLD STANDINGS</h1>
+            <p class="rank-subtitle">Official divisional rankings — ELO × SmartFight Performance Index</p>
+            <div class="last-updated">
+                <span class="dot"></span>
+                Last updated: {{ lastUpdated|date('M d, Y H:i') }}
+            </div>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            {% if is_granted('ROLE_ADMIN') %}
+            <form action="{{ path('app_ranking_recalc') }}" method="post">
+                <button type="submit" class="btn btn-sm btn-danger">
+                    <i class="fa-solid fa-arrows-rotate me-1"></i>Recalculate
+                </button>
+            </form>
+            {% endif %}
+            <a href="{{ path('app_ranking_export') }}" class="btn btn-sm btn-outline-success">
+                <i class="fa-solid fa-file-csv me-1"></i>Export CSV
+            </a>
+            <a href="{{ path('app_ranking_pdf') }}" class="btn btn-sm" style="background:#dc2626;color:#fff;border:none;">
+                <i class="fa-solid fa-file-pdf me-1"></i>Download PDF
+            </a>
+            <button onclick="location.reload()" class="btn btn-sm" style="background:var(--dark2);border:1px solid var(--dark3);color:#d4d4d8;">
+                <i class="fa-solid fa-rotate-right me-1"></i>Refresh
+            </button>
+        </div>
+    </div>
+
+    {# ── Search + Sort ── #}
+    <div class="controls-bar">
+        <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text"
+                   id="rankSearch"
+                   class="rank-search"
+                   placeholder="Search boxer name…"
+                   value="{{ q }}"
+                   autocomplete="off">
+        </div>
+        <div class="sort-btns">
+            <button class="sort-btn active" data-sort="rank">🏅 Rank</button>
+            <button class="sort-btn" data-sort="points">⭐ Points</button>
+            <button class="sort-btn" data-sort="elo">📊 ELO</button>
+            <button class="sort-btn" data-sort="streak">🔥 Streak</button>
+        </div>
+    </div>
+</div>
+
+{# ── Main layout: table + QR sidebar ────────────────── #}
+<div class="rankings-layout">
+
+    {# LEFT: Rankings ──────────────────────────────── #}
+    <div id="rankingsMain">
+        {% if groupedRankings|length > 0 %}
+            {% for wd, fighters in groupedRankings %}
+            <div class="mb-5 division-block" data-division="{{ wd }}">
+                <div class="division-heading">
+                    <i class="fa-solid fa-layer-group"></i>
+                    {{ wd }} Division
+                    <span class="ms-auto" style="font-size:0.75rem;color:var(--muted);font-family:'Inter',sans-serif;font-weight:500;">{{ fighters|length }} boxer{{ fighters|length != 1 ? 's' : '' }}</span>
+                </div>
+
+                {# ── Desktop Table ── #}
+                <div class="desktop-table">
+                <div style="background:var(--dark1);border:1px solid var(--dark2);border-radius:16px;overflow:hidden;">
+                    <table class="rank-table" data-division-table>
+                        <thead>
+                            <tr>
+                                <th data-col="rank">Rank <span class="sort-arrow"></span></th>
+                                <th>Boxer</th>
+                                <th data-col="points" style="text-align:center;">Points <span class="sort-arrow"></span></th>
+                                <th data-col="elo" style="text-align:center;">ELO <span class="sort-arrow"></span></th>
+                                <th style="text-align:center;">Perf</th>
+                                <th data-col="streak" style="text-align:center;">Streak <span class="sort-arrow"></span></th>
+                                <th style="text-align:center;">Record</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for idx, f in fighters %}
+                            {% set rank = idx + 1 %}
+                            {% set pts  = (f.eloRating + f.performanceScore * 10)|round %}
+                            <tr class="rank-row rank-row-{{ rank <= 3 ? rank : 'n' }}"
+                                data-name="{{ f.fullName|lower }}"
+                                data-rank="{{ rank }}"
+                                data-points="{{ pts }}"
+                                data-elo="{{ f.eloRating|round }}"
+                                data-streak="{{ f.winStreak }}">
+                                <td>
+                                    {% if rank == 1 %}
+                                        <span class="rank-badge gold"><i class="fa-solid fa-crown"></i> #1 CHAMP</span>
+                                    {% elseif rank == 2 %}
+                                        <span class="rank-badge silver"><i class="fa-solid fa-medal"></i> #2</span>
+                                    {% elseif rank == 3 %}
+                                        <span class="rank-badge bronze"><i class="fa-solid fa-medal"></i> #3</span>
+                                    {% else %}
+                                        <span class="rank-badge normal">#{{ rank }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rank-avatar">
+                                            {% if f.photoFilename %}
+                                                <img src="{{ asset('uploads/boxers/' ~ f.photoFilename) }}" alt="{{ f.fullName }}">
+                                            {% else %}
+                                                <i class="fa-solid fa-user"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <div style="font-weight:700;color:var(--text);font-size:0.9rem;">{{ f.fullName }}</div>
+                                            {% if f.nickname %}
+                                            <div style="font-size:0.72rem;color:var(--muted);">"{{ f.nickname }}"</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="points-cell" style="text-align:center;" title="ELO + Performance Index × 10">{{ pts }}</td>
+                                <td style="text-align:center;color:#94a3b8;font-weight:600;">{{ f.eloRating|round }}</td>
+                                <td style="text-align:center;color:var(--muted);">{{ f.performanceScore|round(1) }}</td>
+                                <td style="text-align:center;">
+                                    {% if f.winStreak >= 3 %}
+                                        <span class="streak-hot" title="Hot streak!">🔥 {{ f.winStreak }}W</span>
+                                    {% else %}
+                                        <span style="color:var(--muted);">{{ f.winStreak }}W</span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align:center;font-size:0.82rem;">
+                                    <span style="color:#22c55e;font-weight:700;">{{ f.wins }}W</span>
+                                    <span style="color:var(--muted)"> – </span>
+                                    <span style="color:#dc2626;font-weight:700;">{{ f.losses }}L</span>
+                                    <span style="color:var(--muted)"> – </span>
+                                    <span style="color:#94a3b8;font-weight:700;">{{ f.draws }}D</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+
+                {# ── Mobile Cards ── #}
+                <div class="mobile-cards">
+                    {% for idx, f in fighters %}
+                    {% set rank = idx + 1 %}
+                    {% set pts  = (f.eloRating + f.performanceScore * 10)|round %}
+                    <div class="rank-card {{ rank == 1 ? 'gold-card' : rank == 2 ? 'silver-card' : rank == 3 ? 'bronze-card' : '' }}"
+                         data-name="{{ f.fullName|lower }}"
+                         data-rank="{{ rank }}"
+                         data-points="{{ pts }}"
+                         data-elo="{{ f.eloRating|round }}"
+                         data-streak="{{ f.winStreak }}">
+                        <div class="rank-avatar">
+                            {% if f.photoFilename %}
+                                <img src="{{ asset('uploads/boxers/' ~ f.photoFilename) }}" alt="">
+                            {% else %}
+                                <i class="fa-solid fa-user"></i>
+                            {% endif %}
+                        </div>
+                        <div class="rank-card-info">
+                            <div class="rank-card-name">{{ f.fullName }}</div>
+                            <div class="rank-card-sub">
+                                {% if rank == 1 %}<span style="color:var(--gold);">👑 Champion</span>
+                                {% elseif rank == 2 %}<span style="color:var(--silver);">🥈 #2</span>
+                                {% elseif rank == 3 %}<span style="color:var(--bronze);">🥉 #3</span>
+                                {% else %}#{{ rank }}{% endif %}
+                                &nbsp;·&nbsp;{{ f.wins }}W–{{ f.losses }}L–{{ f.draws }}D
+                            </div>
+                        </div>
+                        <div class="rank-card-pts">
+                            {{ pts }}
+                            <div style="font-size:0.6rem;font-family:'Inter',sans-serif;font-weight:500;color:var(--muted);text-align:right;">PTS</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="rank-empty">
+                <i class="fa-solid fa-user-slash fa-3x mb-3" style="opacity:0.3;"></i>
+                <h3>No boxers found in divisional records.</h3>
+                {% if q %}<p>Try clearing the search filter.</p>{% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    {# RIGHT: QR Sidebar ────────────────────────────── #}
+    <div class="qr-sidebar">
+        <div class="qr-panel">
+            <div class="qr-label"><i class="fa-solid fa-qrcode me-1"></i>Scan for PDF Report</div>
+            {% if qrSvg %}
+                <div style="width:100%;max-width:180px;margin:0 auto 1rem;border-radius:12px;overflow:hidden;display:block;">
+                    {{ qrSvg|raw }}
+                </div>
+            {% else %}
+                <div style="width:180px;height:180px;background:var(--dark2);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;color:var(--muted);">
+                    <i class="fa-solid fa-qrcode fa-3x"></i>
+                </div>
+            {% endif %}
+
+            <div style="font-size:0.7rem;color:var(--muted);margin-bottom:1rem;word-break:break-all;">
+                {{ rankingUrl }}
+            </div>
+
+            <a href="{{ path('app_ranking_qr_download') }}" class="qr-btn primary">
+                <i class="fa-solid fa-download"></i> Download QR
+            </a>
+            <button class="qr-btn" id="copyLinkBtn" data-url="{{ rankingUrl }}">
+                <i class="fa-solid fa-link"></i> Copy Link
+            </button>
+            {% if is_granted('ROLE_ADMIN') %}
+            <form action="{{ path('app_ranking_recalc') }}" method="post" style="margin-top:8px;">
+                <button type="submit" class="qr-btn" style="border-color:rgba(220,38,38,0.4);color:#f87171;">
+                    <i class="fa-solid fa-arrows-rotate"></i> Recalculate
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+</div><!-- /.rankings-layout -->
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    /* ── Live Search ─────────────────────────────── */
+    const searchInput = document.getElementById('rankSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            const q = this.value.toLowerCase().trim();
+            document.querySelectorAll('.rank-row, .rank-card').forEach(row => {
+                const name = row.dataset.name || '';
+                row.style.display = (!q || name.includes(q)) ? '' : 'none';
+            });
+            // Hide division blocks with no visible rows
+            document.querySelectorAll('.division-block').forEach(block => {
+                const visible = block.querySelectorAll('.rank-row:not([style*="none"]), .rank-card:not([style*="none"])');
+                block.style.display = visible.length ? '' : 'none';
+            });
+        });
+    }
+
+    /* ── Column Sort ─────────────────────────────── */
+    let currentSort = 'rank';
+    let sortDir     = 1; // 1 = asc, -1 = desc
+
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const col = this.dataset.sort;
+            if (currentSort === col) { sortDir *= -1; }
+            else { currentSort = col; sortDir = col === 'rank' ? 1 : -1; }
+            document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            sortAll(col, sortDir);
+        });
+    });
+
+    function sortAll(col, dir) {
+        document.querySelectorAll('[data-division-table] tbody').forEach(tbody => {
+            const rows = Array.from(tbody.querySelectorAll('.rank-row'));
+            rows.sort((a, b) => {
+                const av = parseFloat(a.dataset[col]) || 0;
+                const bv = parseFloat(b.dataset[col]) || 0;
+                return (av - bv) * dir;
+            });
+            rows.forEach(r => tbody.appendChild(r));
+        });
+        // Sort mobile cards too
+        document.querySelectorAll('.mobile-cards').forEach(container => {
+            const cards = Array.from(container.querySelectorAll('.rank-card'));
+            cards.sort((a, b) => {
+                const av = parseFloat(a.dataset[col]) || 0;
+                const bv = parseFloat(b.dataset[col]) || 0;
+                return (av - bv) * dir;
+            });
+            cards.forEach(c => container.appendChild(c));
+        });
+    }
+
+    /* ── Table header sort clicks ─────────────────── */
+    document.querySelectorAll('[data-division-table] thead th[data-col]').forEach(th => {
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', function () {
+            const col = this.dataset.col;
+            // Simulate sort-btn click
+            const btn = document.querySelector(`.sort-btn[data-sort="${col}"]`);
+            if (btn) btn.click();
+            // Update header arrows
+            document.querySelectorAll('[data-division-table] thead th[data-col]').forEach(t => {
+                t.classList.remove('asc', 'desc');
+            });
+            this.classList.add(sortDir === 1 ? 'asc' : 'desc');
+        });
+    });
+
+    /* ── Copy Link ───────────────────────────────── */
+    const copyBtn = document.getElementById('copyLinkBtn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', function () {
+            const url = this.dataset.url;
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('✅ Link copied to clipboard!');
+            }).catch(() => {
+                showToast('⚠️ Could not copy. Please copy manually.');
+            });
+        });
+    }
+
+    function showToast(msg) {
+        const t = document.createElement('div');
+        t.className = 'sf-toast';
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 3000);
+    }
+})();
+</script>
+{% endblock %}

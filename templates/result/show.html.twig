@@ -1,0 +1,155 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Match Analytics — {{ result.fighter1.lastName }} vs {{ result.fighter2.lastName }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .analytics-card {
+            background: linear-gradient(145deg, #18181b, #09090b);
+            border: 1px solid #27272a;
+            border-radius: 24px;
+            overflow: hidden;
+        }
+        .stat-badge-premium {
+            background: rgba(220, 38, 38, 0.1);
+            color: #ef4444;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .stat-grid-row {
+            display: grid;
+            grid-template-columns: 1fr 100px 1fr;
+            align-items: center;
+            gap: 2rem;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .stat-value {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .stat-label-center {
+            text-align: center;
+            color: #71717a;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .progress-stat-bar {
+            height: 8px;
+            background: #27272a;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+        }
+        .red-fill { background: #dc2626; box-shadow: 0 0 10px rgba(220, 38, 38, 0.3); }
+        .blue-fill { background: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <span class="stat-badge-premium mb-3 d-inline-block">OFFICIAL COMPUBOX DATA</span>
+        <h1 class="display-5 fw-bold text-white mb-2" style="font-family: 'Oswald', sans-serif; letter-spacing: 2px;">{{ result.fighter1.fullName }} vs {{ result.fighter2.fullName }}</h1>
+        <p class="text-muted fs-5">{{ result.event.eventName }} — {{ result.event.eventDate|date('M d, Y') }}</p>
+    </div>
+
+    <div class="analytics-card p-5">
+        <div class="row align-items-center mb-5">
+            <div class="col-md-5 text-center">
+                <h2 class="h1 fw-bold text-danger">{{ result.fighter1.lastName }}</h2>
+                <div class="text-muted text-uppercase small fw-bold">Red Corner</div>
+            </div>
+            <div class="col-md-2 text-center">
+                <div class="display-6 fw-bold text-muted">VS</div>
+            </div>
+            <div class="col-md-5 text-center">
+                <h2 class="h1 fw-bold text-primary">{{ result.fighter2.lastName }}</h2>
+                <div class="text-muted text-uppercase small fw-bold">Blue Corner</div>
+            </div>
+        </div>
+
+        {# Total Stats Summary #}
+        {% set f1_total_thrown = 0 %}{% set f1_total_landed = 0 %}
+        {% set f2_total_thrown = 0 %}{% set f2_total_landed = 0 %}
+        {% for r in 1..rounds %}
+            {% set s1 = fighterStats[result.fighter1.fighterId][r]|default(null) %}
+            {% set s2 = fighterStats[result.fighter2.fighterId][r]|default(null) %}
+            {% if s1 %}{% set f1_total_thrown = f1_total_thrown + s1.punchesThrown %}{% set f1_total_landed = f1_total_landed + s1.punchesLanded %}{% endif %}
+            {% if s2 %}{% set f2_total_thrown = f2_total_thrown + s2.punchesThrown %}{% set f2_total_landed = f2_total_landed + s2.punchesLanded %}{% endif %}
+        {% endfor %}
+
+        <div class="mb-5">
+            <div class="stat-grid-row">
+                <div class="text-end">
+                    <div class="stat-value">{{ f1_total_landed }} / {{ f1_total_thrown }}</div>
+                    <div class="small text-muted">{{ f1_total_thrown > 0 ? (f1_total_landed / f1_total_thrown * 100)|round(1) : 0 }}% Connect</div>
+                </div>
+                <div class="stat-label-center">Total Punches</div>
+                <div class="text-start">
+                    <div class="stat-value">{{ f2_total_landed }} / {{ f2_total_thrown }}</div>
+                    <div class="small text-muted">{{ f2_total_thrown > 0 ? (f2_total_landed / f2_total_thrown * 100)|round(1) : 0 }}% Connect</div>
+                </div>
+            </div>
+
+            {# Power Punches, Jabs, etc. (Can add more here) #}
+        </div>
+
+        {% if result.videoPath or result.highlightVideoUrl %}
+        <div class="mb-5 p-4 rounded-3" style="background:rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+            <h4 class="text-white mb-3" style="font-family:'Oswald',sans-serif;"><i class="fa-solid fa-play me-2 text-danger"></i>High-Impact Highlights</h4>
+            <div class="ratio ratio-21x9 rounded-4 overflow-hidden border border-secondary" style="background:#000; box-shadow: 0 15px 50px rgba(0,0,0,0.6);">
+                {% if result.videoPath %}
+                    <video controls style="width:100%;height:100%;object-fit:contain;">
+                        <source src="{{ asset('uploads/fights/highlights/' ~ result.videoPath) }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                {% else %}
+                    {% set isYouTube = 'youtube.com' in result.highlightVideoUrl or 'youtu.be' in result.highlightVideoUrl %}
+                    {% set isVimeo = 'vimeo.com' in result.highlightVideoUrl %}
+                    
+                    {% if isYouTube %}
+                        {% set videoId = result.highlightVideoUrl|split('v=')|last|split('&')|first|split('?')|first %}
+                        {% if '/' in videoId %}{% set videoId = videoId|split('/')|last %}{% endif %}
+                        <iframe src="https://www.youtube.com/embed/{{ videoId }}?autoplay=0&rel=0&modestbranding=1" 
+                                title="Fight Highlights" allowfullscreen style="border:none;"></iframe>
+                    {% elseif isVimeo %}
+                        {% set videoId = result.highlightVideoUrl|split('/')|last|split('?')|first %}
+                        <iframe src="https://player.vimeo.com/video/{{ videoId }}?badge=0&autopause=0&player_id=0&app_id=58479" 
+                                title="Fight Highlights" allowfullscreen style="border:none;"></iframe>
+                    {% else %}
+                        <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                            <a href="{{ result.highlightVideoUrl }}" target="_blank" class="btn btn-outline-danger btn-lg rounded-pill fw-bold">
+                                Watch Highlights on External Player <i class="fa-solid fa-external-link ms-2"></i>
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="mt-5 p-4 rounded-3" style="background:rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+            <h4 class="text-white mb-3" style="font-family:'Oswald',sans-serif;"><i class="fa-solid fa-brain me-2 text-warning"></i>Inside The Numbers</h4>
+            <div class="text-muted" style="line-height:1.8; font-size:1.1rem;">
+                {{ result.insideTheNumbers|default('Detailed tactical analysis pending AI synthesis.')|nl2br }}
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="{{ path('app_result_manage_card', {id: result.event.eventId}) }}" class="btn btn-outline-secondary px-5 py-3 rounded-pill fw-bold">
+                <i class="fa-solid fa-arrow-left me-2"></i>Back to Fight Card
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

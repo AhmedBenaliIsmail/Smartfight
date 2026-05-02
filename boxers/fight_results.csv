@@ -1,0 +1,6 @@
+ID,Event,Fight#,Fighter1,Fighter2,Winner,Method,Round,Date,Status
+4,"event 80",1,"Tyson Fury","Anthony Joshua","Tyson Fury",KO,6,"24/04/2026 21:19",COMPLETED
+1,"Fury vs Usyk",1,"Tyson Fury","Oleksandr Usyk","Oleksandr Usyk",DECISION,12,"24/03/2026 17:04",COMPLETED
+3,"Canelo vs Benavidez",1,"Canelo Alvarez","David Benavidez","Canelo Alvarez",DECISION,12,"24/01/2026 17:04",COMPLETED
+2,"Crawford vs Spence",1,"Terence Crawford","Errol Spence Jr.","Terence Crawford",KO,9,"24/08/2025 17:04",COMPLETED
+5,"event 80",2,"Terence Crawford","Errol Spence Jr.",,,,,SCHEDULED

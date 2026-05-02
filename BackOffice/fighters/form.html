@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fighter Form — SmartFight Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/smartfight-admin.css" />
+</head>
+<body class="antialiased">
+<div class="wrapper">
+  <aside class="navbar navbar-vertical navbar-expand-lg" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+    <div class="container-fluid flex-column align-items-stretch p-0">
+      <div class="p-3 border-bottom" style="border-color:#27272a!important">
+        <a href="../dashboard.html" class="smartfight-logo"><div class="logo-icon"><i class="fa-solid fa-fist-raised"></i></div><div class="logo-text">Smart<span>Fight</span></div></a>
+      </div>
+      <nav class="flex-fill py-2">
+        <div class="navbar-vertical-section">Management</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../dashboard.html"><span class="nav-link-icon"><i class="fa-solid fa-chart-line fa-fw"></i></span><span class="nav-link-title">Dashboard</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../users/index.html"><span class="nav-link-icon"><i class="fa-solid fa-users fa-fw"></i></span><span class="nav-link-title">Users</span></a></li>
+          <li class="nav-item"><a class="nav-link active" href="index.html"><span class="nav-link-icon"><i class="fa-solid fa-boxing-glove fa-fw"></i></span><span class="nav-link-title">Fighters</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../events/index.html"><span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span><span class="nav-link-title">Events</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fight-results/index.html"><span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span><span class="nav-link-title">Fight Results</span></a></li>
+        </ul>
+        <div class="navbar-vertical-section mt-2">Fan Experience</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../blog/index.html"><span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw"></i></span><span class="nav-link-title">Blog Articles</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../bookings/index.html"><span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw"></i></span><span class="nav-link-title">Event Bookings</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../predictions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span><span class="nav-link-title">Predictions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../reactions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-comments fa-fw"></i></span><span class="nav-link-title">Reactions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../notifications/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span><span class="nav-link-title">Notifications</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
+    <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
+      <div class="d-flex align-items-center gap-3 flex-fill">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="../dashboard.html" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+          <li class="breadcrumb-item"><a href="index.html" style="color:#a1a1aa;text-decoration:none;">Fighters</a></li>
+          <li class="breadcrumb-item active">Add Fighter</li>
+        </ol>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="#" class="nav-link p-1 text-muted"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="../notifications/index.html" class="nav-link p-1 position-relative text-muted"><i class="fa-solid fa-bell"></i><span class="badge bg-danger rounded-pill" style="position:absolute;top:-4px;right:-4px;font-size:.6rem;padding:2px 5px;">7</span></a>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+            <div style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">A</div>
+            <span style="font-size:.875rem;color:#fafafa;">Admin</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user fa-fw me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-fill p-4" style="background:#09090b;">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Add Fighter</h1>
+          <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Register a new fighter in the roster</p>
+        </div>
+        <a href="index.html" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+      </div>
+
+      <form>
+        <div class="row g-4">
+          <!-- Left Column -->
+          <div class="col-lg-8">
+            <!-- Personal Info -->
+            <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+              <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-id-badge me-2" style="color:#dc2626;"></i>Personal Information</h3>
+              </div>
+              <div class="card-body p-4">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label">First Name <span style="color:#dc2626;">*</span></label>
+                    <input type="text" class="form-control" placeholder="e.g. Jon" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Last Name <span style="color:#dc2626;">*</span></label>
+                    <input type="text" class="form-control" placeholder="e.g. Jones" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Nickname</label>
+                    <input type="text" class="form-control" placeholder='e.g. "Bones"' />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Nationality <span style="color:#dc2626;">*</span></label>
+                    <input type="text" class="form-control" placeholder="e.g. American" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Physical Stats -->
+            <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+              <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-ruler me-2" style="color:#3b82f6;"></i>Physical Stats</h3>
+              </div>
+              <div class="card-body p-4">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Weight Class <span style="color:#dc2626;">*</span></label>
+                    <select class="form-select">
+                      <option value="" disabled selected>Select weight class</option>
+                      <option>Strawweight (115 lbs)</option>
+                      <option>Flyweight (125 lbs)</option>
+                      <option>Bantamweight (135 lbs)</option>
+                      <option>Featherweight (145 lbs)</option>
+                      <option>Lightweight (155 lbs)</option>
+                      <option>Welterweight (170 lbs)</option>
+                      <option>Middleweight (185 lbs)</option>
+                      <option>Light Heavyweight (205 lbs)</option>
+                      <option>Heavyweight (265 lbs)</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Stance</label>
+                    <select class="form-select">
+                      <option value="" disabled selected>Select stance</option>
+                      <option>Orthodox</option>
+                      <option>Southpaw</option>
+                      <option>Switch</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Height</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control" placeholder='e.g. 6&apos;4"' />
+                      <span class="input-group-text">ft/in</span>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Weight (lbs)</label>
+                    <div class="input-group">
+                      <input type="number" class="form-control" placeholder="265" />
+                      <span class="input-group-text">lbs</span>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Reach</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control" placeholder='84.5"' />
+                      <span class="input-group-text">in</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bio -->
+            <div class="card" style="background:#18181b;border:1px solid #27272a;">
+              <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-align-left me-2" style="color:#a1a1aa;"></i>Biography</h3>
+              </div>
+              <div class="card-body p-4">
+                <textarea class="form-control" rows="5" placeholder="Write a short biography about the fighter..."></textarea>
+                <div style="font-size:.75rem;color:#52525b;margin-top:.5rem;">Supports plain text only</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div class="col-lg-4">
+            <!-- Photo Upload -->
+            <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+              <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-image me-2" style="color:#a1a1aa;"></i>Profile Photo</h3>
+              </div>
+              <div class="card-body p-4">
+                <div style="border:2px dashed #27272a;border-radius:8px;padding:2rem;text-align:center;cursor:pointer;transition:border-color .2s;" onmouseover="this.style.borderColor='#dc2626'" onmouseout="this.style.borderColor='#27272a'">
+                  <div style="font-size:2rem;margin-bottom:.75rem;">📷</div>
+                  <div style="font-size:.8125rem;color:#a1a1aa;margin-bottom:.5rem;">Drop an image here or click to upload</div>
+                  <div style="font-size:.75rem;color:#52525b;">PNG, JPG up to 5MB</div>
+                  <input type="file" accept="image/*" style="display:none;" id="photoInput" />
+                </div>
+                <button type="button" class="btn w-100 mt-2" style="background:#27272a;color:#a1a1aa;border:none;font-size:.8125rem;" onclick="document.getElementById('photoInput').click()">
+                  <i class="fa-solid fa-upload me-2"></i>Choose File
+                </button>
+              </div>
+            </div>
+
+            <!-- Status -->
+            <div class="card" style="background:#18181b;border:1px solid #27272a;">
+              <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;">Status</h3>
+              </div>
+              <div class="card-body p-4">
+                <select class="form-select mb-3">
+                  <option>Active</option>
+                  <option>Inactive</option>
+                  <option>Retired</option>
+                  <option>Suspended</option>
+                </select>
+                <hr style="border-color:#27272a;opacity:1;" />
+                <div class="d-flex gap-2">
+                  <a href="index.html" class="btn flex-fill" style="background:#27272a;color:#a1a1aa;border:none;">Cancel</a>
+                  <button type="submit" class="btn btn-danger flex-fill"><i class="fa-solid fa-floppy-disk me-1"></i>Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+</body>
+</html>

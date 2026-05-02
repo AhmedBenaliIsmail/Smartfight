@@ -1,0 +1,273 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Enter Result — SmartFight Admin{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_results') }}" style="color:#a1a1aa;text-decoration:none;">Fight Results</a></li>
+    <li class="breadcrumb-item active">Enter Result</li>
+{% endblock %}
+
+{% block content %}
+<div id="loading-overlay" class="upload-overlay d-none">
+    <div class="pro-progress-circle mb-4"></div>
+    <h2 class="text-white fw-bold mb-2">FINALIZING MATCH...</h2>
+    <div class="h1 text-success fw-bold" id="upload-percent-large">0%</div>
+    <p class="text-muted">Synchronizing results with the Global Ranking Database...</p>
+</div>
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Enter Fight Result</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Completing a boxing match will recalculate global rankings and CompuBox analytics.</p>
+    </div>
+    <a href="{{ path('app_results') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+</div>
+
+<form method="post" enctype="multipart/form-data" id="finalize-form">
+    <style>
+        .upload-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .pro-progress-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid #27272a;
+            border-top: 4px solid #16a34a;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .winner-select-card {
+            background: #09090b;
+            border: 1px solid #27272a;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            border-bottom: 4px solid transparent;
+        }
+        .winner-select-card:hover {
+            border-color: #3f3f46;
+            transform: translateY(-5px);
+        }
+        input[type="radio"]:checked + .winner-select-card.red-card {
+            border-color: #dc2626;
+            background: rgba(220, 38, 38, 0.05);
+            box-shadow: 0 5px 15px rgba(220, 38, 38, 0.2);
+        }
+        input[type="radio"]:checked + .winner-select-card.blue-card {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.2);
+        }
+        input[type="radio"]:checked + .winner-select-card.draw-card {
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.05);
+            box-shadow: 0 5px 15px rgba(251, 191, 36, 0.2);
+        }
+        .form-check-input-hidden {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+    </style>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-body text-center p-4">
+                    <h2 class="mb-3">Fight #{{ result.fightNumber }} ({{ result.event.eventName }})</h2>
+                    <div class="d-flex justify-content-center align-items-center gap-5">
+                        <div class="text-center">
+                            {% if fighter1 and fighter1.photoFilename %}
+                                <img src="{{ asset('uploads/boxers/' ~ fighter1.photoFilename) }}" class="rounded-circle mb-2" style="width:100px; height:100px; object-fit:cover; border:3px solid #dc2626;" alt="Photo" />
+                            {% else %}
+                                <div class="rounded-circle mb-2 d-inline-flex align-items-center justify-content-center" style="width:100px; height:100px; background:#27272a; color:#a1a1aa; border:3px solid #dc2626;">
+                                    <i class="fa-solid fa-user fa-3x"></i>
+                                </div>
+                            {% endif %}
+                            <div class="fs-4 fw-bold text-danger">{{ fighter1 ? fighter1.fullName : 'Unknown' }}</div>
+                            <div class="text-muted small">{{ fighter1 and fighter1.weightDivision ? fighter1.weightDivision.name : '' }}</div>
+                        </div>
+                        
+                        <div class="vs-badge fs-3 fw-bold" style="background:#27272a; padding:15px; border-radius:50%; border:1px solid #3f3f46;">VS</div>
+                        
+                        <div class="text-center">
+                            {% if fighter2 and fighter2.photoFilename %}
+                                <img src="{{ asset('uploads/boxers/' ~ fighter2.photoFilename) }}" class="rounded-circle mb-2" style="width:100px; height:100px; object-fit:cover; border:3px solid #3b82f6;" alt="Photo" />
+                            {% else %}
+                                <div class="rounded-circle mb-2 d-inline-flex align-items-center justify-content-center" style="width:100px; height:100px; background:#27272a; color:#a1a1aa; border:3px solid #3b82f6;">
+                                    <i class="fa-solid fa-user fa-3x"></i>
+                                </div>
+                            {% endif %}
+                            <div class="fs-4 fw-bold text-primary">{{ fighter2 ? fighter2.fullName : 'Unknown' }}</div>
+                            <div class="text-muted small">{{ fighter2 and fighter2.weightDivision ? fighter2.weightDivision.name : '' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-gavel me-2" style="color:#c9a227;"></i>Outcome</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-12 mb-4">
+                            <label class="form-label d-block text-center fs-5 mb-4 fw-bold text-uppercase" style="letter-spacing: 2px;">DECLARE WINNER</label>
+                            <div class="row g-3 justify-content-center">
+                                <div class="col-md-4">
+                                    <label class="w-100">
+                                        <input type="radio" name="winner" value="fighter1" class="form-check-input-hidden" required>
+                                        <div class="winner-select-card red-card">
+                                            <div class="badge bg-danger mb-2">RED CORNER</div>
+                                            <div class="h4 fw-bold mb-0">{{ fighter1 ? fighter1.lastName : 'Fighter 1' }}</div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="w-100">
+                                        <input type="radio" name="winner" value="draw" class="form-check-input-hidden" required>
+                                        <div class="winner-select-card draw-card">
+                                            <div class="badge bg-warning text-dark mb-2">DRAW / NC</div>
+                                            <div class="h4 fw-bold mb-0">SPLIT</div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="w-100">
+                                        <input type="radio" name="winner" value="fighter2" class="form-check-input-hidden" required>
+                                        <div class="winner-select-card blue-card">
+                                            <div class="badge bg-primary mb-2">BLUE CORNER</div>
+                                            <div class="h4 fw-bold mb-0">{{ fighter2 ? fighter2.lastName : 'Fighter 2' }}</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Method of Victory</label>
+                            <select name="method" class="form-select" required id="method-select" style="background:#09090b; border-color:#27272a; color:#fff;">
+                                <option value="KO">KO / TKO (Knockout)</option>
+                                <option value="DECISION">DECISION (Judges Scorecards)</option>
+                                <option value="DQ">DQ (Disqualification)</option>
+                                <option value="DRAW">DRAW (Official Ruling)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4" id="decision-type-col" style="display:none;">
+                            <label class="form-label">Decision Specifics</label>
+                            <select name="decisionType" class="form-select" style="background:#09090b; border-color:#27272a; color:#fff;">
+                                <option value="UD">Unanimous (UD)</option>
+                                <option value="SD">Split (SD)</option>
+                                <option value="MD">Majority (MD)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Match Concluded in Round</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background:#27272a; border-color:#27272a; color:#a1a1aa;">RD</span>
+                                <input type="number" name="round" class="form-control" value="12" min="1" max="12" style="background:#09090b; border-color:#27272a; color:#fff;" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 mt-3">
+                            <label class="form-label" style="color:#ef4444;"><i class="fa-solid fa-cloud-arrow-up me-2"></i>Upload Fight Highlights (Video File)</label>
+                            <div class="p-4 rounded-3 border-2 border-dashed d-flex flex-column align-items-center justify-content-center" style="background:#09090b; border: 2px dashed #27272a;">
+                                <i class="fa-solid fa-film text-muted mb-2 fa-2x"></i>
+                                <input type="file" name="videoFile" class="form-control" accept="video/*" style="background:transparent; border:none; color:#fff;" />
+                                <p class="text-muted small mt-2 mb-0 text-center">Supported formats: MP4, WebM. Max size: 100MB.<br>The video will be hosted locally and embedded in the fan dashboard.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <label class="form-label text-muted small"><i class="fa-solid fa-link me-2"></i>Or External Video Link (Optional)</label>
+                            <input type="url" name="highlightVideoUrl" class="form-control" placeholder="https://www.youtube.com/watch?v=..." style="background:#09090b; border-color:#27272a; color:#fafafa; font-size: 0.8rem;" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-body p-3">
+                    <button type="submit" class="btn w-100 py-3" style="background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; border: none; border-radius: 8px; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);"><i class="fa-solid fa-check-double me-2"></i>Finalize Boxing Match</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const finalizeForm = document.getElementById('finalize-form');
+    const overlay = document.getElementById('loading-overlay');
+    const percentEl = document.getElementById('upload-percent-large');
+
+    finalizeForm.onsubmit = function(e) {
+        // Only use AJAX if there's a file to upload
+        const videoInput = document.querySelector('input[name="videoFile"]');
+        if (!videoInput || !videoInput.files || videoInput.files.length === 0) {
+            // Standard submit for no video (faster)
+            return true; 
+        }
+
+        e.preventDefault();
+        overlay.classList.remove('d-none');
+
+        const formData = new FormData(finalizeForm);
+        const xhr = new XMLHttpRequest();
+
+        xhr.upload.addEventListener('progress', (ev) => {
+            if (ev.lengthComputable) {
+                const p = Math.round((ev.loaded / ev.total) * 100);
+                percentEl.innerText = p + '%';
+            }
+        });
+
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 400) {
+                // Success! Redirect to results index
+                window.location.href = "{{ path('app_results') }}";
+            } else {
+                alert('Sync Error: The SmartFight server could not process the match data. Status: ' + xhr.status);
+                overlay.classList.add('d-none');
+            }
+        };
+
+        xhr.onerror = function() {
+            alert('Network Error: The connection to the SmartFight server was lost during synchronization.');
+            overlay.classList.add('d-none');
+        };
+
+        xhr.open('POST', finalizeForm.action || window.location.href, true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.send(formData);
+    };
+
+    const methodSelect = document.getElementById('method-select');
+    const decisionCol = document.getElementById('decision-type-col');
+
+    if (methodSelect) {
+        // Sync visibility on load
+        const syncDecisionUI = () => {
+            decisionCol.style.display = (methodSelect.value === 'DECISION') ? 'block' : 'none';
+        };
+        
+        syncDecisionUI();
+        methodSelect.addEventListener('change', syncDecisionUI);
+    }
+});
+</script>
+{% endblock %}
+

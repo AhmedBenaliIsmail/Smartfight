@@ -1,0 +1,697 @@
+{% extends 'front/base_front.html.twig' %}
+
+{% block title %}{{ title|default('Events') }} — SmartFight{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ─── Stats Dashboard ─────────────────────────────── */
+.stats-section {
+    margin-bottom: 2.5rem;
+}
+.stat-card {
+    background: linear-gradient(145deg, #18181b, #09090b);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    padding: 1.5rem 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+}
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    border-radius: 20px 20px 0 0;
+    opacity: 0.85;
+}
+.stat-card.card-total::before   { background: linear-gradient(90deg, #6366f1, #818cf8); }
+.stat-card.card-upcoming::before { background: linear-gradient(90deg, #10b981, #34d399); }
+.stat-card.card-past::before     { background: linear-gradient(90deg, #f97316, #fb923c); }
+.stat-card.card-champs::before   { background: linear-gradient(90deg, #fbbf24, #fde68a); }
+.stat-card.card-fights::before   { background: linear-gradient(90deg, #dc2626, #ef4444); }
+
+.stat-icon-wrap {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.35rem;
+    flex-shrink: 0;
+}
+.card-total   .stat-icon-wrap { background: rgba(99,102,241,0.15); color: #818cf8; }
+.card-upcoming .stat-icon-wrap { background: rgba(16,185,129,0.15); color: #34d399; }
+.card-past    .stat-icon-wrap { background: rgba(249,115,22,0.15);  color: #fb923c; }
+.card-champs  .stat-icon-wrap { background: rgba(251,191,36,0.15);  color: #fbbf24; }
+.card-fights  .stat-icon-wrap { background: rgba(220,38,38,0.15);   color: #f87171; }
+
+.stat-value {
+    font-family: 'Oswald', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    letter-spacing: -0.5px;
+}
+.stat-label {
+    font-size: 0.75rem;
+    color: #71717a;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 4px;
+}
+.stat-divider {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(220,38,38,0.4), transparent);
+    margin-bottom: 2rem;
+}
+
+/* ─── Event Cards (preserved) ────────────────────── */
+.event-card-ultra {
+    background: linear-gradient(145deg, #18181b, #09090b);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    border-radius: 24px;
+    padding: 2rem;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    height: 100%;
+    overflow: hidden;
+}
+.event-card-ultra:hover {
+    border-color: #dc2626;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(220,38,38,0.1);
+    transform: translateY(-10px);
+}
+.event-card-ultra::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 4px;
+    background: linear-gradient(90deg, #dc2626, #fbbf24);
+    opacity: 0.6;
+}
+.org-tag-top {
+    position: absolute;
+    top: 20px; right: 20px;
+    background: rgba(251,191,36,0.15);
+    color: #fbbf24;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    border: 1px solid rgba(251,191,36,0.3);
+    display: flex; align-items: center; gap: 6px;
+}
+.event-title-pro {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.5px;
+}
+.info-row {
+    display: flex; align-items: center;
+    gap: 10px;
+    color: #a1a1aa;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+.status-box {
+    background: rgba(24,24,27,0.8);
+    border: 1px solid #27272a;
+    border-radius: 16px;
+    padding: 1rem;
+    margin: 1.5rem 0;
+}
+.ultra-manage-btn {
+    background: #dc2626;
+    color: #fff;
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px;
+    transition: all 0.2s;
+    border: none;
+    text-decoration: none !important;
+}
+.ultra-manage-btn:hover {
+    background: #ef4444;
+    transform: scale(1.02);
+    color: #fff;
+}
+.action-dot {
+    width: 40px; height: 40px;
+    background: #18181b;
+    border: 1px solid #27272a;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #71717a;
+    transition: all 0.2s;
+}
+.action-dot:hover { background: #27272a; color: #fff; }
+
+/* ─── Pagination ──────────────────────────────────── */
+.sf-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+}
+.sf-pagination-info {
+    font-size: 0.82rem;
+    color: #52525b;
+    font-weight: 500;
+    white-space: nowrap;
+}
+.sf-pagination-info strong { color: #a1a1aa; }
+.sf-pages {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.sf-page-btn {
+    min-width: 36px; height: 36px;
+    padding: 0 10px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid #27272a;
+    background: #18181b;
+    color: #a1a1aa;
+    letter-spacing: 0.3px;
+}
+.sf-page-btn:hover {
+    background: #27272a;
+    color: #fff;
+    border-color: #3f3f46;
+}
+.sf-page-btn.active {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(220,38,38,0.35);
+}
+.sf-page-btn.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+.sf-page-btn.nav {
+    gap: 6px;
+    padding: 0 14px;
+}
+.sf-page-ellipsis {
+    color: #52525b;
+    padding: 0 4px;
+    font-size: 0.85rem;
+    user-select: none;
+}
+
+/* ── Autocomplete dropdown ───────────────────────── */
+.sf-ac-wrap { position: relative; }
+.sf-ac-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: #18181b;
+    border: 1px solid #3f3f46;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.55);
+    animation: sfAcFade 0.15s ease;
+}
+@keyframes sfAcFade {
+    from { opacity:0; transform:translateY(-6px); }
+    to   { opacity:1; transform:translateY(0); }
+}
+.sf-ac-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
+    border-bottom: 1px solid #27272a;
+    transition: background 0.15s;
+}
+.sf-ac-item:last-child { border-bottom: none; }
+.sf-ac-item:hover, .sf-ac-item.sf-ac-active {
+    background: #27272a;
+}
+.sf-ac-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: rgba(220,38,38,0.12);
+    color: #dc2626;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.8rem;
+}
+.sf-ac-label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #f4f4f5;
+    line-height: 1.2;
+}
+.sf-ac-label mark {
+    background: transparent;
+    color: #f87171;
+    font-weight: 700;
+    padding: 0;
+}
+.sf-ac-meta {
+    font-size: 0.75rem;
+    color: #71717a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.sf-ac-org {
+    margin-left: auto;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    color: #fbbf24;
+    background: rgba(251,191,36,0.1);
+    border: 1px solid rgba(251,191,36,0.2);
+    padding: 2px 7px;
+    border-radius: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.sf-ac-empty {
+    padding: 14px;
+    text-align: center;
+    color: #52525b;
+    font-size: 0.82rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+    {# ── Page Header ───────────────────────────────────────────── #}
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h2 fw-bold text-white mb-1" style="font-family:'Oswald',sans-serif;letter-spacing:1px;">
+                EVENT MANAGEMENT
+            </h1>
+            <p class="text-muted mb-0">Directing professional boxing spectacles and world title events</p>
+        </div>
+        <div class="d-flex gap-3 align-items-center">
+            {# ── Server-side search form — resets to page 1 on submit ── #}
+            <form method="GET" action="{{ path('app_events') }}" class="d-flex gap-2 align-items-center" id="event-search-form">
+                <div class="input-icon" style="width:270px;">
+                    <span class="input-icon-addon"><i class="fa-solid fa-search"></i></span>
+                    <input type="text"
+                           id="search-input"
+                           name="search"
+                           value="{{ search }}"
+                           class="form-control"
+                           style="background:#18181b;border:1px solid #27272a;color:#fafafa;"
+                           placeholder="Search events, venues, cities…"
+                           autocomplete="off">
+                </div>
+                <button type="submit" class="btn btn-outline-secondary px-3" style="border-color:#27272a;color:#a1a1aa;background:#18181b;" title="Search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+                {% if search %}
+                <a href="{{ path('app_events') }}" class="btn btn-outline-danger px-3" title="Clear search">
+                    <i class="fa-solid fa-xmark"></i>
+                </a>
+                {% endif %}
+            </form>
+            {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_event_new') }}" class="btn btn-danger px-4 fw-bold">
+                <i class="fa-solid fa-plus me-2"></i>CREATE EVENT
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {# ── Statistics Dashboard ──────────────────────────────────── #}
+    <div class="stats-section">
+        <div class="row g-3 mb-3">
+            {# Total Events #}
+            <div class="col-xl col-lg-4 col-md-6">
+                <div class="stat-card card-total h-100">
+                    <div class="stat-icon-wrap"><i class="fa-solid fa-calendar-check"></i></div>
+                    <div>
+                        <div class="stat-value">{{ stats.total }}</div>
+                        <div class="stat-label">Total Events</div>
+                    </div>
+                </div>
+            </div>
+            {# Upcoming #}
+            <div class="col-xl col-lg-4 col-md-6">
+                <div class="stat-card card-upcoming h-100">
+                    <div class="stat-icon-wrap"><i class="fa-solid fa-calendar-plus"></i></div>
+                    <div>
+                        <div class="stat-value">{{ stats.upcoming }}</div>
+                        <div class="stat-label">Upcoming</div>
+                    </div>
+                </div>
+            </div>
+            {# Past #}
+            <div class="col-xl col-lg-4 col-md-6">
+                <div class="stat-card card-past h-100">
+                    <div class="stat-icon-wrap"><i class="fa-solid fa-calendar-minus"></i></div>
+                    <div>
+                        <div class="stat-value">{{ stats.past }}</div>
+                        <div class="stat-label">Past Events</div>
+                    </div>
+                </div>
+            </div>
+            {# Champions #}
+            <div class="col-xl col-lg-6 col-md-6">
+                <div class="stat-card card-champs h-100">
+                    <div class="stat-icon-wrap"><i class="fa-solid fa-crown"></i></div>
+                    <div>
+                        <div class="stat-value">{{ stats.champions }}</div>
+                        <div class="stat-label">Champions Events</div>
+                    </div>
+                </div>
+            </div>
+            {# Total Fights #}
+            <div class="col-xl col-lg-6 col-md-6">
+                <div class="stat-card card-fights h-100">
+                    <div class="stat-icon-wrap"><i class="fa-solid fa-hand-fist"></i></div>
+                    <div>
+                        <div class="stat-value">{{ stats.fights }}</div>
+                        <div class="stat-label">Total Fights</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="stat-divider"></div>
+    </div>
+
+    {# ── Pagination — TOP ─────────────────────────────────────── #}
+    {% set totalItems = pagination.getTotalItemCount() %}
+    {% set currentPage = pagination.getCurrentPageNumber() %}
+    {% set itemsPerPage = pagination.getItemNumberPerPage() %}
+    {% set totalPages = (totalItems / itemsPerPage)|round(0, 'ceil') %}
+    {% set firstItem = ((currentPage - 1) * itemsPerPage) + 1 %}
+    {% set lastItem = (currentPage * itemsPerPage > totalItems) ? totalItems : (currentPage * itemsPerPage) %}
+
+    {% if totalPages > 1 %}
+    <div class="sf-pagination mb-4">
+        <div class="sf-pagination-info">
+            {% if search %}
+                Found <strong>{{ totalItems }}</strong> result{{ totalItems != 1 ? 's' : '' }} for "<em>{{ search|e }}</em>" &mdash; showing <strong>{{ firstItem }}–{{ lastItem }}</strong>
+            {% else %}
+                Showing <strong>{{ firstItem }}–{{ lastItem }}</strong> of <strong>{{ totalItems }}</strong> events
+            {% endif %}
+        </div>
+        <div class="sf-pages">
+            <a href="{{ path('app_events', {page: currentPage - 1, search: search}) }}"
+               class="sf-page-btn nav {{ currentPage <= 1 ? 'disabled' : '' }}">
+                <i class="fa-solid fa-chevron-left fa-xs"></i> Prev
+            </a>
+            {% for p in 1..totalPages %}
+                {% if p == 1 or p == totalPages or (p >= currentPage - 2 and p <= currentPage + 2) %}
+                    <a href="{{ path('app_events', {page: p, search: search}) }}"
+                       class="sf-page-btn {{ p == currentPage ? 'active' : '' }}">
+                        {{ p }}
+                    </a>
+                {% elseif p == currentPage - 3 or p == currentPage + 3 %}
+                    <span class="sf-page-ellipsis">…</span>
+                {% endif %}
+            {% endfor %}
+            <a href="{{ path('app_events', {page: currentPage + 1, search: search}) }}"
+               class="sf-page-btn nav {{ currentPage >= totalPages ? 'disabled' : '' }}">
+                Next <i class="fa-solid fa-chevron-right fa-xs"></i>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    {# ── Events Grid ──────────────────────────────────────────── #}
+    <div class="row g-4 event-grid">
+        {% for event in pagination %}
+            {% set fight_count = fightCounts[event.eventId]|default(0) %}
+            <div class="col-lg-4 col-md-6 event-card-col">
+                <div class="event-card-ultra">
+                    <div class="event-title-pro">{{ event.eventName }}</div>
+
+                    {% if event.isChampionsEvent %}
+                        <div class="org-tag-top">
+                            <i class="fa-solid fa-crown"></i>
+                            {{ event.organization }} BELT
+                        </div>
+                    {% endif %}
+
+                    <div class="info-row">
+                        <i class="fa-solid fa-calendar-day text-danger"></i>
+                        <span>{{ event.eventDate ? event.eventDate|date('l, M d, Y') : 'Date TBD' }}</span>
+                    </div>
+
+                    <div class="info-row">
+                        <i class="fa-solid fa-map-pin text-danger"></i>
+                        <span>{{ event.venue|default('TBD') }}, {{ event.city|default('TBD') }}</span>
+                    </div>
+
+                    <div class="status-box">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small text-muted fw-bold uppercase">Sanctioning Progress</span>
+                            <span class="text-white small fw-bold">{{ fight_count }}/3 BOUTS</span>
+                        </div>
+                        <div class="progress" style="height:6px;background:#09090b;border-radius:10px;">
+                            <div class="progress-bar bg-danger"
+                                 style="width:{{ (fight_count/3*100)|round }}%;border-radius:10px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <a href="{{ path('app_event_fights', {'id': event.eventId}) }}"
+                           class="ultra-manage-btn flex-grow-1">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            Manage Card
+                        </a>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <div class="dropdown">
+                                <button class="action-dot" data-bs-toggle="dropdown">
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end bg-dark border-secondary">
+                                    <li>
+                                        <a class="dropdown-item text-white"
+                                           href="{{ path('app_event_edit', {'id': event.eventId}) }}">
+                                            <i class="fa-solid fa-pen me-2"></i>Edit Profile
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider border-secondary"></li>
+                                    <li>
+                                        <form method="post"
+                                              action="{{ path('app_event_delete', {'id': event.eventId}) }}"
+                                              onsubmit="return confirm('Delete this event?');">
+                                            <input type="hidden" name="_token"
+                                                   value="{{ csrf_token('delete' ~ event.eventId) }}">
+                                            <button class="dropdown-item text-danger">
+                                                <i class="fa-solid fa-trash me-2"></i>Remove Event
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center py-5">
+                {% if search %}
+                    <i class="fa-solid fa-magnifying-glass fa-3x text-muted mb-3"></i>
+                    <h3 class="text-white">No events found for "{{ search|e }}"</h3>
+                    <p class="text-muted mb-3">Try a different name, venue, city, or organization.</p>
+                    <a href="{{ path('app_events') }}" class="btn btn-outline-danger">
+                        <i class="fa-solid fa-xmark me-2"></i>Clear Search
+                    </a>
+                {% else %}
+                    <i class="fa-solid fa-calendar-xmark fa-3x text-muted mb-3"></i>
+                    <h3 class="text-white">No Sanctioned Events</h3>
+                    <p class="text-muted">Start by scheduling a professional boxing card.</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    {# ── Pagination — BOTTOM ───────────────────────────────────── #}
+    {% if totalPages > 1 %}
+    <div class="sf-pagination mt-5">
+        <div class="sf-pagination-info">
+            {% if search %}
+                Found <strong>{{ totalItems }}</strong> result{{ totalItems != 1 ? 's' : '' }} for "<em>{{ search|e }}</em>" &mdash; showing <strong>{{ firstItem }}–{{ lastItem }}</strong>
+            {% else %}
+                Showing <strong>{{ firstItem }}–{{ lastItem }}</strong> of <strong>{{ totalItems }}</strong> events
+            {% endif %}
+        </div>
+        <div class="sf-pages">
+            <a href="{{ path('app_events', {page: currentPage - 1, search: search}) }}"
+               class="sf-page-btn nav {{ currentPage <= 1 ? 'disabled' : '' }}">
+                <i class="fa-solid fa-chevron-left fa-xs"></i> Prev
+            </a>
+            {% for p in 1..totalPages %}
+                {% if p == 1 or p == totalPages or (p >= currentPage - 2 and p <= currentPage + 2) %}
+                    <a href="{{ path('app_events', {page: p, search: search}) }}"
+                       class="sf-page-btn {{ p == currentPage ? 'active' : '' }}">
+                        {{ p }}
+                    </a>
+                {% elseif p == currentPage - 3 or p == currentPage + 3 %}
+                    <span class="sf-page-ellipsis">…</span>
+                {% endif %}
+            {% endfor %}
+            <a href="{{ path('app_events', {page: currentPage + 1, search: search}) }}"
+               class="sf-page-btn nav {{ currentPage >= totalPages ? 'disabled' : '' }}">
+                Next <i class="fa-solid fa-chevron-right fa-xs"></i>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    const input      = document.getElementById('search-input');
+    const form       = document.getElementById('event-search-form');
+    if (!input || !form) return;
+
+    // Wrap input in a relative-positioned container for the dropdown
+    const wrap = document.createElement('div');
+    wrap.className = 'sf-ac-wrap';
+    wrap.style.cssText = 'position:relative;flex:1;';
+    input.parentNode.insertBefore(wrap, input);
+    wrap.appendChild(input);
+
+    let dropdown   = null;
+    let activeIdx  = -1;
+    let lastQuery  = '';
+    let debounce   = null;
+    const URL_BASE = '{{ path("app_events_autocomplete") }}';
+
+    function highlight(text, query) {
+        if (!query) return escHtml(text);
+        const re = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+        return escHtml(text).replace(re, '<mark>$1</mark>');
+    }
+
+    function escHtml(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function buildDropdown(items, query) {
+        if (dropdown) dropdown.remove();
+        activeIdx = -1;
+
+        dropdown = document.createElement('div');
+        dropdown.className = 'sf-ac-dropdown';
+
+        if (!items.length) {
+            dropdown.innerHTML = '<div class="sf-ac-empty"><i class="fa-solid fa-magnifying-glass me-2"></i>No events match "' + escHtml(query) + '"</div>';
+        } else {
+            items.forEach((item, i) => {
+                const row = document.createElement('div');
+                row.className = 'sf-ac-item';
+                row.dataset.idx = i;
+                row.innerHTML = `
+                    <div class="sf-ac-icon"><i class="fa-solid fa-calendar-day"></i></div>
+                    <div style="min-width:0;flex:1">
+                        <div class="sf-ac-label">${highlight(item.label, query)}</div>
+                        ${item.meta ? '<div class="sf-ac-meta"><i class="fa-solid fa-map-pin fa-xs me-1" style="color:#dc2626"></i>' + escHtml(item.meta) + '</div>' : ''}
+                    </div>
+                    ${item.org && item.org !== 'INDEPENDENT' ? '<div class="sf-ac-org">' + escHtml(item.org) + '</div>' : ''}
+                `;
+                row.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    input.value = item.label;
+                    closeDropdown();
+                    form.submit();
+                });
+                dropdown.appendChild(row);
+            });
+        }
+
+        wrap.appendChild(dropdown);
+    }
+
+    function closeDropdown() {
+        if (dropdown) { dropdown.remove(); dropdown = null; }
+        activeIdx = -1;
+    }
+
+    function setActive(idx) {
+        const rows = dropdown ? dropdown.querySelectorAll('.sf-ac-item') : [];
+        rows.forEach(r => r.classList.remove('sf-ac-active'));
+        if (idx >= 0 && idx < rows.length) {
+            rows[idx].classList.add('sf-ac-active');
+            activeIdx = idx;
+        } else {
+            activeIdx = -1;
+        }
+    }
+
+    async function fetchSuggestions(q) {
+        try {
+            const res  = await fetch(URL_BASE + '?q=' + encodeURIComponent(q));
+            const data = await res.json();
+            if (input.value.trim() === q) buildDropdown(data, q);
+        } catch (_) {}
+    }
+
+    input.addEventListener('input', () => {
+        clearTimeout(debounce);
+        const q = input.value.trim();
+        if (q.length < 2) { closeDropdown(); return; }
+        if (q === lastQuery) return;
+        lastQuery = q;
+        debounce  = setTimeout(() => fetchSuggestions(q), 200);
+    });
+
+    input.addEventListener('keydown', (e) => {
+        if (!dropdown) return;
+        const rows = dropdown.querySelectorAll('.sf-ac-item');
+        if (e.key === 'ArrowDown')  { e.preventDefault(); setActive(Math.min(activeIdx + 1, rows.length - 1)); }
+        if (e.key === 'ArrowUp')    { e.preventDefault(); setActive(Math.max(activeIdx - 1, 0)); }
+        if (e.key === 'Enter' && activeIdx >= 0) {
+            e.preventDefault();
+            input.value = rows[activeIdx].querySelector('.sf-ac-label').textContent;
+            closeDropdown();
+            form.submit();
+        }
+        if (e.key === 'Escape') closeDropdown();
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!wrap.contains(e.target)) closeDropdown();
+    });
+
+    // Focus opens dropdown if there's already text
+    input.addEventListener('focus', () => {
+        const q = input.value.trim();
+        if (q.length >= 2) fetchSuggestions(q);
+    });
+})();
+</script>
+{% endblock %}

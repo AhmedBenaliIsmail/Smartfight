@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{#
+  Front-office base template.
+  Extends the unified base (sidebar + topbar) and injects:
+    - Front-specific fonts and CSS (Oswald, Inter, frontoffice stylesheets)
+    - A footer below the page content
+    - Front-specific JS (main.js, notification bell logic)
+  Child templates continue to use {% block content %} as before.
+  Extra per-page CSS/JS go in {% block extra_css %} / {% block extra_js %}.
+#}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="{{ asset('frontoffice/css/smartfight.css') }}">
+    <link rel="stylesheet" href="{{ asset('frontoffice/css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+{% endblock %}
+
+{# Footer is injected after content without touching {% block content %} #}
+{% block after_content %}
+    {% include 'front/partials/footer.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('frontoffice/js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+{% endblock %}

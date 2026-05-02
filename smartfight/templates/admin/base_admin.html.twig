@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('backoffice/css/smartfight-admin.css') }}">
+    {% block extra_css %}{% endblock %}
+{% endblock %}
+
+{% block body %}
+<div class="wrapper" data-bs-theme="dark">
+    {% include 'admin/partials/sidebar.html.twig' %}
+
+    <div style="margin-left:260px; min-height:100vh; background:#09090b;">
+        {% include 'admin/partials/navbar.html.twig' %}
+
+        <div class="container-xl py-4">
+            {% for type, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ type == 'error' ? 'danger' : type }} alert-dismissible fade show mb-3">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            {% block admin_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+    {% block extra_js %}{% endblock %}
+{% endblock %}

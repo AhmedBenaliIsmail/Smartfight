@@ -1,0 +1,375 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Match Analytics — {{ fighter1.lastName }} vs {{ fighter2.lastName }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .stats-card-premium {
+            background: linear-gradient(145deg, #18181b, #09090b);
+            border: 1px solid #27272a;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .nav-stats-tabs {
+            background: #09090b;
+            border-bottom: 1px solid #27272a;
+            padding: 0 1rem;
+        }
+        .nav-stats-tabs .nav-link {
+            color: #71717a;
+            border: none;
+            padding: 1.25rem 1rem;
+            font-weight: 700;
+            font-family: 'Oswald', sans-serif;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .nav-stats-tabs .nav-link.active {
+            color: #dc2626;
+            background: transparent;
+        }
+        .nav-stats-tabs .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background: #dc2626;
+            border-radius: 3px 3px 0 0;
+            box-shadow: 0 -2px 10px rgba(220, 38, 38, 0.5);
+        }
+        .stat-input-group {
+            background: rgba(24, 24, 27, 0.5);
+            border: 1px solid #27272a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: border-color 0.3s;
+        }
+        .stat-input-group:hover {
+            border-color: #3f3f46;
+        }
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #a1a1aa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .form-control-stat {
+            background: #09090b;
+            border: 1px solid #27272a;
+            color: #fafafa;
+            font-weight: 600;
+            text-align: center;
+            border-radius: 8px;
+        }
+        .form-control-stat:focus {
+            background: #09090b;
+            border-color: #dc2626;
+            color: #fff;
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1);
+        }
+        .fighter-header-stats {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .red-corner-bg {
+            background: linear-gradient(90deg, rgba(220, 38, 38, 0.1) 0%, transparent 100%);
+            border-left: 4px solid #dc2626;
+        }
+        .blue-corner-bg {
+            background: linear-gradient(270deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+            border-right: 4px solid #3b82f6;
+            flex-direction: row-reverse;
+            text-align: right;
+        }
+        .ai-magic-btn {
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            color: #fff;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+            transition: all 0.3s;
+        }
+        .ai-magic-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+            color: #fff;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center justify-content-between mb-5">
+        <div>
+            <h1 class="h2 fw-bold text-white mb-1" style="font-family: 'Oswald', sans-serif; letter-spacing: 1px;">COMPUBOX ANALYTICS ENTRY</h1>
+            <p class="text-muted mb-0">Recording granular performance data for {{ result.event.eventName }}</p>
+        </div>
+        <div class="d-flex gap-3">
+            <button type="button" class="ai-magic-btn" id="aiAutoFillBtn">
+                <i class="fa-solid fa-wand-magic-sparkles me-2"></i>AI Match Synthesis
+            </button>
+            <a href="{{ path('app_result_manage_card', {id: result.event.eventId}) }}" class="btn btn-outline-secondary px-4 fw-bold">
+                <i class="fa-solid fa-xmark me-2"></i>CANCEL
+            </a>
+        </div>
+    </div>
+
+    <form method="post">
+        <div class="stats-card-premium">
+            <div class="nav-stats-tabs">
+                <ul class="nav nav-tabs border-0" id="roundTabs" role="tablist">
+                    {% set totalRounds = result.roundNumber|default(result.scheduledRounds|default(12)) %}
+                    {% for r in 1..totalRounds %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if r == 1 %}active{% endif %}" id="round-{{ r }}-tab" data-bs-toggle="tab" data-bs-target="#round-{{ r }}" type="button" role="tab">ROUND {{ r }}</button>
+                    </li>
+                    {% endfor %}
+                    {% if result.roundNumber and result.roundNumber < (result.scheduledRounds|default(12)) %}
+                        <li class="nav-item ms-auto d-flex align-items-center pe-3">
+                            <span class="badge bg-danger-lt" style="font-size: 10px; letter-spacing: 1px;">
+                                <i class="fa-solid fa-stopwatch me-1"></i> FINISHED IN R{{ result.roundNumber }}
+                            </span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            <div class="tab-content p-5" id="roundTabsContent">
+                {% for r in 1..totalRounds %}
+                <div class="tab-pane fade {% if r == 1 %}show active{% endif %}" id="round-{{ r }}" role="tabpanel">
+                    <div class="row g-5">
+                        {# Red Corner #}
+                        <div class="col-lg-6">
+                            <div class="fighter-header-stats red-corner-bg">
+                                <div class="avatar avatar-md rounded-circle border border-danger p-1">
+                                    <i class="fa-solid fa-user text-danger"></i>
+                                </div>
+                                <div>
+                                    <div class="small text-danger fw-bold text-uppercase" style="letter-spacing: 1px;">Red Corner</div>
+                                    <div class="h4 mb-0 fw-bold text-white">{{ fighter1.fullName }}</div>
+                                </div>
+                            </div>
+
+                            <div class="stat-input-group mb-4">
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <label class="stat-label">Total Punches (L/T)</label>
+                                        <div class="input-group">
+                                            <input type="number" name="stats[{{ r }}][f1][landed]" class="form-control form-control-stat" placeholder="L">
+                                            <input type="number" name="stats[{{ r }}][f1][thrown]" class="form-control form-control-stat" placeholder="T">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="stat-label">Power Punches (L/T)</label>
+                                        <div class="input-group">
+                                            <input type="number" name="stats[{{ r }}][f1][power_landed]" class="form-control form-control-stat" placeholder="L">
+                                            <input type="number" name="stats[{{ r }}][f1][power_thrown]" class="form-control form-control-stat" placeholder="T">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="stat-label">Jab Performance (L/T)</label>
+                                        <div class="input-group">
+                                            <input type="number" name="stats[{{ r }}][f1][jabs_landed]" class="form-control form-control-stat" placeholder="L">
+                                            <input type="number" value="0" readonly class="form-control form-control-stat bg-dark-lt">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="stat-label">Right Hand (L/T)</label>
+                                        <div class="input-group">
+                                            <input type="number" name="stats[{{ r }}][f1][right_landed]" class="form-control form-control-stat" placeholder="L">
+                                            <input type="number" name="stats[{{ r }}][f1][right_thrown]" class="form-control form-control-stat" placeholder="T">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="stat-label">Left Hand (L/T)</label>
+                                        <div class="input-group">
+                                            <input type="number" name="stats[{{ r }}][f1][left_landed]" class="form-control form-control-stat" placeholder="L">
+                                            <input type="number" name="stats[{{ r }}][f1][left_thrown]" class="form-control form-control-stat" placeholder="T">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <label class="stat-label">Body</label>
+                                                <input type="number" name="stats[{{ r }}][f1][body_shots]" class="form-control form-control-stat" placeholder="0">
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="stat-label">KD</label>
+                                                <input type="number" name="stats[{{ r }}][f1][kds]" class="form-control form-control-stat" placeholder="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Blue Corner #}
+                        <div class="col-lg-6">
+                            <div class="fighter-header-stats blue-corner-bg">
+                                <div class="avatar avatar-md rounded-circle border border-primary p-1">
+                                    <i class="fa-solid fa-user text-primary"></i>
+                                </div>
+                                <div>
+                                    <div class="small text-primary fw-bold text-uppercase" style="letter-spacing: 1px;">Blue Corner</div>
+                                    <div class="h4 mb-0 fw-bold text-white">{{ fighter2.fullName }}</div>
+                                </div>
+                            </div>
+
+                            <div class="stat-input-group mb-4">
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <label class="stat-label">Total Punches (L/T)</label>
+                                        <div class="input-group">
+                                            <input type="number" name="stats[{{ r }}][f2][landed]" class="form-control form-control-stat" placeholder="L">
+                                            <input type="number" name="stats[{{ r }}][f2][thrown]" class="form-control form-control-stat" placeholder="T">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="stat-label">Power Punches (L/T)</label>
+                                        <div class="input-group">
+                                            <input type="number" name="stats[{{ r }}][f2][power_landed]" class="form-control form-control-stat" placeholder="L">
+                                            <input type="number" name="stats[{{ r }}][f2][power_thrown]" class="form-control form-control-stat" placeholder="T">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="stat-label">Jab Performance (L/T)</label>
+                                        <div class="input-group">
+                                            <input type="number" name="stats[{{ r }}][f2][jabs_landed]" class="form-control form-control-stat" placeholder="L">
+                                            <input type="number" value="0" readonly class="form-control form-control-stat bg-dark-lt">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="stat-label">Right Hand (L/T)</label>
+                                        <div class="input-group">
+                                            <input type="number" name="stats[{{ r }}][f2][right_landed]" class="form-control form-control-stat" placeholder="L">
+                                            <input type="number" name="stats[{{ r }}][f2][right_thrown]" class="form-control form-control-stat" placeholder="T">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="stat-label">Left Hand (L/T)</label>
+                                        <div class="input-group">
+                                            <input type="number" name="stats[{{ r }}][f2][left_landed]" class="form-control form-control-stat" placeholder="L">
+                                            <input type="number" name="stats[{{ r }}][f2][left_thrown]" class="form-control form-control-stat" placeholder="T">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <label class="stat-label">Body</label>
+                                                <input type="number" name="stats[{{ r }}][f2][body_shots]" class="form-control form-control-stat" placeholder="0">
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="stat-label">KD</label>
+                                                <input type="number" name="stats[{{ r }}][f2][kds]" class="form-control form-control-stat" placeholder="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="p-5 border-top border-secondary">
+                <label class="stat-label" style="color:#fbbf24;"><i class="fa-solid fa-microchip me-2"></i>Inside The Numbers — AI Tactical Synthesis</label>
+                <textarea name="insideTheNumbers" class="form-control" rows="6" style="background:#09090b; border:1px solid #27272a; color:#fff; border-radius:15px; padding:1.5rem;" placeholder="DeepSeek will analyze the round chunks and provide a broadcast-ready tactical breakdown...">{{ result.insideTheNumbers }}</textarea>
+                
+                <div class="mt-5 text-center">
+                    <button type="submit" class="btn btn-success btn-lg px-5 py-3 fw-bold rounded-pill" style="box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);">
+                        <i class="fa-solid fa-cloud-arrow-up me-2"></i>SAVE ANALYTICS LEDGER
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const aiBtn = document.getElementById('aiAutoFillBtn');
+    
+    if (aiBtn) {
+        aiBtn.addEventListener('click', function() {
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i>AI SYNTHESIZING...';
+            this.disabled = true;
+
+            const totalRounds = {{ result.roundNumber|default(result.scheduledRounds|default(12)) }};
+
+            fetch('{{ path('app_result_generate_ai_stats', {'id': result.resultId}) }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ totalRounds: totalRounds })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    Object.keys(data.rounds).forEach(r => {
+                        const roundData = data.rounds[r];
+                        if (r > totalRounds) return;
+                        
+                        // F1
+                        setInputVal(`stats[${r}][f1][landed]`, roundData.f1.punches_landed);
+                        setInputVal(`stats[${r}][f1][thrown]`, roundData.f1.punches_thrown);
+                        setInputVal(`stats[${r}][f1][right_landed]`, roundData.f1.right_landed);
+                        setInputVal(`stats[${r}][f1][right_thrown]`, roundData.f1.right_thrown);
+                        setInputVal(`stats[${r}][f1][left_landed]`, roundData.f1.left_landed);
+                        setInputVal(`stats[${r}][f1][left_thrown]`, roundData.f1.left_thrown);
+                        setInputVal(`stats[${r}][f1][power_landed]`, roundData.f1.power_landed);
+                        setInputVal(`stats[${r}][f1][power_thrown]`, roundData.f1.power_thrown);
+                        setInputVal(`stats[${r}][f1][jabs_landed]`, roundData.f1.jabs_landed);
+                        setInputVal(`stats[${r}][f1][body_shots]`, roundData.f1.body_shots);
+                        setInputVal(`stats[${r}][f1][kds]`, roundData.f1.kds);
+
+                        // F2
+                        setInputVal(`stats[${r}][f2][landed]`, roundData.f2.punches_landed);
+                        setInputVal(`stats[${r}][f2][thrown]`, roundData.f2.punches_thrown);
+                        setInputVal(`stats[${r}][f2][right_landed]`, roundData.f2.right_landed);
+                        setInputVal(`stats[${r}][f2][right_thrown]`, roundData.f2.right_thrown);
+                        setInputVal(`stats[${r}][f2][left_landed]`, roundData.f2.left_landed);
+                        setInputVal(`stats[${r}][f2][left_thrown]`, roundData.f2.left_thrown);
+                        setInputVal(`stats[${r}][f2][power_landed]`, roundData.f2.power_landed);
+                        setInputVal(`stats[${r}][f2][power_thrown]`, roundData.f2.power_thrown);
+                        setInputVal(`stats[${r}][f2][jabs_landed]`, roundData.f2.jabs_landed);
+                        setInputVal(`stats[${r}][f2][body_shots]`, roundData.f2.body_shots);
+                        setInputVal(`stats[${r}][f2][kds]`, roundData.f2.kds);
+                    });
+
+                    document.querySelector('textarea[name="insideTheNumbers"]').value = data.insideTheNumbers;
+                }
+            })
+            .finally(() => {
+                this.innerHTML = originalText;
+                this.disabled = false;
+            });
+        });
+    }
+
+    function setInputVal(name, val) {
+        const input = document.querySelector(`input[name="${name}"]`);
+        if (input) input.value = val;
+    }
+});
+</script>
+{% endblock %}

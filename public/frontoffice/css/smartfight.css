@@ -1,0 +1,699 @@
+/* ============================================================
+   SmartFight CSS Variables & Design Tokens
+   UFC/MMA Theme - Color Override Layer
+   ============================================================ */
+
+:root {
+  /* Core Brand Colors */
+  --primary:          #dc2626;
+  --primary-hover:    #b91c1c;
+  --primary-light:    rgba(220, 38, 38, 0.15);
+  --gold:             #c9a227;
+  --gold-hover:       #a8861f;
+  --gold-light:       rgba(201, 162, 39, 0.15);
+
+  /* Background Layers */
+  --bg-dark:          #09090b;
+  --bg-surface:       #18181b;
+  --bg-surface-2:     #1f1f23;
+  --bg-overlay:       rgba(9, 9, 11, 0.85);
+
+  /* Border Colors */
+  --border-color:     #27272a;
+  --border-light:     #3f3f46;
+
+  /* Text Colors */
+  --text-primary:     #fafafa;
+  --text-muted:       #a1a1aa;
+  --text-subtle:      #71717a;
+
+  /* Status Colors */
+  --status-live:      #ef4444;
+  --status-upcoming:  #dc2626;
+  --status-completed: #52525b;
+
+  /* Rank Badge Colors */
+  --badge-gold-bg:    #c9a227;
+  --badge-gold-text:  #000000;
+  --badge-silver-bg:  #9ca3af;
+  --badge-silver-text:#000000;
+  --badge-bronze-bg:  #92400e;
+  --badge-bronze-text:#ffffff;
+
+  /* Spacing Scale (4px base) */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* Border Radius */
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.5);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.6);
+  --shadow-red: 0 4px 24px rgba(220, 38, 38, 0.35);
+  --shadow-gold:0 4px 24px rgba(201, 162, 39, 0.35);
+
+  /* Transitions */
+  --transition-fast:   150ms ease;
+  --transition-base:   250ms ease;
+  --transition-slow:   400ms ease;
+
+  /* Font Family */
+  --font-heading: 'Oswald', 'Impact', sans-serif;
+  --font-body:    'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Z-Index Scale */
+  --z-dropdown: 1000;
+  --z-sticky:   1020;
+  --z-overlay:  1040;
+  --z-modal:    1060;
+  --z-toast:    1080;
+}
+
+/* Notification Bell Active State */
+.notif-bell-link.has-unread i {
+    color: #dc2626 !important; /* Using --primary color */
+    animation: bell-pulse 2s infinite;
+}
+
+.notif-badge-count {
+    background-color: #dc2626;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
+@keyframes bell-pulse {
+    0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(220, 38, 38, 0)); }
+    50% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.8)); }
+    100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(220, 38, 38, 0)); }
+}
+    /* ============================================================
+   SmartFight Sidebar & Layout
+   ============================================================ */
+
+/* ── Layout shell ── */
+.sf-fan-layout {
+  display: flex;
+  min-height: 100vh;
+  padding-top: var(--sf-navbar-h, 64px);
+  background: var(--bg-dark);
+}
+
+.sf-fan-content {
+  flex: 1;
+  min-width: 0;
+  transition: margin-left var(--transition-base);
+}
+
+/* ── Sidebar ── */
+.sf-sidebar {
+  position: fixed;
+  top: var(--sf-navbar-h, 64px);
+  left: 0;
+  height: calc(100vh - var(--sf-navbar-h, 64px));
+  width: 240px;
+  background: #111113;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  z-index: var(--z-sticky);
+  transition: width var(--transition-base), transform var(--transition-base);
+  overflow: hidden;
+}
+
+.sf-sidebar.sf-collapsed {
+  width: 64px;
+}
+
+/* Push content when sidebar is open */
+.sf-fan-layout:has(#sfSidebar:not(.sf-collapsed)) .sf-fan-content {
+  margin-left: 240px;
+}
+.sf-fan-layout:has(#sfSidebar.sf-collapsed) .sf-fan-content {
+  margin-left: 64px;
+}
+
+/* ── Toggle button ── */
+.sf-sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin: 12px auto 4px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.sf-sidebar-toggle:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+/* ── Nav links ── */
+.sf-sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 0;
+  scrollbar-width: none;
+}
+.sf-sidebar-nav::-webkit-scrollbar { display: none; }
+
+.sf-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  margin: 2px 8px;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.sf-sidebar-link i {
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.sf-sidebar-link:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.sf-sidebar-link.active {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* Hide labels when collapsed */
+.sf-sidebar.sf-collapsed .sf-sidebar-label,
+.sf-sidebar.sf-collapsed .sf-sidebar-sep,
+.sf-sidebar.sf-collapsed .sf-sidebar-user-info {
+  display: none;
+}
+.sf-sidebar.sf-collapsed .sf-sidebar-link {
+  justify-content: center;
+  padding: 10px;
+  margin: 2px 8px;
+}
+.sf-sidebar.sf-collapsed .sf-sidebar-footer {
+  justify-content: center;
+}
+
+/* ── Separator ── */
+.sf-sidebar-sep {
+  height: 1px;
+  background: var(--border-color);
+  margin: 8px 16px;
+}
+
+/* ── Footer / user info ── */
+.sf-sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+.sf-sidebar-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sf-sidebar-uname {
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.sf-sidebar-pts {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+/* ── Mobile backdrop ── */
+.sf-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: calc(var(--z-sticky) - 1);
+}
+.sf-sidebar-backdrop.sf-active {
+  display: block;
+}
+
+/* ── Mobile behaviour ── */
+@media (max-width: 767px) {
+  .sf-sidebar {
+    transform: translateX(-100%);
+    width: 240px !important;
+  }
+  .sf-sidebar.sf-mobile-open {
+    transform: translateX(0);
+  }
+  .sf-fan-layout:has(#sfSidebar) .sf-fan-content {
+    margin-left: 0 !important;
+  }
+}
+
+/* ── Tablet ── */
+@media (min-width: 768px) and (max-width: 991px) {
+  .sf-sidebar { width: 64px; }
+  .sf-sidebar .sf-sidebar-label,
+  .sf-sidebar .sf-sidebar-sep,
+  .sf-sidebar .sf-sidebar-user-info { display: none; }
+  .sf-sidebar .sf-sidebar-link { justify-content: center; padding: 10px; }
+  .sf-sidebar .sf-sidebar-footer { justify-content: center; }
+  .sf-fan-layout:has(#sfSidebar) .sf-fan-content { margin-left: 64px; }
+}
+    /* ============================================================
+   SmartFight Sidebar & Layout
+   ============================================================ */
+
+/* ── Layout shell ── */
+.sf-fan-layout {
+  display: flex;
+  min-height: 100vh;
+  padding-top: var(--sf-navbar-h, 64px);
+  background: var(--bg-dark);
+}
+
+.sf-fan-content {
+  flex: 1;
+  min-width: 0;
+  transition: margin-left var(--transition-base);
+}
+
+/* ── Sidebar ── */
+.sf-sidebar {
+  position: fixed;
+  top: var(--sf-navbar-h, 64px);
+  left: 0;
+  height: calc(100vh - var(--sf-navbar-h, 64px));
+  width: 240px;
+  background: #111113;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  z-index: var(--z-sticky);
+  transition: width var(--transition-base), transform var(--transition-base);
+  overflow: hidden;
+}
+
+.sf-sidebar.sf-collapsed {
+  width: 64px;
+}
+
+/* Push content when sidebar is open */
+.sf-fan-layout:has(#sfSidebar:not(.sf-collapsed)) .sf-fan-content {
+  margin-left: 240px;
+}
+.sf-fan-layout:has(#sfSidebar.sf-collapsed) .sf-fan-content {
+  margin-left: 64px;
+}
+
+/* ── Toggle button ── */
+.sf-sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin: 12px auto 4px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.sf-sidebar-toggle:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+/* ── Nav links ── */
+.sf-sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 0;
+  scrollbar-width: none;
+}
+.sf-sidebar-nav::-webkit-scrollbar { display: none; }
+
+.sf-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  margin: 2px 8px;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.sf-sidebar-link i {
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.sf-sidebar-link:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.sf-sidebar-link.active {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* Hide labels when collapsed */
+.sf-sidebar.sf-collapsed .sf-sidebar-label,
+.sf-sidebar.sf-collapsed .sf-sidebar-sep,
+.sf-sidebar.sf-collapsed .sf-sidebar-user-info {
+  display: none;
+}
+.sf-sidebar.sf-collapsed .sf-sidebar-link {
+  justify-content: center;
+  padding: 10px;
+  margin: 2px 8px;
+}
+.sf-sidebar.sf-collapsed .sf-sidebar-footer {
+  justify-content: center;
+}
+
+/* ── Separator ── */
+.sf-sidebar-sep {
+  height: 1px;
+  background: var(--border-color);
+  margin: 8px 16px;
+}
+
+/* ── Footer / user info ── */
+.sf-sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+.sf-sidebar-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sf-sidebar-uname {
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.sf-sidebar-pts {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+/* ── Mobile backdrop ── */
+.sf-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: calc(var(--z-sticky) - 1);
+}
+.sf-sidebar-backdrop.sf-active {
+  display: block;
+}
+
+/* ── Mobile behaviour ── */
+@media (max-width: 767px) {
+  .sf-sidebar {
+    transform: translateX(-100%);
+    width: 240px !important;
+  }
+  .sf-sidebar.sf-mobile-open {
+    transform: translateX(0);
+  }
+  .sf-fan-layout:has(#sfSidebar) .sf-fan-content {
+    margin-left: 0 !important;
+  }
+}
+
+/* ── Tablet ── */
+@media (min-width: 768px) and (max-width: 991px) {
+  .sf-sidebar { width: 64px; }
+  .sf-sidebar .sf-sidebar-label,
+  .sf-sidebar .sf-sidebar-sep,
+  .sf-sidebar .sf-sidebar-user-info { display: none; }
+  .sf-sidebar .sf-sidebar-link { justify-content: center; padding: 10px; }
+  .sf-sidebar .sf-sidebar-footer { justify-content: center; }
+  .sf-fan-layout:has(#sfSidebar) .sf-fan-content { margin-left: 64px; }
+}
+    /* ============================================================
+   SmartFight Sidebar & Layout
+   ============================================================ */
+
+/* ── Layout shell ── */
+.sf-fan-layout {
+  display: flex;
+  min-height: 100vh;
+  padding-top: var(--sf-navbar-h, 64px);
+  background: var(--bg-dark);
+}
+
+.sf-fan-content {
+  flex: 1;
+  min-width: 0;
+  transition: margin-left var(--transition-base);
+}
+
+/* ── Sidebar ── */
+.sf-sidebar {
+  position: fixed;
+  top: var(--sf-navbar-h, 64px);
+  left: 0;
+  height: calc(100vh - var(--sf-navbar-h, 64px));
+  width: 240px;
+  background: #111113;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  z-index: var(--z-sticky);
+  transition: width var(--transition-base), transform var(--transition-base);
+  overflow: hidden;
+}
+
+.sf-sidebar.sf-collapsed {
+  width: 64px;
+}
+
+/* Push content when sidebar is open */
+.sf-fan-layout:has(#sfSidebar:not(.sf-collapsed)) .sf-fan-content {
+  margin-left: 240px;
+}
+.sf-fan-layout:has(#sfSidebar.sf-collapsed) .sf-fan-content {
+  margin-left: 64px;
+}
+
+/* ── Toggle button ── */
+.sf-sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin: 12px auto 4px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.sf-sidebar-toggle:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+/* ── Nav links ── */
+.sf-sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 0;
+  scrollbar-width: none;
+}
+.sf-sidebar-nav::-webkit-scrollbar { display: none; }
+
+.sf-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  margin: 2px 8px;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.sf-sidebar-link i {
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.sf-sidebar-link:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.sf-sidebar-link.active {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* Hide labels when collapsed */
+.sf-sidebar.sf-collapsed .sf-sidebar-label,
+.sf-sidebar.sf-collapsed .sf-sidebar-sep,
+.sf-sidebar.sf-collapsed .sf-sidebar-user-info {
+  display: none;
+}
+.sf-sidebar.sf-collapsed .sf-sidebar-link {
+  justify-content: center;
+  padding: 10px;
+  margin: 2px 8px;
+}
+.sf-sidebar.sf-collapsed .sf-sidebar-footer {
+  justify-content: center;
+}
+
+/* ── Separator ── */
+.sf-sidebar-sep {
+  height: 1px;
+  background: var(--border-color);
+  margin: 8px 16px;
+}
+
+/* ── Footer / user info ── */
+.sf-sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+.sf-sidebar-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sf-sidebar-uname {
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.sf-sidebar-pts {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+/* ── Mobile backdrop ── */
+.sf-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: calc(var(--z-sticky) - 1);
+}
+.sf-sidebar-backdrop.sf-active {
+  display: block;
+}
+
+/* ── Mobile behaviour ── */
+@media (max-width: 767px) {
+  .sf-sidebar {
+    transform: translateX(-100%);
+    width: 240px !important;
+  }
+  .sf-sidebar.sf-mobile-open {
+    transform: translateX(0);
+  }
+  .sf-fan-layout:has(#sfSidebar) .sf-fan-content {
+    margin-left: 0 !important;
+  }
+}
+
+/* ── Tablet ── */
+@media (min-width: 768px) and (max-width: 991px) {
+  .sf-sidebar { width: 64px; }
+  .sf-sidebar .sf-sidebar-label,
+  .sf-sidebar .sf-sidebar-sep,
+  .sf-sidebar .sf-sidebar-user-info { display: none; }
+  .sf-sidebar .sf-sidebar-link { justify-content: center; padding: 10px; }
+  .sf-sidebar .sf-sidebar-footer { justify-content: center; }
+  .sf-fan-layout:has(#sfSidebar) .sf-fan-content { margin-left: 64px; }
+}

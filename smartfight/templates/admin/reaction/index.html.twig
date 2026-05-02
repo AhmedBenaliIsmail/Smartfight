@@ -1,0 +1,100 @@
+{% extends 'admin/base_admin.html.twig' %}
+{% set breadcrumb_title = 'Fan Reactions' %}
+
+{% block admin_content %}
+<div class="page-header d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h2 class="page-title mb-1" style="font-family:'Oswald',sans-serif;color:#fff;">Fan Reactions</h2>
+        <p class="text-muted mb-0">{{ pagination.getTotalItemCount() }} reactions</p>
+    </div>
+</div>
+
+{# Filters #}
+<div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <select name="fight_result" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;">
+                    <option value="">All Fights</option>
+                    {% for fr in fightResults %}
+                        <option value="{{ fr.id }}" {% if filters.fight_result|default('') == fr.id %}selected{% endif %}>{{ fr.fightLabel }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="type" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;">
+                    <option value="">All Types</option>
+                    {% for t in ['FIRE','SHOCK','RESPECT','DOMINANT','CONTROVERSIAL'] %}
+                        <option value="{{ t }}" {% if filters.type|default('') == t %}selected{% endif %}>{{ t }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;">
+                    <option value="">All</option>
+                    <option value="pinned" {% if filters.status|default('') == 'pinned' %}selected{% endif %}>Pinned</option>
+                    <option value="unpinned" {% if filters.status|default('') == 'unpinned' %}selected{% endif %}>Unpinned</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-secondary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Reaction Cards #}
+<div class="row g-3">
+    {% for reaction in pagination %}
+    <div class="col-md-6 col-xl-4">
+        <div class="card h-100" style="background:#18181b;border:1px solid {% if reaction.isPinned %}#c9a227{% else %}#27272a{% endif %};">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div style="width:40px;height:40px;background:#09090b;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">
+                        {{ reaction.reactionEmoji }}
+                    </div>
+                    <div>
+                        <div style="color:#fff;font-weight:600;">{{ reaction.fan.fullName }}</div>
+                        <div style="color:#71717a;font-size:.8rem;">{{ reaction.reactedAt|date('d M Y, H:i') }}</div>
+                    </div>
+                    {% if reaction.isPinned %}
+                        <span class="ms-auto badge" style="background:#c9a227;color:#000;">📌 Pinned</span>
+                    {% endif %}
+                </div>
+
+                <div style="font-size:.8rem;color:#71717a;margin-bottom:.5rem;">{{ reaction.fightResult.fightLabel }}</div>
+                <span class="badge bg-secondary mb-2">{{ reaction.reactionType }}</span>
+
+                {% if reaction.comment %}
+                    <p style="color:#d4d4d8;font-size:.9rem;margin-bottom:0;">"{{ reaction.comment }}"</p>
+                {% endif %}
+            </div>
+            <div class="card-footer d-flex gap-2" style="border-top:1px solid #27272a;background:transparent;">
+                <form method="POST" action="{{ path('admin_reaction_pin', {id: reaction.id}) }}">
+                    <button type="submit" class="btn btn-sm {% if reaction.isPinned %}btn-warning{% else %}btn-outline-secondary{% endif %}">
+                        <i class="fa-solid fa-thumbtack"></i> {{ reaction.isPinned ? 'Unpin' : 'Pin' }}
+                    </button>
+                </form>
+                <form method="POST" action="{{ path('admin_reaction_delete', {id: reaction.id}) }}"
+                      onsubmit="return confirm('Remove this reaction?')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reaction.id) }}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="text-center text-muted py-5">No reactions found.</div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if pagination.pageCount > 1 %}
+<div class="d-flex justify-content-center mt-4">
+    {{ knp_pagination_render(pagination) }}
+</div>
+{% endif %}
+{% endblock %}

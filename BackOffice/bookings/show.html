@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Booking #BK-1234 — SmartFight Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/smartfight-admin.css" />
+</head>
+<body class="antialiased">
+<div class="wrapper">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────── -->
+  <aside class="navbar navbar-vertical navbar-expand-lg" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+    <div class="container-fluid flex-column align-items-stretch p-0">
+      <div class="p-3 border-bottom" style="border-color:#27272a!important">
+        <a href="../dashboard.html" class="smartfight-logo">
+          <div class="logo-icon"><i class="fa-solid fa-fist-raised"></i></div>
+          <div class="logo-text">Smart<span>Fight</span></div>
+        </a>
+      </div>
+      <nav class="flex-fill py-2">
+        <div class="navbar-vertical-section">Management</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../dashboard.html"><span class="nav-link-icon"><i class="fa-solid fa-chart-line fa-fw"></i></span><span class="nav-link-title">Dashboard</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../users/index.html"><span class="nav-link-icon"><i class="fa-solid fa-users fa-fw"></i></span><span class="nav-link-title">Users</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fighters/index.html"><span class="nav-link-icon"><i class="fa-solid fa-boxing-glove fa-fw"></i></span><span class="nav-link-title">Fighters</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../events/index.html"><span class="nav-link-icon"><i class="fa-solid fa-calendar-days fa-fw"></i></span><span class="nav-link-title">Events</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../fight-results/index.html"><span class="nav-link-icon"><i class="fa-solid fa-trophy fa-fw"></i></span><span class="nav-link-title">Fight Results</span></a></li>
+        </ul>
+        <div class="navbar-vertical-section mt-2">Fan Experience</div>
+        <ul class="navbar-nav flex-column px-2 gap-1">
+          <li class="nav-item"><a class="nav-link" href="../blog/index.html"><span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw"></i></span><span class="nav-link-title">Blog Articles</span></a></li>
+          <li class="nav-item"><a class="nav-link active" href="index.html"><span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw"></i></span><span class="nav-link-title">Event Bookings</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../predictions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span><span class="nav-link-title">Predictions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../reactions/index.html"><span class="nav-link-icon"><i class="fa-solid fa-comments fa-fw"></i></span><span class="nav-link-title">Reactions</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="../notifications/index.html"><span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span><span class="nav-link-title">Notifications</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- ── Main ─────────────────────────────────────────────────── -->
+  <div style="margin-left:260px;min-height:100vh;display:flex;flex-direction:column;">
+    <header class="navbar navbar-expand-md" style="background:#09090b;border-bottom:1px solid #27272a;padding:.75rem 1.5rem;position:sticky;top:0;z-index:99;">
+      <div class="d-flex align-items-center gap-3 flex-fill">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="../dashboard.html" style="color:#a1a1aa;text-decoration:none;">Dashboard</a></li>
+          <li class="breadcrumb-item"><a href="index.html" style="color:#a1a1aa;text-decoration:none;">Bookings</a></li>
+          <li class="breadcrumb-item active">#BK-1234</li>
+        </ol>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="../notifications/index.html" class="nav-link p-1 position-relative text-muted">
+          <i class="fa-solid fa-bell"></i>
+          <span class="badge bg-danger rounded-pill" style="position:absolute;top:-4px;right:-4px;font-size:.6rem;padding:2px 5px;">7</span>
+        </a>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+            <div class="avatar avatar-sm" style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">A</div>
+            <span style="font-size:.875rem;color:#fafafa;">Admin</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user fa-fw me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-fill p-4" style="background:#09090b;">
+      <!-- Booking Header -->
+      <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-3 mb-1">
+            <h1 class="h3 fw-bold mb-0" style="color:#fafafa;">Booking #BK-1234</h1>
+            <span class="badge" style="background:rgba(34,197,94,.15);color:#22c55e;font-size:.8rem;padding:.4rem .8rem;">Confirmed</span>
+          </div>
+          <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;"><i class="fa-regular fa-calendar me-1"></i>Booked on April 5, 2026 at 14:32 PM</p>
+        </div>
+        <a href="index.html" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left me-2"></i>Back to Bookings</a>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="d-flex gap-2 mb-4 flex-wrap">
+        <button class="btn" style="background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3);">
+          <i class="fa-solid fa-check me-2"></i>Confirm Booking
+        </button>
+        <button class="btn" style="background:rgba(220,38,38,.15);color:#dc2626;border:1px solid rgba(220,38,38,.3);">
+          <i class="fa-solid fa-xmark me-2"></i>Cancel Booking
+        </button>
+        <button class="btn" style="background:rgba(249,115,22,.15);color:#f97316;border:1px solid rgba(249,115,22,.3);">
+          <i class="fa-solid fa-rotate-left me-2"></i>Process Refund
+        </button>
+      </div>
+
+      <div class="row g-4">
+        <!-- Left: Event + Ticket Info -->
+        <div class="col-lg-6">
+          <div class="card h-100" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+              <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;">
+                <i class="fa-solid fa-calendar-days me-2" style="color:#dc2626;"></i>Event &amp; Ticket Details
+              </h3>
+            </div>
+            <div class="card-body" style="padding:1.5rem;">
+              <table class="table table-borderless mb-0" style="--tblr-table-border-color:transparent;">
+                <tbody>
+                  <tr>
+                    <td style="color:#a1a1aa;font-size:.8rem;padding:.5rem 0;width:40%;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Event</td>
+                    <td style="color:#fafafa;font-weight:600;padding:.5rem 0;">UFC 310: Night of Champions</td>
+                  </tr>
+                  <tr>
+                    <td style="color:#a1a1aa;font-size:.8rem;padding:.5rem 0;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Date</td>
+                    <td style="color:#d4d4d8;padding:.5rem 0;">May 15, 2026 — 10:00 PM ET</td>
+                  </tr>
+                  <tr>
+                    <td style="color:#a1a1aa;font-size:.8rem;padding:.5rem 0;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Venue</td>
+                    <td style="color:#d4d4d8;padding:.5rem 0;">T-Mobile Arena, Las Vegas, NV</td>
+                  </tr>
+                  <tr><td colspan="2"><hr class="hr-dark my-2" /></td></tr>
+                  <tr>
+                    <td style="color:#a1a1aa;font-size:.8rem;padding:.5rem 0;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Ticket Type</td>
+                    <td style="padding:.5rem 0;"><span class="badge" style="background:rgba(201,162,39,.15);color:#c9a227;">VIP</span></td>
+                  </tr>
+                  <tr>
+                    <td style="color:#a1a1aa;font-size:.8rem;padding:.5rem 0;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Quantity</td>
+                    <td style="color:#fafafa;font-weight:700;padding:.5rem 0;">2</td>
+                  </tr>
+                  <tr>
+                    <td style="color:#a1a1aa;font-size:.8rem;padding:.5rem 0;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Unit Price</td>
+                    <td style="color:#d4d4d8;padding:.5rem 0;">$300.00</td>
+                  </tr>
+                  <tr>
+                    <td style="color:#a1a1aa;font-size:.8rem;padding:.5rem 0;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Total Price</td>
+                    <td style="color:#22c55e;font-weight:700;font-size:1.1rem;padding:.5rem 0;">$600.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Fan + Payment Info -->
+        <div class="col-lg-6">
+          <div class="card h-100" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+              <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;">
+                <i class="fa-solid fa-user me-2" style="color:#3b82f6;"></i>Fan &amp; Payment Details
+              </h3>
+            </div>
+            <div class="card-body" style="padding:1.5rem;">
+              <table class="table table-borderless mb-0" style="--tblr-table-border-color:transparent;">
+                <tbody>
+                  <tr>
+                    <td style="color:#a1a1aa;font-size:.8rem;padding:.5rem 0;width:40%;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Fan Name</td>
+                    <td style="color:#fafafa;font-weight:600;padding:.5rem 0;">Marcus Johnson</td>
+                  </tr>
+                  <tr>
+                    <td style="color:#a1a1aa;font-size:.8rem;padding:.5rem 0;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Email</td>
+                    <td style="color:#d4d4d8;padding:.5rem 0;">marcus.j@email.com</td>
+                  </tr>
+                  <tr>
+                    <td style="color:#a1a1aa;font-size:.8rem;padding:.5rem 0;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Phone</td>
+                    <td style="color:#d4d4d8;padding:.5rem 0;">+1 (702) 555-0192</td>
+                  </tr>
+                  <tr><td colspan="2"><hr class="hr-dark my-2" /></td></tr>
+                  <tr>
+                    <td style="color:#a1a1aa;font-size:.8rem;padding:.5rem 0;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Payment</td>
+                    <td style="padding:.5rem 0;"><span class="badge" style="background:rgba(59,130,246,.15);color:#60a5fa;">Credit Card</span></td>
+                  </tr>
+                  <tr>
+                    <td style="color:#a1a1aa;font-size:.8rem;padding:.5rem 0;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Card</td>
+                    <td style="color:#d4d4d8;padding:.5rem 0;">Visa •••• 4821</td>
+                  </tr>
+                  <tr>
+                    <td style="color:#a1a1aa;font-size:.8rem;padding:.5rem 0;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Payment Date</td>
+                    <td style="color:#d4d4d8;padding:.5rem 0;">April 5, 2026</td>
+                  </tr>
+                  <tr>
+                    <td style="color:#a1a1aa;font-size:.8rem;padding:.5rem 0;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Transaction ID</td>
+                    <td style="color:#52525b;font-size:.8rem;padding:.5rem 0;">txn_3N9kJLKZ2eZvKYlo</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking Timeline -->
+      <div class="card mt-4" style="background:#18181b;border:1px solid #27272a;">
+        <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+          <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;">
+            <i class="fa-solid fa-timeline me-2" style="color:#c9a227;"></i>Booking Timeline
+          </h3>
+        </div>
+        <div class="card-body" style="padding:1.5rem;">
+          <ol class="list-group list-group-flush" style="background:transparent;">
+            <li class="list-group-item d-flex align-items-start gap-3" style="background:transparent;border-color:#27272a;padding:.75rem 0;">
+              <div style="width:36px;height:36px;border-radius:50%;background:rgba(34,197,94,.15);color:#22c55e;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="fa-solid fa-ticket fa-sm"></i>
+              </div>
+              <div>
+                <div style="font-weight:600;color:#fafafa;font-size:.875rem;">Booking Created</div>
+                <div style="color:#a1a1aa;font-size:.8rem;">Fan submitted booking for UFC 310 — 2x VIP tickets</div>
+                <div style="color:#52525b;font-size:.75rem;margin-top:.2rem;">Apr 5, 2026 at 14:32 PM</div>
+              </div>
+            </li>
+            <li class="list-group-item d-flex align-items-start gap-3" style="background:transparent;border-color:#27272a;padding:.75rem 0;">
+              <div style="width:36px;height:36px;border-radius:50%;background:rgba(59,130,246,.15);color:#60a5fa;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="fa-solid fa-credit-card fa-sm"></i>
+              </div>
+              <div>
+                <div style="font-weight:600;color:#fafafa;font-size:.875rem;">Payment Received</div>
+                <div style="color:#a1a1aa;font-size:.8rem;">$600.00 charged to Visa •••• 4821 — Transaction ID: txn_3N9kJLKZ2eZvKYlo</div>
+                <div style="color:#52525b;font-size:.75rem;margin-top:.2rem;">Apr 5, 2026 at 14:33 PM</div>
+              </div>
+            </li>
+            <li class="list-group-item d-flex align-items-start gap-3" style="background:transparent;border-color:transparent;padding:.75rem 0;">
+              <div style="width:36px;height:36px;border-radius:50%;background:rgba(34,197,94,.15);color:#22c55e;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="fa-solid fa-check fa-sm"></i>
+              </div>
+              <div>
+                <div style="font-weight:600;color:#fafafa;font-size:.875rem;">Booking Confirmed</div>
+                <div style="color:#a1a1aa;font-size:.8rem;">Booking confirmed and confirmation email sent to marcus.j@email.com</div>
+                <div style="color:#52525b;font-size:.75rem;margin-top:.2rem;">Apr 5, 2026 at 14:34 PM</div>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+</body>
+</html>
