@@ -49,23 +49,41 @@
                         <div class="d-flex align-items-center justify-content-between mb-4">
                             {# Fighter 1 #}
                             <div style="flex: 1;">
-                                <h4 class="mb-1 fw-bold" style="color: {{ winner and winner.fighterId == f1.fighterId ? '#22c55e' : '#fafafa' }};">
+                                <div class="mb-2 d-flex justify-content-center">
+                                    <div style="width: 50px; height: 50px; border-radius: 10px; overflow: hidden; background: #27272a; border: 1px solid rgba(255,255,255,0.1);">
+                                        {% if f1 and f1.photoFilename %}
+                                            <img src="{{ asset('uploads/boxers/' ~ f1.photoFilename) }}" style="width:100%; height:100%; object-fit:cover;">
+                                        {% else %}
+                                            <i class="fa-solid fa-user mt-2 text-muted" style="font-size:1.5rem;"></i>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <h4 class="mb-1 fw-bold" style="font-size: 0.9rem; color: {{ winner and winner.fighterId == f1.fighterId ? '#22c55e' : '#fafafa' }};">
                                     {{ f1 ? f1.fullName : 'Unknown' }}
                                 </h4>
-                                <small class="text-danger d-block fw-bold">RED CORNER</small>
+                                <small class="text-danger d-block fw-bold" style="font-size: 0.65rem;">RED CORNER</small>
                             </div>
 
                             {# VS #}
-                            <div class="px-3">
-                                <div style="width: 36px; height: 36px; border-radius: 50%; background: #27272a; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #71717a; border: 1px solid #3f3f46;">VS</div>
+                            <div class="px-2">
+                                <div style="width: 30px; height: 30px; border-radius: 50%; background: #27272a; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10px; color: #71717a; border: 1px solid #3f3f46;">VS</div>
                             </div>
 
                             {# Fighter 2 #}
                             <div style="flex: 1;">
-                                <h4 class="mb-1 fw-bold" style="color: {{ winner and winner.fighterId == f2.fighterId ? '#22c55e' : '#fafafa' }};">
+                                <div class="mb-2 d-flex justify-content-center">
+                                    <div style="width: 50px; height: 50px; border-radius: 10px; overflow: hidden; background: #27272a; border: 1px solid rgba(255,255,255,0.1);">
+                                        {% if f2 and f2.photoFilename %}
+                                            <img src="{{ asset('uploads/boxers/' ~ f2.photoFilename) }}" style="width:100%; height:100%; object-fit:cover;">
+                                        {% else %}
+                                            <i class="fa-solid fa-user mt-2 text-muted" style="font-size:1.5rem;"></i>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <h4 class="mb-1 fw-bold" style="font-size: 0.9rem; color: {{ winner and winner.fighterId == f2.fighterId ? '#22c55e' : '#fafafa' }};">
                                     {{ f2 ? f2.fullName : 'Unknown' }}
                                 </h4>
-                                <small class="text-primary d-block fw-bold">BLUE CORNER</small>
+                                <small class="text-primary d-block fw-bold" style="font-size: 0.65rem;">BLUE CORNER</small>
                             </div>
                         </div>
 

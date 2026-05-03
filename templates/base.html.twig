@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
     <link rel="stylesheet" href="{{ asset('backoffice/css/smartfight-admin.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/smartfight-admin.css') }}" />
+    <link rel="stylesheet" href="{{ asset('frontoffice/css/pagination.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/design-system.css') }}" />
     {% endblock %}
 </head>
 <body class="antialiased">
@@ -105,77 +107,13 @@
 </style>
 
 <div class="sf-admin-wrap">
+    {% if show_navbar|default(true) %}
+    {% include 'front/partials/navbar.html.twig' %}
+    {% endif %}
 
-    <!-- ── Topbar (unchanged) ─────────────────────────────── -->
-    <header class="navbar navbar-expand-md" style="background:#09090b; border-bottom:1px solid #27272a; padding: 0.75rem 1.5rem; position:sticky; top:0; z-index:99; height: 64px; flex-shrink:0;">
-        <div class="container-fluid p-0 d-flex align-items-center justify-content-between">
-
-            <!-- Left: Breadcrumb -->
-            <div class="d-flex align-items-center" style="min-width: 200px;">
-                <ol class="breadcrumb mb-0 d-none d-xl-flex">
-                    {% block breadcrumb %}
-                    <li class="breadcrumb-item active">Dashboard</li>
-                    {% endblock %}
-                </ol>
-            </div>
-
-            <!-- Center: Global Search Bar -->
-            <div class="position-relative d-flex justify-content-center flex-grow-1 px-4">
-                <div class="input-group input-group-flat shadow-sm" style="max-width: 500px; border-radius: 8px; overflow: hidden; border: 1px solid #27272a;">
-                    <span class="input-group-text bg-dark border-0 px-3">
-                        <i class="fa-solid fa-magnifying-glass text-muted" style="font-size: 0.85rem;"></i>
-                    </span>
-                    <input type="text" id="globalSearchInput" class="form-control bg-dark border-0 text-white ps-0" placeholder="Search Boxers, Events, or News..." autocomplete="off" style="font-size: 0.85rem; height: 38px;">
-                    <span class="input-group-text bg-dark border-0 pe-3 d-none" id="globalSearchSpinner">
-                        <i class="fa-solid fa-circle-notch fa-spin text-muted" style="font-size: 0.85rem;"></i>
-                    </span>
-                </div>
-
-                <!-- Search Results Dropdown -->
-                <div id="globalSearchResults" class="position-absolute mt-2 shadow-lg d-none" style="background:#18181b; border: 1px solid #27272a; border-radius: 8px; z-index: 1000; width: 500px; max-height: 400px; overflow-y: auto; backdrop-filter: blur(10px); top: 100%;">
-                    <!-- Results will be injected here -->
-                </div>
-            </div>
-
-            <!-- Right: Notifications & User -->
-            <div class="d-flex align-items-center gap-3" style="min-width: 200px; justify-content: flex-end;">
-            {% if app.user %}
-                {{ render(controller('App\\Controller\\NotificationController::list')) }}
-
-                {% if not is_granted('ROLE_ADMIN') %}
-                <div class="d-none d-md-flex align-items-center gap-2 me-2">
-                    <span class="badge bg-blue-lt" title="Fantasy Points"><i class="fa-solid fa-star me-1 text-blue"></i>{{ app.user.predictionPoints|default(0) }} PTS</span>
-                </div>
-                {% endif %}
-            <div class="dropdown">
-                <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
-                    <div class="avatar avatar-sm" style="background:#27272a;color:#a1a1aa;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem;">
-                        {{ app.user.username|first|upper }}
-                    </div>
-                    <span style="font-size:.875rem;color:#fafafa;">{{ app.user.username }}</span>
-                    <i class="fa-solid fa-chevron-down" style="font-size:.65rem;color:#a1a1aa;"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="background:#18181b; border: 1px solid #27272a;">
-                    <li><a class="dropdown-item text-white" href="{{ path('app_profile') }}"><i class="fa-solid fa-user-gear fa-fw me-2 text-blue"></i>Profile & Security</a></li>
-                    <li><hr class="dropdown-divider" style="border-color:#27272a;"></li>
-                    {% if is_granted('ROLE_USER') and not is_granted('ROLE_ADMIN') %}
-                        <li><a class="dropdown-item text-white" href="{{ path('front_booking_index') }}"><i class="fa-solid fa-cart-plus fa-fw me-2 text-danger"></i>Book Tickets</a></li>
-                        <li><a class="dropdown-item text-white" href="{{ path('front_booking_my') }}"><i class="fa-solid fa-ticket fa-fw me-2 text-danger"></i>My Bookings</a></li>
-                        <li><hr class="dropdown-divider" style="border-color:#27272a;"></li>
-                    {% endif %}
-                    <li><a class="dropdown-item text-danger" href="{{ path('app_logout') }}"><i class="fa-solid fa-right-from-bracket fa-fw me-2"></i>Logout</a></li>
-                </ul>
-            </div>
-            {% else %}
-            <a href="{{ path('app_login') }}" class="btn btn-sm btn-outline-danger">Login</a>
-            {% endif %}
-            </div>
-        </div>
-    </header>
-
-    <!-- ── Body row: sidebar + content ───────────────────── -->
     <div class="sf-admin-body">
 
+        {% if show_sidebar|default(true) %}
         <!-- Sidebar -->
         <aside class="sf-sidebar sf-collapsed" id="sfSidebar">
             <button class="sf-sidebar-toggle" id="sfSidebarToggle" aria-label="Toggle sidebar">
@@ -320,6 +258,7 @@
             </div>
             {% endif %}
         </aside>
+        {% endif %}
 
         <!-- Main content -->
         <div class="sf-admin-content">
@@ -353,6 +292,7 @@
 {% block javascripts %}
 <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="{{ asset('frontoffice/js/pagination.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Flatpickr Init
@@ -366,9 +306,11 @@
 
         // ── Advanced Reusable Filter & Sort System ───────────────────────────────
         class AdvancedFilter {
-            constructor(containerSelector, itemSelector) {
+            constructor(containerSelector, itemSelector, onUpdate = null) {
                 this.container = document.querySelector(containerSelector);
                 this.itemSelector = itemSelector;
+                this.onUpdate = onUpdate;
+                this.customFilter = null; // New: Hook for custom filtering logic
                 if (!this.container) return;
                 
                 this.items = Array.from(this.container.querySelectorAll(itemSelector));
@@ -417,6 +359,9 @@
                         if (attrVal && attrVal.toLowerCase() !== value) return false;
                     }
 
+                    // Custom Filter check
+                    if (this.customFilter && !this.customFilter(item)) return false;
+
                     return true;
                 });
 
@@ -438,12 +383,16 @@
                 }
 
                 // 3. Render
-                this.container.innerHTML = '';
-                this.items.forEach(item => item.style.display = 'none');
-                visibleItems.forEach(item => {
-                    item.style.display = '';
-                    this.container.appendChild(item);
-                });
+                if (this.onUpdate) {
+                    this.onUpdate(visibleItems);
+                } else {
+                    this.container.innerHTML = '';
+                    this.items.forEach(item => item.style.display = 'none');
+                    visibleItems.forEach(item => {
+                        item.style.display = '';
+                        this.container.appendChild(item);
+                    });
+                }
 
                 // Handle empty state
                 const emptyMsg = this.container.querySelector('.sf-empty-msg');

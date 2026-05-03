@@ -8,7 +8,6 @@ use App\Entity\FightStatistic;
 use App\Service\FightResultService;
 use App\Service\FightStatisticService;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Service\PdfService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -251,7 +250,7 @@ class ResultController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_result_show', methods: ['GET'])]
-    public function show(int $id, FightResultRepository $resultRepo, \App\Repository\FightStatisticRepository $statRepo, \App\Service\PerformanceAnalyzer $analyzer): Response
+    public function show(int $id, FightResultRepository $resultRepo, \App\Repository\FightStatisticRepository $statRepo): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
         $fr = $resultRepo->find($id);
@@ -267,49 +266,11 @@ class ResultController extends AbstractController
             $fighterStats[$fid][$s->getRound()] = $s;
         }
 
-        // Advanced Metier Analysis
-        $f1 = $fr->getFighter1();
-        $f2 = $fr->getFighter2();
-        
-        $analysis = [
-            'f1_efficiency' => $analyzer->calculateEfficiencyScore($f1),
-            'f2_efficiency' => $analyzer->calculateEfficiencyScore($f2),
-            'f1_momentum' => $analyzer->getMomentum($f1),
-            'f2_momentum' => $analyzer->getMomentum($f2),
-            'matchup' => $analyzer->getStyleMatchupAnalysis($f1, $f2)
-        ];
-
         return $this->render('result/show.html.twig', [
-            'result' => $fr,
-            'fighterStats' => $fighterStats,
-            'rounds' => $fr->getRoundNumber() ?: $fr->getScheduledRounds(),
-            'analysis' => $analysis
-        ]);
-    }
-
-    #[Route('/{id}/pdf', name: 'app_result_pdf', methods: ['GET'])]
-    public function pdf(int $id, FightResultRepository $resultRepo, \App\Repository\FightStatisticRepository $statRepo, PdfService $pdfService): void
-    {
-        $this->denyAccessUnlessGranted('ROLE_USER');
-        $fr = $resultRepo->find($id);
-        if (!$fr) throw $this->createNotFoundException();
-
-        $stats = $statRepo->findBy(['fightResult' => $fr]);
-        
-        $fighterStats = [];
-        foreach ($stats as $s) {
-            if ($s->getRound() === null) continue;
-            $fid = $s->getFighter()->getFighterId();
-            $fighterStats[$fid][$s->getRound()] = $s;
-        }
-
-        $html = $this->renderView('result/pdf.html.twig', [
             'result' => $fr,
             'fighterStats' => $fighterStats,
             'rounds' => $fr->getRoundNumber() ?: $fr->getScheduledRounds()
         ]);
-
-        $pdfService->showPdfFile($html, "Match_Report_" . $fr->getFighter1()->getLastName() . "_vs_" . $fr->getFighter2()->getLastName());
     }
 
     #[Route('/export', name: 'app_result_export')]

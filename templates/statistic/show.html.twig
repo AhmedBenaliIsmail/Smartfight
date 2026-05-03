@@ -1,0 +1,224 @@
+{% extends 'front/base_front.html.twig' %}
+
+{% block title %}Fight Statistics — {{ fight.fighter1.lastName }} vs {{ fight.fighter2.lastName }}{% endblock %}
+
+{% block content %}
+<div class="sf-broadcast-container py-5">
+    {# Hero Header #}
+    <div class="container mb-5">
+        <div class="sf-bout-hero">
+            <div class="hero-overlay"></div>
+            <div class="row align-items-center g-0 position-relative z-2">
+                {# Fighter 1 #}
+                <div class="col-lg-5 text-center text-lg-end p-lg-5">
+                    <div class="corner-label red">RED CORNER</div>
+                    <h2 class="fighter-hero-name">{{ fight.fighter1.firstName|upper }} <span class="text-danger">{{ fight.fighter1.lastName|upper }}</span></h2>
+                    <div class="fighter-hero-meta">{{ fight.fighter1.wins }}W - {{ fight.fighter1.losses }}L ({{ fight.fighter1.koWins }} KO)</div>
+                </div>
+
+                {# VS Center #}
+                <div class="col-lg-2 text-center my-4 my-lg-0">
+                    <div class="vs-burst">
+                        <div class="vs-text">VS</div>
+                        <div class="burst-rings">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+
+                {# Fighter 2 #}
+                <div class="col-lg-5 text-center text-lg-start p-lg-5">
+                    <div class="corner-label blue">BLUE CORNER</div>
+                    <h2 class="fighter-hero-name">{{ fight.fighter2.firstName|upper }} <span class="text-primary">{{ fight.fighter2.lastName|upper }}</span></h2>
+                    <div class="fighter-hero-meta">{{ fight.fighter2.wins }}W - {{ fight.fighter2.losses }}L ({{ fight.fighter2.koWins }} KO)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Comparison Metrics #}
+    <div class="container mb-5">
+        <div class="row g-4">
+            {% for t in totalStats %}
+            <div class="col-lg-6">
+                <div class="sf-stat-card {{ loop.first ? 'red-border' : 'blue-border' }}">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="fighter-mini-avatar">
+                                {% if t.fighter.photoFilename %}
+                                    <img src="{{ asset('uploads/boxers/' ~ t.fighter.photoFilename) }}" alt="">
+                                {% else %}
+                                    <i class="fa-solid fa-user"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h3 class="h5 fw-bold text-white mb-0">{{ t.fighter.lastName|upper }}</h3>
+                                <div class="x-small text-muted">TOTAL PERFORMANCE ARCHIVE</div>
+                            </div>
+                        </div>
+                        <div class="payout-box text-end">
+                            <div class="payout-val">${{ (t.payout|default(0))|number_format(0) }}</div>
+                            <div class="x-small text-success fw-bold">TOTAL PURSE</div>
+                        </div>
+                    </div>
+
+                    <div class="card-body py-4">
+                        <div class="row g-0 text-center">
+                            <div class="col-4 border-end border-secondary border-opacity-10">
+                                <div class="metric-val text-white">{{ t.punchAccuracy|round(1) }}%</div>
+                                <div class="metric-lbl">ACCURACY</div>
+                            </div>
+                            <div class="col-4 border-end border-secondary border-opacity-10">
+                                <div class="metric-val text-white">{{ t.punchesLanded }}</div>
+                                <div class="metric-lbl">LANDED</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="metric-val text-white">{{ t.punchesThrown }}</div>
+                                <div class="metric-lbl">THROWN</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer-stats p-4 bg-black bg-opacity-20 border-top border-secondary border-opacity-10">
+                        <div class="row g-4">
+                            <div class="col-6">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="x-small text-muted fw-bold">JAB EFFICIENCY</span>
+                                    <span class="x-small text-white fw-bold">{{ t.jabAccuracy|round(1) }}%</span>
+                                </div>
+                                <div class="sf-progress"><div class="bar bg-info" style="width: {{ t.jabAccuracy }}%"></div></div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="x-small text-muted fw-bold">POWER PUNCHES</span>
+                                    <span class="x-small text-white fw-bold">{{ t.powerAccuracy|round(1) }}%</span>
+                                </div>
+                                <div class="sf-progress"><div class="bar bg-warning" style="width: {{ t.powerAccuracy }}%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {# Round by Round Detail #}
+    <div class="container">
+        <div class="sf-data-panel">
+            <div class="panel-header d-flex justify-content-between align-items-center p-4">
+                <h4 class="h6 fw-bold text-white mb-0" style="letter-spacing: 2px;"><i class="fa-solid fa-list-ol text-danger me-2"></i>ROUND_BY_ROUND_LOG</h4>
+                <div class="x-small text-muted fw-bold">DATA SOURCE: SMARFIGHT_OS_v2.4</div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0 align-middle">
+                    <thead>
+                        <tr class="x-small text-muted border-bottom border-secondary border-opacity-10">
+                            <th class="ps-4 py-3">ROUND</th>
+                            <th>FIGHTER</th>
+                            <th>LANDED/THROWN</th>
+                            <th>ACC %</th>
+                            <th>JABS</th>
+                            <th>POWER</th>
+                            <th>BODY</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stat in stats %}
+                        <tr class="border-bottom border-secondary border-opacity-5">
+                            <td class="ps-4 fw-black {{ loop.index is odd ? 'text-danger' : 'text-primary' }}">R{{ stat.round }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="fw-bold text-white">{{ stat.fighter.lastName|upper }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="text-white fw-bold">{{ stat.punchesLanded }}</span> / <span class="text-muted">{{ stat.punchesThrown }}</span>
+                            </td>
+                            <td>
+                                {% set acc = stat.punchesThrown > 0 ? (stat.punchesLanded / stat.punchesThrown * 100)|round(1) : 0 %}
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="acc-dot {{ acc > 40 ? 'bg-success' : 'bg-secondary' }}"></div>
+                                    <span class="text-white">{{ acc }}%</span>
+                                </div>
+                            </td>
+                            <td><span class="text-white-50">{{ stat.jabsLanded }}</span><span class="text-muted mx-1">/</span><span class="text-white-50">{{ stat.jabsThrown }}</span></td>
+                            <td><span class="text-white-50">{{ stat.powerPunchesLanded }}</span><span class="text-muted mx-1">/</span><span class="text-white-50">{{ stat.powerPunchesThrown }}</span></td>
+                            <td><span class="text-info">{{ stat.bodyShotsLanded }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.sf-broadcast-container { min-height: 100vh; background: #09090b; }
+
+.sf-bout-hero {
+    background: linear-gradient(135deg, #1e1b4b 0%, #431407 100%);
+    border-radius: 40px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: url('{{ asset('images/noise.png') }}'), radial-gradient(circle at center, transparent 0%, #09090b 150%);
+    opacity: 0.3;
+}
+
+.corner-label { font-size: 0.65rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 10px; }
+.corner-label.red { color: #dc2626; }
+.corner-label.blue { color: #3b82f6; }
+
+.fighter-hero-name { font-family: 'Oswald', sans-serif; font-size: 3rem; color: #fff; margin-bottom: 5px; letter-spacing: 2px; }
+.fighter-hero-meta { font-size: 0.9rem; font-weight: 800; color: #71717a; letter-spacing: 1px; }
+
+.vs-burst { position: relative; width: 80px; height: 80px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+.vs-text { font-family: 'Oswald', sans-serif; font-size: 2rem; font-weight: 900; color: #fff; z-index: 10; position: relative; }
+
+.burst-rings span {
+    position: absolute; inset: 0; border: 1px solid rgba(220, 38, 38, 0.5); border-radius: 50%;
+    animation: burst 3s infinite linear; opacity: 0;
+}
+.burst-rings span:nth-child(2) { animation-delay: 1s; border-color: rgba(59, 130, 246, 0.5); }
+.burst-rings span:nth-child(3) { animation-delay: 2s; border-color: rgba(255, 255, 255, 0.5); }
+
+@keyframes burst {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { opacity: 0.5; }
+    100% { transform: scale(2.5); opacity: 0; }
+}
+
+.sf-stat-card {
+    background: #121214; border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px;
+    overflow: hidden; transition: all 0.3s ease;
+}
+.sf-stat-card.red-border { border-left: 4px solid #dc2626; }
+.sf-stat-card.blue-border { border-left: 4px solid #3b82f6; }
+
+.fighter-mini-avatar { width: 50px; height: 50px; border-radius: 12px; overflow: hidden; background: #27272a; display: flex; align-items: center; justify-content: center; }
+.fighter-mini-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.payout-val { font-family: 'Oswald', sans-serif; font-size: 1.8rem; color: #22c55e; line-height: 1; }
+
+.metric-val { font-family: 'Oswald', sans-serif; font-size: 2.2rem; margin-bottom: 2px; }
+.metric-lbl { font-size: 0.65rem; font-weight: 900; color: #52525b; letter-spacing: 1px; }
+
+.sf-progress { height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 2px; overflow: hidden; }
+.sf-progress .bar { height: 100%; border-radius: 2px; }
+
+.sf-data-panel { background: #121214; border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px; overflow: hidden; }
+.table-dark { --bs-table-bg: transparent; }
+
+.acc-dot { width: 8px; height: 8px; border-radius: 50%; }
+.x-small { font-size: 0.65rem; }
+.fw-black { font-weight: 900; }
+</style>
+{% endblock %}
+

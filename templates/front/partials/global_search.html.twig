@@ -1,0 +1,105 @@
+<div class="sf-global-search-wrapper position-relative" style="width: 100%; max-width: 500px;">
+    <div class="input-group input-group-flat shadow-sm" style="border-radius: 8px; overflow: hidden; border: 1px solid var(--sf-border, #27272a); background: rgba(255,255,255,0.05);">
+        <span class="input-group-text bg-transparent border-0 px-3">
+            <i class="fa-solid fa-magnifying-glass text-muted" style="font-size: 0.85rem;"></i>
+        </span>
+        <input type="text" class="form-control bg-transparent border-0 text-white ps-0 sf-global-search-input" placeholder="Search Warriors, Events, Analytics..." autocomplete="off" style="font-size: 0.85rem; height: 38px;">
+    </div>
+    <div class="sf-global-search-results position-absolute mt-2 shadow-lg d-none" style="background: #18181b; border: 1px solid var(--sf-border, #27272a); border-radius: 12px; z-index: 2000; width: 100%; max-height: 400px; overflow-y: auto; backdrop-filter: blur(20px); top: 100%;"></div>
+</div>
+
+<style>
+.sf-search-item { transition: all 0.2s; text-decoration: none !important; border-bottom: 1px solid rgba(255,255,255,0.02); display: flex; align-items: center; gap: 15px; padding: 12px 15px; }
+.sf-search-item:last-child { border-bottom: none; }
+.sf-search-item:hover { background: rgba(220, 38, 38, 0.08); }
+.sf-search-icon-circle {
+    width: 32px; height: 32px; background: rgba(255,255,255,0.03); 
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    color: #ef4444; font-size: 0.8rem;
+}
+.extra-small { font-size: 0.65rem; }
+.uppercase { text-transform: uppercase; }
+</style>
+
+<script>
+(function() {
+    function initGlobalSearch() {
+        const wrappers = document.querySelectorAll('.sf-global-search-wrapper');
+        
+        wrappers.forEach(wrapper => {
+            const input = wrapper.querySelector('.sf-global-search-input');
+            const results = wrapper.querySelector('.sf-global-search-results');
+            let debounceTimer;
+
+            if (!input || !results) return;
+
+            input.addEventListener('input', function(e) {
+                clearTimeout(debounceTimer);
+                const query = e.target.value.trim();
+
+                if (query.length < 2) {
+                    results.classList.add('d-none');
+                    return;
+                }
+
+                debounceTimer = setTimeout(() => {
+                    fetch(`/api/global-search?q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            renderResults(data.results, results);
+                        })
+                        .catch(err => console.error('Global search error:', err));
+                }, 300);
+            });
+
+            // Close on click outside
+            document.addEventListener('click', function(e) {
+                if (!wrapper.contains(e.target)) {
+                    results.classList.add('d-none');
+                }
+            });
+
+            // Handle focus
+            input.addEventListener('focus', function() {
+                if (this.value.trim().length >= 2) {
+                    results.classList.remove('d-none');
+                }
+            });
+        });
+    }
+
+    function renderResults(results, container) {
+        if (!results || results.length === 0) {
+            container.innerHTML = '<div class="p-4 text-center text-muted small"><i class="fa-solid fa-ghost d-block mb-2 opacity-50"></i>No intelligence found for this query</div>';
+            container.classList.remove('d-none');
+            return;
+        }
+
+        let html = '<div class="p-2 text-muted extra-small fw-bold border-bottom border-secondary border-opacity-10 mb-1" style="letter-spacing:1px; background: rgba(0,0,0,0.2);">GLOBAL INTELLIGENCE</div>';
+        
+        results.forEach(res => {
+            html += `
+                <a href="${res.url}" class="sf-search-item">
+                    <div class="sf-search-icon-circle">
+                        <i class="fa-solid ${res.icon}"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div class="text-white fw-bold" style="font-size:0.85rem;">${res.title}</div>
+                        <div class="text-muted extra-small uppercase" style="letter-spacing:0.5px;">${res.type} &bull; ${res.subtitle}</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.6rem;"></i>
+                </a>
+            `;
+        });
+
+        container.innerHTML = html;
+        container.classList.remove('d-none');
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initGlobalSearch);
+    } else {
+        initGlobalSearch();
+    }
+})();
+</script>

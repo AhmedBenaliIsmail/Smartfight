@@ -11,15 +11,63 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <link rel="stylesheet" href="{{ asset('frontoffice/css/smartfight.css') }}">
         <link rel="stylesheet" href="{{ asset('frontoffice/css/style.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/pagination.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/design-system.css') }}">
+        <style>
+            /* Notification Panel Pro Styling */
+            .sf-notification-panel {
+                position: fixed;
+                top: 0;
+                left: -400px;
+                width: 380px;
+                height: 100vh;
+                background: rgba(18, 18, 20, 0.95);
+                backdrop-filter: blur(20px);
+                border-right: 1px solid rgba(255, 255, 255, 0.05);
+                z-index: 2000;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 20px 0 50px rgba(0,0,0,0.5);
+            }
+            .sf-notification-panel.active {
+                left: 0;
+            }
+            .sf-notification-panel .panel-header {
+                padding: 30px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .btn-close-panel {
+                background: transparent;
+                border: none;
+                color: #71717a;
+                font-size: 1.2rem;
+                transition: color 0.2s;
+            }
+            .btn-close-panel:hover { color: #fff; }
+            .panel-body { padding: 30px; }
+            .icon-pulse { animation: sf-pulse 2s infinite; }
+            @keyframes sf-pulse {
+                0% { transform: scale(1); opacity: 0.5; }
+                50% { transform: scale(1.1); opacity: 1; }
+                100% { transform: scale(1); opacity: 0.5; }
+            }
+            .x-small { font-size: 0.65rem; }
+        </style>
         {% block extra_css %}{% endblock %}
     {% endblock %}
 </head>
 <body>
 
+    {% if show_navbar|default(true) %}
     {% include 'front/partials/navbar.html.twig' %}
+    {% endif %}
 
     <div class="sf-fan-layout">
+        {% if show_sidebar|default(true) %}
         {% include 'front/partials/sidebar.html.twig' %}
+        {% endif %}
 
         <div class="sf-fan-content">
             <main>
@@ -41,11 +89,32 @@
         </div>
     </div>
 
+    <!-- Senior Notification Center Panel -->
+    <div class="sf-notification-panel" id="sfNotificationPanel">
+        <div class="panel-header">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fa-solid fa-bell text-danger"></i>
+                <h3 class="h6 fw-bold mb-0 text-white text-uppercase" style="letter-spacing: 1.5px;">Tactical Alerts</h3>
+            </div>
+            <button class="btn-close-panel" id="sfCloseNotifications"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="panel-body">
+            <div class="empty-notifications text-center py-5">
+                <div class="icon-pulse mb-3">
+                    <i class="fa-solid fa-satellite-dish fa-2x text-muted opacity-25"></i>
+                </div>
+                <p class="text-muted small">No incoming transmission alerts detected.</p>
+                <div class="text-uppercase x-small fw-bold text-secondary" style="letter-spacing: 1px; font-size: 0.6rem;">Status: Synchronized</div>
+            </div>
+        </div>
+    </div>
+
     <div class="sf-sidebar-backdrop" id="sfSidebarBackdrop"></div>
 
     {% block javascripts %}
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <script src="{{ asset('frontoffice/js/main.js') }}"></script>
+        <script src="{{ asset('frontoffice/js/pagination.js') }}"></script>
         <script>
         (function () {
             var sidebar  = document.getElementById('sfSidebar');
@@ -66,10 +135,10 @@
 
             // Desktop: expand only if user previously chose expanded
             function applyDesktopState() {
-                if (localStorage.getItem(STORAGE_KEY) === '0') {
-                    sidebar.classList.remove('sf-collapsed');
-                } else {
+                if (localStorage.getItem(STORAGE_KEY) === '1') {
                     sidebar.classList.add('sf-collapsed');
+                } else {
+                    sidebar.classList.remove('sf-collapsed');
                 }
             }
 
@@ -109,9 +178,11 @@
 
         // ── Advanced Reusable Filter & Sort System ───────────────────────────────
         class AdvancedFilter {
-            constructor(containerSelector, itemSelector) {
+            constructor(containerSelector, itemSelector, onUpdate = null) {
                 this.container = document.querySelector(containerSelector);
                 this.itemSelector = itemSelector;
+                this.onUpdate = onUpdate;
+                this.customFilter = null;
                 if (!this.container) return;
                 
                 this.items = Array.from(this.container.querySelectorAll(itemSelector));
@@ -148,6 +219,7 @@
 
                 let visibleItems = this.items.filter(item => {
                     const textMatch = item.innerText.toLowerCase().includes(this.searchQuery) || 
+                                     (item.getAttribute('data-search') && item.getAttribute('data-search').toLowerCase().includes(this.searchQuery)) ||
                                      (item.getAttribute('data-search-content') && item.getAttribute('data-search-content').toLowerCase().includes(this.searchQuery));
                     
                     if (!textMatch) return false;
@@ -156,6 +228,8 @@
                         const attrVal = item.getAttribute(`data-filter-${key}`);
                         if (attrVal && attrVal.toLowerCase() !== value) return false;
                     }
+
+                    if (this.customFilter && !this.customFilter(item)) return false;
 
                     return true;
                 });
@@ -176,12 +250,14 @@
                     });
                 }
 
-                this.container.innerHTML = '';
-                this.items.forEach(item => item.style.display = 'none');
-                visibleItems.forEach(item => {
-                    item.style.display = '';
-                    this.container.appendChild(item);
-                });
+                if (this.onUpdate) {
+                    this.onUpdate(visibleItems);
+                } else {
+                    this.items.forEach(item => {
+                        item.style.display = visibleItems.includes(item) ? '' : 'none';
+                    });
+                    this.container.replaceChildren(...visibleItems);
+                }
 
                 const emptyMsg = this.container.querySelector('.sf-empty-msg');
                 if (visibleItems.length === 0) {
@@ -205,6 +281,35 @@
             const filter = new AdvancedFilter(containerSelector, itemSelector);
             input.addEventListener('input', (e) => filter.search(e.target.value));
             input._sfFilter = filter;
+        });
+
+        // ── Notification Center Trigger Logic ────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', function() {
+            const trigger = document.getElementById('sfNotificationTrigger');
+            const panel = document.getElementById('sfNotificationPanel');
+            const closeBtn = document.getElementById('sfCloseNotifications');
+            const backdrop = document.getElementById('sfSidebarBackdrop');
+
+            if (trigger && panel) {
+                trigger.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    panel.classList.add('active');
+                    if (backdrop) backdrop.classList.add('sf-active');
+                });
+
+                const closePanel = () => {
+                    panel.classList.remove('active');
+                    if (backdrop) {
+                        // Only remove backdrop if sidebar isn't using it (mobile)
+                        if (!document.getElementById('sfSidebar').classList.contains('sf-mobile-open')) {
+                            backdrop.classList.remove('sf-active');
+                        }
+                    }
+                };
+
+                if (closeBtn) closeBtn.addEventListener('click', closePanel);
+                if (backdrop) backdrop.addEventListener('click', closePanel);
+            }
         });
         </script>
         {% block extra_js %}{% endblock %}

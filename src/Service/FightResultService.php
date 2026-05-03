@@ -16,7 +16,6 @@ class FightResultService
         private FighterRepository $fighterRepo,
         private RankingService $rankingService,
         private FighterContractRepository $contractRepo,
-        private ContractService $contractService,
     ) {}
 
     public function getAllFightResults(): array
@@ -46,7 +45,8 @@ class FightResultService
         bool $isBeltFight = false,
         ?string $beltOrganization = null,
         ?float $fighter1Odds = null,
-        ?float $fighter2Odds = null
+        ?float $fighter2Odds = null,
+        bool $isAiGenerated = false
     ): bool {
         // Enforce 3-fight limit
         $existingCount = $this->resultRepo->countByEvent($eventId);
@@ -87,6 +87,7 @@ class FightResultService
         $fr->setFighter1Odds($fighter1Odds);
         $fr->setFighter2Odds($fighter2Odds);
         $fr->setStatus('SCHEDULED');
+        $fr->setIsAiGenerated($isAiGenerated);
 
         $this->em->persist($fr);
         $this->em->flush();
@@ -137,18 +138,28 @@ class FightResultService
             // Process rankings only on first completion
             $this->rankingService->processCompletedFight($fr);
 
-            // Calculate Purses via Advanced Contract Metier
+            // Calculate Purses
             if ($fr->getFighter1()) {
                 $f1Contract = $this->contractRepo->findOneBy(['fighter' => $fr->getFighter1(), 'event' => $fr->getEvent()]);
                 if ($f1Contract && !$f1Contract->isPaid()) {
-                    $this->contractService->calculateFinalPurse($f1Contract, $fr);
+                    $payout = $f1Contract->getBasePay();
+                    if ($fr->getWinner() && $fr->getWinner()->getFighterId() === $fr->getFighter1()->getFighterId()) {
+                        $payout += $f1Contract->getWinBonus();
+                    }
+                    $f1Contract->setCalculatedPayout($payout);
+                    $this->em->persist($f1Contract);
                 }
             }
 
             if ($fr->getFighter2()) {
                 $f2Contract = $this->contractRepo->findOneBy(['fighter' => $fr->getFighter2(), 'event' => $fr->getEvent()]);
                 if ($f2Contract && !$f2Contract->isPaid()) {
-                    $this->contractService->calculateFinalPurse($f2Contract, $fr);
+                    $payout = $f2Contract->getBasePay();
+                    if ($fr->getWinner() && $fr->getWinner()->getFighterId() === $fr->getFighter2()->getFighterId()) {
+                        $payout += $f2Contract->getWinBonus();
+                    }
+                    $f2Contract->setCalculatedPayout($payout);
+                    $this->em->persist($f2Contract);
                 }
             }
             

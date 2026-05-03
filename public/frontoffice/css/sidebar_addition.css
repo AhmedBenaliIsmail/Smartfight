@@ -1,0 +1,197 @@
+    /* ============================================================
+   SmartFight Sidebar & Layout
+   ============================================================ */
+
+/* ── Layout shell ── */
+.sf-fan-layout {
+  display: flex;
+  min-height: 100vh;
+  padding-top: var(--sf-navbar-h, 64px);
+  background: var(--bg-dark);
+}
+
+.sf-fan-content {
+  flex: 1;
+  min-width: 0;
+  transition: margin-left var(--transition-base);
+}
+
+/* ── Sidebar ── */
+.sf-sidebar {
+  position: fixed;
+  top: var(--sf-navbar-h, 64px);
+  left: 0;
+  height: calc(100vh - var(--sf-navbar-h, 64px));
+  width: 240px;
+  background: #111113;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  z-index: var(--z-sticky);
+  transition: width var(--transition-base), transform var(--transition-base);
+  overflow: hidden;
+}
+
+.sf-sidebar.sf-collapsed {
+  width: 64px;
+}
+
+/* Push content when sidebar is open */
+.sf-fan-layout:has(#sfSidebar:not(.sf-collapsed)) .sf-fan-content {
+  margin-left: 240px;
+}
+.sf-fan-layout:has(#sfSidebar.sf-collapsed) .sf-fan-content {
+  margin-left: 64px;
+}
+
+/* ── Toggle button ── */
+.sf-sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin: 12px auto 4px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.sf-sidebar-toggle:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+/* ── Nav links ── */
+.sf-sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 0;
+  scrollbar-width: none;
+}
+.sf-sidebar-nav::-webkit-scrollbar { display: none; }
+
+.sf-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  margin: 2px 8px;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.sf-sidebar-link i {
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.sf-sidebar-link:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.sf-sidebar-link.active {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* Hide labels when collapsed */
+.sf-sidebar.sf-collapsed .sf-sidebar-label,
+.sf-sidebar.sf-collapsed .sf-sidebar-sep,
+.sf-sidebar.sf-collapsed .sf-sidebar-user-info {
+  display: none;
+}
+.sf-sidebar.sf-collapsed .sf-sidebar-link {
+  justify-content: center;
+  padding: 10px;
+  margin: 2px 8px;
+}
+.sf-sidebar.sf-collapsed .sf-sidebar-footer {
+  justify-content: center;
+}
+
+/* ── Separator ── */
+.sf-sidebar-sep {
+  height: 1px;
+  background: var(--border-color);
+  margin: 8px 16px;
+}
+
+/* ── Footer / user info ── */
+.sf-sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+.sf-sidebar-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sf-sidebar-uname {
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.sf-sidebar-pts {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+/* ── Mobile backdrop ── */
+.sf-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: calc(var(--z-sticky) - 1);
+}
+.sf-sidebar-backdrop.sf-active {
+  display: block;
+}
+
+/* ── Mobile behaviour ── */
+@media (max-width: 767px) {
+  .sf-sidebar {
+    transform: translateX(-100%);
+    width: 240px !important;
+  }
+  .sf-sidebar.sf-mobile-open {
+    transform: translateX(0);
+  }
+  .sf-fan-layout:has(#sfSidebar) .sf-fan-content {
+    margin-left: 0 !important;
+  }
+}
+
+/* ── Tablet ── */
+@media (min-width: 768px) and (max-width: 991px) {
+  .sf-sidebar { width: 64px; }
+  .sf-sidebar .sf-sidebar-label,
+  .sf-sidebar .sf-sidebar-sep,
+  .sf-sidebar .sf-sidebar-user-info { display: none; }
+  .sf-sidebar .sf-sidebar-link { justify-content: center; padding: 10px; }
+  .sf-sidebar .sf-sidebar-footer { justify-content: center; }
+  .sf-fan-layout:has(#sfSidebar) .sf-fan-content { margin-left: 64px; }
+}

@@ -4,6 +4,7 @@ namespace App\Controller;
 use App\Entity\Event;
 use App\Entity\WeightDivision;
 use App\Repository\EventRepository;
+use App\Repository\EventBookingRepository;
 use App\Repository\FighterRepository;
 use App\Repository\FightResultRepository;
 use App\Repository\WeightDivisionRepository;
@@ -11,6 +12,7 @@ use App\Repository\RankingRepository;
 use App\Repository\MatchProposalRepository;
 use App\Service\FightResultService;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,18 +22,69 @@ use Symfony\Component\Routing\Annotation\Route;
 class EventController extends AbstractController
 {
     #[Route('', name: 'app_events')]
-    public function index(EventRepository $eventRepo, FightResultRepository $resultRepo): Response
-    {
-        $events = $eventRepo->findAllOrderedByDate();
+    public function index(
+        Request $request,
+        EventRepository $eventRepo,
+        FightResultRepository $resultRepo,
+        EventBookingRepository $bookingRepo,
+        PaginatorInterface $paginator
+    ): Response {
+        $search = trim((string) $request->query->get('search', ''));
+        $page   = max(1, (int) $request->query->get('page', 1));
+
+        // --- Dashboard stats (always reflect full DB) ---
+        $totalEvents    = $eventRepo->count([]);
+        $upcomingCount  = $eventRepo->countUpcoming();
+        $pastCount      = $eventRepo->countPast();
+        $championsCount = $eventRepo->countChampions();
+        $totalFights    = $resultRepo->count([]);
+
+        $stats = [
+            'total'     => $totalEvents,
+            'upcoming'  => $upcomingCount,
+            'past'      => $pastCount,
+            'champions' => $championsCount,
+            'fights'    => $totalFights,
+        ];
+
+        // --- Paginated + filtered events ---
+        $qb         = $eventRepo->createSearchQueryBuilder($search);
+        $pagination = $paginator->paginate($qb, $page, 6);
+
+        // Fight counts for the events on this page only
         $fightCounts = [];
-        foreach ($events as $e) {
+        foreach ($pagination->getItems() as $e) {
             $fightCounts[$e->getEventId()] = $resultRepo->countByEvent($e->getEventId());
         }
+
         return $this->render('event/index.html.twig', [
-            'events' => $events,
+            'pagination'  => $pagination,
             'fightCounts' => $fightCounts,
-            'title' => 'Events'
+            'stats'       => $stats,
+            'search'      => $search,
+            'title'       => 'Events',
         ]);
+    }
+
+    /**
+     * JSON autocomplete endpoint — called by the search input as you type.
+     * URL: /events/autocomplete?q=las+vegas
+     * Must be declared BEFORE any /{id} wildcard routes.
+     */
+    #[Route('/autocomplete', name: 'app_events_autocomplete', methods: ['GET'])]
+    public function autocomplete(Request $request, EventRepository $eventRepo): Response
+    {
+        $q       = trim((string) $request->query->get('q', ''));
+        $results = $eventRepo->findSuggestions($q, 8);
+
+        $suggestions = array_map(fn($e) => [
+            'id'    => $e['eventId'],
+            'label' => $e['eventName'],
+            'meta'  => trim(($e['venue'] ?? '') . ($e['city'] ? ', ' . $e['city'] : '')),
+            'org'   => $e['organization'] ?? '',
+        ], $results);
+
+        return $this->json($suggestions);
     }
 
     #[Route('/champions', name: 'app_events_champions')]
@@ -184,6 +237,53 @@ class EventController extends AbstractController
             $this->addFlash('error', $e->getMessage());
         }
         return $this->redirectToRoute('app_event_fights', ['id' => $id]);
+    }
+
+    /**
+     * AJAX endpoint — saves an AI-suggested fight directly to the database.
+     * Called by the "Apply Match" button in the AI modal (replaces the old
+     * "just fill the dropdowns" behaviour).
+     */
+    #[Route('/{id}/fights/ai-apply', name: 'app_event_fight_ai_apply', methods: ['POST'])]
+    public function applyAiMatch(
+        int $id,
+        Request $request,
+        FightResultService $service,
+        FightResultRepository $resultRepo
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $data      = json_decode($request->getContent(), true) ?? [];
+        $fighter1Id = (int)($data['fighter1Id'] ?? 0);
+        $fighter2Id = (int)($data['fighter2Id'] ?? 0);
+
+        if (!$fighter1Id || !$fighter2Id) {
+            return $this->json(['error' => 'Invalid fighter IDs.'], 400);
+        }
+
+        // Auto-assign next available slot (1, 2 or 3)
+        $available = $resultRepo->getAvailableFightNumbers($id);
+        if (empty($available)) {
+            return $this->json(['error' => 'This event card is already full (max 3 bouts).'], 400);
+        }
+        $fightNumber = $available[0];
+
+        try {
+            $service->addScheduledFight(
+                $id,
+                $fightNumber,
+                $fighter1Id,
+                $fighter2Id,
+                isAiGenerated: true
+            );
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
+        }
+
+        return $this->json([
+            'success'  => true,
+            'redirect' => $this->generateUrl('app_event_fights', ['id' => $id]),
+        ]);
     }
 
     #[Route('/fights/{fightId}/delete', name: 'app_event_fight_delete', methods: ['POST'])]

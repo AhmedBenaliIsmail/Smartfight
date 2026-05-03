@@ -276,52 +276,12 @@
             color: #fff;
         }
         
-        /* Pagination CSS */
-        .pagination-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 3rem;
-            margin-bottom: 2rem;
-        }
-        .page-btn {
-            background: #18181b;
-            border: 1px solid #27272a;
-            color: #a1a1aa;
-            width: 42px;
-            height: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 600;
-        }
-        .page-btn:hover:not(:disabled) {
-            background: #27272a;
-            color: #fafafa;
-            border-color: #3f3f46;
-            transform: scale(1.05);
-        }
-        .page-btn.active {
-            background: #dc2626;
-            color: #fff;
-            border-color: #dc2626;
-        }
-        .page-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-        .page-info {
+        .no-results {
+            text-align: center;
+            padding: 50px;
             color: #71717a;
-            font-size: 0.95rem;
-            margin: 0 15px;
-            font-weight: 600;
-            font-family: 'Oswald', sans-serif;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            font-size: 1.2rem;
+            width: 100%;
         }
         /* Filter Bar Styles */
         .filter-bar {
@@ -421,28 +381,28 @@
     <div class="row g-3 align-items-end">
         <div class="col-md-3">
             <div class="filter-group">
-                <label class="filter-label">Recherche</label>
+                <label class="filter-label">Search</label>
                 <div class="input-icon">
                     <span class="input-icon-addon">
                         <i class="fa-solid fa-search"></i>
                     </span>
-                    <input type="text" id="mainSearch" class="filter-input" style="padding-left: 2.5rem;" placeholder="Rechercher un boxeur...">
+                    <input type="text" id="mainSearch" class="filter-input" style="padding-left: 2.5rem;" placeholder="Search for a fighter...">
                 </div>
             </div>
         </div>
         <div class="col-md-2">
             <div class="filter-group">
-                <label class="filter-label">Pays</label>
+                <label class="filter-label">Country</label>
                 <select id="filterCountry" class="filter-select">
-                    <option value="">Tous les pays</option>
+                    <option value="">All Countries</option>
                 </select>
             </div>
         </div>
         <div class="col-md-2">
             <div class="filter-group">
-                <label class="filter-label">&#x1F3F7;&#xFE0F; Cat&eacute;gorie</label>
+                <label class="filter-label">&#x1F3F7;&#xFE0F; Category</label>
                 <select id="filterCategory" class="filter-select">
-                    <option value="">Toutes</option>
+                    <option value="">All Categories</option>
                 </select>
             </div>
         </div>
@@ -450,7 +410,7 @@
             <div class="filter-group">
                 <label class="filter-label">Style</label>
                 <select id="filterStyle" class="filter-select">
-                    <option value="">Tous</option>
+                    <option value="">All Styles</option>
                 </select>
             </div>
         </div>
@@ -466,14 +426,15 @@
                 <input type="number" id="filterElo" class="filter-input" placeholder="ELO">
             </div>
         </div>
-        <div class="col-md-1 d-flex">
-            <button id="resetFilters" class="btn-reset w-100" title="RÃƒÂ©initialiser">
+        <div class="col-md-2 d-flex gap-1">
+            <button class="btn-reset w-100" title="Sort A-Z" onclick="window._fighterFilter.sort('name', 'string', 'asc')"><i class="fa-solid fa-arrow-down-a-z"></i></button>
+            <button class="btn-reset w-100" title="Sort by ELO" onclick="window._fighterFilter.sort('elo', 'number', 'desc')"><i class="fa-solid fa-ranking-star"></i></button>
+            <button class="btn-reset w-100" title="Sort by Win Rate" onclick="window._fighterFilter.sort('winrate', 'number', 'desc')"><i class="fa-solid fa-percent"></i></button>
+            <button id="resetFilters" class="btn-reset w-100" title="Reset All Filters">
                 <i class="fa-solid fa-rotate-left"></i>
             </button>
         </div>
     </div>
-</div>
-
 <div class="row g-4 fighter-grid">
     {% set known_coaches = {
         'Agit Kabayel': 'Ulli Wegner',
@@ -489,44 +450,22 @@
     {% set random_coaches = ['Freddie Roach', 'Emmanuel Steward', 'Teddy Atlas', 'Virgil Hunter', 'Buddy McGirt', 'Shane McGuigan', 'Derrick James', 'SugarHill Steward', "Cus D'Amato", 'Kevin Rooney', 'Angelo Dundee', 'Nacho Beristain'] %}
 
     {% set known_countries = {
-        'Agit Kabayel': {code: 'DE', codeLower: 'de', name: 'Allemagne'},
-        'Anthony Joshua': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
+        'Agit Kabayel': {code: 'DE', codeLower: 'de', name: 'Germany'},
+        'Anthony Joshua': {code: 'GB', codeLower: 'gb', name: 'United Kingdom'},
         'Artur Beterbiev': {code: 'CA', codeLower: 'ca', name: 'Canada'},
-        'Caleb Plant': {code: 'US', codeLower: 'us', name: 'Ãƒâ€°tats-Unis'},
-        'Canelo Alvarez': {code: 'MX', codeLower: 'mx', name: 'Mexique'},
-        'Carlos Adames': {code: 'DO', codeLower: 'do', name: 'RÃƒÂ©publique Dominicaine'},
+        'Caleb Plant': {code: 'US', codeLower: 'us', name: 'United States'},
+        'Canelo Alvarez': {code: 'MX', codeLower: 'mx', name: 'Mexico'},
+        'Carlos Adames': {code: 'DO', codeLower: 'do', name: 'Dominican Republic'},
         'Christian Mbilli': {code: 'FR', codeLower: 'fr', name: 'France'},
-        'Daniel Dubois': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
-        'David Benavidez': {code: 'US', codeLower: 'us', name: 'Ãƒâ€°tats-Unis'},
-        'Tyson Fury': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
-        'Oleksandr Usyk': {code: 'UA', codeLower: 'ua', name: 'Ukraine'},
-        'Deontay Wilder': {code: 'US', codeLower: 'us', name: 'Ãƒâ€°tats-Unis'},
-        'Errol Spence Jr': {code: 'US', codeLower: 'us', name: 'Ãƒâ€°tats-Unis'},
-        'Terence Crawford': {code: 'US', codeLower: 'us', name: 'Ãƒâ€°tats-Unis'},
-        'Gennady Golovkin': {code: 'KZ', codeLower: 'kz', name: 'Kazakhstan'},
-        'Vasiliy Lomachenko': {code: 'UA', codeLower: 'ua', name: 'Ukraine'},
-        'Shakur Stevenson': {code: 'US', codeLower: 'us', name: 'Ãƒâ€°tats-Unis'},
-        'Devin Haney': {code: 'US', codeLower: 'us', name: 'Ãƒâ€°tats-Unis'},
-        'Ryan Garcia': {code: 'US', codeLower: 'us', name: 'Ãƒâ€°tats-Unis'},
-        'Gervonta Davis': {code: 'US', codeLower: 'us', name: 'Ãƒâ€°tats-Unis'},
-        'Naoya Inoue': {code: 'JP', codeLower: 'jp', name: 'Japon'},
-        'Joe Joyce': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
-        'Zhilei Zhang': {code: 'CN', codeLower: 'cn', name: 'Chine'},
-        'Jai Opetaia': {code: 'AU', codeLower: 'au', name: 'Australie'},
-        'Lawrence Okolie': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
-        'Badou Jack': {code: 'SE', codeLower: 'se', name: 'SuÃƒÂ¨de'},
-        'Gilberto Ramirez': {code: 'MX', codeLower: 'mx', name: 'Mexique'},
-        'Dmitry Bivol': {code: 'RU', codeLower: 'ru', name: 'Russie'},
-        'Callum Smith': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
-        'Joshua Buatsi': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
-        'Anthony Yarde': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
-        'Lyndon Arthur': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'}
+        'Daniel Dubois': {code: 'GB', codeLower: 'gb', name: 'United Kingdom'},
+        'David Benavidez': {code: 'US', codeLower: 'us', name: 'United States'}
     } %}
+
     {% set random_countries = [
-        {code: 'US', codeLower: 'us', name: 'Ãƒâ€°tats-Unis'},
-        {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
-        {code: 'MX', codeLower: 'mx', name: 'Mexique'},
-        {code: 'PR', codeLower: 'pr', name: 'Porto Rico'}
+        {code: 'US', codeLower: 'us', name: 'United States'},
+        {code: 'GB', codeLower: 'gb', name: 'United Kingdom'},
+        {code: 'MX', codeLower: 'mx', name: 'Mexico'},
+        {code: 'PR', codeLower: 'pr', name: 'Puerto Rico'}
     ] %}
 
     {% for fighter in fighters %}
@@ -536,7 +475,13 @@
         {% set win_rate = total_fights > 0 ? (fighter.wins / total_fights * 100)|round : 0 %}
         {% set standing_percent = max(5, min(100, (fighter.eloRating / 2000 * 100))) %}
         
-        <div class="col-lg-4 col-md-6 fighter-card-col">
+        <div class="col-lg-4 col-md-6 fighter-card-col"
+             data-filter-country="{{ f_country.name }}"
+             data-filter-category="{{ fighter.weightDivision ? fighter.weightDivision.name : 'Unassigned' }}"
+             data-filter-style="{{ fighter.calculatedFightingStyle }}"
+             data-sort-name="{{ fighter.fullName|lower }}"
+             data-sort-elo="{{ fighter.eloRating }}"
+             data-sort-winrate="{{ win_rate }}">
             <div class="fighter-card-pro">
                 <div class="d-flex gap-4 mb-5">
                     <div class="fighter-photo-container">
@@ -634,8 +579,8 @@
                 <div class="modal-body text-center p-4">
                     <h5 class="text-white mb-3 fw-bold" id="qrModalTitle">QR CODE</h5>
                     <img id="qrCodeImage" src="" alt="QR Code" style="width: 200px; height: 200px; border-radius: 10px; background: white; padding: 10px; margin-bottom: 10px;">
-                    <p class="text-muted small mb-3">Scannez avec votre t&eacute;l&eacute;phone</p>
-                    <button type="button" class="btn btn-danger w-100 fw-bold" data-bs-dismiss="modal">Fermer</button>
+                    <p class="text-muted small mb-3">Scan with your mobile device</p>
+                    <button type="button" class="btn btn-danger w-100 fw-bold" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -657,7 +602,7 @@
                         </h3>
                         <p class="text-muted mb-0">Dr. James Wong | PhD Biomechanics</p>
                     </div>
-                    <span class="badge-recommended">&#11088;&#11088;&#11088;&#11088;&#11088; RECOMMAND&Eacute;</span>
+                    <span class="badge-recommended">&#11088;&#11088;&#11088;&#11088;&#11088; RECOMMENDED</span>
                 </div>
 
                 <div class="risk-section mb-4">
@@ -674,32 +619,32 @@
                     <div class="col-6">
                         <div class="prediction-box">
                             <div class="pred-label">PREDICTION</div>
-                            <div class="pred-value text-warning">&#x1F4AA; &Eacute;PAULE DROITE</div>
+                            <div class="pred-value text-warning">&#x1F4AA; RIGHT SHOULDER</div>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="prediction-box">
-                            <div class="pred-label">ALERTE</div>
-                            <div class="pred-value text-danger">18 jours</div>
+                            <div class="pred-label">ALERT</div>
+                            <div class="pred-value text-danger">18 days</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="recommendation-box mb-4">
-                    <div class="rec-label mb-1">RECOMMANDATION</div>
+                    <div class="rec-label mb-1">RECOMMENDATION</div>
                     <div class="rec-text">
-                        <i class="fa-solid fa-circle-check me-2"></i>Repos &eacute;paule + kin&eacute; 2x/jour
+                        <i class="fa-solid fa-circle-check me-2"></i>Shoulder rest + PT 2x/day
                     </div>
                 </div>
 
                 <div class="metrics-grid mb-4">
                     <div class="metric-item">
                         <div class="metric-val">96%</div>
-                        <div class="metric-label">Pr&eacute;cision</div>
+                        <div class="metric-label">Accuracy</div>
                     </div>
                     <div class="metric-item">
                         <div class="metric-val">3</div>
-                        <div class="metric-label">Semaines avance</div>
+                        <div class="metric-label">Weeks Early</div>
                     </div>
                     <div class="metric-item">
                         <div class="metric-val">500%</div>
@@ -708,7 +653,7 @@
                 </div>
 
                 <button class="btn btn-danger w-100 btn-analyst" onclick="showAnalystAlert()">
-                    <i class="fa-solid fa-chart-column me-2"></i>VOIR ANALYSE D&Eacute;TAILL&Eacute;E
+                    <i class="fa-solid fa-chart-column me-2"></i>VIEW DETAILED ANALYSIS
                 </button>
             </div>
         </div>
@@ -856,49 +801,49 @@ function generateMedicalReport(fighterName) {
     doc.setFontSize(11);
     doc.setTextColor(50, 50, 50);
     doc.setFont("helvetica", "normal");
-    doc.text("- Diagnostic principal : Tendinopathie de la coiffe des rotateurs - Epaule droite", 25, 85);
-    doc.text("- Niveau de gravite : Modere (Grade 2 sur 4)", 25, 92);
-    doc.text("- Risque d'aggravation : 12% si repos immediat, 68% si combat maintenu", 25, 99);
-    doc.text("- Delai estime avant blessure grave : 18 jours", 25, 106);
+    doc.text("- Primary diagnosis: Rotator cuff tendinopathy - Right shoulder", 25, 85);
+    doc.text("- Severity level: Moderate (Grade 2 of 4)", 25, 92);
+    doc.text("- Aggravation risk: 12% if immediate rest, 68% if fight proceeds", 25, 99);
+    doc.text("- Estimated time before severe injury: 18 days", 25, 106);
 
-    // Section 2: Symptomes
+    // Section 2: Symptoms
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
     doc.setTextColor(230, 57, 70);
-    doc.text("2. SYMPTOMES DETECTES", 20, 120);
+    doc.text("2. DETECTED SYMPTOMS", 20, 120);
     doc.setFontSize(11);
     doc.setTextColor(50, 50, 50);
     doc.setFont("helvetica", "normal");
-    doc.text("- Fatigue musculaire : 68% (au-dessus du seuil)", 25, 130);
-    doc.text("- Amplitude reduite : -22% compare a la baseline", 25, 137);
-    doc.text("- Douleur a la pression : Presente au niveau du sus-epineux", 25, 144);
-    doc.text("- Inflammation IRM virtuelle : Confirmation d'une tendinopathie debutante", 25, 151);
+    doc.text("- Muscle fatigue: 68% (above threshold)", 25, 130);
+    doc.text("- Reduced range of motion: -22% compared to baseline", 25, 137);
+    doc.text("- Tenderness: Present at the supraspinatus level", 25, 144);
+    doc.text("- Virtual MRI inflammation: Confirmation of early tendinopathy", 25, 151);
 
-    // Section 3: Recommandations
+    // Section 3: Recommendations
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
     doc.setTextColor(34, 197, 94);
-    doc.text("3. RECOMMANDATIONS MEDICALES", 20, 165);
+    doc.text("3. MEDICAL RECOMMENDATIONS", 20, 165);
     doc.setFontSize(11);
     doc.setTextColor(50, 50, 50);
     doc.setFont("helvetica", "normal");
-    doc.text("- Repos complet : 5 jours minimum", 25, 175);
-    doc.text("- Kinesitherapie : 2 seances par jour pendant 14 jours", 25, 182);
-    doc.text("- Anti-inflammatoires : Prescription Ibuprofene 600mg x 3/jour", 25, 189);
-    doc.text("- Electrostimulation : 1 seance par jour", 25, 196);
-    doc.text("- Retour progressif : J6 a 30%, J10 a 60%, J14 a 100% si indolore", 25, 203);
+    doc.text("- Complete rest: 5 days minimum", 25, 175);
+    doc.text("- Physical Therapy: 2 sessions per day for 14 days", 25, 182);
+    doc.text("- Anti-inflammatories: Ibuprofen 600mg x 3/day", 25, 189);
+    doc.text("- Electrostimulation: 1 session per day", 25, 196);
+    doc.text("- Progressive return: D6 at 30%, D10 at 60%, D14 at 100% if painless", 25, 203);
 
-    // Section 4: Analyse predictive
+    // Section 4: Predictive Analysis
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
     doc.setTextColor(37, 99, 235);
-    doc.text("4. ANALYSE PREDICTIVE (BIOMECANIQUE AI)", 20, 217);
+    doc.text("4. PREDICTIVE ANALYSIS (AI BIOMECHANICS)", 20, 217);
     doc.setFontSize(11);
     doc.setTextColor(50, 50, 50);
     doc.setFont("helvetica", "normal");
-    doc.text("- Si recommandations suivies : 96% de chance d'eviter la blessure grave", 25, 227);
-    doc.text("- Si combat maintenu : 73% de chance de rupture tendineuse", 25, 234);
-    doc.text("- Perte financiere estimee : 2.4M$ si blessure confirmee", 25, 241);
+    doc.text("- If recommendations followed: 96% chance to avoid severe injury", 25, 227);
+    doc.text("- If fight proceeds: 73% chance of tendon rupture", 25, 234);
+    doc.text("- Estimated financial loss: $2.4M if injury confirmed", 25, 241);
 
     // Footer
     doc.setDrawColor(230, 57, 70);
@@ -907,7 +852,7 @@ function generateMedicalReport(fighterName) {
     doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(150, 150, 150);
-    doc.text("CONFIDENTIEL - USAGE INTERNE SMARTFIGHT UNIQUEMENT", 105, 282, { align: "center" });
+    doc.text("CONFIDENTIAL - FOR SMARTFIGHT INTERNAL USE ONLY", 105, 282, { align: "center" });
 
     // Save
     const safeName = fighterName.replace(/\s+/g, '_');
@@ -919,57 +864,17 @@ function generateMedicalReport(fighterName) {
 <script>
 document.addEventListener("DOMContentLoaded", function() {
 
-    const itemsPerPage = 6;
-    const grid = document.querySelector('.fighter-grid');
-    const allItems = Array.from(grid.querySelectorAll('.fighter-card-col'));
-    const paginationContainer = document.getElementById('paginationControls');
-    let currentPage = 1;
-    let filteredItems = allItems;
+    const pagination = new SmartPagination({
+        containerSelector: '.fighter-grid',
+        itemSelector: '.fighter-card-col',
+        paginationContainerId: 'paginationControls',
+        itemsPerPage: 6
+    });
 
-    function renderPage(page) {
-        const totalPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
-        currentPage = page;
-        allItems.forEach(item => { item.style.display = 'none'; });
-        const start = (page - 1) * itemsPerPage;
-        const end = start + itemsPerPage;
-        filteredItems.slice(start, end).forEach(item => { item.style.display = ''; });
-        renderControls(totalPages);
-    }
-
-    function renderControls(totalPages) {
-        paginationContainer.innerHTML = '';
-        if (totalPages <= 1) { paginationContainer.style.display = 'none'; return; }
-        else { paginationContainer.style.display = 'flex'; }
-
-        const prevBtn = document.createElement('button');
-        prevBtn.className = 'page-btn';
-        prevBtn.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
-        prevBtn.disabled = currentPage === 1;
-        prevBtn.addEventListener('click', () => renderPage(currentPage - 1));
-        paginationContainer.appendChild(prevBtn);
-
-        for (let i = 1; i <= totalPages; i++) {
-            const pageBtn = document.createElement('button');
-            pageBtn.className = 'page-btn ' + (i === currentPage ? 'active' : '');
-            pageBtn.textContent = i;
-            pageBtn.addEventListener('click', () => renderPage(i));
-            paginationContainer.appendChild(pageBtn);
-        }
-
-        const nextBtn = document.createElement('button');
-        nextBtn.className = 'page-btn';
-        nextBtn.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
-        nextBtn.disabled = currentPage === totalPages;
-        nextBtn.addEventListener('click', () => renderPage(currentPage + 1));
-        paginationContainer.appendChild(nextBtn);
-
-        const pageInfo = document.createElement('div');
-        pageInfo.className = 'page-info';
-        pageInfo.textContent = `Page ${currentPage} sur ${totalPages}`;
-        paginationContainer.appendChild(pageInfo);
-    }
+    // Initialize the global filter instance for this module
+    window._fighterFilter = new AdvancedFilter('.fighter-grid', '.fighter-card-col', (visibleItems) => {
+        pagination.setFilteredItems(visibleItems);
+    });
 
     const filterCountry  = document.getElementById('filterCountry');
     const filterCategory = document.getElementById('filterCategory');
@@ -980,84 +885,62 @@ document.addEventListener("DOMContentLoaded", function() {
     const resetBtn       = document.getElementById('resetFilters');
     const searchInput    = document.getElementById('mainSearch');
 
-    const countries = new Set();
-    const categories = new Set();
-    const styles = new Set();
+    // Setup Custom Range Filtering
+    window._fighterFilter.customFilter = (item) => {
+        const minWinRate = parseInt(filterWinRate.value) || 0;
+        const minElo     = parseInt(filterElo.value) || 0;
+        
+        const itemWinRate = parseInt(item.getAttribute('data-sort-winrate')) || 0;
+        const itemElo     = parseInt(item.getAttribute('data-sort-elo')) || 0;
+        
+        return itemWinRate >= minWinRate && itemElo >= minElo;
+    };
 
-    allItems.forEach(item => {
-        const country  = item.querySelector('h3 span')?.getAttribute('title');
-        const category = item.querySelector('.text-muted.small.fw-medium')?.textContent.replace(' Division', '').trim();
-        const style    = item.querySelector('.badge-tactician')?.textContent.trim();
-        if (country)  countries.add(country);
-        if (category) categories.add(category);
-        if (style)    styles.add(style);
+    // Populate filter selects
+    const countries = new Set(), categories = new Set(), styles = new Set();
+    window._fighterFilter.items.forEach(item => {
+        const country = item.getAttribute('data-filter-country');
+        const cat = item.getAttribute('data-filter-category');
+        const style = item.getAttribute('data-filter-style');
+        if (country) countries.add(country);
+        if (cat) categories.add(cat);
+        if (style) styles.add(style);
     });
-
-    [...countries].sort().forEach(c  => filterCountry.innerHTML  += `<option value="${c}">${c}</option>`);
+    [...countries].sort().forEach(c => filterCountry.innerHTML += `<option value="${c}">${c}</option>`);
     [...categories].sort().forEach(c => filterCategory.innerHTML += `<option value="${c}">${c}</option>`);
-    [...styles].sort().forEach(s    => filterStyle.innerHTML    += `<option value="${s}">${s}</option>`);
+    [...styles].sort().forEach(s => filterStyle.innerHTML += `<option value="${s}">${s}</option>`);
 
-    function applyFilters() {
-        const countryVal  = filterCountry.value;
-        const categoryVal = filterCategory.value;
-        const styleVal    = filterStyle.value;
-        const winRateVal  = parseInt(filterWinRate.value);
-        const eloVal      = parseInt(filterElo.value) || 0;
-        const searchTerm  = searchInput ? searchInput.value.toLowerCase() : '';
-
-        filteredItems = allItems.filter(item => {
-            const itemCountry  = item.querySelector('h3 span')?.getAttribute('title');
-            const itemCategory = item.querySelector('.text-muted.small.fw-medium')?.textContent.replace(' Division', '').trim();
-            const itemStyle    = item.querySelector('.badge-tactician')?.textContent.trim();
-            const itemWinRate  = parseInt(item.querySelectorAll('.stat-value')[0].textContent);
-            const itemElo      = parseInt(item.querySelectorAll('.stat-value')[1].textContent);
-            const itemText     = item.textContent.toLowerCase();
-
-            return (!countryVal  || itemCountry  === countryVal)
-                && (!categoryVal || itemCategory === categoryVal)
-                && (!styleVal    || itemStyle    === styleVal)
-                && itemWinRate  >= winRateVal
-                && itemElo      >= eloVal
-                && (!searchTerm || itemText.includes(searchTerm));
-        });
-
-        const noResultsMsg = document.getElementById('noResultsMsg');
-        if (filteredItems.length === 0) {
-            if (!noResultsMsg) {
-                const msg = document.createElement('div');
-                msg.id = 'noResultsMsg';
-                msg.className = 'no-results';
-                msg.innerHTML = '<i class="fa-solid fa-face-frown fa-3x mb-3 d-block"></i>Aucun boxeur ne correspond aux filtres';
-                grid.appendChild(msg);
-            }
-        } else if (noResultsMsg) {
-            noResultsMsg.remove();
-        }
-        renderPage(1);
+    // Event Listeners
+    filterCountry.addEventListener('change', (e) => window._fighterFilter.filter('country', e.target.value));
+    filterCategory.addEventListener('change', (e) => window._fighterFilter.filter('category', e.target.value));
+    filterStyle.addEventListener('change', (e) => window._fighterFilter.filter('style', e.target.value));
+    
+    filterWinRate.addEventListener('input', (e) => {
+        winRateValue.textContent = e.target.value;
+        window._fighterFilter.apply();
+    });
+    
+    filterElo.addEventListener('input', () => window._fighterFilter.apply());
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => window._fighterFilter.search(e.target.value));
     }
 
-    [filterCountry, filterCategory, filterStyle, filterWinRate, filterElo].forEach(el => {
-        el.addEventListener('change', applyFilters);
-        el.addEventListener('input', () => {
-            if (el.id === 'filterWinRate') winRateValue.textContent = el.value;
-            if (el.type === 'number' || el.type === 'range') applyFilters();
-        });
-    });
-
-    if (searchInput) searchInput.addEventListener('keyup', applyFilters);
-
     resetBtn.addEventListener('click', () => {
-        filterCountry.value  = '';
+        filterCountry.value = '';
         filterCategory.value = '';
-        filterStyle.value    = '';
-        filterWinRate.value  = 0;
+        filterStyle.value = '';
+        filterWinRate.value = 0;
         winRateValue.textContent = 0;
-        filterElo.value      = '';
+        filterElo.value = '';
         if (searchInput) searchInput.value = '';
-        applyFilters();
+        
+        window._fighterFilter.activeFilters = {};
+        window._fighterFilter.searchQuery = '';
+        window._fighterFilter.apply();
     });
 
-    renderPage(1);
+    pagination.init();
 });
 </script>
 {% endblock %}

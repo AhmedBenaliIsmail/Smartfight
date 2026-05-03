@@ -4,6 +4,7 @@ namespace App\Controller;
 use App\Entity\Fighter;
 use App\Entity\WeightDivision;
 use App\Repository\FighterRepository;
+use App\Repository\UserRepository;
 use App\Repository\WeightDivisionRepository;
 use App\Service\RankingService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,7 +28,7 @@ class FighterController extends AbstractController
     }
 
     #[Route('/new', name: 'app_fighter_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em, WeightDivisionRepository $wdRepo): Response
+    public function new(Request $request, EntityManagerInterface $em, WeightDivisionRepository $wdRepo, UserRepository $userRepo): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         if ($request->isMethod('POST')) {
@@ -40,12 +41,13 @@ class FighterController extends AbstractController
         }
         return $this->render('fighter/form.html.twig', [
             'fighter' => null,
-            'weightDivisions' => $wdRepo->findAll()
+            'weightDivisions' => $wdRepo->findAll(),
+            'users' => $userRepo->findAll()
         ]);
     }
 
     #[Route('/{id}/edit', name: 'app_fighter_edit', methods: ['GET', 'POST'])]
-    public function edit(int $id, Request $request, FighterRepository $repo, EntityManagerInterface $em, WeightDivisionRepository $wdRepo): Response
+    public function edit(int $id, Request $request, FighterRepository $repo, EntityManagerInterface $em, WeightDivisionRepository $wdRepo, UserRepository $userRepo): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $f = $repo->find($id);
@@ -58,7 +60,8 @@ class FighterController extends AbstractController
         }
         return $this->render('fighter/form.html.twig', [
             'fighter' => $f,
-            'weightDivisions' => $wdRepo->findAll()
+            'weightDivisions' => $wdRepo->findAll(),
+            'users' => $userRepo->findAll()
         ]);
     }
 
@@ -136,6 +139,14 @@ class FighterController extends AbstractController
         $f->setDecisionWins((int)$r->request->get('decisionWins', 0));
         $f->setHeight((int)$r->request->get('height', 0) ?: null);
         $f->setReach((int)$r->request->get('reach', 0) ?: null);
+
+        $managerId = (int)$r->request->get('manager_id');
+        if ($managerId) {
+            $manager = $em->getRepository(\App\Entity\User::class)->find($managerId);
+            $f->setManager($manager);
+        } else {
+            $f->setManager(null);
+        }
 
         // Photo Upload Handling
         $photoFile = $r->files->get('photo');

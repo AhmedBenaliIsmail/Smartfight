@@ -4,124 +4,411 @@
 
 {% block extra_css %}
     <style>
-        .event-card-ultra {
-            background: linear-gradient(145deg, #18181b, #09090b);
-            border: 1px solid rgba(220, 38, 38, 0.2);
-            border-radius: 24px;
-            padding: 2rem;
-            position: relative;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            height: 100%;
+        /* Premium Bout Card Styles */
+        .sf-result-card-premium {
+            background: #121214;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
             overflow: hidden;
-            border-left: 5px solid #27272a;
+            position: relative;
+            height: 220px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .event-card-ultra.sanctioned {
-            border-left-color: #c9a227;
-            background: linear-gradient(145deg, #1c1917, #0c0a09);
+        .sf-result-card-premium:hover {
+            transform: scale(1.02);
+            border-color: rgba(220, 38, 38, 0.4);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
         }
-        .event-card-ultra:hover {
-            border-color: #dc2626;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(220, 38, 38, 0.1);
-            transform: translateY(-10px);
+        .card-header-meta {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .org-tag-top {
+        .event-mini { font-size: 0.6rem; font-weight: 900; color: #71717a; letter-spacing: 2px; }
+        .date-mini { font-size: 0.6rem; color: #52525b; font-weight: 600; }
+        
+        .matchup-container {
+            display: flex;
+            height: calc(100% - 37px);
+            position: relative;
+        }
+        .fighter-side {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            transition: all 0.5s;
+        }
+        .fighter-side.is-winner { background: linear-gradient(to bottom, rgba(34, 197, 94, 0.05), transparent); }
+        .fighter-side.is-loser { opacity: 0.6; filter: grayscale(0.5); }
+        
+        .name-box { display: flex; flex-direction: column; line-height: 1.1; }
+        .name-box .first { font-size: 0.7rem; color: #71717a; font-weight: 800; }
+        .name-box .last { font-family: 'Oswald', sans-serif; font-size: 1.4rem; color: #fff; font-weight: 700; }
+        
+        .corner-indicator { font-size: 0.55rem; font-weight: 900; margin-top: 5px; letter-spacing: 1px; }
+        .corner-indicator.red { color: #ef4444; }
+        .corner-indicator.blue { color: #3b82f6; }
+        
+        .winner-badge {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(251, 191, 36, 0.15);
-            color: #fbbf24;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            border: 1px solid rgba(251, 191, 36, 0.3);
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #22c55e;
+            color: #000;
+            font-size: 0.6rem;
+            font-weight: 900;
+            padding: 4px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .text-end .winner-badge { left: 50%; }
+
+        .result-center {
+            width: 80px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            z-index: 2;
         }
-        .event-title-pro {
-            font-family: 'Oswald', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 1rem;
-            letter-spacing: 0.5px;
-            line-height: 1.2;
-        }
-        .info-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #a1a1aa;
-            font-size: 0.85rem;
-            margin-bottom: 0.75rem;
-        }
-        .status-box-mini {
-            background: rgba(24, 24, 27, 0.8);
-            border: 1px solid #27272a;
-            border-radius: 12px;
-            padding: 0.75rem 1rem;
-            margin: 1.25rem 0;
-        }
-        .ultra-manage-btn {
-            background: #dc2626;
-            color: #fff;
-            width: 100%;
-            padding: 10px;
-            border-radius: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.8rem;
+        .vs-circle {
+            width: 30px;
+            height: 30px;
+            background: #27272a;
+            border: 1px solid #3f3f46;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            font-size: 0.6rem;
+            font-weight: 900;
+            color: #71717a;
+            margin-bottom: 10px;
+        }
+        .method-box { text-align: center; }
+        .method-box .method { font-size: 0.7rem; font-weight: 900; color: #c9a227; letter-spacing: 1px; }
+        .method-box .round { font-size: 0.6rem; color: #52525b; font-weight: 700; }
+
+        .card-actions-overlay {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: linear-gradient(to top, #000, transparent);
+            padding: 20px;
+            opacity: 0;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            transform: translateY(10px);
+        }
+        .sf-result-card-premium:hover .card-actions-overlay { opacity: 1; transform: translateY(0); }
+        .view-dossier-btn {
+            background: #fff; color: #000; font-size: 0.7rem; font-weight: 900; 
+            padding: 8px 20px; border-radius: 10px; text-decoration: none !important;
             transition: all 0.2s;
-            border: none;
+        }
+        .view-dossier-btn:hover { background: #dc2626; color: #fff; }
+
+        .active-view-btn { background: rgba(255,255,255,0.1) !important; color: #fff !important; }
+        .empty-state-visual { opacity: 0.3; padding: 60px 0; }
+        .empty-state-visual i { font-size: 4rem; color: #71717a; }
+        .empty-state-visual h3 { font-family: 'Oswald', sans-serif; letter-spacing: 1px; color: #fff; }
+        
+        /* Photo Hex System */
+        .photo-hex { width: 60px; height: 60px; position: relative; margin-bottom: 10px; }
+        .photo-inner { width: 100%; height: 100%; background: #18181b; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; z-index: 2; border: 1px solid rgba(255,255,255,0.1); }
+        .photo-inner img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-inner i { font-size: 1.2rem; color: #27272a; }
+        .hex-border { position: absolute; inset: -2px; border: 2px solid #dc2626; border-radius: 14px; opacity: 0.3; z-index: 1; }
+        .hex-border.blue { border-color: #3b82f6; }
+        .text-end .photo-hex { margin-left: auto; }
+
+        /* Senior Designer Overhaul - Command Center */
+        .filter-command-center {
+            background: rgba(24, 24, 27, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .form-control-pro {
+            background: #09090b !important;
+            border: 1px solid #27272a !important;
+            color: #fff !important;
+            border-radius: 12px !important;
+            padding: 10px 16px !important;
+            font-size: 0.85rem !important;
+            transition: all 0.2s;
+        }
+        .form-control-pro:focus {
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1) !important;
+        }
+
+        /* Event Card Ultra - Senior Edition */
+        .event-card-ultra {
+            background: linear-gradient(145deg, #18181b 0%, #09090b 100%);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 28px;
+            padding: 28px;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .event-card-ultra::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, transparent, rgba(220,38,38,0.5), transparent);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .event-card-ultra:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: rgba(220, 38, 38, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(145deg, #1f1f23 0%, #0c0c0e 100%);
+        }
+        .event-card-ultra:hover::before { opacity: 1; }
+        
+        .event-card-ultra.sanctioned {
+            border-left: 2px solid rgba(220, 38, 38, 0.4);
+        }
+        
+        .org-tag-pro {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            border-radius: 8px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: #dc2626;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+        
+        .event-title-pro {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.6rem;
+            color: #fafafa;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: linear-gradient(to right, #fff, #a1a1aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .meta-group { margin-bottom: 25px; }
+        .info-row-pro {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            color: #71717a;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .info-row-pro i { width: 16px; color: #dc2626; opacity: 0.8; }
+        
+        .status-badge-premium {
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.65rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .status-badge-premium.completed { background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); }
+        .status-badge-premium.scheduled { background: rgba(161, 161, 170, 0.1); color: #a1a1aa; border: 1px solid rgba(161, 161, 170, 0.2); }
+        .status-badge-premium.live { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); animation: pulse-blue 2s infinite; }
+        
+        @keyframes pulse-blue {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+
+        .results-ticker-pro {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.03);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: auto;
+        }
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+        .ticker-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .ticker-item .winner-name { font-weight: 700; color: #fff; font-size: 0.8rem; }
+        .ticker-item .method-tag { font-size: 0.65rem; color: #71717a; background: #1f1f23; padding: 2px 8px; border-radius: 4px; }
+        
+        .action-grid-pro {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 12px;
+            margin-top: 25px;
+        }
+        
+        .btn-pro {
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-decoration: none !important;
+            cursor: pointer;
         }
-        .ultra-manage-btn:hover {
-            background: #ef4444;
-            transform: scale(1.02);
+        .btn-pro-primary {
+            background: #dc2626;
             color: #fff;
+            border: none;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
         }
-        [data-live-search] {
-            transition: opacity 0.3s ease;
+        .btn-pro-primary:hover {
+            background: #ef4444;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
         }
-        .search-hidden {
-            display: none !important;
+        .btn-pro-outline {
+            background: transparent;
+            color: #a1a1aa;
+            border: 1px solid #27272a;
+        }
+        .btn-pro-outline:hover {
+            border-color: #52525b;
+            color: #fff;
+            background: rgba(255,255,255,0.02);
+        }
+
+        /* Senior Pagination Styling */
+        .sf-pagination-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 50px;
+        }
+        .page-btn {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 12px;
+            color: #71717a;
+            font-size: 0.85rem;
+            font-weight: 700;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .page-btn:hover:not(:disabled) {
+            border-color: #52525b;
+            color: #fff;
+            background: #27272a;
+        }
+        .page-btn.active {
+            background: #dc2626 !important;
+            border-color: #dc2626 !important;
+            color: #fff !important;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+        .page-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .page-info {
+            margin-left: 20px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.8rem;
+            color: #71717a;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
         }
     </style>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-4">
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
     <div>
-        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa; font-family: 'Oswald', sans-serif; letter-spacing: 1px;">{{ title|default('FIGHT RESULTS CENTRAL') }}</h1>
-        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">
-            Select a sanctioned event card to verify round-by-round statistics
-        </p>
-    </div>
-    <div class="d-flex gap-2">
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa; font-family: 'Oswald', sans-serif; letter-spacing: 2px;">{{ title|default('FIGHT RESULTS CENTRAL') }}</h1>
+        <p class="mb-0" style="color:#71717a;font-size:.875rem;">Official fight outcomes and technical archives</p>
+    </div>    <div class="d-flex gap-3 align-items-center">
+        <div class="btn-group p-1 bg-dark rounded-pill border border-secondary border-opacity-25 shadow-sm">
+            <button class="btn btn-sm rounded-pill px-4 btn-pro-nav active" id="viewGridBtn" onclick="toggleView('grid')">
+                <i class="fa-solid fa-calendar-days me-2"></i>EVENT GRID
+            </button>
+            <button class="btn btn-sm rounded-pill px-4 btn-pro-nav" id="viewGalleryBtn" onclick="toggleView('gallery')">
+                <i class="fa-solid fa-trophy me-2"></i>BOUT GALLERY
+            </button>
+        </div>
         {% if is_granted('ROLE_ADMIN') %}
-            <a href="{{ path('app_result_schedule') }}" class="btn btn-primary btn-sm px-3 fw-bold"><i class="fa-solid fa-calendar-plus me-1"></i>SCHEDULE BOUT</a>
+            <a href="{{ path('app_result_schedule') }}" class="btn btn-primary btn-sm px-4 rounded-pill fw-bold shadow-sm"><i class="fa-solid fa-plus me-1"></i>SCHEDULE</a>
         {% endif %}
-        <a href="{{ path('app_result_export') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-download me-1"></i>EXPORT CSV</a>
+        <a href="{{ path('app_result_export_pdf') }}" class="btn btn-danger btn-sm px-4 rounded-pill fw-bold shadow-sm">
+            <i class="fa-solid fa-file-pdf me-2"></i>PDF REPORT
+        </a>
     </div>
 </div>
 
-<!-- Event Picker Filter -->
-<div class="card mb-4" style="background:#18181b;border:1px solid #27272a; border-radius: 15px;">
-    <div class="card-body py-3">
+<style>
+    .btn-pro-nav {
+        color: #71717a !important;
+        font-size: 0.7rem !important;
+        font-weight: 800 !important;
+        letter-spacing: 1px !important;
+        transition: all 0.3s !important;
+        border: none !important;
+    }
+    .btn-pro-nav.active {
+        background: rgba(220, 38, 38, 0.1) !important;
+        color: #dc2626 !important;
+        box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.2) !important;
+    }
+    .btn-pro-nav:hover:not(.active) {
+        color: #fff !important;
+        background: rgba(255,255,255,0.05) !important;
+    }
+</style>
+
+<!-- Filter Command Center -->
+<div class="card mb-5 border-0 bg-transparent">
+    <div class="filter-command-center">
         <form onsubmit="return false;">
             <div class="row g-3 align-items-center">
-                <div class="col-md-4">
+                <div class="col-lg-4">
                     <div class="position-relative sf-search-wrapper">
                         <div class="input-group">
-                            <span class="input-group-text bg-transparent border-end-0" style="border-color:#3f3f46;"><i class="fa-solid fa-magnifying-glass" style="color:#71717a;"></i></span>
-                            <input type="text" id="resultSearchInput" class="form-control border-start-0" placeholder="Search events or fighters..." style="background:#27272a;border-color:#3f3f46;color:#fafafa;" />
+                            <span class="input-group-text border-0 bg-transparent text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
+                            <input type="text" id="resultSearchInput" class="form-control form-control-pro border-0" placeholder="Search events, boxers, or venues...">
                         </div>
                         <div id="resultSearchDropdown" class="sf-search-dropdown d-none">
                             <div class="p-2 text-muted xsmall fw-bold border-bottom border-secondary mb-2" style="letter-spacing:1px;">EVENT DISCOVERY</div>
@@ -130,36 +417,35 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <select class="form-select bg-dark border-secondary text-white" onchange="document.getElementById('eventSearchInput')._sfFilter.filter('org', this.value)">
-                        <option value="all">All Organizations</option>
-                        <option value="INDEPENDENT">Independent</option>
-                        {% set orgs = [] %}
-                        {% for e in events %}
-                            {% if e.organization != 'INDEPENDENT' and e.organization not in orgs %}
-                                <option value="{{ e.organization }}">{{ e.organization }}</option>
-                                {% set orgs = orgs|merge([e.organization]) %}
-                            {% endif %}
-                        {% endfor %}
+                    <select class="form-select form-control-pro" onchange="window._resultFilter.filter('org', this.value)">
+                        <option value="all">Global Organizations</option>
+                        <option value="WBC">WBC World Boxing Council</option>
+                        <option value="WBA">WBA World Boxing Assoc.</option>
+                        <option value="IBF">IBF Int. Boxing Federation</option>
+                        <option value="WBO">WBO World Boxing Org.</option>
+                        <option value="INDEPENDENT">Independent Circuits</option>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <select class="form-select bg-dark border-secondary text-white" onchange="document.getElementById('eventSearchInput')._sfFilter.filter('status', this.value)">
-                        <option value="all">All Statuses</option>
-                        <option value="completed">Completed</option>
+                    <select class="form-select form-control-pro" onchange="window._resultFilter.filter('status', this.value)">
+                        <option value="all">Archive Status</option>
+                        <option value="completed">Verified Results</option>
                         <option value="progress">In Progress</option>
-                        <option value="empty">Scheduled</option>
+                        <option value="empty">Scheduled Only</option>
                     </select>
                 </div>
-                <div class="col-md-2 d-flex gap-1">
-                    <button class="btn btn-dark border-secondary w-100" title="Sort by Date" onclick="document.getElementById('eventSearchInput')._sfFilter.sort('date', 'number', 'desc')"><i class="fa-solid fa-calendar-days"></i></button>
-                    <button class="btn btn-dark border-secondary w-100" title="Sort A-Z" onclick="document.getElementById('eventSearchInput')._sfFilter.sort('name', 'string', 'asc')"><i class="fa-solid fa-arrow-down-a-z"></i></button>
+                <div class="col-md-2 d-flex gap-2">
+                    <button class="btn btn-dark border-secondary rounded-3 px-3 py-2" title="Sort by Date" onclick="window._resultFilter.sort('date', 'number', 'desc')"><i class="fa-solid fa-calendar-days"></i></button>
+                    <button class="btn btn-dark border-secondary rounded-3 px-3 py-2" title="Sort A-Z" onclick="window._resultFilter.sort('name', 'string', 'asc')"><i class="fa-solid fa-arrow-down-a-z"></i></button>
                 </div>
             </div>
         </form>
     </div>
 </div>
 
-<div class="row g-4" id="eventCardGrid">
+<!-- Results View -->
+<div id="resultsGridView">
+    <div class="row g-4" id="eventCardGrid">
     {% for event in events %}
         {% set stats = eventStats[event.eventId] %}
         {% set fighters = eventFighters[event.eventId]|default('') %}
@@ -171,49 +457,82 @@
              data-sort-name="{{ event.eventName }}">
             <div class="event-card-ultra {% if event.organization != 'INDEPENDENT' %}sanctioned{% endif %}">
                 {% if event.organization != 'INDEPENDENT' %}
-                    <div class="org-tag-top">
+                    <div class="org-tag-pro">
                         <i class="fa-solid fa-crown"></i>
-                        {{ event.organization }}
+                        {{ event.organization }} CHAMPIONSHIP
+                    </div>
+                {% else %}
+                    <div class="org-tag-pro" style="background: rgba(161,161,170,0.1); color:#a1a1aa; border-color: rgba(161,161,170,0.2);">
+                        <i class="fa-solid fa-calendar"></i>
+                        STANDARD EVENT
                     </div>
                 {% endif %}
 
                 <div class="event-title-pro">{{ event.eventName }}</div>
                 
-                <div class="info-row">
-                    <i class="fa-solid fa-calendar-day text-danger"></i>
-                    <span>{{ event.eventDate|date('l, M d, Y') }}</span>
-                </div>
-                <div class="info-row">
-                    <i class="fa-solid fa-map-pin text-danger"></i>
-                    <span>{{ event.venue }}, {{ event.city }}</span>
+                <div class="meta-group">
+                    <div class="info-row-pro">
+                        <i class="fa-solid fa-calendar-day"></i>
+                        <span>{{ event.eventDate|date('l, M d, Y') }}</span>
+                    </div>
+                    <div class="info-row-pro">
+                        <i class="fa-solid fa-map-pin"></i>
+                        <span>{{ event.venue }}, {{ event.city }}</span>
+                    </div>
                 </div>
 
-                <div class="status-box-mini">
+                <div class="mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         {% if stats.total == 0 %}
-                            <span class="small text-muted fw-bold">NO FIGHTS SCHEDULED</span>
-                            <span class="badge bg-secondary-lt">EMPTY</span>
+                            <span class="status-badge-premium scheduled">SCHEDULED</span>
+                            <span class="small text-muted fw-bold">PENDING</span>
                         {% elseif stats.isFullyCompleted %}
-                            <span class="small text-success fw-bold">COMPLETED</span>
-                            <span class="badge bg-green-lt">{{ stats.completed }}/{{ stats.total }}</span>
+                            <span class="status-badge-premium completed">COMPLETED</span>
+                            <span class="small text-success fw-bold">{{ stats.completed }}/{{ stats.total }} BOUTS</span>
                         {% else %}
-                            <span class="small text-blue fw-bold">IN PROGRESS</span>
-                            <span class="badge bg-blue-lt">{{ stats.completed }}/{{ stats.total }}</span>
+                            <span class="status-badge-premium live">LIVE NOW</span>
+                            <span class="small text-blue fw-bold">{{ stats.completed }}/{{ stats.total }} BOUTS</span>
                         {% endif %}
                     </div>
-                    <div class="progress" style="height: 4px; background: #09090b; border-radius: 10px;">
+                    <div class="progress" style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 100px; overflow: hidden;">
                         <div class="progress-bar {% if stats.isFullyCompleted %}bg-success{% else %}bg-blue{% endif %}" 
-                             style="width: {{ stats.total > 0 ? (stats.completed/stats.total*100) : 0 }}%; border-radius: 10px;"></div>
+                             style="width: {{ stats.total > 0 ? (stats.completed/stats.total*100) : 0 }}%; transition: width 1s ease;"></div>
                     </div>
                 </div>
 
-                <a href="{{ path('app_result_manage_card', {id: event.eventId}) }}" class="ultra-manage-btn mt-2">
-                    {% if is_granted('ROLE_ADMIN') %}
-                        <i class="fa-solid fa-pen-to-square"></i>MANAGE RESULTS
+                {# Results Import Section #}
+                {% if stats.completed > 0 %}
+                    <div class="results-ticker-pro">
+                        <div class="text-muted xsmall fw-bold mb-3 text-uppercase" style="letter-spacing:1.5px; font-size: 0.6rem;">Archive Outcomes</div>
+                        {% for res in eventResults[event.eventId]|default([]) %}
+                            <div class="ticker-item">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-certificate text-success" style="font-size:0.6rem;"></i>
+                                    <span class="winner-name">{{ res.winner ? res.winner.lastName|upper : 'DRAW' }}</span>
+                                </div>
+                                <span class="method-tag">{{ res.methodOfVictory }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="action-grid-pro">
+                    {% if stats.completed > 0 %}
+                        <button onclick="viewEventResults('{{ event.eventId }}', '{{ event.eventName|escape('js') }}')" class="btn-pro btn-pro-primary">
+                            <i class="fa-solid fa-chart-line"></i> VIEW RESULTS
+                        </button>
                     {% else %}
-                        <i class="fa-solid fa-chart-line"></i>VIEW ANALYTICS
+                        <div class="btn-pro btn-pro-outline" style="opacity: 0.5; cursor: not-allowed;">
+                            <i class="fa-solid fa-lock"></i> NO DATA
+                        </div>
                     {% endif %}
-                </a>
+                    
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('app_result_manage_card', {id: event.eventId}) }}" class="btn-pro btn-pro-outline">
+                            <i class="fa-solid fa-sliders"></i>
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     {% else %}
@@ -221,7 +540,115 @@
             <p class="text-muted">No boxing events found in the ledger.</p>
         </div>
     {% endfor %}
+    </div>
+    
+    <!-- Pagination Hub -->
+    <div id="resultPagination" class="sf-pagination-container"></div>
 </div>
+<!-- Bout Gallery View (Initially Hidden) -->
+<div id="resultsGalleryView" class="d-none">
+    {% set events_with_results = 0 %}
+    <div id="eventResultsHeader" class="mb-4">
+        <button onclick="backToEvents()" class="btn btn-outline-secondary btn-sm mb-3"><i class="fa-solid fa-arrow-left me-2"></i>BACK TO EVENTS</button>
+        <h2 id="selectedEventTitle" class="h3 fw-bold text-white mb-0" style="font-family: 'Oswald', sans-serif; letter-spacing: 2px;"></h2>
+        <p class="text-muted small">Viewing all archived bouts for this event</p>
+    </div>
+
+    {% for event in events %}
+        {% set results = eventResults[event.eventId]|default([]) %}
+        {% if results|length > 0 %}
+            {% set events_with_results = events_with_results + 1 %}
+        <div class="event-results-container d-none" id="event-results-{{ event.eventId }}">
+            <div class="row g-4">
+                {% for result in results %}
+                    <div class="col-xl-6 col-xxl-4">
+                        <div class="sf-result-card-premium">
+                            <div class="card-header-meta">
+                                <span class="event-mini">BOUT #{{ result.fightNumber }}</span>
+                                <span class="date-mini">{{ result.fightDate|date('H:i') }} ARCHIVE</span>
+                            </div>
+                            
+                            <div class="matchup-container">
+                                {# Fighter 1 #}
+                                <div class="fighter-side {{ result.winner and result.winner.fighterId == result.fighter1.fighterId ? 'is-winner' : 'is-loser' }}">
+                                    <div class="fighter-info">
+                                        <div class="photo-hex">
+                                            <div class="photo-inner">
+                                                {% if result.fighter1.photoFilename %}
+                                                    <img src="{{ asset('uploads/boxers/' ~ result.fighter1.photoFilename) }}" alt="">
+                                                {% else %}
+                                                    <i class="fa-solid fa-user"></i>
+                                                {% endif %}
+                                            </div>
+                                            <div class="hex-border"></div>
+                                        </div>
+                                        <div class="name-box">
+                                            <span class="first">{{ result.fighter1.firstName|upper }}</span>
+                                            <span class="last">{{ result.fighter1.lastName|upper }}</span>
+                                        </div>
+                                        <div class="corner-indicator red">RED CORNER</div>
+                                    </div>
+                                    {% if result.winner and result.winner.fighterId == result.fighter1.fighterId %}
+                                        <div class="winner-badge"><i class="fa-solid fa-crown"></i> WINNER</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="result-center">
+                                    <div class="vs-circle">VS</div>
+                                    <div class="method-box">
+                                        <div class="method">{{ result.methodOfVictory }}</div>
+                                        <div class="round">ROUND {{ result.roundNumber }}</div>
+                                    </div>
+                                </div>
+
+                                {# Fighter 2 #}
+                                <div class="fighter-side {{ result.winner and result.winner.fighterId == result.fighter2.fighterId ? 'is-winner' : 'is-loser' }}">
+                                    <div class="fighter-info text-end">
+                                        <div class="photo-hex">
+                                            <div class="photo-inner">
+                                                {% if result.fighter2.photoFilename %}
+                                                    <img src="{{ asset('uploads/boxers/' ~ result.fighter2.photoFilename) }}" alt="">
+                                                {% else %}
+                                                    <i class="fa-solid fa-user"></i>
+                                                {% endif %}
+                                            </div>
+                                            <div class="hex-border blue"></div>
+                                        </div>
+                                        <div class="name-box">
+                                            <span class="first">{{ result.fighter2.firstName|upper }}</span>
+                                            <span class="last">{{ result.fighter2.lastName|upper }}</span>
+                                        </div>
+                                        <div class="corner-indicator blue">BLUE CORNER</div>
+                                    </div>
+                                    {% if result.winner and result.winner.fighterId == result.fighter2.fighterId %}
+                                        <div class="winner-badge"><i class="fa-solid fa-crown"></i> WINNER</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="card-actions-overlay">
+                                <a href="{{ path('app_result_show', {id: result.resultId}) }}" class="view-dossier-btn">
+                                    VIEW FULL ANALYTICS <i class="fa-solid fa-chart-simple ms-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    {% if events_with_results == 0 %}
+        <div class="col-12 text-center py-5">
+            <div class="empty-state-visual">
+                <i class="fa-solid fa-trophy mb-4"></i>
+                <h3>NO COMPLETED BOUTS FOUND</h3>
+                <p>Archived fight results will appear here once finalized.</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
 
 {% block extra_js %}
 <script>
@@ -230,9 +657,74 @@ document.addEventListener('DOMContentLoaded', function() {
     const dropdown = document.getElementById('resultSearchDropdown');
     const results = document.getElementById('resultSearchResults');
     const cards = document.querySelectorAll('.event-search-item');
+    const filterSection = document.querySelector('.filter-command-center');
+
+    if (!filterSection) {
+        console.warn('Command Center not found, initialization partially aborted.');
+    }
+
+    window.viewEventResults = function(eventId, eventName) {
+        document.getElementById('resultsGridView').classList.add('d-none');
+        if (filterSection) filterSection.classList.add('d-none');
+        const gallery = document.getElementById('resultsGalleryView');
+        gallery.classList.remove('d-none');
+        document.querySelectorAll('.event-results-container').forEach(c => c.classList.add('d-none'));
+        const container = document.getElementById('event-results-' + eventId);
+        if (container) container.classList.remove('d-none');
+        document.getElementById('selectedEventTitle').innerText = eventName.toUpperCase();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.backToEvents = function() {
+        document.getElementById('resultsGridView').classList.remove('d-none');
+        if (filterSection) filterSection.classList.remove('d-none');
+        document.getElementById('resultsGalleryView').classList.add('d-none');
+    };
+
+    window.toggleView = function(view) {
+        const gridBtn = document.getElementById('viewGridBtn');
+        const galleryBtn = document.getElementById('viewGalleryBtn');
+        
+        if (view === 'grid') {
+            gridBtn.classList.add('active');
+            galleryBtn.classList.remove('active');
+            backToEvents();
+        } else {
+            galleryBtn.classList.add('active');
+            gridBtn.classList.remove('active');
+            
+            // If already in gallery for an event, stay there.
+            // Otherwise, default to first event with results.
+            const currentGallery = document.querySelector('.event-results-container:not(.d-none)');
+            if (!currentGallery) {
+                const anyEvent = document.querySelector('.event-results-container');
+                if (anyEvent) {
+                    const id = anyEvent.id.replace('event-results-', '');
+                    const name = "FIGHT ARCHIVE";
+                    viewEventResults(id, name);
+                }
+            }
+            document.getElementById('resultsGridView').classList.add('d-none');
+            if (filterSection) filterSection.classList.add('d-none');
+            document.getElementById('resultsGalleryView').classList.remove('d-none');
+        }
+    };
+
+    const pagination = new SmartPagination({
+        containerSelector: '#eventCardGrid',
+        itemSelector: '.event-search-item',
+        paginationContainerId: 'resultPagination',
+        itemsPerPage: 6
+    });
+
+    window._resultFilter = new AdvancedFilter('#eventCardGrid', '.event-search-item', (visibleItems) => {
+        pagination.setFilteredItems(visibleItems);
+    });
 
     searchInput.addEventListener('input', function(e) {
         const q = e.target.value.toLowerCase().trim();
+        window._resultFilter.search(q);
+
         if (q.length < 1) {
             dropdown.classList.add('d-none');
             return;
@@ -250,7 +742,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 div.style.cursor = 'pointer';
                 
                 const title = card.querySelector('.event-title-pro').innerText;
-                const location = card.querySelector('.info-row:nth-child(3) span').innerText;
+                const location = card.querySelector('.info-row-pro:nth-child(2) span').innerText;
                 
                 div.innerHTML = `
                     <div class="d-flex align-items-center justify-content-between">
@@ -284,6 +776,7 @@ document.addEventListener('DOMContentLoaded', function() {
             dropdown.classList.add('d-none');
         }
     });
+
 });
 </script>
 <style>

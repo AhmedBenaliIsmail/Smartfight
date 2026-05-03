@@ -16,14 +16,8 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/stats')]
 class FightStatisticController extends AbstractController
 {
-    #[Route('/hub', name: 'app_stats_hub')]
-    public function hub(): Response
-    {
-        return $this->render('statistic/hub.html.twig');
-    }
-
     #[Route('', name: 'app_stats')]
-    public function index(Request $request, FightStatisticRepository $statRepo, FighterRepository $fighterRepo, FightResultRepository $resultRepo, EventRepository $eventRepo, \App\Service\BoutAnalysisService $analysisService, EntityManagerInterface $em): Response
+    public function index(Request $request, FightStatisticRepository $statRepo, FighterRepository $fighterRepo, FightResultRepository $resultRepo, EventRepository $eventRepo, \App\Service\BoutAnalysisService $analysisService): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
         
@@ -46,47 +40,9 @@ class FightStatisticController extends AbstractController
             $groupedStats[$rid]['stats'][] = $s;
         }
 
-        // Generate AI analysis and Aggregate totals per fighter for each group
+        // Generate AI analysis for each group
         foreach ($groupedStats as $rid => &$group) {
             $group['analysis'] = $analysisService->analyzeBout($group['result'], $group['stats']);
-            
-            $totals = [];
-            foreach ($group['stats'] as $s) {
-                $fid = $s->getFighter()->getFighterId();
-                if (!isset($totals[$fid])) {
-                    // Use $group['result'] not stale outer $fight variable
-                    $contract = $em->getRepository(\App\Entity\FighterContract::class)->findOneBy([
-                        'fighter' => $s->getFighter(),
-                        'event'   => $group['result']->getEvent()
-                    ]);
-                    
-                    $totals[$fid] = [
-                        'fighter' => $s->getFighter(),
-                        'punchesLanded' => 0, 'punchesThrown' => 0,
-                        'jabsLanded' => 0, 'jabsThrown' => 0,
-                        'powerPunchesLanded' => 0, 'powerPunchesThrown' => 0,
-                        'bodyShotsLanded' => 0,
-                        'payout' => $contract ? $contract->getCalculatedPayout() : 0
-                    ];
-                }
-                $totals[$fid]['punchesLanded'] += $s->getPunchesLanded();
-                $totals[$fid]['punchesThrown'] += $s->getPunchesThrown();
-                $totals[$fid]['jabsLanded'] += $s->getJabsLanded();
-                $totals[$fid]['jabsThrown'] += $s->getJabsThrown();
-                $totals[$fid]['powerPunchesLanded'] += $s->getPowerPunchesLanded();
-                $totals[$fid]['powerPunchesThrown'] += $s->getPowerPunchesThrown();
-                $totals[$fid]['bodyShotsLanded'] += $s->getBodyShotsLanded();
-            }
-            
-            // Calculate accuracies for aggregated totals
-            foreach ($totals as &$t) {
-                $t['punchAccuracy'] = $t['punchesThrown'] > 0 ? ($t['punchesLanded'] / $t['punchesThrown'] * 100) : 0;
-                $t['jabAccuracy'] = $t['jabsThrown'] > 0 ? ($t['jabsLanded'] / $t['jabsThrown'] * 100) : 0;
-                $t['powerAccuracy'] = $t['powerPunchesThrown'] > 0 ? ($t['powerPunchesLanded'] / $t['powerPunchesThrown'] * 100) : 0;
-            }
-            
-            $group['totalStats'] = array_values($totals);
-            $group['totalPayout'] = array_sum(array_column($group['totalStats'], 'payout'));
         }
 
         // Apply search if needed
@@ -94,8 +50,8 @@ class FightStatisticController extends AbstractController
         if ($q) {
             $groupedStats = array_filter($groupedStats, function($group) use ($q) {
                 if ($group['event'] && str_contains(strtolower($group['event']->getEventName()), $q)) return true;
-                foreach ($group['totalStats'] as $t) {
-                    if (str_contains(strtolower($t['fighter']->getFullName()), $q)) return true;
+                foreach ($group['stats'] as $s) {
+                    if ($s->getFighter() && str_contains(strtolower($s->getFighter()->getFullName()), $q)) return true;
                 }
                 return false;
             });
@@ -107,92 +63,30 @@ class FightStatisticController extends AbstractController
         ]);
     }
 
-    #[Route('/select', name: 'app_stat_selection')]
-    public function selection(Request $request, EventRepository $eventRepo, FightResultRepository $resultRepo): Response
-    {
-        $this->denyAccessUnlessGranted('ROLE_USER');
-        
-        $eventId = $request->query->get('eventId');
-        
-        if (!$eventId) {
-            return $this->render('statistic/form_select_event.html.twig', [
-                'events' => $eventRepo->findFinishedEvents()
-            ]);
-        }
-
-        $event = $eventRepo->find($eventId);
-        if (!$event) throw $this->createNotFoundException();
-        
-        return $this->render('statistic/form_select_fight.html.twig', [
-            'event' => $event,
-            'fights' => $resultRepo->findCompletedFightsByEvent($eventId),
-            'targetRoute' => $this->isGranted('ROLE_ADMIN') ? 'app_stat_new' : 'app_stat_show'
-        ]);
-    }
-
-    #[Route('/show/{fightId}', name: 'app_stat_show')]
-    public function show(int $fightId, FightStatisticRepository $statRepo, FightResultRepository $resultRepo, \App\Service\BoutAnalysisService $analysisService, EntityManagerInterface $em): Response
-    {
-        $this->denyAccessUnlessGranted('ROLE_USER');
-        
-        $fight = $resultRepo->find($fightId);
-        if (!$fight) throw $this->createNotFoundException();
-        
-        $stats = $statRepo->findByFightResult($fightId);
-        
-        // Similar aggregation logic as index...
-        $analysis = $analysisService->analyzeBout($fight, $stats);
-        
-        $totals = [];
-        foreach ($stats as $s) {
-            $fid = $s->getFighter()->getFighterId();
-            if (!isset($totals[$fid])) {
-                $contract = $em->getRepository(\App\Entity\FighterContract::class)->findOneBy([
-                    'fighter' => $s->getFighter(),
-                    'event' => $fight->getEvent()
-                ]);
-                $totals[$fid] = [
-                    'fighter' => $s->getFighter(),
-                    'punchesLanded' => 0, 'punchesThrown' => 0,
-                    'jabsLanded' => 0, 'jabsThrown' => 0,
-                    'powerPunchesLanded' => 0, 'powerPunchesThrown' => 0,
-                    'bodyShotsLanded' => 0,
-                    'payout' => $contract ? $contract->getCalculatedPayout() : 0
-                ];
-            }
-            $totals[$fid]['punchesLanded'] += $s->getPunchesLanded();
-            $totals[$fid]['punchesThrown'] += $s->getPunchesThrown();
-            $totals[$fid]['jabsLanded'] += $s->getJabsLanded();
-            $totals[$fid]['jabsThrown'] += $s->getJabsThrown();
-            $totals[$fid]['powerPunchesLanded'] += $s->getPowerPunchesLanded();
-            $totals[$fid]['powerPunchesThrown'] += $s->getPowerPunchesThrown();
-            $totals[$fid]['bodyShotsLanded'] += $s->getBodyShotsLanded();
-        }
-        
-        foreach ($totals as &$t) {
-            $t['punchAccuracy'] = $t['punchesThrown'] > 0 ? ($t['punchesLanded'] / $t['punchesThrown'] * 100) : 0;
-            $t['jabAccuracy'] = $t['jabsThrown'] > 0 ? ($t['jabsLanded'] / $t['jabsThrown'] * 100) : 0;
-            $t['powerAccuracy'] = $t['powerPunchesThrown'] > 0 ? ($t['powerPunchesLanded'] / $t['powerPunchesThrown'] * 100) : 0;
-        }
-
-        return $this->render('statistic/show.html.twig', [
-            'fight' => $fight,
-            'stats' => $stats,
-            'analysis' => $analysis,
-            'totalStats' => array_values($totals),
-        ]);
-    }
-
     #[Route('/new', name: 'app_stat_new', methods: ['GET', 'POST'])]
     public function new(Request $request, FightStatisticService $service, FighterRepository $fighterRepo, FightResultRepository $resultRepo, EventRepository $eventRepo, FightStatisticRepository $statRepo, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
+        $eventId = $request->query->get('eventId');
         $fightId = $request->query->get('fightId');
         $round = (int)$request->query->get('round', 1);
 
-        if (!$fightId) {
-            return $this->redirectToRoute('app_stat_selection');
+        // Phase 1: Event Selection
+        if (!$eventId && !$fightId) {
+            return $this->render('statistic/form_select_event.html.twig', [
+                'events' => $eventRepo->findFinishedEvents()
+            ]);
+        }
+
+        // Phase 2: Fight Selection
+        if ($eventId && !$fightId) {
+            $event = $eventRepo->find($eventId);
+            if (!$event) throw $this->createNotFoundException();
+            return $this->render('statistic/form_select_fight.html.twig', [
+                'event' => $event,
+                'fights' => $resultRepo->findCompletedFightsByEvent($eventId)
+            ]);
         }
 
         // Phase 3: SmartFight Statistics Entry (Per Round)
@@ -262,6 +156,75 @@ class FightStatisticController extends AbstractController
             'currentRound' => $round,
             'totalRounds' => $maxRound,
         ]);
+    }
+
+    #[Route('/show/{fightId}', name: 'app_stat_show')]
+    public function show(int $fightId, FightStatisticRepository $statRepo, FightResultRepository $resultRepo, \App\Service\BoutAnalysisService $analysisService): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
+        $fight = $resultRepo->find($fightId);
+        if (!$fight) throw $this->createNotFoundException('Fight not found.');
+
+        $allStats = $statRepo->findBy(['fightResult' => $fight], ['round' => 'ASC']);
+
+        $fighter1 = $fight->getFighter1();
+        $fighter2 = $fight->getFighter2();
+
+        // Build one aggregate FightStatistic per fighter so the template can
+        // call ->getPunchAccuracy(), ->getJabAccuracy(), ->getPowerAccuracy() etc.
+        $aggregates = [];
+        foreach ([$fighter1, $fighter2] as $fighter) {
+            if (!$fighter) continue;
+
+            $agg = new FightStatistic();
+            $agg->setFighter($fighter);
+            $agg->setFightResult($fight);
+
+            $pl = $pt = $ppl = $ppt = $jl = $jt = $kd = $bsl = 0;
+            foreach ($allStats as $s) {
+                if ($s->getFighter() && $s->getFighter()->getFighterId() === $fighter->getFighterId()) {
+                    $pl  += $s->getPunchesLanded();
+                    $pt  += $s->getPunchesThrown();
+                    $ppl += $s->getPowerPunchesLanded();
+                    $ppt += $s->getPowerPunchesThrown();
+                    $jl  += $s->getJabsLanded();
+                    $jt  += $s->getJabsThrown();
+                    $kd  += $s->getKnockdowns();
+                    $bsl += $s->getBodyShotsLanded();
+                }
+            }
+
+            $agg->setPunchesLanded($pl);
+            $agg->setPunchesThrown($pt);
+            $agg->setPowerPunchesLanded($ppl);
+            $agg->setPowerPunchesThrown($ppt);
+            $agg->setJabsLanded($jl);
+            $agg->setJabsThrown($jt);
+            $agg->setKnockdowns($kd);
+            $agg->setBodyShotsLanded($bsl);
+
+            $aggregates[] = $agg;
+        }
+
+        $analysis = $analysisService->analyzeBout($fight, $allStats);
+
+        return $this->render('statistic/show.html.twig', [
+            'fight'       => $fight,
+            'fighter1'    => $fighter1,
+            'fighter2'    => $fighter2,
+            'totalStats'  => $aggregates,   // template: {% for t in totalStats %}
+            'stats'       => $allStats,      // template: {% for stat in stats %}
+            'analysis'    => $analysis,
+        ]);
+    }
+
+
+    #[Route('/selection', name: 'app_stat_selection')]
+    public function selection(): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        return $this->redirectToRoute('app_stat_new');
     }
 
     #[Route('/{id}/edit', name: 'app_stat_edit')]

@@ -16,12 +16,22 @@
             <h1 class="display-4 fw-bold text-white mb-2" style="font-family: 'Oswald', sans-serif; letter-spacing: 3px;">PHASE 1: BATTLEGROUND SELECTION</h1>
             <p class="text-muted fs-5">Identify the event to unlock specific performance intelligence and tactical logs.</p>
         </div>
+
+        {# Search bar #}
+        <div class="mt-5" style="max-width: 600px;">
+            <div class="input-group input-group-flat shadow-sm" style="border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2);">
+                <span class="input-group-text bg-transparent border-0 px-4">
+                    <i class="fa-solid fa-magnifying-glass text-muted"></i>
+                </span>
+                <input type="text" id="eventSearchInput" class="form-control bg-transparent border-0 text-white ps-0 py-3" placeholder="FILTER BY EVENT NAME, VENUE, OR CITY..." style="letter-spacing: 1px; font-weight: 700; font-size: 0.8rem;">
+            </div>
+        </div>
     </div>
 
     <div class="container">
-        <div class="row g-4 justify-content-center">
+        <div class="row g-4 justify-content-center" id="eventGrid">
             {% for event in events %}
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-4 col-md-6 event-card-item" data-search="{{ event.eventName|lower }} {{ event.venue|lower }} {{ event.city|lower }}">
                 <a href="{{ path('app_stat_selection', {'eventId': event.eventId}) }}" class="sf-event-panel">
                     <div class="panel-bg"></div>
                     <div class="panel-content">
@@ -176,4 +186,20 @@
 .empty-state-console i { font-size: 5rem; color: #52525b; }
 .empty-state-console h2 { font-family: 'Oswald', sans-serif; color: #fff; letter-spacing: 3px; margin-top: 20px; }
 </style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('eventSearchInput');
+    const items = document.querySelectorAll('.event-card-item');
+
+    if (input) {
+        input.addEventListener('input', function(e) {
+            const q = e.target.value.toLowerCase().trim();
+            items.forEach(item => {
+                const content = item.getAttribute('data-search');
+                item.style.display = content.includes(q) ? 'block' : 'none';
+            });
+        });
+    }
+});
+</script>
 {% endblock %}

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Helvetica', 'Arial', sans-serif; color: #333; line-height: 1.4; margin: 0; padding: 30px; }
+        .header { text-align: center; border-bottom: 3px solid #dc2626; padding-bottom: 15px; margin-bottom: 25px; }
+        .header h1 { margin: 0; text-transform: uppercase; letter-spacing: 1px; color: #000; font-size: 24px; }
+        .header p { margin: 5px 0 0; color: #dc2626; font-weight: bold; font-size: 12px; letter-spacing: 2px; }
+        
+        .match-info { text-align: center; margin-bottom: 30px; }
+        .match-info h2 { margin: 0; font-size: 20px; color: #000; }
+        .match-info p { margin: 5px 0; color: #71717a; font-size: 13px; }
+        
+        .result-box { background: #f4f4f5; border: 1px solid #e4e4e7; padding: 15px; text-align: center; margin-bottom: 30px; }
+        .result-box .winner { font-size: 18px; font-weight: bold; color: #dc2626; margin-bottom: 5px; }
+        .result-box .method { font-size: 14px; color: #18181b; }
+        
+        .section-title { background: #18181b; color: #fff; padding: 8px 15px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
+        
+        .stats-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+        .stats-table th { background: #f4f4f5; border: 1px solid #e4e4e7; padding: 8px; font-size: 11px; text-transform: uppercase; color: #71717a; }
+        .stats-table td { border: 1px solid #e4e4e7; padding: 8px; text-align: center; font-size: 12px; }
+        .stats-table .fighter-name { text-align: left; font-weight: bold; width: 30%; }
+        
+        .insight-box { border-left: 4px solid #fbbf24; background: #fffcf2; padding: 15px; font-size: 12px; line-height: 1.6; font-style: italic; color: #444; }
+        
+        .footer { margin-top: 40px; text-align: center; border-top: 1px solid #e4e4e7; padding-top: 15px; font-size: 10px; color: #a1a1aa; }
+        
+        .red { color: #dc2626; }
+        .blue { color: #3b82f6; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>SMARTFIGHT ANALYTICS</h1>
+        <p>OFFICIAL COMPUBOX MATCH REPORT</p>
+    </div>
+
+    <div class="match-info">
+        <h2>{{ result.fighter1.fullName }} <span style="color:#71717a">vs</span> {{ result.fighter2.fullName }}</h2>
+        <p>{{ result.event.eventName }} • {{ result.event.eventDate|date('F d, Y') }}</p>
+    </div>
+
+    <div class="result-box">
+        <div class="winner">WINNER: {{ result.winner ? result.winner.fullName : 'DRAW/NC' }}</div>
+        <div class="method">{{ result.methodOfVictory }} • Round {{ result.roundNumber }}</div>
+    </div>
+
+    <div class="section-title">TOTAL PUNCH STATS SUMMARY</div>
+    {% set f1_total_thrown = 0 %}{% set f1_total_landed = 0 %}
+    {% set f2_total_thrown = 0 %}{% set f2_total_landed = 0 %}
+    {% for r in 1..rounds %}
+        {% set s1 = fighterStats[result.fighter1.fighterId][r]|default(null) %}
+        {% set s2 = fighterStats[result.fighter2.fighterId][r]|default(null) %}
+        {% if s1 %}{% set f1_total_thrown = f1_total_thrown + s1.punchesThrown %}{% set f1_total_landed = f1_total_landed + s1.punchesLanded %}{% endif %}
+        {% if s2 %}{% set f2_total_thrown = f2_total_thrown + s2.punchesThrown %}{% set f2_total_landed = f2_total_landed + s2.punchesLanded %}{% endif %}
+    {% endfor %}
+
+    <table class="stats-table">
+        <thead>
+            <tr>
+                <th class="fighter-name">FIGHTER</th>
+                <th>TOTAL LANDED</th>
+                <th>TOTAL THROWN</th>
+                <th>CONNECT %</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="fighter-name red">{{ result.fighter1.fullName }}</td>
+                <td>{{ f1_total_landed }}</td>
+                <td>{{ f1_total_thrown }}</td>
+                <td>{{ f1_total_thrown > 0 ? (f1_total_landed / f1_total_thrown * 100)|round(1) : 0 }}%</td>
+            </tr>
+            <tr>
+                <td class="fighter-name blue">{{ result.fighter2.fullName }}</td>
+                <td>{{ f2_total_landed }}</td>
+                <td>{{ f2_total_thrown }}</td>
+                <td>{{ f2_total_thrown > 0 ? (f2_total_landed / f2_total_thrown * 100)|round(1) : 0 }}%</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="section-title">ROUND-BY-ROUND BREAKDOWN</div>
+    <table class="stats-table">
+        <thead>
+            <tr>
+                <th>RD</th>
+                <th class="red">{{ result.fighter1.lastName|upper }}</th>
+                <th>THROWN</th>
+                <th class="blue">{{ result.fighter2.lastName|upper }}</th>
+                <th>THROWN</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in 1..rounds %}
+                {% set s1 = fighterStats[result.fighter1.fighterId][r]|default(null) %}
+                {% set s2 = fighterStats[result.fighter2.fighterId][r]|default(null) %}
+                <tr>
+                    <td><strong>{{ r }}</strong></td>
+                    <td class="red">{{ s1 ? s1.punchesLanded : 0 }}</td>
+                    <td>{{ s1 ? s1.punchesThrown : 0 }}</td>
+                    <td class="blue">{{ s2 ? s2.punchesLanded : 0 }}</td>
+                    <td>{{ s2 ? s2.punchesThrown : 0 }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if result.insideTheNumbers %}
+    <div class="section-title">INSIDE THE NUMBERS — TACTICAL ANALYSIS</div>
+    <div class="insight-box">
+        {{ result.insideTheNumbers|nl2br }}
+    </div>
+    {% endif %}
+
+    <div class="footer">
+        © {{ "now"|date('Y') }} SmartFight Organization. All statistics are verified via CompuBox-style manual tracking. 
+        Report ID: SF-STAT-{{ result.resultId }}-{{ "now"|date('U') }}
+    </div>
+</body>
+</html>

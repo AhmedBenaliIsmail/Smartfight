@@ -1,0 +1,6 @@
+code client 147498646326-qguh1dagi0mkrhn4sllh5cbu46lbn5rt.apps.googleusercontent.com
+code secret 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
+google dsn password 
+uucx npki zcyl ppsr
+deepseek api
+sk-23d74dc6f4f14f5d8020ee22ff1939b4

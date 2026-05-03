@@ -22,7 +22,7 @@
                 <div class="col-md-5">
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
-                        <input type="text" name="q" class="form-control" placeholder="Search boxers..." value="{{ q }}" />
+                        <input type="text" name="q" class="form-control" placeholder="Search boxers..." value="{{ q }}" data-live-search="tbody" />
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -84,5 +84,21 @@
         </table>
     </div>
 </div>
+
+<!-- Pagination Controls -->
+<div id="paginationControls" class="pagination-container"></div>
 {% endblock %}
 
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    new SmartPagination({
+        containerSelector: 'table tbody',
+        itemSelector: 'tr',
+        paginationContainerId: 'paginationControls',
+        itemsPerPage: 6
+    });
+});
+</script>
+{% endblock %}

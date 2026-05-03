@@ -205,7 +205,7 @@
         </div>
         
         <div class="d-flex gap-3">
-            <select class="form-select bg-dark text-white border-secondary rounded-3 px-4" style="width: 180px;" onchange="document.getElementById('contractSearch')._sfFilter.filter('status', this.value)">
+            <select class="form-select bg-dark text-white border-secondary rounded-3 px-4" style="width: 180px;" onchange="window._contractFilter.filter('status', this.value)">
                 <option value="all">Status: All</option>
                 <option value="paid">Status: Paid</option>
                 <option value="ready">Status: Ready</option>
@@ -213,10 +213,10 @@
             </select>
             
             <div class="btn-group bg-dark rounded-3 border border-secondary overflow-hidden">
-                <button class="btn btn-sm text-muted px-3 border-end border-secondary" onclick="document.getElementById('contractSearch')._sfFilter.sort('pay', 'number', 'desc')">
+                <button class="btn btn-sm text-muted px-3 border-end border-secondary" onclick="window._contractFilter.sort('pay', 'number', 'desc')">
                     <i class="fa-solid fa-arrow-up-wide-short me-2"></i>Sort Pay
                 </button>
-                <button class="btn btn-sm text-muted px-3" onclick="document.getElementById('contractSearch')._sfFilter.sort('name', 'string', 'asc')">
+                <button class="btn btn-sm text-muted px-3" onclick="window._contractFilter.sort('name', 'string', 'asc')">
                     <i class="fa-solid fa-arrow-down-a-z me-2"></i>Name
                 </button>
             </div>
@@ -327,6 +327,8 @@
             </tbody>
         </table>
     </div>
+    <!-- Pagination Controls -->
+    <div id="paginationControls" class="pagination-container"></div>
 </div>
 
 <!-- Create Contract Modal (Pro Cinematic Edition) -->
@@ -388,66 +390,35 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        // Search Dropdown Logic
+        // Advanced Filter & Pagination initialization
         document.addEventListener('DOMContentLoaded', function() {
+            const pagination = new SmartPagination({
+                containerSelector: '.pro-table tbody',
+                itemSelector: 'tr:not(.text-center)', // Exclude empty state
+                paginationContainerId: 'paginationControls',
+                itemsPerPage: 8
+            });
+
+            window._contractFilter = new AdvancedFilter('.pro-table tbody', 'tr:not(.text-center)', (visibleItems) => {
+                pagination.setFilteredItems(visibleItems);
+            });
+
             const searchInput = document.getElementById('contractSearch');
-            const dropdown = document.getElementById('contractSearchDropdown');
-            const results = document.getElementById('contractSearchResults');
-            const rows = document.querySelectorAll('.pro-table tbody tr:not(.text-center)');
-
-            searchInput.addEventListener('input', function(e) {
-                const q = e.target.value.toLowerCase().trim();
-                if (q.length < 1) {
-                    dropdown.classList.add('d-none');
-                    return;
-                }
-
-                results.innerHTML = '';
-                let found = 0;
-
-                rows.forEach(row => {
-                    const content = row.getAttribute('data-search-content');
-                    if (content && content.includes(q)) {
-                        found++;
-                        const div = document.createElement('div');
-                        div.className = 'sf-search-item p-2 rounded-3 mb-1';
-                        div.style.cursor = 'pointer';
-                        
-                        const name = row.querySelector('.fw-bold.text-white').innerText;
-                        const event = row.querySelector('td:nth-child(2) .text-white').innerText;
-                        
-                        div.innerHTML = `
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div style="flex: 1;">
-                                    <div class="text-white fw-bold" style="font-size:0.85rem;">${name}</div>
-                                    <div class="text-muted xsmall" style="font-size:0.65rem;">${event}</div>
-                                </div>
-                                <i class="fa-solid fa-chevron-right text-muted" style="font-size:0.6rem;"></i>
-                            </div>
-                        `;
-                        div.onclick = () => {
-                            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            row.style.background = 'rgba(220, 38, 38, 0.15)';
-                            setTimeout(() => row.style.background = '', 3000);
-                            dropdown.classList.add('d-none');
-                            searchInput.value = name;
-                        };
-                        results.appendChild(div);
-                    }
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    window._contractFilter.search(e.target.value);
                 });
+            }
 
-                if (found > 0) {
-                    dropdown.classList.remove('d-none');
-                } else {
-                    dropdown.classList.add('d-none');
-                }
-            });
+            pagination.init();
+        });
 
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.sf-search-wrapper')) {
-                    dropdown.classList.add('d-none');
-                }
-            });
+        // Pagination initialization
+        new SmartPagination({
+            containerSelector: '.pro-table tbody',
+            itemSelector: 'tr',
+            paginationContainerId: 'paginationControls',
+            itemsPerPage: 6
         });
 
         // Modal Fighter Selection Logic

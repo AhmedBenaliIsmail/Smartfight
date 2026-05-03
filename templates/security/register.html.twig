@@ -1,12 +1,11 @@
-<!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Register - SmartFight Admin</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/smartfight-admin.css') }}">
+{% extends 'base.html.twig' %}
+
+{% set show_sidebar = false %}
+
+{% block title %}Register - SmartFight Admin{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
     <style>
         body { background: #09090b; display: flex; align-items: center; min-height: 100vh; overflow: hidden; }
         .login-card { background: #18181b; border: 1px solid #27272a; border-radius: 12px; max-width: 420px; margin: auto; padding: 2.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); position: relative; z-index: 10; }
@@ -36,18 +35,15 @@
             color: #111827;
         }
     </style>
-</head>
-<body class="antialiased">
+{% endblock %}
 
+{% block content %}
 <div class="bg-element bg-blue"></div>
 <div class="bg-element bg-purple"></div>
 
-<div class="container-tight py-4">
-    <div class="login-card w-100">
+<div class="container-tight py-4" style="position: relative; z-index: 1;">
+    <div class="login-card w-100 sf-card">
         <div class="text-center mb-4">
-            <a href="#" class="smartfight-logo justify-content-center mb-3">
-                <div class="logo-icon fs-3"><i class="fa-solid fa-fist-raised"></i></div>
-            </a>
             <h2 class="h2 text-center" style="color:#fafafa;">Create Account</h2>
         </div>
         
@@ -72,7 +68,7 @@
             </div>
             
             <div class="form-footer">
-                <button type="submit" class="btn btn-primary w-100 py-2 fs-5 fw-bold">Sign Up</button>
+                <button type="submit" class="btn btn-premium btn-premium-danger w-100 py-2 fs-5">Sign Up</button>
             </div>
 
             <div class="hr-text" style="color: #52525b; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Or continue with</div>
@@ -93,11 +89,8 @@
         {{ form_end(registrationForm) }}
         
         <div class="text-center text-muted mt-4">
-            Already have account? <a href="{{ path('app_login') }}" class="text-primary text-decoration-none">Sign in</a>
+            Already have account? <a href="{{ path('app_login') }}" class="text-danger text-decoration-none">Sign in</a>
         </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
-</body>
-</html>
+{% endblock %}

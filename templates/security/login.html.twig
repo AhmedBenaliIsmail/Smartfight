@@ -1,289 +1,324 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login - SmartFight Admin</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/smartfight-admin.css') }}">
+    <title>Login - SmartFight</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        body { background: #09090b; display: flex; align-items: center; min-height: 100vh; overflow: hidden; }
-        .login-card { background: #18181b; border: 1px solid #27272a; border-radius: 12px; max-width: 420px; margin: auto; padding: 2.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); position: relative; z-index: 10; }
-        .bg-element { position: absolute; border-radius: 50%; filter: blur(100px); z-index: 0; opacity: 0.15; }
-        .bg-red { background: #dc2626; width: 600px; height: 600px; top: -200px; left: -200px; }
-        .bg-gold { background: #c9a227; width: 500px; height: 500px; bottom: -100px; right: -100px; }
-        .btn-google-pro {
+        :root {
+            --sf-bg: #09090b;
+            --sf-card: #121214;
+            --sf-border: rgba(255, 255, 255, 0.05);
+            --sf-red: #dc2626;
+        }
+        body { 
+            background: var(--sf-bg); 
+            color: #fff; 
+            font-family: 'Inter', sans-serif;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            min-height: 100vh; 
+            margin: 0;
+            overflow-x: hidden;
+            position: relative;
+        }
+        .bg-element { 
+            position: absolute; 
+            border-radius: 50%; 
+            filter: blur(120px); 
+            z-index: 0; 
+            opacity: 0.1; 
+        }
+        .bg-red { background: var(--sf-red); width: 600px; height: 600px; top: -300px; left: -300px; }
+        .bg-blue { background: #3b82f6; width: 500px; height: 500px; bottom: -200px; right: -200px; }
+
+        .login-card { 
+            background: rgba(18, 18, 20, 0.8); 
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--sf-border); 
+            border-radius: 24px; 
+            width: 100%;
+            max-width: 440px; 
+            padding: 40px; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
+            position: relative; 
+            z-index: 10; 
+        }
+        .oswald { font-family: 'Oswald', sans-serif; letter-spacing: 1px; }
+        
+        .form-control {
+            background: #09090b;
+            border: 1px solid var(--sf-border);
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 12px;
+        }
+        .form-control:focus {
+            background: #000;
+            border-color: var(--sf-red);
+            box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
+            color: #fff;
+        }
+        .form-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #71717a;
+            margin-bottom: 8px;
+        }
+
+        .btn-premium {
+            background: var(--sf-red);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+        .btn-premium:hover {
+            background: #ef4444;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(220, 38, 38, 0.3);
+        }
+
+        .hr-text {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 25px 0;
+            color: #3f3f46;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .hr-text::before, .hr-text::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--sf-border);
+        }
+        .hr-text:not(:empty)::before { margin-right: 15px; }
+        .hr-text:not(:empty)::after { margin-left: 15px; }
+
+        .btn-social {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            background: #ffffff;
-            color: #1f2937;
-            font-weight: 600;
-            padding: 0.75rem;
-            border-radius: 8px;
+            background: #18181b;
+            border: 1px solid var(--sf-border);
+            color: #fff;
+            padding: 12px;
+            border-radius: 12px;
             text-decoration: none;
-            width: 100%;
-            border: 1px solid #e5e7eb;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
         }
-        .btn-google-pro:hover {
-            background: #f9fafb;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-            color: #111827;
+        .btn-social:hover {
+            background: #27272a;
+            border-color: #3f3f46;
+            color: #fff;
+        }
+        .btn-google { background: #fff; color: #000; border: none; }
+        .btn-google:hover { background: #f4f4f5; color: #000; }
+
+        .text-gold { color: #fbbf24; transition: color 0.2s; }
+        .text-gold:hover { color: #f59e0b; }
+
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 15px #00ffff;
+            animation: scan 2s linear infinite;
+            z-index: 10;
+        }
+        @keyframes scan {
+            0% { top: 0; }
+            50% { top: 100%; }
+            100% { top: 0; }
         }
     </style>
 </head>
-<body class="antialiased">
+<body>
+    <div class="bg-element bg-red"></div>
+    <div class="bg-element bg-blue"></div>
 
-<div class="bg-element bg-red"></div>
-<div class="bg-element bg-gold"></div>
-
-<div class="container-tight py-4">
-    <div class="login-card w-100">
-        <div class="text-center mb-4">
-            <a href="#" class="smartfight-logo justify-content-center mb-3">
-                <div class="logo-icon fs-3"><i class="fa-solid fa-fist-raised"></i></div>
-            </a>
-            <h2 class="h2 text-center" style="color:#fafafa;">Login to Account</h2>
-            <p class="text-muted mt-2">Enter your credentials to access the analytics portal</p>
+    <div class="login-card">
+        <div class="text-center mb-5">
+            <div class="oswald fw-bold fs-2 mb-2">
+                <span style="color: var(--sf-red)">LOGIN</span> TO ACCOUNT
+            </div>
+            <p class="text-muted small px-4">Enter your credentials to access the cinematic analytics portal</p>
         </div>
-        
-        {% if error %}
-            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-        {% endif %}
-        {% for msg in app.flashes('success') %}
-            <div class="alert alert-success">{{ msg }}</div>
-        {% endfor %}
 
-        <form action="{{ path('app_login') }}" method="post" autocomplete="off" id="login-form" novalidate>
+        {% if error %}
+            <div class="alert alert-danger py-2 small border-0 bg-danger bg-opacity-10 text-danger mb-4 text-center">
+                {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
+
+        <form action="{{ path('app_login') }}" method="post" id="login-form">
             <div class="mb-3">
                 <label class="form-label">Username</label>
                 <input type="text" name="_username" id="login-username" class="form-control" placeholder="Enter username" value="{{ last_username }}" required autofocus>
             </div>
-            <div class="mb-4">
-                <label class="form-label">
-                    Password
-                    <span class="form-label-description">
-                        <a href="{{ path('app_forgot_password') }}" class="text-muted text-decoration-none" style="font-size:0.75rem;">Forgot password?</a>
-                    </span>
-                </label>
-                <div class="input-group input-group-flat">
-                    <input type="password" name="_password" class="form-control" placeholder="Password" required>
-                </div>
-            </div>
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
             
-            <div class="form-footer">
-                <button type="submit" class="btn btn-danger w-100 py-2 fs-5 fw-bold">Sign In</button>
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="form-label mb-0">Password</label>
+                    <a href="{{ path('app_forgot_password') }}" class="text-muted text-decoration-none" style="font-size: 0.65rem; font-weight: 600;">FORGOT PASSWORD?</a>
+                </div>
+                <input type="password" name="_password" class="form-control" placeholder="Password" required>
             </div>
 
-            <script>
-                document.getElementById('login-form').addEventListener('submit', function(e) {
-                    const identifier = document.getElementById('login-username').value.trim();
-                    if (identifier.length === 0) {
-                        e.preventDefault();
-                        alert('Please enter your username');
-                    }
-                });
-            </script>
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-            <div class="hr-text" style="color: #52525b; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Or continue with</div>
-            <div class="row g-2">
-                <div class="col-12">
-                    <button type="button" id="btn-face-scan-toggle" class="btn w-100 py-2 btn-dark border-secondary disabled">
-                        <i class="fa-solid fa-spinner fa-spin me-2 text-primary" id="ai-loader-icon"></i>
-                        <span id="ai-loader-text">Loading AI...</span>
-                    </button>
-                </div>
-                
-                <div class="col-12">
-                    <div id="login-camera-container" class="mt-3 d-none" style="position: relative;">
-                        <video id="login-webcam" autoplay playsinline class="rounded-3 border border-primary w-100" style="transform: scaleX(-1);"></video>
-                        <div class="scanner-line"></div>
-                        <canvas id="login-canvas" class="d-none"></canvas>
-                        <div class="mt-2">
-                            <button type="button" id="btn-login-capture" class="btn btn-primary w-100 fw-bold">IDENTIFY & LOGIN</button>
-                        </div>
+            <button type="submit" class="btn btn-premium w-100 mb-2">Sign In</button>
+            
+            <div class="hr-text">Or continue with</div>
+
+            <div class="d-grid gap-2">
+                <button type="button" id="btn-face-scan-toggle" class="btn btn-social disabled w-100">
+                    <i class="fa-solid fa-spinner fa-spin me-2 text-primary" id="ai-loader-icon"></i>
+                    <span id="ai-loader-text">Initializing AI...</span>
+                </button>
+
+                <!-- Face ID Camera UI -->
+                <div id="login-camera-container" class="mt-3 d-none" style="position: relative;">
+                    <video id="login-webcam" autoplay playsinline class="rounded-4 border border-primary w-100" style="transform: scaleX(-1); border-color: var(--sf-red) !important;"></video>
+                    <div class="scanner-line"></div>
+                    <canvas id="login-canvas" class="d-none"></canvas>
+                    <div class="mt-3">
+                        <button type="button" id="btn-login-capture" class="btn btn-premium w-100 fw-bold fs-6">IDENTIFY & LOGIN</button>
                     </div>
                 </div>
-                <div class="col-12">
-                    <a href="{{ path('connect_google') }}" class="btn-google-pro">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48">
-                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/>
-                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                            <path fill="none" d="M0 0h48v48H0z"/>
-                        </svg>
-                        <span>Sign in with Google</span>
-                    </a>
-                </div>
+
+                <a href="{{ path('connect_google') }}" class="btn btn-social btn-google">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                        <path fill="none" d="M0 0h48v48H0z"/>
+                    </svg>
+                    <span>Sign in with Google</span>
+                </a>
+            </div>
+
+            <div class="text-center mt-5">
+                <span class="text-muted small">Don't have account yet?</span>
+                <a href="{{ path('app_register') }}" class="text-gold text-decoration-none small fw-bold ms-1">Sign up</a>
             </div>
         </form>
-        
-        <div class="text-center text-muted mt-4">
-            Don't have account yet? <a href="{{ path('app_register') }}" class="text-gold text-decoration-none">Sign up</a>
-        </div>
     </div>
-</div>
 
-<style>
-    .scanner-line {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background: rgba(0, 255, 255, 0.5);
-        box-shadow: 0 0 15px #00ffff;
-        animation: scan 2s linear infinite;
-        z-index: 10;
-    }
-    @keyframes scan {
-        0% { top: 0; }
-        50% { top: 100%; }
-        100% { top: 0; }
-    }
-</style>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loaderText = document.getElementById('ai-loader-text');
+            const loaderIcon = document.getElementById('ai-loader-icon');
+            const toggleBtn = document.getElementById('btn-face-scan-toggle');
+            const container = document.getElementById('login-camera-container');
+            const video = document.getElementById('login-webcam');
+            const canvas = document.getElementById('login-canvas');
+            const captureBtn = document.getElementById('btn-login-capture');
+            const usernameInput = document.getElementById('login-username');
+            
+            const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights';
+            let modelsLoaded = false;
 
-<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const loaderText = document.getElementById('ai-loader-text');
-    const loaderIcon = document.getElementById('ai-loader-icon');
-    const toggleBtn = document.getElementById('btn-face-scan-toggle');
-    const container = document.getElementById('login-camera-container');
-    const video = document.getElementById('login-webcam');
-    const canvas = document.getElementById('login-canvas');
-    const captureBtn = document.getElementById('btn-login-capture');
-    const usernameInput = document.querySelector('input[name="_username"]');
-    
-    const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights';
-    let modelsLoaded = false;
-
-    // Force Enable: Ensure user is NEVER stuck on "Loading AI"
-    const fallbackTimeout = setTimeout(() => {
-        if (!modelsLoaded) {
-            console.warn('AI models taking too long - Enabling manual FaceID mode');
-            activateFaceIdUI();
-        }
-    }, 4000);
-
-    function activateFaceIdUI() {
-        if (toggleBtn) {
-            toggleBtn.classList.remove('disabled');
-            if (loaderText) loaderText.innerText = 'Log In with Face ID';
-            if (loaderIcon) loaderIcon.className = 'fa-solid fa-face-viewfinder me-2 text-primary';
-        }
-    }
-
-    // Preload AI models
-    if (window.faceapi) {
-        Promise.all([
-            faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-            faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)
-        ]).then(() => {
-            modelsLoaded = true;
-            clearTimeout(fallbackTimeout);
-            console.log('FaceAI Armed');
-            activateFaceIdUI();
-        }).catch(err => {
-            console.warn('AI Init failed, falling back to legacy mode:', err);
-            activateFaceIdUI();
-        });
-    }
-
-    // Toggle Camera View
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', async function() {
-            if (container.classList.contains('d-none')) {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                    video.srcObject = stream;
-                    container.classList.remove('d-none');
-                    toggleBtn.style.display = 'none';
-                    video.onplay = () => {
-                        const overlay = faceapi.createCanvasFromMedia(video);
-                        overlay.style.position = 'absolute';
-                        overlay.style.top = '0';
-                        overlay.style.left = '0';
-                        overlay.style.zIndex = '5';
-                        container.append(overlay);
-                        
-                        const displaySize = { width: video.clientWidth, height: video.clientHeight };
-                        faceapi.matchDimensions(overlay, displaySize);
-
-                        setInterval(async () => {
-                            if (modelsLoaded) {
-                                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 128 })).withFaceLandmarks();
-                                const resizedDetections = faceapi.resizeResults(detections, displaySize);
-                                overlay.getContext('2d').clearRect(0, 0, overlay.width, overlay.height);
-                                faceapi.draw.drawDetections(overlay, resizedDetections);
-                                
-                                if (detections.length > 0) {
-                                    captureBtn.classList.remove('disabled');
-                                    captureBtn.innerHTML = 'IDENTIFY & LOGIN';
-                                } else {
-                                    captureBtn.classList.add('disabled');
-                                    captureBtn.innerHTML = '<i class="fa-solid fa-hourglass-start me-2"></i>WAITING FOR FACE...';
-                                }
-                            } else {
-                                captureBtn.classList.remove('disabled');
-                                captureBtn.innerHTML = 'IDENTIFY & LOGIN';
-                            }
-                        }, 150);
-                    };
-                } catch (err) {
-                    alert('Could not access camera. Please check permissions.');
+            function activateFaceIdUI() {
+                if (toggleBtn) {
+                    toggleBtn.classList.remove('disabled');
+                    if (loaderText) loaderText.innerText = 'Log In with Face ID';
+                    if (loaderIcon) loaderIcon.className = 'fa-solid fa-face-viewfinder me-2 text-primary';
                 }
             }
-        });
-    }
 
-    // Biometric Verification Handler
-    if (captureBtn) {
-        captureBtn.addEventListener('click', async function() {
-            if (this.classList.contains('disabled')) return;
+            // Load Face-API models
+            if (window.faceapi) {
+                Promise.all([
+                    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)
+                ]).then(() => {
+                    modelsLoaded = true;
+                    activateFaceIdUI();
+                }).catch(() => activateFaceIdUI());
+            }
 
-            const context = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            const photoData = canvas.toDataURL('image/jpeg', 0.8);
-            const username = usernameInput.value.trim();
-            
-            this.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>BIOMETRIC MATCHING...';
-            this.disabled = true;
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', async function() {
+                    if (this.classList.contains('disabled')) return;
+                    
+                    if (container.classList.contains('d-none')) {
+                        try {
+                            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                            video.srcObject = stream;
+                            container.classList.remove('d-none');
+                            toggleBtn.classList.add('d-none');
+                            
+                            video.onplay = () => {
+                                const overlay = faceapi.createCanvasFromMedia(video);
+                                overlay.style.position = 'absolute';
+                                overlay.style.top = '0'; overlay.style.left = '0'; overlay.style.zIndex = '5';
+                                container.append(overlay);
+                                const displaySize = { width: video.clientWidth, height: video.clientHeight };
+                                faceapi.matchDimensions(overlay, displaySize);
 
-            try {
-                const response = await fetch('{{ path('app_face_id_verify_visual') }}', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: username, photo: photoData })
+                                setInterval(async () => {
+                                    if (modelsLoaded) {
+                                        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 128 })).withFaceLandmarks();
+                                        const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                                        overlay.getContext('2d').clearRect(0, 0, overlay.width, overlay.height);
+                                        faceapi.draw.drawDetections(overlay, resizedDetections);
+                                        captureBtn.classList.toggle('disabled', detections.length === 0);
+                                        captureBtn.innerHTML = detections.length > 0 ? 'IDENTIFY & LOGIN' : '<i class="fa-solid fa-hourglass-start me-2"></i>WAITING FOR FACE...';
+                                    }
+                                }, 200);
+                            };
+                        } catch (err) { alert('Could not access camera.'); }
+                    }
                 });
-                const result = await response.json();
-                if (result.success) {
-                    window.location.href = result.redirect;
-                } else {
-                    alert(result.error);
-                    this.disabled = false;
-                    this.innerHTML = 'IDENTIFY & LOGIN';
-                }
-            } catch (err) {
-                alert('Security server unreachable.');
-                this.disabled = false;
-                this.innerHTML = 'IDENTIFY & LOGIN';
+            }
+
+            if (captureBtn) {
+                captureBtn.addEventListener('click', async function() {
+                    if (this.classList.contains('disabled')) return;
+                    const context = canvas.getContext('2d');
+                    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const photoData = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    this.innerHTML = '<i class="fa-solid fa-dna fa-spin me-2"></i>ANALYZING BIOMETRICS...';
+                    this.disabled = true;
+
+                    try {
+                        const response = await fetch('{{ path('app_face_id_verify_visual') }}', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ photo: photoData })
+                        });
+                        const result = await response.json();
+                        if (result.success) window.location.href = result.redirect;
+                        else { alert(result.error); this.disabled = false; this.innerHTML = 'IDENTIFY & LOGIN'; }
+                    } catch (err) { alert('Security server unreachable.'); this.disabled = false; this.innerHTML = 'IDENTIFY & LOGIN'; }
+                });
             }
         });
-    }
-
-});
-</script>
+    </script>
 </body>
 </html>

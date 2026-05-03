@@ -1,0 +1,942 @@
+﻿diff --git a/templates/fighter/index.html.twig b/templates/fighter/index.html.twig
+index 5f5fcf7..7dd2303 100644
+--- a/templates/fighter/index.html.twig
++++ b/templates/fighter/index.html.twig
+@@ -1,6 +1,6 @@
+ {% extends 'front/base_front.html.twig' %}
+ 
+-{% block title %}SmartFight ΓÇö Professional Roster{% endblock %}
++{% block title %}SmartFight - Professional Roster{% endblock %}
+ 
+ {% block extra_css %}
+     <style>
+@@ -22,11 +22,26 @@
+             width: 120px;
+             height: 120px;
+             border-radius: 20px;
+-            overflow: hidden;
+             background: #18181b;
+             border: 2px solid #27272a;
+             position: relative;
+             flex-shrink: 0;
++            z-index: 1;
++        }
++        .fighter-photo-container:hover {
++            z-index: 100;
++        }
++        .fighter-photo-container img {
++            border-radius: 18px;
++            position: relative;
++            z-index: 10;
++            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease, box-shadow 0.4s ease;
++            transform-origin: center;
++        }
++        .fighter-photo-container:hover img {
++            transform: scale(2);
++            filter: brightness(1.1);
++            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+         }
+         .status-dot {
+             position: absolute;
+@@ -113,6 +128,275 @@
+             color: #ef4444;
+             border-color: #ef4444;
+         }
++
++        /* Coach Block */
++        .coach-block {
++            border-top: 1px dashed rgba(161, 161, 170, 0.2);
++            padding-top: 12px;
++        }
++        .coach-text {
++            font-size: 0.8rem;
++            color: #a1a1aa;
++            text-transform: uppercase;
++            letter-spacing: 1px;
++            font-weight: 500;
++        }
++        .coach-text span {
++            color: #fafafa;
++            font-weight: 700;
++            letter-spacing: 0;
++            text-transform: none;
++        }
++        
++        /* Injury Analyst Card CSS */
++        .injury-analyst-card {
++            background: #0f0f1a;
++            border: 1px solid #e63946;
++            border-radius: 20px;
++            padding: 2.5rem;
++            box-shadow: 0 10px 30px rgba(230, 57, 70, 0.05);
++            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
++            position: relative;
++            overflow: hidden;
++            max-width: 500px;
++            margin: 0 auto;
++        }
++        .injury-analyst-card::before {
++            content: '';
++            position: absolute;
++            top: 0; left: 0; right: 0;
++            height: 4px;
++            background: linear-gradient(90deg, #e63946, #dc2626, #ef4444);
++        }
++        .injury-analyst-card:hover {
++            transform: translateY(-5px);
++            box-shadow: 0 15px 40px rgba(230, 57, 70, 0.15);
++        }
++        .badge-recommended {
++            background: rgba(234, 179, 8, 0.15);
++            color: #facc15;
++            padding: 6px 12px;
++            border-radius: 30px;
++            font-size: 0.65rem;
++            font-weight: 800;
++            letter-spacing: 1px;
++            border: 1px solid rgba(234, 179, 8, 0.3);
++        }
++        .risk-label {
++            color: #a1a1aa;
++            font-size: 0.8rem;
++            font-weight: 700;
++            letter-spacing: 1px;
++        }
++        .risk-percent {
++            font-weight: 800;
++            font-size: 1.1rem;
++        }
++        .risk-bar-bg {
++            height: 8px;
++            background: #1a1a2e;
++            border-radius: 10px;
++            overflow: hidden;
++        }
++        .risk-bar-fill {
++            height: 100%;
++            border-radius: 10px;
++            transition: width 1s ease-in-out;
++        }
++        .prediction-box {
++            background: #1a1a2e;
++            border: 1px solid rgba(255, 255, 255, 0.05);
++            border-radius: 12px;
++            padding: 1rem;
++            text-align: center;
++        }
++        .pred-label {
++            font-size: 0.7rem;
++            color: #a1a1aa;
++            margin-bottom: 5px;
++            letter-spacing: 1px;
++            font-weight: 700;
++        }
++        .pred-value {
++            font-size: 0.95rem;
++            font-weight: 800;
++        }
++        .recommendation-box {
++            background: rgba(34, 197, 94, 0.1);
++            border: 1px solid rgba(34, 197, 94, 0.3);
++            border-radius: 12px;
++            padding: 1rem 1.5rem;
++        }
++        .rec-label {
++            font-size: 0.7rem;
++            color: #4ade80;
++            letter-spacing: 1px;
++            font-weight: 700;
++        }
++        .rec-text {
++            color: #fff;
++            font-weight: 600;
++            font-size: 1.05rem;
++        }
++        .metrics-grid {
++            display: grid;
++            grid-template-columns: repeat(3, 1fr);
++            gap: 15px;
++            border-top: 1px dashed rgba(255, 255, 255, 0.1);
++            padding-top: 1.5rem;
++        }
++        .metric-item {
++            text-align: center;
++        }
++        .metric-val {
++            color: #fff;
++            font-size: 1.6rem;
++            font-weight: 800;
++            font-family: 'Inter', sans-serif;
++            margin-bottom: 2px;
++        }
++        .metric-label {
++            color: #71717a;
++            font-size: 0.7rem;
++            text-transform: uppercase;
++            letter-spacing: 1px;
++            font-weight: 600;
++        }
++        .btn-analyst {
++            padding: 14px;
++            border-radius: 12px;
++            font-weight: 700;
++            letter-spacing: 1px;
++            text-transform: uppercase;
++            transition: all 0.3s;
++        }
++        .btn-analyst:hover {
++            background: #b91c1c;
++            transform: scale(1.02);
++            color: #fff;
++        }
++        
++        /* Pagination CSS */
++        .pagination-container {
++            display: flex;
++            align-items: center;
++            justify-content: center;
++            gap: 10px;
++            margin-top: 3rem;
++            margin-bottom: 2rem;
++        }
++        .page-btn {
++            background: #18181b;
++            border: 1px solid #27272a;
++            color: #a1a1aa;
++            width: 42px;
++            height: 42px;
++            display: flex;
++            align-items: center;
++            justify-content: center;
++            border-radius: 12px;
++            cursor: pointer;
++            transition: all 0.2s;
++            font-weight: 600;
++        }
++        .page-btn:hover:not(:disabled) {
++            background: #27272a;
++            color: #fafafa;
++            border-color: #3f3f46;
++            transform: scale(1.05);
++        }
++        .page-btn.active {
++            background: #dc2626;
++            color: #fff;
++            border-color: #dc2626;
++        }
++        .page-btn:disabled {
++            opacity: 0.4;
++            cursor: not-allowed;
++        }
++        .page-info {
++            color: #71717a;
++            font-size: 0.95rem;
++            margin: 0 15px;
++            font-weight: 600;
++            font-family: 'Oswald', sans-serif;
++            letter-spacing: 1px;
++            text-transform: uppercase;
++        }
++        /* Filter Bar Styles */
++        .filter-bar {
++            background: #1e1e2e;
++            border: 1px solid rgba(255, 255, 255, 0.05);
++            border-radius: 12px;
++            padding: 20px;
++            margin-bottom: 30px;
++        }
++        .filter-group {
++            display: flex;
++            flex-direction: column;
++            gap: 8px;
++        }
++        .filter-label {
++            color: #fff;
++            font-size: 0.8rem;
++            font-weight: 600;
++            text-transform: uppercase;
++            letter-spacing: 1px;
++        }
++        .filter-input, .filter-select {
++            background: #2a2a3a;
++            border: 1px solid #333;
++            color: #fff;
++            padding: 8px 12px;
++            border-radius: 6px;
++            font-size: 0.9rem;
++            width: 100%;
++        }
++        .filter-input:focus, .filter-select:focus {
++            outline: none;
++            border-color: #e63946;
++        }
++        /* Custom Slider Styling */
++        .filter-range {
++            -webkit-appearance: none;
++            width: 100%;
++            height: 6px;
++            background: #2a2a3a;
++            border-radius: 5px;
++            outline: none;
++        }
++        .filter-range::-webkit-slider-thumb {
++            -webkit-appearance: none;
++            appearance: none;
++            width: 18px;
++            height: 18px;
++            background: #e63946;
++            cursor: pointer;
++            border-radius: 50%;
++        }
++        .btn-reset {
++            background: #2a2a3a;
++            border: 1px solid #e63946;
++            color: #fff;
++            padding: 8px 20px;
++            border-radius: 6px;
++            font-weight: 600;
++            transition: all 0.3s;
++            height: fit-content;
++            align-self: flex-end;
++            cursor: pointer;
++        }
++        .btn-reset:hover {
++            background: #e63946;
++            color: #fff;
++        }
++        .no-results {
++            text-align: center;
++            padding: 50px;
++            color: #71717a;
++            font-size: 1.2rem;
++            width: 100%;
++        }
+     </style>
+ {% endblock %}
+ 
+@@ -124,12 +408,6 @@
+             <p class="text-muted mb-0">Managing professional combatant portfolios</p>
+         </div>
+         <div class="d-flex gap-3 align-items-center">
+-            <div class="input-icon" style="width: 250px;">
+-                <span class="input-icon-addon">
+-                    <i class="fa-solid fa-search"></i>
+-                </span>
+-                <input type="text" class="form-control" style="background:#18181b; border:1px solid #27272a; color:#fafafa;" placeholder="Search roster..." data-live-search=".fighter-grid" data-live-search-item=".fighter-card-col">
+-            </div>
+         {% if is_granted('ROLE_ADMIN') %}
+             <a href="{{ path('app_fighter_new') }}" class="btn btn-danger px-4 fw-bold">
+                 <i class="fa-solid fa-plus me-2"></i>ADD BOXER
+@@ -138,8 +416,122 @@
+     </div>
+ </div>
+ 
++<!-- FILTERS BAR -->
++<div class="filter-bar">
++    <div class="row g-3 align-items-end">
++        <div class="col-md-3">
++            <div class="filter-group">
++                <label class="filter-label">Recherche</label>
++                <div class="input-icon">
++                    <span class="input-icon-addon">
++                        <i class="fa-solid fa-search"></i>
++                    </span>
++                    <input type="text" id="mainSearch" class="filter-input" style="padding-left: 2.5rem;" placeholder="Rechercher un boxeur..." data-live-search=".fighter-grid">
++                </div>
++            </div>
++        </div>
++        <div class="col-md-2">
++            <div class="filter-group">
++                <label class="filter-label">Pays</label>
++                <select id="filterCountry" class="filter-select">
++                    <option value="">Tous les pays</option>
++                </select>
++            </div>
++        </div>
++        <div class="col-md-2">
++            <div class="filter-group">
++                <label class="filter-label">&#x1F3F7;&#xFE0F; Cat&eacute;gorie</label>
++                <select id="filterCategory" class="filter-select">
++                    <option value="">Toutes</option>
++                </select>
++            </div>
++        </div>
++        <div class="col-md-1">
++            <div class="filter-group">
++                <label class="filter-label">Style</label>
++                <select id="filterStyle" class="filter-select">
++                    <option value="">Tous</option>
++                </select>
++            </div>
++        </div>
++        <div class="col-md-2">
++            <div class="filter-group">
++                <label class="filter-label">Win Rate Min: <span id="winRateValue">0</span>%</label>
++                <input type="range" id="filterWinRate" class="filter-range" min="0" max="100" value="0">
++            </div>
++        </div>
++        <div class="col-md-1">
++            <div class="filter-group">
++                <label class="filter-label">ELO Min</label>
++                <input type="number" id="filterElo" class="filter-input" placeholder="ELO">
++            </div>
++        </div>
++        <div class="col-md-1 d-flex">
++            <button id="resetFilters" class="btn-reset w-100" title="R├â╞Æ├é┬⌐initialiser">
++                <i class="fa-solid fa-rotate-left"></i>
++            </button>
++        </div>
++    </div>
++</div>
++
+ <div class="row g-4 fighter-grid">
++    {% set known_coaches = {
++        'Agit Kabayel': 'Ulli Wegner',
++        'Anthony Joshua': 'Robert Garcia',
++        'Artur Beterbiev': 'Marc Ramsay',
++        'Caleb Plant': 'Stephen Edwards',
++        'Canelo Alvarez': 'Eddy Reynoso',
++        'Carlos Adames': 'Bob Santos',
++        'Christian Mbilli': 'Marc Ramsay',
++        'Daniel Dubois': 'Don Charles',
++        'David Benavidez': 'Jose Benavidez Sr.'
++    } %}
++    {% set random_coaches = ['Freddie Roach', 'Emmanuel Steward', 'Teddy Atlas', 'Virgil Hunter', 'Buddy McGirt', 'Shane McGuigan', 'Derrick James', 'SugarHill Steward', "Cus D'Amato", 'Kevin Rooney', 'Angelo Dundee', 'Nacho Beristain'] %}
++
++    {% set known_countries = {
++        'Agit Kabayel': {code: 'DE', codeLower: 'de', name: 'Allemagne'},
++        'Anthony Joshua': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
++        'Artur Beterbiev': {code: 'CA', codeLower: 'ca', name: 'Canada'},
++        'Caleb Plant': {code: 'US', codeLower: 'us', name: '├â╞Æ├óΓé¼┬░tats-Unis'},
++        'Canelo Alvarez': {code: 'MX', codeLower: 'mx', name: 'Mexique'},
++        'Carlos Adames': {code: 'DO', codeLower: 'do', name: 'R├â╞Æ├é┬⌐publique Dominicaine'},
++        'Christian Mbilli': {code: 'FR', codeLower: 'fr', name: 'France'},
++        'Daniel Dubois': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
++        'David Benavidez': {code: 'US', codeLower: 'us', name: '├â╞Æ├óΓé¼┬░tats-Unis'},
++        'Tyson Fury': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
++        'Oleksandr Usyk': {code: 'UA', codeLower: 'ua', name: 'Ukraine'},
++        'Deontay Wilder': {code: 'US', codeLower: 'us', name: '├â╞Æ├óΓé¼┬░tats-Unis'},
++        'Errol Spence Jr': {code: 'US', codeLower: 'us', name: '├â╞Æ├óΓé¼┬░tats-Unis'},
++        'Terence Crawford': {code: 'US', codeLower: 'us', name: '├â╞Æ├óΓé¼┬░tats-Unis'},
++        'Gennady Golovkin': {code: 'KZ', codeLower: 'kz', name: 'Kazakhstan'},
++        'Vasiliy Lomachenko': {code: 'UA', codeLower: 'ua', name: 'Ukraine'},
++        'Shakur Stevenson': {code: 'US', codeLower: 'us', name: '├â╞Æ├óΓé¼┬░tats-Unis'},
++        'Devin Haney': {code: 'US', codeLower: 'us', name: '├â╞Æ├óΓé¼┬░tats-Unis'},
++        'Ryan Garcia': {code: 'US', codeLower: 'us', name: '├â╞Æ├óΓé¼┬░tats-Unis'},
++        'Gervonta Davis': {code: 'US', codeLower: 'us', name: '├â╞Æ├óΓé¼┬░tats-Unis'},
++        'Naoya Inoue': {code: 'JP', codeLower: 'jp', name: 'Japon'},
++        'Joe Joyce': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
++        'Zhilei Zhang': {code: 'CN', codeLower: 'cn', name: 'Chine'},
++        'Jai Opetaia': {code: 'AU', codeLower: 'au', name: 'Australie'},
++        'Lawrence Okolie': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
++        'Badou Jack': {code: 'SE', codeLower: 'se', name: 'Su├â╞Æ├é┬¿de'},
++        'Gilberto Ramirez': {code: 'MX', codeLower: 'mx', name: 'Mexique'},
++        'Dmitry Bivol': {code: 'RU', codeLower: 'ru', name: 'Russie'},
++        'Callum Smith': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
++        'Joshua Buatsi': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
++        'Anthony Yarde': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
++        'Lyndon Arthur': {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'}
++    } %}
++    {% set random_countries = [
++        {code: 'US', codeLower: 'us', name: '├â╞Æ├óΓé¼┬░tats-Unis'},
++        {code: 'GB', codeLower: 'gb', name: 'Royaume-Uni'},
++        {code: 'MX', codeLower: 'mx', name: 'Mexique'},
++        {code: 'PR', codeLower: 'pr', name: 'Porto Rico'}
++    ] %}
++
+     {% for fighter in fighters %}
++        {% set coach_name = known_coaches[fighter.fullName] ?? random_coaches[loop.index0 % random_coaches|length] %}
++        {% set f_country = known_countries[fighter.fullName] ?? random_countries[loop.index0 % random_countries|length] %}
+         {% set total_fights = fighter.wins + fighter.losses + fighter.draws %}
+         {% set win_rate = total_fights > 0 ? (fighter.wins / total_fights * 100)|round : 0 %}
+         {% set standing_percent = max(5, min(100, (fighter.eloRating / 2000 * 100))) %}
+@@ -159,7 +551,13 @@
+                     </div>
+                     <div class="pt-2">
+                         <div class="d-flex align-items-center gap-3 mb-2">
+-                            <h3 class="h4 fw-bold text-white mb-0">{{ fighter.fullName }}</h3>
++                            <h3 class="h4 fw-bold text-white mb-0">
++                                {{ fighter.fullName }}
++                                <span title="{{ f_country.name }}" style="margin-left: 4px; cursor: help; display: inline-flex; align-items: center; gap: 4px;">
++                                    <img src="https://flagcdn.com/24x18/{{ f_country.codeLower }}.png" width="24" height="18" alt="{{ f_country.name }}" style="border-radius: 2px;">
++                                    <span style="font-size: 0.65rem; color: #a1a1aa;">{{ f_country.code }}</span>
++                                </span>
++                            </h3>
+                             <span class="badge-tactician" style="color: #3b82f6; background: rgba(37, 99, 235, 0.1); border-color: rgba(37, 99, 235, 0.3);">
+                                 {{ fighter.calculatedFightingStyle }}
+                             </span>
+@@ -194,13 +592,24 @@
+                     </div>
+                 </div>
+ 
++                <div class="coach-block mb-4 mt-2">
++                    <div class="d-flex align-items-center gap-2">
++                        <div class="coach-text">&#x1F94A; Coach: <span>{{ coach_name }}</span></div>
++                    </div>
++                </div>
++
++
++
+                 <div class="pt-4 border-top border-secondary border-opacity-10 d-flex align-items-center justify-content-between">
+                     <div class="d-flex gap-4 bottom-icon-group">
+                         <span><i class="fa-solid fa-ruler-vertical me-2"></i>{{ fighter.height|default('--') }}cm</span>
+                         <span><i class="fa-solid fa-arrows-left-right me-2"></i>{{ fighter.reach|default('--') }}cm</span>
+                     </div>
+-                    {% if is_granted('ROLE_ADMIN') %}
+-                        <div class="d-flex gap-2">
++                    <div class="d-flex gap-2">
++                        <button type="button" class="bottom-action-btn" title="Voir l'historique" style="color: #e63946; font-size: 1.3rem;" onclick="showQrModal('{{ fighter.fullName|escape('js') }}', '{{ f_country.name|escape('js') }}', '{{ fighter.weightDivision ? fighter.weightDivision.name|escape('js') : 'Unknown' }}', '{{ fighter.wins }}-{{ fighter.losses }}-{{ fighter.draws }}', '{{ coach_name|escape('js') }}', {{ fighter.fighterId }})">
++                            <i class="fa-solid fa-clock"></i>
++                        </button>
++                        {% if is_granted('ROLE_ADMIN') %}
+                             <a href="{{ path('app_fighter_edit', {'id': fighter.fighterId}) }}" class="bottom-action-btn" title="Edit Profile">
+                                 <i class="fa-solid fa-user-pen"></i>
+                             </a>
+@@ -210,12 +619,445 @@
+                                     <i class="fa-solid fa-trash"></i>
+                                 </button>
+                             </form>
+-                        </div>
+-                    {% endif %}
++                        {% endif %}
++                    </div>
+                 </div>
+             </div>
+         </div>
+         {% endfor %}
+     </div>
++
++    <!-- QR Code Modal -->
++    <div class="modal fade" id="qrModal" tabindex="-1" aria-hidden="true">
++        <div class="modal-dialog modal-dialog-centered modal-sm">
++            <div class="modal-content" style="background-color: rgba(30, 30, 46, 0.95); border: 1px solid rgba(230, 57, 70, 0.3); border-radius: 15px;">
++                <div class="modal-body text-center p-4">
++                    <h5 class="text-white mb-3 fw-bold" id="qrModalTitle">QR CODE</h5>
++                    <img id="qrCodeImage" src="" alt="QR Code" style="width: 200px; height: 200px; border-radius: 10px; background: white; padding: 10px; margin-bottom: 10px;">
++                    <p class="text-muted small mb-3">Scannez avec votre t&eacute;l&eacute;phone</p>
++                    <button type="button" class="btn btn-danger w-100 fw-bold" data-bs-dismiss="modal">Fermer</button>
++                </div>
++            </div>
++        </div>
++    </div>
++
++    <!-- Pagination Controls Container -->
++    <div class="pagination-container" id="paginationControls">
++        <!-- Javascript will populate this -->
++    </div>
++
++    <!-- INJURY PREDICTION ANALYST SECTION -->
++    <div class="row justify-content-center mt-5 pt-4 mb-4">
++        <div class="col-12">
++            <div class="injury-analyst-card">
++                <div class="d-flex justify-content-between align-items-start mb-4">
++                    <div>
++                        <h3 class="h4 fw-bold text-white mb-1">
++                            <i class="fa-solid fa-shield-halved me-2" style="color:#e63946;"></i>INJURY PREDICTION ANALYST
++                        </h3>
++                        <p class="text-muted mb-0">Dr. James Wong | PhD Biomechanics</p>
++                    </div>
++                    <span class="badge-recommended">&#11088;&#11088;&#11088;&#11088;&#11088; RECOMMAND&Eacute;</span>
++                </div>
++
++                <div class="risk-section mb-4">
++                    <div class="d-flex justify-content-between mb-2">
++                        <span class="risk-label">RISK LEVEL</span>
++                        <span class="risk-percent text-success">12%</span>
++                    </div>
++                    <div class="risk-bar-bg">
++                        <div class="risk-bar-fill bg-success" style="width: 12%;"></div>
++                    </div>
++                </div>
++
++                <div class="row g-3 mb-4">
++                    <div class="col-6">
++                        <div class="prediction-box">
++                            <div class="pred-label">PREDICTION</div>
++                            <div class="pred-value text-warning">&#x1F4AA; &Eacute;PAULE DROITE</div>
++                        </div>
++                    </div>
++                    <div class="col-6">
++                        <div class="prediction-box">
++                            <div class="pred-label">ALERTE</div>
++                            <div class="pred-value text-danger">18 jours</div>
++                        </div>
++                    </div>
++                </div>
++
++                <div class="recommendation-box mb-4">
++                    <div class="rec-label mb-1">RECOMMANDATION</div>
++                    <div class="rec-text">
++                        <i class="fa-solid fa-circle-check me-2"></i>Repos &eacute;paule + kin&eacute; 2x/jour
++                    </div>
++                </div>
++
++                <div class="metrics-grid mb-4">
++                    <div class="metric-item">
++                        <div class="metric-val">96%</div>
++                        <div class="metric-label">Pr&eacute;cision</div>
++                    </div>
++                    <div class="metric-item">
++                        <div class="metric-val">3</div>
++                        <div class="metric-label">Semaines avance</div>
++                    </div>
++                    <div class="metric-item">
++                        <div class="metric-val">500%</div>
++                        <div class="metric-label">ROI</div>
++                    </div>
++                </div>
++
++                <button class="btn btn-danger w-100 btn-analyst" onclick="showAnalystAlert()">
++                    <i class="fa-solid fa-chart-column me-2"></i>VOIR ANALYSE D&Eacute;TAILL&Eacute;E
++                </button>
++            </div>
++        </div>
++    </div>
++
++
++
++
+ </div>
+ {% endblock %}
++
++{% block javascripts %}
++{{ parent() }}
++
++<!-- jsPDF CDN -->
++<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
++
++<script>
++function generateFighterHistoryText(name, country, category, record, coach, fighterId) {
++    const opponents = [
++        'Anthony Joshua', 'Tyson Fury', 'Oleksandr Usyk', 'Deontay Wilder',
++        'Daniel Dubois', 'Joe Joyce', 'Otto Wallin', 'Filip Hrgovic',
++        'Dillian Whyte', 'Carlos Takam', 'Luis Ortiz', 'Andy Ruiz Jr',
++        'David Price', 'Derek Chisora', 'Joseph Parker', 'Tony Bellew',
++        'Artur Beterbiev', 'Dmitry Bivol', 'Canelo Alvarez', 'Gennadiy Golovkin',
++        'David Benavidez', 'Jermall Charlo', 'Sergiy Derevyanchenko'
++    ];
++    const methods = ['KO round 3', 'KO round 6', 'KO round 8', 'KO round 10', 'TKO round 5', 'TKO round 7', 'D&eacute;cision', 'D&eacute;cision unanime', 'D&eacute;cision partag&eacute;e'];
++    const venues = ['Las Vegas', 'Londres', 'New York', 'Riyad', 'Paris', 'Abu Dhabi'];
++
++    const seed = fighterId * 7;
++    function random(seedOffset) {
++        let x = Math.sin(seed + seedOffset) * 10000;
++        return x - Math.floor(x);
++    }
++    
++    let past = [];
++    for(let i=0; i<3; i++) {
++        let opp = opponents[Math.floor(random(i*10) * opponents.length)];
++        if(opp === name) opp = opponents[(Math.floor(random(i*10)*opponents.length)+1)%opponents.length];
++        let won = random(i*11) > 0.3; // 70% win rate
++        let method = methods[Math.floor(random(i*12) * methods.length)];
++        
++        let daysAgo = Math.floor(random(i*13) * 600) + 30;
++        let date = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
++        let dateStr = date.toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit', year: 'numeric'});
++        
++        past.push({ opp, won, method, dateStr });
++    }
++    
++    let upcoming = [];
++    for(let i=0; i<2; i++) {
++        let opp = opponents[Math.floor(random(i*20 + 50) * opponents.length)];
++        if(opp === name) opp = opponents[(Math.floor(random(i*20+50)*opponents.length)+1)%opponents.length];
++        let venue = venues[Math.floor(random(i*21 + 50) * venues.length)];
++        
++        let daysAhead = Math.floor(random(i*22 + 50) * 300) + 30;
++        let date = new Date(Date.now() + daysAhead * 24 * 60 * 60 * 1000);
++        let dateStr = date.toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit', year: 'numeric'});
++        
++        upcoming.push({ opp, venue, dateStr });
++    }
++
++    // Decode HTML entities for plain text
++    const doc = new DOMParser().parseFromString(category, "text/html");
++    const cleanCategory = doc.documentElement.textContent;
++    
++    const decodeHtml = (html) => {
++        const txt = document.createElement("textarea");
++        txt.innerHTML = html;
++        return txt.value;
++    };
++
++    return `ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
++&#x1F94A; ${name.toUpperCase()} (${country})
++${cleanCategory}
++Record: ${record} | Coach: ${coach}
++ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
++
++&#x1F4DC; DERNIERS MATCHS :
++Γö£ΓöÇ VS ${past[0].opp} (${past[0].dateStr}) \u2192 ${past[0].won ? '&#x2705; VICTOIRE' : '&#x274C; D&Eacute;FAITE'} (${decodeHtml(past[0].method)})
++Γö£ΓöÇ VS ${past[1].opp} (${past[1].dateStr}) \u2192 ${past[1].won ? '&#x2705; VICTOIRE' : '&#x274C; D&Eacute;FAITE'} (${decodeHtml(past[1].method)})
++ΓööΓöÇ VS ${past[2].opp} (${past[2].dateStr}) \u2192 ${past[2].won ? '&#x2705; VICTOIRE' : '&#x274C; D&Eacute;FAITE'} (${decodeHtml(past[2].method)})
++
++&#x1F4C5; PROCHAINS MATCHS :
++Γö£ΓöÇ VS ${upcoming[0].opp} (${upcoming[0].dateStr}) - &#x1F4CD; ${upcoming[0].venue}
++ΓööΓöÇ VS ${upcoming[1].opp} (${upcoming[1].dateStr}) - &#x1F4CD; ${upcoming[1].venue}
++
++ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü`;
++}
++
++function showQrModal(name, country, category, record, coach, fighterId) {
++    document.getElementById('qrModalTitle').textContent = `QR CODE - ${name}`;
++    
++    const rawText = generateFighterHistoryText(name, country, category, record, coach, fighterId);
++    // Properly decode emojis/entities so they are sent as actual characters to the QR generator
++    const decodedText = new DOMParser().parseFromString(rawText, "text/html").documentElement.textContent;
++    const encodedText = encodeURIComponent(decodedText);
++    
++    const qrImage = document.getElementById('qrCodeImage');
++    qrImage.src = `https://quickchart.io/qr?text=${encodedText}&size=300`;
++    
++    const modal = new bootstrap.Modal(document.getElementById('qrModal'));
++    modal.show();
++}
++
++function showAnalystAlert() {
++    const firstFighterEl = document.querySelector('.fighter-card-col:not([style*="display: none"]) .h4.text-white');
++    let fighterName = 'Agit Kabayel';
++    if (firstFighterEl) {
++        fighterName = firstFighterEl.childNodes[0].textContent.trim();
++    }
++    generateMedicalReport(fighterName);
++}
++
++function generateMedicalReport(fighterName) {
++    const { jsPDF } = window.jspdf;
++    const doc = new jsPDF();
++
++    // Header
++    doc.setFillColor(230, 57, 70);
++    doc.rect(0, 0, 210, 25, 'F');
++    doc.setTextColor(255, 255, 255);
++    doc.setFont("helvetica", "bold");
++    doc.setFontSize(22);
++    doc.text("SMARTFIGHT MEDICAL REPORT", 105, 17, { align: "center" });
++
++    // Meta info
++    doc.setTextColor(0, 0, 0);
++    doc.setFontSize(10);
++    doc.setFont("helvetica", "normal");
++    const today = new Date();
++    const dateStr = today.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
++    doc.text(`Patient : ${fighterName}`, 20, 40);
++    doc.text(`Date du rapport : ${dateStr}`, 20, 47);
++    doc.text(`Medecin responsable : Dr. James Wong, PhD Biomechanics`, 20, 54);
++    doc.setDrawColor(200, 200, 200);
++    doc.line(20, 60, 190, 60);
++
++    // Section 1: Diagnostic
++    doc.setFont("helvetica", "bold");
++    doc.setFontSize(14);
++    doc.setTextColor(230, 57, 70);
++    doc.text("1. DIAGNOSTIC MEDICAL DETAILLE", 20, 75);
++    doc.setFontSize(11);
++    doc.setTextColor(50, 50, 50);
++    doc.setFont("helvetica", "normal");
++    doc.text("- Diagnostic principal : Tendinopathie de la coiffe des rotateurs - Epaule droite", 25, 85);
++    doc.text("- Niveau de gravite : Modere (Grade 2 sur 4)", 25, 92);
++    doc.text("- Risque d'aggravation : 12% si repos immediat, 68% si combat maintenu", 25, 99);
++    doc.text("- Delai estime avant blessure grave : 18 jours", 25, 106);
++
++    // Section 2: Symptomes
++    doc.setFont("helvetica", "bold");
++    doc.setFontSize(14);
++    doc.setTextColor(230, 57, 70);
++    doc.text("2. SYMPTOMES DETECTES", 20, 120);
++    doc.setFontSize(11);
++    doc.setTextColor(50, 50, 50);
++    doc.setFont("helvetica", "normal");
++    doc.text("- Fatigue musculaire : 68% (au-dessus du seuil)", 25, 130);
++    doc.text("- Amplitude reduite : -22% compare a la baseline", 25, 137);
++    doc.text("- Douleur a la pression : Presente au niveau du sus-epineux", 25, 144);
++    doc.text("- Inflammation IRM virtuelle : Confirmation d'une tendinopathie debutante", 25, 151);
++
++    // Section 3: Recommandations
++    doc.setFont("helvetica", "bold");
++    doc.setFontSize(14);
++    doc.setTextColor(34, 197, 94);
++    doc.text("3. RECOMMANDATIONS MEDICALES", 20, 165);
++    doc.setFontSize(11);
++    doc.setTextColor(50, 50, 50);
++    doc.setFont("helvetica", "normal");
++    doc.text("- Repos complet : 5 jours minimum", 25, 175);
++    doc.text("- Kinesitherapie : 2 seances par jour pendant 14 jours", 25, 182);
++    doc.text("- Anti-inflammatoires : Prescription Ibuprofene 600mg x 3/jour", 25, 189);
++    doc.text("- Electrostimulation : 1 seance par jour", 25, 196);
++    doc.text("- Retour progressif : J6 a 30%, J10 a 60%, J14 a 100% si indolore", 25, 203);
++
++    // Section 4: Analyse predictive
++    doc.setFont("helvetica", "bold");
++    doc.setFontSize(14);
++    doc.setTextColor(37, 99, 235);
++    doc.text("4. ANALYSE PREDICTIVE (BIOMECANIQUE AI)", 20, 217);
++    doc.setFontSize(11);
++    doc.setTextColor(50, 50, 50);
++    doc.setFont("helvetica", "normal");
++    doc.text("- Si recommandations suivies : 96% de chance d'eviter la blessure grave", 25, 227);
++    doc.text("- Si combat maintenu : 73% de chance de rupture tendineuse", 25, 234);
++    doc.text("- Perte financiere estimee : 2.4M$ si blessure confirmee", 25, 241);
++
++    // Footer
++    doc.setDrawColor(230, 57, 70);
++    doc.setLineWidth(1.5);
++    doc.line(20, 275, 190, 275);
++    doc.setFontSize(9);
++    doc.setFont("helvetica", "bold");
++    doc.setTextColor(150, 150, 150);
++    doc.text("CONFIDENTIEL - USAGE INTERNE SMARTFIGHT UNIQUEMENT", 105, 282, { align: "center" });
++
++    // Save
++    const safeName = fighterName.replace(/\s+/g, '_');
++    const fileName = `Analyse_medicale_${safeName}_${dateStr.replace(/\//g, '_')}.pdf`;
++    doc.save(fileName);
++}
++</script>
++
++<script>
++document.addEventListener("DOMContentLoaded", function() {
++
++    const itemsPerPage = 6;
++    const grid = document.querySelector('.fighter-grid');
++    const allItems = Array.from(grid.querySelectorAll('.fighter-card-col'));
++    const paginationContainer = document.getElementById('paginationControls');
++    let currentPage = 1;
++    let filteredItems = allItems;
++
++    function renderPage(page) {
++        const totalPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
++        if (page < 1) page = 1;
++        if (page > totalPages) page = totalPages;
++        currentPage = page;
++        allItems.forEach(item => { item.style.display = 'none'; });
++        const start = (page - 1) * itemsPerPage;
++        const end = start + itemsPerPage;
++        filteredItems.slice(start, end).forEach(item => { item.style.display = ''; });
++        renderControls(totalPages);
++    }
++
++    function renderControls(totalPages) {
++        paginationContainer.innerHTML = '';
++        if (totalPages <= 1) { paginationContainer.style.display = 'none'; return; }
++        else { paginationContainer.style.display = 'flex'; }
++
++        const prevBtn = document.createElement('button');
++        prevBtn.className = 'page-btn';
++        prevBtn.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
++        prevBtn.disabled = currentPage === 1;
++        prevBtn.addEventListener('click', () => renderPage(currentPage - 1));
++        paginationContainer.appendChild(prevBtn);
++
++        for (let i = 1; i <= totalPages; i++) {
++            const pageBtn = document.createElement('button');
++            pageBtn.className = 'page-btn ' + (i === currentPage ? 'active' : '');
++            pageBtn.textContent = i;
++            pageBtn.addEventListener('click', () => renderPage(i));
++            paginationContainer.appendChild(pageBtn);
++        }
++
++        const nextBtn = document.createElement('button');
++        nextBtn.className = 'page-btn';
++        nextBtn.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
++        nextBtn.disabled = currentPage === totalPages;
++        nextBtn.addEventListener('click', () => renderPage(currentPage + 1));
++        paginationContainer.appendChild(nextBtn);
++
++        const pageInfo = document.createElement('div');
++        pageInfo.className = 'page-info';
++        pageInfo.textContent = `Page ${currentPage} sur ${totalPages}`;
++        paginationContainer.appendChild(pageInfo);
++    }
++
++    const filterCountry  = document.getElementById('filterCountry');
++    const filterCategory = document.getElementById('filterCategory');
++    const filterStyle    = document.getElementById('filterStyle');
++    const filterWinRate  = document.getElementById('filterWinRate');
++    const filterElo      = document.getElementById('filterElo');
++    const winRateValue   = document.getElementById('winRateValue');
++    const resetBtn       = document.getElementById('resetFilters');
++    const searchInput    = document.getElementById('mainSearch');
++
++    const countries = new Set();
++    const categories = new Set();
++    const styles = new Set();
++
++    allItems.forEach(item => {
++        const country  = item.querySelector('h3 span')?.getAttribute('title');
++        const category = item.querySelector('.text-muted.small.fw-medium')?.textContent.replace(' Division', '').trim();
++        const style    = item.querySelector('.badge-tactician')?.textContent.trim();
++        if (country)  countries.add(country);
++        if (category) categories.add(category);
++        if (style)    styles.add(style);
++    });
++
++    [...countries].sort().forEach(c  => filterCountry.innerHTML  += `<option value="${c}">${c}</option>`);
++    [...categories].sort().forEach(c => filterCategory.innerHTML += `<option value="${c}">${c}</option>`);
++    [...styles].sort().forEach(s    => filterStyle.innerHTML    += `<option value="${s}">${s}</option>`);
++
++    function applyFilters() {
++        const countryVal  = filterCountry.value;
++        const categoryVal = filterCategory.value;
++        const styleVal    = filterStyle.value;
++        const winRateVal  = parseInt(filterWinRate.value);
++        const eloVal      = parseInt(filterElo.value) || 0;
++        const searchTerm  = searchInput ? searchInput.value.toLowerCase() : '';
++
++        filteredItems = allItems.filter(item => {
++            const itemCountry  = item.querySelector('h3 span')?.getAttribute('title');
++            const itemCategory = item.querySelector('.text-muted.small.fw-medium')?.textContent.replace(' Division', '').trim();
++            const itemStyle    = item.querySelector('.badge-tactician')?.textContent.trim();
++            const itemWinRate  = parseInt(item.querySelectorAll('.stat-value')[0].textContent);
++            const itemElo      = parseInt(item.querySelectorAll('.stat-value')[1].textContent);
++            const itemText     = item.textContent.toLowerCase();
++
++            return (!countryVal  || itemCountry  === countryVal)
++                && (!categoryVal || itemCategory === categoryVal)
++                && (!styleVal    || itemStyle    === styleVal)
++                && itemWinRate  >= winRateVal
++                && itemElo      >= eloVal
++                && (!searchTerm || itemText.includes(searchTerm));
++        });
++
++        const noResultsMsg = document.getElementById('noResultsMsg');
++        if (filteredItems.length === 0) {
++            if (!noResultsMsg) {
++                const msg = document.createElement('div');
++                msg.id = 'noResultsMsg';
++                msg.className = 'no-results';
++                msg.innerHTML = '<i class="fa-solid fa-face-frown fa-3x mb-3 d-block"></i>Aucun boxeur ne correspond aux filtres';
++                grid.appendChild(msg);
++            }
++        } else if (noResultsMsg) {
++            noResultsMsg.remove();
++        }
++        renderPage(1);
++    }
++
++    [filterCountry, filterCategory, filterStyle, filterWinRate, filterElo].forEach(el => {
++        el.addEventListener('change', applyFilters);
++        el.addEventListener('input', () => {
++            if (el.id === 'filterWinRate') winRateValue.textContent = el.value;
++            if (el.type === 'number' || el.type === 'range') applyFilters();
++        });
++    });
++
++    if (searchInput) searchInput.addEventListener('keyup', applyFilters);
++
++    resetBtn.addEventListener('click', () => {
++        filterCountry.value  = '';
++        filterCategory.value = '';
++        filterStyle.value    = '';
++        filterWinRate.value  = 0;
++        winRateValue.textContent = 0;
++        filterElo.value      = '';
++        if (searchInput) searchInput.value = '';
++        applyFilters();
++    });
++
++    renderPage(1);
++});
++</script>
++{% endblock %}
