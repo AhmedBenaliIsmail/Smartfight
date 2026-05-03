@@ -17,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/events')]
 class EventController extends AbstractController
@@ -104,22 +105,42 @@ class EventController extends AbstractController
     }
 
     #[Route('/new', name: 'app_event_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    public function new(Request $request, EntityManagerInterface $em, ValidatorInterface $validator): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $e = new Event();
+        $errors = [];
+
         if ($request->isMethod('POST')) {
-            $e = new Event();
             $e->setEventName(trim($request->request->get('eventName', '')));
-            $e->setEventDate(new \DateTime($request->request->get('eventDate', 'now')));
+            
+            $dateStr = $request->request->get('eventDate');
+            if ($dateStr) {
+                try {
+                    $e->setEventDate(new \DateTime($dateStr));
+                } catch (\Exception $ex) {}
+            }
+
             $e->setVenue(trim($request->request->get('venue', '')));
             $e->setCity(trim($request->request->get('city', '')));
             $e->setOrganization(trim($request->request->get('organization', 'INDEPENDENT')));
-            $em->persist($e);
-            $em->flush();
-            $this->addFlash('success', 'Boxing event card created.');
-            return $this->redirectToRoute('app_events');
+
+            $violations = $validator->validate($e);
+            if (count($violations) > 0) {
+                foreach ($violations as $v) {
+                    $errors[$v->getPropertyPath()] = $v->getMessage();
+                }
+            } else {
+                $em->persist($e);
+                $em->flush();
+                $this->addFlash('success', 'Boxing event card created.');
+                return $this->redirectToRoute('app_events');
+            }
         }
-        return $this->render('event/form.html.twig', ['event' => null]);
+        return $this->render('event/form.html.twig', [
+            'event' => $e,
+            'errors' => $errors
+        ]);
     }
 
     #[Route('/champions-event/new', name: 'app_event_champions_new', methods: ['GET', 'POST'])]
@@ -176,22 +197,45 @@ class EventController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_event_edit', methods: ['GET', 'POST'])]
-    public function edit(int $id, Request $request, EventRepository $repo, EntityManagerInterface $em): Response
+    public function edit(int $id, Request $request, EventRepository $repo, EntityManagerInterface $em, ValidatorInterface $validator): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $e = $repo->find($id);
         if (!$e) throw $this->createNotFoundException();
+        
+        $errors = [];
+
         if ($request->isMethod('POST')) {
             $e->setEventName(trim($request->request->get('eventName', '')));
-            $e->setEventDate(new \DateTime($request->request->get('eventDate', 'now')));
+            
+            $dateStr = $request->request->get('eventDate');
+            if ($dateStr) {
+                try {
+                    $e->setEventDate(new \DateTime($dateStr));
+                } catch (\Exception $ex) {}
+            } else {
+                $e->setEventDate(null);
+            }
+
             $e->setVenue(trim($request->request->get('venue', '')));
             $e->setCity(trim($request->request->get('city', '')));
             $e->setOrganization(trim($request->request->get('organization', 'INDEPENDENT')));
-            $em->flush();
-            $this->addFlash('success', 'Event updated.');
-            return $this->redirectToRoute('app_events');
+
+            $violations = $validator->validate($e);
+            if (count($violations) > 0) {
+                foreach ($violations as $v) {
+                    $errors[$v->getPropertyPath()] = $v->getMessage();
+                }
+            } else {
+                $em->flush();
+                $this->addFlash('success', 'Event updated.');
+                return $this->redirectToRoute('app_events');
+            }
         }
-        return $this->render('event/form.html.twig', ['event' => $e]);
+        return $this->render('event/form.html.twig', [
+            'event' => $e,
+            'errors' => $errors
+        ]);
     }
 
     #[Route('/{id}/delete', name: 'app_event_delete', methods: ['POST'])]

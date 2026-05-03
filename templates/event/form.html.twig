@@ -11,16 +11,18 @@
 {% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-4">
-    <div>
-        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">{{ event ? 'Edit' : 'Create' }} Boxing Event</h1>
-        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Set up card details and sanctioning body</p>
+<div class="row mb-4">
+    <div class="col-lg-8 mx-auto d-flex align-items-center justify-content-between">
+        <div>
+            <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">{{ event ? 'Edit' : 'Create' }} Boxing Event</h1>
+            <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Set up card details and sanctioning body</p>
+        </div>
+        <a href="{{ path('app_events') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
     </div>
-    <a href="{{ path('app_events') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
 </div>
 
-<form method="post">
-    <div class="row g-4">
+<form method="post" novalidate>
+    <div class="row g-4 justify-content-center">
         <div class="col-lg-8">
             <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
                 <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
@@ -30,13 +32,19 @@
                     <div class="row g-3">
                         <div class="col-md-12">
                             <label class="form-label">Event Name <span style="color:#dc2626;">*</span></label>
-                            <input type="text" name="eventName" class="form-control" placeholder="e.g. Fury vs Usyk: Ring of Fire" value="{{ event ? event.eventName : '' }}" required />
+                            <input type="text" name="eventName" class="form-control {{ errors.eventName is defined ? 'is-invalid' : '' }}" placeholder="e.g. Fury vs Usyk: Ring of Fire" value="{{ event ? event.eventName : '' }}" required />
+                            {% if errors.eventName is defined %}
+                                <div class="invalid-feedback" style="color: #dc2626; font-size: 0.875rem; margin-top: 0.25rem;">{{ errors.eventName }}</div>
+                            {% endif %}
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Event Date <span style="color:#dc2626;">*</span></label>
-                            <div class="input-group">
+                            <div class="input-group has-validation">
                                 <span class="input-group-text bg-dark border-secondary text-muted"><i class="fa-solid fa-calendar-days"></i></span>
-                                <input type="text" id="eventDatePicker" name="eventDate" class="form-control" value="{{ event and event.eventDate ? event.eventDate|date('Y-m-d') : '' }}" placeholder="Select Date..." required />
+                                <input type="text" id="eventDatePicker" name="eventDate" class="form-control {{ errors.eventDate is defined ? 'is-invalid' : '' }}" value="{{ event and event.eventDate ? event.eventDate|date('Y-m-d') : '' }}" placeholder="Select Date..." required />
+                                {% if errors.eventDate is defined %}
+                                    <div class="invalid-feedback" style="color: #dc2626; font-size: 0.875rem; margin-top: 0.25rem;">{{ errors.eventDate }}</div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -52,7 +60,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">City <span style="color:#dc2626;">*</span></label>
-                            <select id="city-selector" name="city" class="form-select" required>
+                            <select id="city-selector" name="city" class="form-select {{ errors.city is defined ? 'is-invalid' : '' }}" required>
                                 <option value="">Select City...</option>
                                 <option value="Anaheim, USA" {{ event and event.city == 'Anaheim, USA' ? 'selected' : '' }}>Anaheim, USA</option>
                                 <option value="Antalya, Turkey" {{ event and event.city == 'Antalya, Turkey' ? 'selected' : '' }}>Antalya, Turkey</option>
@@ -87,15 +95,21 @@
                                 <option value="Tokyo, Japan" {{ event and event.city == 'Tokyo, Japan' ? 'selected' : '' }}>Tokyo, Japan</option>
                                 <option value="Tashkent, Uzbekistan" {{ event and event.city == 'Tashkent, Uzbekistan' ? 'selected' : '' }}>Tashkent, Uzbekistan</option>
                             </select>
+                            {% if errors.city is defined %}
+                                <div class="invalid-feedback" style="color: #dc2626; font-size: 0.875rem; margin-top: 0.25rem;">{{ errors.city }}</div>
+                            {% endif %}
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Venue <span style="color:#dc2626;">*</span></label>
-                            <select id="venue-selector" name="venue" class="form-select" required>
+                            <select id="venue-selector" name="venue" class="form-select {{ errors.venue is defined ? 'is-invalid' : '' }}" required>
                                 <option value="">Select Venue...</option>
                                 {% if event and event.venue %}
                                     <option value="{{ event.venue }}" selected>{{ event.venue }}</option>
                                 {% endif %}
                             </select>
+                            {% if errors.venue is defined %}
+                                <div class="invalid-feedback" style="color: #dc2626; font-size: 0.875rem; margin-top: 0.25rem;">{{ errors.venue }}</div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

@@ -9,16 +9,18 @@
 {% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-4">
-    <div>
-        <h1 class="h3 mb-1 fw-bold" style="color:#fbbf24;"><i class="fa-solid fa-crown me-2"></i>Create World Title Card</h1>
-        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Automatically schedule #1 vs #2 contenders for Sanctioned Titles</p>
+<div class="row mb-4">
+    <div class="col-lg-8 mx-auto d-flex align-items-center justify-content-between">
+        <div>
+            <h1 class="h3 mb-1 fw-bold" style="color:#fbbf24;"><i class="fa-solid fa-crown me-2"></i>Create World Title Card</h1>
+            <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Automatically schedule #1 vs #2 contenders for Sanctioned Titles</p>
+        </div>
+        <a href="{{ path('app_events') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
     </div>
-    <a href="{{ path('app_events') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
 </div>
 
 <form method="post">
-    <div class="row g-4">
+    <div class="row g-4 justify-content-center">
         <div class="col-lg-8">
             <div class="card mb-4" style="background:#18181b;border:1px solid #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.1);">
                 <div class="card-header" style="background:#18181b;border-bottom:1px solid #3f3f46;">

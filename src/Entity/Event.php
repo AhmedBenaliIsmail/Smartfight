@@ -19,6 +19,7 @@ class Event
     private ?string $eventName = null;
 
     #[ORM\Column(name: 'eventDate', type: 'date', nullable: true)]
+    #[Assert\NotBlank(message: 'Event date is required')]
     private ?\DateTimeInterface $eventDate = null;
 
     #[ORM\Column(length: 20, options: ['default' => 'INDEPENDENT'])]
@@ -35,7 +36,7 @@ class Event
     private ?string $city = null;
 
     #[ORM\Column(length: 2, nullable: true)]
-    #[Assert\Country(message: 'Invalid country code')]
+    // #[Assert\Country(message: 'Invalid country code')]
     private ?string $country = null;
 
     #[ORM\Column(name: 'seat_capacity', type: 'integer', nullable: true)]
