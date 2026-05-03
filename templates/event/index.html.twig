@@ -106,6 +106,31 @@
             background: #27272a;
             color: #fff;
         }
+        /* Custom Pagination Styles */
+        .modern-pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 3rem;
+        }
+        .modern-pagination .page-item .page-link {
+            background: #18181b;
+            border: 1px solid #27272a;
+            color: #a1a1aa;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .modern-pagination .page-item.active .page-link {
+            background: #dc2626;
+            border-color: #dc2626;
+            color: #fff;
+        }
+        .modern-pagination .page-item:not(.active) .page-link:hover {
+            background: #27272a;
+            color: #fff;
+        }
     </style>
 {% endblock %}
 
@@ -116,23 +141,57 @@
             <h1 class="h2 fw-bold text-white mb-1" style="font-family: 'Oswald', sans-serif; letter-spacing: 1px;">EVENT MANAGEMENT</h1>
             <p class="text-muted mb-0">Directing professional boxing spectacles and world title events</p>
         </div>
-        <div class="d-flex gap-3 align-items-center">
-            <div class="input-icon" style="width: 250px;">
-                <span class="input-icon-addon">
-                    <i class="fa-solid fa-search"></i>
-                </span>
-                <input type="text" class="form-control" style="background:#18181b; border:1px solid #27272a; color:#fafafa;" placeholder="Search events..." data-live-search=".event-grid" data-live-search-item=".event-card-col">
+        <form method="GET" action="{{ path('app_events') }}" class="d-flex flex-wrap gap-3 align-items-center mt-3 p-3 rounded w-100" style="background: rgba(24,24,27,0.5); border: 1px solid #27272a;">
+            <div class="position-relative flex-grow-1" style="min-width: 250px;">
+                <div class="input-icon">
+                    <span class="input-icon-addon">
+                        <i class="fa-solid fa-search"></i>
+                    </span>
+                    <input type="text" name="q" id="search-input" value="{{ current_q|default('') }}" class="form-control" style="background:#18181b; border:1px solid #27272a; color:#fafafa;" placeholder="Search events..." autocomplete="off">
+                </div>
+                <ul id="search-suggestions" class="list-group position-absolute w-100 mt-1 d-none" style="z-index: 1000; background: #18181b; border: 1px solid #27272a; border-radius: 8px; max-height: 250px; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5);"></ul>
             </div>
+            
+            <select name="organization" class="form-select" style="width: auto; background:#18181b; border:1px solid #27272a; color:#fafafa;">
+                <option value="">All Organizations</option>
+                <option value="WBC" {% if current_org|default('') == 'WBC' %}selected{% endif %}>WBC</option>
+                <option value="WBA" {% if current_org|default('') == 'WBA' %}selected{% endif %}>WBA</option>
+                <option value="IBF" {% if current_org|default('') == 'IBF' %}selected{% endif %}>IBF</option>
+                <option value="WBO" {% if current_org|default('') == 'WBO' %}selected{% endif %}>WBO</option>
+                <option value="INDEPENDENT" {% if current_org|default('') == 'INDEPENDENT' %}selected{% endif %}>INDEPENDENT</option>
+            </select>
+
+            <select name="status" class="form-select" style="width: auto; background:#18181b; border:1px solid #27272a; color:#fafafa;">
+                <option value="">All Statuses</option>
+                <option value="SCHEDULED" {% if current_status|default('') == 'SCHEDULED' %}selected{% endif %}>SCHEDULED</option>
+                <option value="LIVE" {% if current_status|default('') == 'LIVE' %}selected{% endif %}>LIVE</option>
+                <option value="COMPLETED" {% if current_status|default('') == 'COMPLETED' %}selected{% endif %}>COMPLETED</option>
+                <option value="CANCELLED" {% if current_status|default('') == 'CANCELLED' %}selected{% endif %}>CANCELLED</option>
+            </select>
+
+            <select name="sortBy" class="form-select" style="width: auto; background:#18181b; border:1px solid #27272a; color:#fafafa;">
+                <option value="date_desc" {% if current_sortBy|default('date_desc') == 'date_desc' %}selected{% endif %}>Date (Newest)</option>
+                <option value="date_asc" {% if current_sortBy|default('') == 'date_asc' %}selected{% endif %}>Date (Oldest)</option>
+                <option value="capacity_desc" {% if current_sortBy|default('') == 'capacity_desc' %}selected{% endif %}>Capacity (Largest)</option>
+                <option value="capacity_asc" {% if current_sortBy|default('') == 'capacity_asc' %}selected{% endif %}>Capacity (Smallest)</option>
+            </select>
+
+            <button type="submit" class="btn btn-outline-danger fw-bold"><i class="fa-solid fa-filter me-2"></i>Apply</button>
+            <a href="{{ path('app_events') }}" class="btn btn-link text-muted text-decoration-none">Reset</a>
+            
+            <a href="{{ path('app_event_calendar') }}" class="btn btn-outline-secondary fw-bold ms-auto text-white">
+                <i class="fa-solid fa-calendar me-2"></i>CALENDAR
+            </a>
             {% if is_granted('ROLE_ADMIN') %}
-            <a href="{{ path('app_event_new') }}" class="btn btn-danger px-4 fw-bold">
+            <a href="{{ path('app_event_new') }}" class="btn btn-danger px-4 fw-bold {% if not is_granted('ROLE_ADMIN') %}ms-auto{% endif %}">
                 <i class="fa-solid fa-plus me-2"></i>CREATE EVENT
             </a>
             {% endif %}
-        </div>
+        </form>
     </div>
 
     <div class="row g-4 event-grid">
-        {% for event in events %}
+        {% for event in pagination %}
             {% set fight_count = fightCounts[event.eventId]|default(0) %}
             <div class="col-lg-4 col-md-6 event-card-col">
                 <div class="event-card-ultra">
@@ -187,6 +246,16 @@
                                 </ul>
                             </div>
                         {% endif %}
+                        {# Google Calendar Link - Works for everyone #}
+                        {% if event.eventDate %}
+                            {% set gcal_title = event.eventName|url_encode %}
+                            {% set gcal_date = event.eventDate|date('Ymd') %}
+                            {% set gcal_location = ((event.venue|default('')) ~ ' ' ~ (event.city|default('')))|url_encode %}
+                            {% set gcal_details = ('Organization: ' ~ event.organization)|url_encode %}
+                            <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text={{ gcal_title }}&dates={{ gcal_date }}/{{ gcal_date }}&location={{ gcal_location }}&details={{ gcal_details }}" target="_blank" title="Add to Google Calendar" class="action-dot" style="color: #4285f4; border-color: rgba(66,133,244,0.3);">
+                                <i class="fa-brands fa-google"></i>
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -198,5 +267,66 @@
             </div>
         {% endfor %}
     </div>
+
+    <div class="modern-pagination">
+        {{ knp_pagination_render(pagination) }}
+    </div>
 </div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search-input');
+        const suggestionsBox = document.getElementById('search-suggestions');
+        let timeout = null;
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(timeout);
+                const query = this.value.trim();
+                
+                if (query.length < 2) {
+                    suggestionsBox.classList.add('d-none');
+                    return;
+                }
+
+                timeout = setTimeout(() => {
+                    fetch(`{{ path('app_event_search_suggestions') }}?q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            suggestionsBox.innerHTML = '';
+                            if (data.length > 0) {
+                                data.forEach(item => {
+                                    const li = document.createElement('li');
+                                    li.className = 'list-group-item list-group-item-action text-white';
+                                    li.style.background = '#18181b';
+                                    li.style.borderBottom = '1px solid #27272a';
+                                    li.style.cursor = 'pointer';
+                                    li.textContent = item.name;
+                                    li.addEventListener('mouseenter', () => { li.style.background = '#27272a'; });
+                                    li.addEventListener('mouseleave', () => { li.style.background = '#18181b'; });
+                                    li.addEventListener('click', () => {
+                                        searchInput.value = item.name;
+                                        suggestionsBox.classList.add('d-none');
+                                        searchInput.closest('form').submit();
+                                    });
+                                    suggestionsBox.appendChild(li);
+                                });
+                                suggestionsBox.classList.remove('d-none');
+                            } else {
+                                suggestionsBox.classList.add('d-none');
+                            }
+                        });
+                }, 300);
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                    suggestionsBox.classList.add('d-none');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
 {% endblock %}

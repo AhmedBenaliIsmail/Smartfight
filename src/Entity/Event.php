@@ -56,6 +56,12 @@ class Event
     #[ORM\Column(name: 'is_champions_event', type: 'boolean', options: ['default' => false])]
     private bool $isChampionsEvent = false;
 
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $latitude = null;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $longitude = null;
+
     public function getEventId(): ?int { return $this->eventId; }
     public function getEventName(): ?string { return $this->eventName; }
     public function setEventName(string $v): self { $this->eventName = $v; return $this; }
@@ -88,6 +94,12 @@ class Event
 
     public function getIsChampionsEvent(): bool { return $this->isChampionsEvent; }
     public function setIsChampionsEvent(bool $v): self { $this->isChampionsEvent = $v; return $this; }
+
+    public function getLatitude(): ?float { return $this->latitude; }
+    public function setLatitude(?float $v): self { $this->latitude = $v; return $this; }
+
+    public function getLongitude(): ?float { return $this->longitude; }
+    public function setLongitude(?float $v): self { $this->longitude = $v; return $this; }
 
     public function getId(): ?int { return $this->eventId; }
     public function getCapacity(): ?int { return $this->seatCapacity; }

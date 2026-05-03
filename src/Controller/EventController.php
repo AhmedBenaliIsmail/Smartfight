@@ -15,35 +15,132 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Knp\Component\Pager\PaginatorInterface;
 
 #[Route('/events')]
 class EventController extends AbstractController
 {
-    #[Route('', name: 'app_events')]
-    public function index(EventRepository $eventRepo, FightResultRepository $resultRepo): Response
+    #[Route('/search-suggestions', name: 'app_event_search_suggestions', methods: ['GET'])]
+    public function searchSuggestions(Request $request, EventRepository $repo): Response
     {
-        $events = $eventRepo->findAllOrderedByDate();
+        $q = $request->query->get('q', '');
+        if (empty($q)) {
+            return $this->json([]);
+        }
+
+        $qb = $repo->createQueryBuilder('e')
+            ->where('e.eventName LIKE :query')
+            ->setParameter('query', '%' . $q . '%')
+            ->setMaxResults(10);
+            
+        $events = $qb->getQuery()->getResult();
+        $results = [];
+        foreach ($events as $event) {
+            $results[] = [
+                'id' => $event->getEventId(),
+                'name' => $event->getEventName()
+            ];
+        }
+
+        return $this->json($results);
+    }
+
+    #[Route('/calendar', name: 'app_event_calendar', methods: ['GET'])]
+    public function calendar(): Response
+    {
+        return $this->render('event/calendar.html.twig', [
+            'title' => 'Event Calendar'
+        ]);
+    }
+
+    #[Route('/api/calendar-events', name: 'app_event_api_calendar', methods: ['GET'])]
+    public function calendarEvents(EventRepository $repo): Response
+    {
+        $events = $repo->findAll();
+        $data = [];
+
+        foreach ($events as $event) {
+            if ($event->getEventDate()) {
+                $status = $event->getStatus();
+                $bgColor = match($status) {
+                    'COMPLETED' => '#22c55e',
+                    'LIVE'      => '#eab308',
+                    'CANCELLED' => '#6b7280',
+                    default     => '#dc2626',
+                };
+                $data[] = [
+                    'id'              => $event->getEventId(),
+                    'title'           => $event->getEventName(),
+                    'start'           => $event->getEventDate()->format('Y-m-d'),
+                    'url'             => $this->generateUrl('app_event_fights', ['id' => $event->getEventId()]),
+                    'backgroundColor' => $bgColor,
+                    'borderColor'     => '#09090b',
+                    'textColor'       => '#ffffff',
+                    'extendedProps'   => [
+                        'venue'        => $event->getVenue(),
+                        'city'         => $event->getCity(),
+                        'organization' => $event->getOrganization(),
+                        'status'       => $status,
+                        'gcalDate'     => $event->getEventDate()->format('Ymd'),
+                    ]
+                ];
+            }
+        }
+
+        return $this->json($data);
+    }
+
+    #[Route('', name: 'app_events')]
+    public function index(EventRepository $eventRepo, FightResultRepository $resultRepo, PaginatorInterface $paginator, Request $request): Response
+    {
+        $q = $request->query->get('q');
+        $org = $request->query->get('organization');
+        $status = $request->query->get('status');
+        $sortBy = $request->query->get('sortBy');
+
+        $queryBuilder = $eventRepo->findFilteredAndSortedEvents($q, $org, $status, $sortBy);
+        
+        $pagination = $paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            5 // limit per page
+        );
+
         $fightCounts = [];
-        foreach ($events as $e) {
+        foreach ($pagination->getItems() as $e) {
             $fightCounts[$e->getEventId()] = $resultRepo->countByEvent($e->getEventId());
         }
         return $this->render('event/index.html.twig', [
-            'events' => $events,
+            'pagination' => $pagination,
             'fightCounts' => $fightCounts,
-            'title' => 'Events'
+            'title' => 'Events',
+            'current_q' => $q,
+            'current_org' => $org,
+            'current_status' => $status,
+            'current_sortBy' => $sortBy,
         ]);
     }
 
     #[Route('/champions', name: 'app_events_champions')]
-    public function championsIndex(EventRepository $eventRepo, FightResultRepository $resultRepo): Response
+    public function championsIndex(EventRepository $eventRepo, FightResultRepository $resultRepo, PaginatorInterface $paginator, Request $request): Response
     {
-        $events = $eventRepo->findChampionsEvents();
+        $queryBuilder = $eventRepo->createQueryBuilder('e')
+            ->where('e.isChampionsEvent = :isChamp')
+            ->setParameter('isChamp', true)
+            ->orderBy('e.eventDate', 'DESC');
+            
+        $pagination = $paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            5 // limit per page
+        );
+
         $fightCounts = [];
-        foreach ($events as $e) {
+        foreach ($pagination->getItems() as $e) {
             $fightCounts[$e->getEventId()] = $resultRepo->countByEvent($e->getEventId());
         }
         return $this->render('event/index.html.twig', [
-            'events' => $events,
+            'pagination' => $pagination,
             'fightCounts' => $fightCounts,
             'title' => 'Major Sanctioned Events',
             'isChampionsOnly' => true
@@ -148,6 +245,35 @@ class EventController extends AbstractController
         $e = $repo->find($id);
         if ($e) { $em->remove($e); $em->flush(); $this->addFlash('success', 'Event deleted.'); }
         return $this->redirectToRoute('app_events');
+    }
+
+    #[Route('/{id}/flyer', name: 'app_event_flyer', methods: ['GET'])]
+    public function generateFlyer(int $id, EventRepository $repo): Response
+    {
+        $event = $repo->find($id);
+        if (!$event) throw $this->createNotFoundException();
+
+        $html = $this->renderView('event/flyer.html.twig', [
+            'event' => $event
+        ]);
+
+        $options = new \Dompdf\Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+        
+        $dompdf = new \Dompdf\Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        return new Response(
+            $dompdf->output(),
+            Response::HTTP_OK,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="SmartFight-Event-' . $event->getEventId() . '.pdf"'
+            ]
+        );
     }
 
     #[Route('/{id}/fights', name: 'app_event_fights')]

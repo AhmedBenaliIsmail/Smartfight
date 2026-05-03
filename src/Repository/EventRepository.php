@@ -61,4 +61,44 @@ class EventRepository extends ServiceEntityRepository
             ->orderBy('e.eventDate', 'ASC')
             ->getQuery()->getResult();
     }
+
+    public function findFilteredAndSortedEvents(?string $query, ?string $organization, ?string $status, ?string $sort): \Doctrine\ORM\QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('e');
+
+        if (!empty($query)) {
+            $qb->andWhere('e.eventName LIKE :query OR e.venue LIKE :query OR e.city LIKE :query')
+               ->setParameter('query', '%' . $query . '%');
+        }
+
+        if (!empty($organization)) {
+            $qb->andWhere('e.organization = :org')
+               ->setParameter('org', $organization);
+        }
+
+        if (!empty($status)) {
+            $qb->andWhere('e.status = :status')
+               ->setParameter('status', $status);
+        }
+
+        switch ($sort) {
+            case 'date_asc':
+                $qb->orderBy('e.eventDate', 'ASC');
+                break;
+            case 'date_desc':
+                $qb->orderBy('e.eventDate', 'DESC');
+                break;
+            case 'capacity_desc':
+                $qb->orderBy('e.seatCapacity', 'DESC');
+                break;
+            case 'capacity_asc':
+                $qb->orderBy('e.seatCapacity', 'ASC');
+                break;
+            default:
+                $qb->orderBy('e.eventDate', 'DESC');
+                break;
+        }
+
+        return $qb;
+    }
 }

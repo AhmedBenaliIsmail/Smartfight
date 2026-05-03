@@ -14,7 +14,10 @@
         <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Manage Card: {{ event.eventName }}</h1>
         <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Building the professional boxing card (Max 3 bouts)</p>
     </div>
-    <a href="{{ path('app_events') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back Schedule</a>
+    <div class="d-flex gap-2">
+        <a href="{{ path('app_event_flyer', {'id': event.eventId}) }}" class="btn btn-sm btn-outline-danger fw-bold"><i class="fa-solid fa-file-pdf me-1"></i>Download Flyer</a>
+        <a href="{{ path('app_events') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back Schedule</a>
+    </div>
 </div>
 
 <div class="row g-4">
@@ -187,6 +190,69 @@
     </div>
     {% endif %}
 </div>
+
+<!-- Leaflet Map Integration -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<div class="row g-4 mt-2">
+    <div class="col-12">
+        <div class="card" style="background:#18181b;border:1px solid #27272a; border-radius: 12px;">
+            <div class="card-header d-flex align-items-center justify-content-between" style="background:#18181b;border-bottom:1px solid #27272a; padding: 1rem 1.25rem;">
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-map-location-dot me-2" style="color:#3b82f6;"></i>Event Location</h3>
+                <span class="text-muted small" id="mapAddress">{{ event.venue }}, {{ event.city }}, {{ event.country }}</span>
+            </div>
+            <div class="card-body p-0">
+                <div id="eventMap" style="width: 100%; height: 350px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; z-index: 1;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var lat = {{ event.latitude|default('null') }};
+        var lon = {{ event.longitude|default('null') }};
+        
+        var map = L.map('eventMap').setView([20, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        if (lat !== null && lon !== null) {
+            // Use stored coordinates
+            map.setView([lat, lon], 14);
+            var marker = L.marker([lat, lon]).addTo(map);
+            marker.bindPopup("<b>{{ event.eventName|escape('js') }}</b><br>{{ event.venue|escape('js') }}").openPopup();
+        } else {
+            // Fallback: Geocode using Nominatim API
+            var addressQuery = "{{ event.venue|escape('js') }} {{ event.city|escape('js') }} {{ event.country|escape('js') }}".trim();
+            if (addressQuery.length > 2) {
+                fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(addressQuery))
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.length > 0) {
+                            var alat = data[0].lat;
+                            var alon = data[0].lon;
+                            map.setView([alat, alon], 14);
+                            var marker = L.marker([alat, alon]).addTo(map);
+                            marker.bindPopup("<b>{{ event.eventName|escape('js') }}</b><br>{{ event.venue|escape('js') }}").openPopup();
+                        } else {
+                            fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent("{{ event.city|escape('js') }}"))
+                                .then(res => res.json())
+                                .then(dataCity => {
+                                    if (dataCity && dataCity.length > 0) {
+                                        map.setView([dataCity[0].lat, dataCity[0].lon], 12);
+                                        var marker = L.marker([dataCity[0].lat, dataCity[0].lon]).addTo(map);
+                                        marker.bindPopup("<b>{{ event.eventName|escape('js') }}</b><br>{{ event.city|escape('js') }} (Approximate)").openPopup();
+                                    }
+                                });
+                        }
+                    })
+                    .catch(err => console.error('Geocoding error:', err));
+            }
+        }
+    });
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
