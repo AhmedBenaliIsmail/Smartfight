@@ -45,8 +45,7 @@ class FightResultService
         bool $isBeltFight = false,
         ?string $beltOrganization = null,
         ?float $fighter1Odds = null,
-        ?float $fighter2Odds = null,
-        bool $isAiGenerated = false
+        ?float $fighter2Odds = null
     ): bool {
         // Enforce 3-fight limit
         $existingCount = $this->resultRepo->countByEvent($eventId);
@@ -87,7 +86,6 @@ class FightResultService
         $fr->setFighter1Odds($fighter1Odds);
         $fr->setFighter2Odds($fighter2Odds);
         $fr->setStatus('SCHEDULED');
-        $fr->setIsAiGenerated($isAiGenerated);
 
         $this->em->persist($fr);
         $this->em->flush();

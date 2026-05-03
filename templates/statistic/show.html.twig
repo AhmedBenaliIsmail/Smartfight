@@ -152,6 +152,104 @@
             </div>
         </div>
     </div>
+
+    {# ── AI Bout Analytics ────────────────────────────────────────────────── #}
+    {% if analysis is defined and analysis is not empty and analysis.summary is defined %}
+    <div class="container mt-5">
+        <div class="sf-data-panel">
+            <div class="panel-header d-flex align-items-center gap-3 p-4 border-bottom border-secondary border-opacity-10">
+                <div style="width:36px;height:36px;background:rgba(220,38,38,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                    <i class="fa-solid fa-brain text-danger" style="font-size:.9rem;"></i>
+                </div>
+                <div>
+                    <h4 class="h6 fw-bold text-white mb-0" style="letter-spacing:2px;">AI_BOUT_INTELLIGENCE</h4>
+                    <div class="x-small text-muted fw-bold">POWERED BY SMARTFIGHT ANALYTICS ENGINE v2</div>
+                </div>
+            </div>
+            <div class="p-4">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="sf-mini-metric">
+                            <div class="metric-val text-white" style="font-size:1.6rem; font-family:'Oswald',sans-serif;">{{ analysis.dominanceScore|default(0)|round(1) }}</div>
+                            <div class="metric-lbl" style="font-size:0.65rem; font-weight:900; color:#52525b; letter-spacing:1px;">DOMINANCE SCORE</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="sf-mini-metric">
+                            <div class="metric-val text-info" style="font-size:1.6rem; font-family:'Oswald',sans-serif;">{{ analysis.totalPunchesLanded|default(0) }}</div>
+                            <div class="metric-lbl" style="font-size:0.65rem; font-weight:900; color:#52525b; letter-spacing:1px;">TOTAL LANDED</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="sf-mini-metric">
+                            <div class="metric-val text-warning" style="font-size:1.6rem; font-family:'Oswald',sans-serif;">{{ analysis.knockdowns|default(0) }}</div>
+                            <div class="metric-lbl" style="font-size:0.65rem; font-weight:900; color:#52525b; letter-spacing:1px;">KNOCKDOWNS</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="sf-mini-metric">
+                            <div class="metric-val text-success" style="font-size:1.6rem; font-family:'Oswald',sans-serif;">{{ analysis.overallAccuracy|default(0)|round(1) }}%</div>
+                            <div class="metric-lbl" style="font-size:0.65rem; font-weight:900; color:#52525b; letter-spacing:1px;">OVERALL ACC</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);border-radius:16px;padding:24px;margin-bottom:20px;">
+                    <div class="x-small text-danger fw-bold mb-3" style="letter-spacing:2px;">
+                        <i class="fa-solid fa-signal me-2"></i>BROADCAST SUMMARY
+                    </div>
+                    <p class="text-white-75 mb-0" style="font-size:.9rem;line-height:1.8;">{{ analysis.summary }}</p>
+                </div>
+
+                {% if analysis.insights is defined and analysis.insights|length > 0 %}
+                <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:16px;padding:24px;">
+                    <div class="x-small text-primary fw-bold mb-3" style="letter-spacing:2px;">
+                        <i class="fa-solid fa-chart-line me-2"></i>DEEP DIVE INSIGHTS
+                    </div>
+                    <ul class="mb-0 ps-3" style="font-size:.875rem;line-height:1.8;color:rgba(255,255,255,.75);">
+                        {% for insight in analysis.insights %}
+                            <li class="mb-2">{{ insight }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# ── Round-by-Round Commentary ────────────────────────────────────────── #}
+    {% set roundsWithCommentary = stats|filter(s => s.commentary is not null and s.commentary != '') %}
+    {% if roundsWithCommentary|length > 0 %}
+    <div class="container mt-4 mb-5">
+        <div class="sf-data-panel">
+            <div class="panel-header d-flex align-items-center gap-3 p-4 border-bottom border-secondary border-opacity-10">
+                <div style="width:36px;height:36px;background:rgba(59,130,246,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                    <i class="fa-solid fa-microphone text-primary" style="font-size:.9rem;"></i>
+                </div>
+                <div>
+                    <h4 class="h6 fw-bold text-white mb-0" style="letter-spacing:2px;">ROUND_COMMENTARY_LOG</h4>
+                    <div class="x-small text-muted fw-bold">BROADCAST-STYLE ROUND ANALYSIS</div>
+                </div>
+            </div>
+            <div class="p-4">
+                {% set displayed = [] %}
+                {% for stat in stats %}
+                    {% if stat.commentary and stat.round not in displayed %}
+                        {% set displayed = displayed|merge([stat.round]) %}
+                        <div class="mb-3" style="border-left:3px solid rgba(220,38,38,.4);padding-left:16px;">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span style="font-family:'Oswald',sans-serif;font-size:1.1rem;color:#dc2626;font-weight:700;">RD {{ stat.round }}</span>
+                                <span class="x-small text-muted fw-bold" style="letter-spacing:1px;">ANALYSIS</span>
+                            </div>
+                            <p class="text-white-75 mb-0" style="font-size:.875rem;line-height:1.7;">{{ stat.commentary }}</p>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 <style>

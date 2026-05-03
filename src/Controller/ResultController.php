@@ -24,13 +24,18 @@ class ResultController extends AbstractController
         $eventStats = [];
         $eventFighters = [];
 
+        $eventResults = [];
         foreach ($events as $e) {
             $fights = $resultRepo->findByEvent($e->getEventId());
             $total = count($fights);
             $completed = 0;
             $names = [];
+            $completedFights = [];
             foreach ($fights as $f) {
-                if ($f->getStatus() === 'COMPLETED') $completed++;
+                if ($f->getStatus() === 'COMPLETED') {
+                    $completed++;
+                    $completedFights[] = $f;
+                }
                 if ($f->getFighter1()) $names[] = $f->getFighter1()->getFullName();
                 if ($f->getFighter2()) $names[] = $f->getFighter2()->getFullName();
             }
@@ -40,12 +45,14 @@ class ResultController extends AbstractController
                 'isFullyCompleted' => ($total > 0 && $total === $completed)
             ];
             $eventFighters[$e->getEventId()] = implode(', ', array_unique($names));
+            $eventResults[$e->getEventId()] = $completedFights;
         }
 
         return $this->render('result/index.html.twig', [
             'events' => $events,
             'eventStats' => $eventStats,
             'eventFighters' => $eventFighters,
+            'eventResults' => $eventResults,
             'q' => $request->query->get('q', ''),
             'title' => 'Fight Results'
         ]);
@@ -397,5 +404,59 @@ class ResultController extends AbstractController
             'rounds' => $rounds,
             'insideTheNumbers' => $insideTheNumbers
         ]);
+    }
+
+    #[Route('/{id}/generate-round-commentary', name: 'app_result_generate_round_commentary', methods: ['POST'])]
+    public function generateRoundCommentary(
+        int $id,
+        FightResultRepository $resultRepo,
+        \App\Service\RoundCommentaryService $commentaryService,
+        Request $request
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $fr = $resultRepo->find($id);
+        if (!$fr) throw $this->createNotFoundException();
+
+        $data  = json_decode($request->getContent(), true);
+        $round = (int)($data['round'] ?? 1);
+
+        $commentary = $commentaryService->generateForRound(
+            $fr->getFighter1()->getFullName(), $data['f1'] ?? [],
+            $fr->getFighter2()->getFullName(), $data['f2'] ?? [],
+            $round
+        );
+
+        return $this->json(['success' => true, 'commentary' => $commentary]);
+    }
+
+    #[Route('/export-pdf', name: 'app_result_export_pdf')]
+    public function exportPdf(FightResultRepository $resultRepo, EventRepository $eventRepo): StreamedResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+        $results = $resultRepo->findAllOrdered();
+
+        $response = new StreamedResponse(function () use ($results) {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['Fight #', 'Event', 'Fighter 1', 'Fighter 2', 'Winner', 'Method', 'Round', 'Date', 'Belt Fight']);
+            foreach ($results as $r) {
+                if ($r->getStatus() !== 'COMPLETED') continue;
+                fputcsv($out, [
+                    $r->getFightNumber(),
+                    $r->getEvent() ? $r->getEvent()->getEventName() : '',
+                    $r->getFighter1() ? $r->getFighter1()->getFullName() : '',
+                    $r->getFighter2() ? $r->getFighter2()->getFullName() : '',
+                    $r->getWinner() ? $r->getWinner()->getFullName() : 'DRAW',
+                    $r->getMethodOfVictory() ?? '',
+                    $r->getRoundNumber() ?? '',
+                    $r->getFightDate() ? $r->getFightDate()->format('d/m/Y') : '',
+                    $r->isBeltFight() ? 'YES' : 'NO',
+                ]);
+            }
+            fclose($out);
+        });
+
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="smartfight-results-report.csv"');
+        return $response;
     }
 }
