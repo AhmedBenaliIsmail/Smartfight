@@ -90,6 +90,9 @@ class FightStatistic
     #[Assert\PositiveOrZero]
     private int $knockdowns = 0;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $commentary = null;
+
     public function getId(): ?int { return $this->id; }
 
     public function getFightResult(): ?FightResult { return $this->fightResult; }
@@ -148,6 +151,9 @@ class FightStatistic
 
     public function getKnockdowns(): int { return $this->knockdowns; }
     public function setKnockdowns(int $v): self { $this->knockdowns = $v; return $this; }
+
+    public function getCommentary(): ?string { return $this->commentary; }
+    public function setCommentary(?string $v): self { $this->commentary = $v; return $this; }
 
     public function getPunchAccuracy(): float
     {

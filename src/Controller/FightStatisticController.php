@@ -40,10 +40,48 @@ class FightStatisticController extends AbstractController
             $groupedStats[$rid]['stats'][] = $s;
         }
 
+        // Build aggregated per-fighter totals (totalStats[0] = fighter1, totalStats[1] = fighter2)
+        // so the template can render fighter names, punch accuracy and landed stats correctly
+        foreach ($groupedStats as $rid => &$group) {
+            $fight = $group['result'];
+            $fighters = array_filter([$fight->getFighter1(), $fight->getFighter2()]);
+            $totalStats = [];
+            foreach ($fighters as $fighter) {
+                $agg = new \App\Entity\FightStatistic();
+                $agg->setFighter($fighter);
+                $agg->setFightResult($fight);
+                $pl = $pt = $ppl = $ppt = $jl = $jt = $kd = $bsl = 0;
+                foreach ($group['stats'] as $s) {
+                    if ($s->getFighter() && $s->getFighter()->getFighterId() === $fighter->getFighterId()) {
+                        $pl  += $s->getPunchesLanded();
+                        $pt  += $s->getPunchesThrown();
+                        $ppl += $s->getPowerPunchesLanded();
+                        $ppt += $s->getPowerPunchesThrown();
+                        $jl  += $s->getJabsLanded();
+                        $jt  += $s->getJabsThrown();
+                        $kd  += $s->getKnockdowns();
+                        $bsl += $s->getBodyShotsLanded();
+                    }
+                }
+                $agg->setPunchesLanded($pl);
+                $agg->setPunchesThrown($pt);
+                $agg->setPowerPunchesLanded($ppl);
+                $agg->setPowerPunchesThrown($ppt);
+                $agg->setJabsLanded($jl);
+                $agg->setJabsThrown($jt);
+                $agg->setKnockdowns($kd);
+                $agg->setBodyShotsLanded($bsl);
+                $totalStats[] = $agg;
+            }
+            $group['totalStats'] = $totalStats;
+        }
+        unset($group);
+
         // Generate AI analysis for each group
         foreach ($groupedStats as $rid => &$group) {
             $group['analysis'] = $analysisService->analyzeBout($group['result'], $group['stats']);
         }
+        unset($group);
 
         // Apply search if needed
         $q = strtolower(trim($request->query->get('q', '')));
@@ -122,6 +160,10 @@ class FightStatisticController extends AbstractController
                 $stat1->setRound($round);
                 $stat2->setRound($round);
                 
+                $commentary = $request->request->get('roundCommentary') ?: null;
+                $stat1->setCommentary($commentary);
+                $stat2->setCommentary($commentary);
+
                 $em->persist($stat1);
                 $em->persist($stat2);
                 $em->flush();
@@ -158,6 +200,129 @@ class FightStatisticController extends AbstractController
         ]);
     }
 
+    #[Route('/show/{fightId}', name: 'app_stat_show')]
+    public function show(int $fightId, FightStatisticRepository $statRepo, FightResultRepository $resultRepo, \App\Service\BoutAnalysisService $analysisService, \App\Service\RoundCommentaryService $commentaryService): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
+        $fight = $resultRepo->find($fightId);
+        if (!$fight) throw $this->createNotFoundException('Fight not found.');
+
+        $allStats = $statRepo->findBy(['fightResult' => $fight], ['round' => 'ASC']);
+
+        $fighter1 = $fight->getFighter1();
+        $fighter2 = $fight->getFighter2();
+
+        // Build one aggregate FightStatistic per fighter so the template can
+        // call ->getPunchAccuracy(), ->getJabAccuracy(), ->getPowerAccuracy() etc.
+        $aggregates = [];
+        foreach ([$fighter1, $fighter2] as $fighter) {
+            if (!$fighter) continue;
+
+            $agg = new FightStatistic();
+            $agg->setFighter($fighter);
+            $agg->setFightResult($fight);
+
+            $pl = $pt = $ppl = $ppt = $jl = $jt = $kd = $bsl = 0;
+            foreach ($allStats as $s) {
+                if ($s->getFighter() && $s->getFighter()->getFighterId() === $fighter->getFighterId()) {
+                    $pl  += $s->getPunchesLanded();
+                    $pt  += $s->getPunchesThrown();
+                    $ppl += $s->getPowerPunchesLanded();
+                    $ppt += $s->getPowerPunchesThrown();
+                    $jl  += $s->getJabsLanded();
+                    $jt  += $s->getJabsThrown();
+                    $kd  += $s->getKnockdowns();
+                    $bsl += $s->getBodyShotsLanded();
+                }
+            }
+
+            $agg->setPunchesLanded($pl);
+            $agg->setPunchesThrown($pt);
+            $agg->setPowerPunchesLanded($ppl);
+            $agg->setPowerPunchesThrown($ppt);
+            $agg->setJabsLanded($jl);
+            $agg->setJabsThrown($jt);
+            $agg->setKnockdowns($kd);
+            $agg->setBodyShotsLanded($bsl);
+
+            $aggregates[] = $agg;
+        }
+
+        // Group stats by round to generate on-the-fly commentary if missing
+        $roundsData = [];
+        foreach ($allStats as $s) {
+            $r = $s->getRound();
+            if (!isset($roundsData[$r])) {
+                $roundsData[$r] = [];
+            }
+            $roundsData[$r][] = $s;
+        }
+
+        // Generate dynamic commentary for any round that doesn't have it
+        foreach ($roundsData as $r => $roundStats) {
+            $hasCommentary = false;
+            foreach ($roundStats as $s) {
+                if ($s->getCommentary()) {
+                    $hasCommentary = true;
+                    break;
+                }
+            }
+
+            if (!$hasCommentary && count($roundStats) == 2) {
+                $s1 = $roundStats[0];
+                $s2 = $roundStats[1];
+
+                $f1Data = [
+                    'landed' => $s1->getPunchesLanded(),
+                    'thrown' => $s1->getPunchesThrown(),
+                    'kds' => $s1->getKnockdowns(),
+                    'power_landed' => $s1->getPowerPunchesLanded(),
+                    'power_thrown' => $s1->getPowerPunchesThrown(),
+                    'body_shots' => $s1->getBodyShotsLanded(),
+                    'jabs_landed' => $s1->getJabsLanded(),
+                ];
+
+                $f2Data = [
+                    'landed' => $s2->getPunchesLanded(),
+                    'thrown' => $s2->getPunchesThrown(),
+                    'kds' => $s2->getKnockdowns(),
+                    'power_landed' => $s2->getPowerPunchesLanded(),
+                    'power_thrown' => $s2->getPowerPunchesThrown(),
+                    'body_shots' => $s2->getBodyShotsLanded(),
+                    'jabs_landed' => $s2->getJabsLanded(),
+                ];
+
+                $generatedCommentary = $commentaryService->generateForRound(
+                    $s1->getFighter()->getLastName(), $f1Data,
+                    $s2->getFighter()->getLastName(), $f2Data,
+                    $r
+                );
+
+                // Attach to the first stat of the round for template display
+                $s1->setCommentary($generatedCommentary);
+            }
+        }
+
+        $analysis = $analysisService->analyzeBout($fight, $aggregates, $allStats);
+
+        return $this->render('statistic/show.html.twig', [
+            'fight'       => $fight,
+            'fighter1'    => $fighter1,
+            'fighter2'    => $fighter2,
+            'totalStats'  => $aggregates,   // template: {% for t in totalStats %}
+            'stats'       => $allStats,      // template: {% for stat in stats %}
+            'analysis'    => $analysis,
+        ]);
+    }
+
+
+    #[Route('/selection', name: 'app_stat_selection')]
+    public function selection(): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        return $this->redirectToRoute('app_stat_new');
+    }
     #[Route('/{id}/edit', name: 'app_stat_edit')]
     public function edit(int $id, FightStatisticRepository $repo): Response
     {
