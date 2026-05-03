@@ -1,0 +1,196 @@
+{% extends 'front/base_front.html.twig' %}
+
+{% block title %}Event Calendar — SmartFight{% endblock %}
+
+{% block extra_css %}
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
+    <style>
+        .fc {
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .fc-theme-standard td, .fc-theme-standard th, .fc-theme-standard .fc-scrollgrid {
+            border-color: #27272a;
+        }
+        .fc .fc-toolbar-title {
+            color: #fafafa;
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .fc .fc-button-primary {
+            background-color: #dc2626;
+            border-color: #dc2626;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .fc .fc-button-primary:hover {
+            background-color: #ef4444;
+            border-color: #ef4444;
+        }
+        .fc .fc-button-primary:not(:disabled).fc-button-active,
+        .fc .fc-button-primary:not(:disabled):active {
+            background-color: #b91c1c;
+            border-color: #b91c1c;
+        }
+        .fc .fc-daygrid-day-number { color: #a1a1aa; }
+        .fc .fc-col-header-cell-cushion { color: #fafafa; font-weight: 700; }
+        .fc .fc-event {
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.78rem;
+        }
+        .fc .fc-daygrid-day.fc-day-today {
+            background: rgba(220, 38, 38, 0.06) !important;
+        }
+        .fc .fc-list-event:hover td { background: rgba(220,38,38,0.08); }
+        .fc .fc-list-day-cushion { background: #18181b; }
+        .fc .fc-list-table td { border-color: #27272a; color: #a1a1aa; }
+        .fc .fc-list-event-title a { color: #fff; }
+
+        /* Event tooltip popup */
+        .fc-event-tooltip {
+            position: fixed;
+            z-index: 9999;
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-left: 4px solid #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            pointer-events: none;
+            min-width: 220px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .fc-event-tooltip.visible { opacity: 1; }
+        .fc-event-tooltip .tooltip-title { font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .fc-event-tooltip .tooltip-meta { font-size: 0.75rem; color: #a1a1aa; }
+        .gcal-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #4285f4;
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .gcal-badge:hover { background: #2563eb; transform: scale(1.03); color: #fff; }
+        .legend-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+    {# Header #}
+    <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-3">
+        <div>
+            <h1 class="h2 fw-bold text-white mb-1" style="font-family: 'Oswald', sans-serif; letter-spacing: 1px;">
+                <i class="fa-solid fa-calendar-days me-3 text-danger"></i>EVENT CALENDAR
+            </h1>
+            <p class="text-muted mb-0">All scheduled, live & completed boxing events — click any event to manage its card.</p>
+        </div>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            {# Google Calendar subscribe link #}
+            <a href="https://calendar.google.com/calendar/r" target="_blank" class="gcal-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                Open Google Calendar
+            </a>
+            <a href="{{ path('app_events') }}" class="btn btn-outline-secondary fw-bold text-white">
+                <i class="fa-solid fa-list me-2"></i>List View
+            </a>
+        </div>
+    </div>
+
+    {# Legend #}
+    <div class="d-flex gap-4 mb-3 flex-wrap">
+        <span class="text-muted small d-flex align-items-center gap-2"><span class="legend-dot" style="background:#dc2626;"></span>Scheduled</span>
+        <span class="text-muted small d-flex align-items-center gap-2"><span class="legend-dot" style="background:#eab308;"></span>Live</span>
+        <span class="text-muted small d-flex align-items-center gap-2"><span class="legend-dot" style="background:#22c55e;"></span>Completed</span>
+        <span class="text-muted small d-flex align-items-center gap-2"><span class="legend-dot" style="background:#6b7280;"></span>Cancelled</span>
+    </div>
+
+    <div id="calendar" class="mt-2"></div>
+
+    {# Tooltip element #}
+    <div id="eventTooltip" class="fc-event-tooltip">
+        <div class="tooltip-title" id="tooltipTitle"></div>
+        <div class="tooltip-meta" id="tooltipMeta"></div>
+        <div class="mt-2" id="tooltipGcal"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tooltip = document.getElementById('eventTooltip');
+            const tooltipTitle = document.getElementById('tooltipTitle');
+            const tooltipMeta = document.getElementById('tooltipMeta');
+            const tooltipGcal = document.getElementById('tooltipGcal');
+
+            const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,listMonth'
+                },
+                events: '{{ path("app_event_api_calendar") }}',
+                
+                eventMouseEnter: function(info) {
+                    const ep = info.event.extendedProps;
+                    tooltipTitle.textContent = info.event.title;
+                    tooltipMeta.innerHTML = [
+                        ep.organization ? `<span style="color:#fbbf24;font-weight:700;">${ep.organization}</span>` : '',
+                        ep.venue ? `📍 ${ep.venue}` : '',
+                        ep.city ? `🏙️ ${ep.city}` : '',
+                        ep.status ? `Status: <strong style="color:${ep.status==='LIVE'?'#eab308':ep.status==='COMPLETED'?'#22c55e':'#dc2626'}">${ep.status}</strong>` : ''
+                    ].filter(Boolean).join('<br>');
+                    
+                    // Google Calendar quick-add link
+                    const gcalDate = info.event.startStr.replace(/-/g,'');
+                    const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(info.event.title)}&dates=${gcalDate}/${gcalDate}&location=${encodeURIComponent((ep.venue||'') + ' ' + (ep.city||''))}&details=${encodeURIComponent('Organization: '+(ep.organization||''))}`;
+                    tooltipGcal.innerHTML = `<a href="${gcalUrl}" target="_blank" style="font-size:0.72rem; color:#4285f4; text-decoration:none; font-weight:700;">📅 Add to Google Calendar →</a>`;
+
+                    tooltip.classList.add('visible');
+                    moveTip(info.jsEvent);
+                },
+                eventMouseLeave: function() {
+                    tooltip.classList.remove('visible');
+                },
+                eventClick: function(info) {
+                    info.jsEvent.preventDefault();
+                    if (info.event.url) {
+                        window.location.href = info.event.url;
+                    }
+                },
+                eventDidMount: function(info) {
+                    // Mouse tracking on tile
+                    info.el.addEventListener('mousemove', moveTip);
+                }
+            });
+
+            calendar.render();
+
+            function moveTip(e) {
+                const x = e.clientX + 15;
+                const y = e.clientY - 10;
+                tooltip.style.left = Math.min(x, window.innerWidth - 260) + 'px';
+                tooltip.style.top = y + 'px';
+            }
+
+            document.getElementById('calendar').addEventListener('mousemove', moveTip);
+        });
+    </script>
+{% endblock %}
