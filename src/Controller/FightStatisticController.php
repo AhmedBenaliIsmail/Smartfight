@@ -121,7 +121,10 @@ class FightStatisticController extends AbstractController
                 $this->bindPairedStats($stat1, $stat2, $fight, $request);
                 $stat1->setRound($round);
                 $stat2->setRound($round);
-                
+                $commentary = $request->request->get('roundCommentary') ?: null;
+                $stat1->setCommentary($commentary);
+                $stat2->setCommentary($commentary);
+
                 $em->persist($stat1);
                 $em->persist($stat2);
                 $em->flush();
@@ -155,6 +158,7 @@ class FightStatisticController extends AbstractController
             'fighter2' => $boxer2,
             'currentRound' => $round,
             'totalRounds' => $maxRound,
+            'roundCommentary' => $stat1->getCommentary(),
         ]);
     }
 

@@ -64,6 +64,19 @@ class QrCodeService
         return 'data:image/png;base64,' . base64_encode($result->getString());
     }
 
+    public function generateQrPngRaw(string $data, int $size = 250): string
+    {
+        $qrCode = new QrCode(
+            data: $data,
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::Low,
+            size: $size,
+            margin: 10
+        );
+
+        return (new PngWriter())->write($qrCode)->getString();
+    }
+
     public function generateQrResponse(string $data, int $size = 250): Response
     {
         $qrCode = new QrCode(

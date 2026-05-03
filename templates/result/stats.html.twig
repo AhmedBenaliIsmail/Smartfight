@@ -137,12 +137,13 @@
         <div class="stats-card-premium">
             <div class="nav-stats-tabs">
                 <ul class="nav nav-tabs border-0" id="roundTabs" role="tablist">
-                    {% for r in 1..result.roundNumber %}
+                    {% set totalRounds = result.roundNumber|default(result.scheduledRounds|default(12)) %}
+                    {% for r in 1..totalRounds %}
                     <li class="nav-item" role="presentation">
                         <button class="nav-link {% if r == 1 %}active{% endif %}" id="round-{{ r }}-tab" data-bs-toggle="tab" data-bs-target="#round-{{ r }}" type="button" role="tab">ROUND {{ r }}</button>
                     </li>
                     {% endfor %}
-                    {% if result.roundNumber < (result.scheduledRounds|default(12)) %}
+                    {% if result.roundNumber and result.roundNumber < (result.scheduledRounds|default(12)) %}
                         <li class="nav-item ms-auto d-flex align-items-center pe-3">
                             <span class="badge bg-danger-lt" style="font-size: 10px; letter-spacing: 1px;">
                                 <i class="fa-solid fa-stopwatch me-1"></i> FINISHED IN R{{ result.roundNumber }}
@@ -153,7 +154,7 @@
             </div>
 
             <div class="tab-content p-5" id="roundTabsContent">
-                {% for r in 1..result.roundNumber %}
+                {% for r in 1..totalRounds %}
                 <div class="tab-pane fade {% if r == 1 %}show active{% endif %}" id="round-{{ r }}" role="tabpanel">
                     <div class="row g-5">
                         {# Red Corner #}
@@ -286,6 +287,24 @@
                             </div>
                         </div>
                     </div>
+
+                    {# Per-round commentary #}
+                    <div class="mt-4 pt-4 border-top" style="border-color:#27272a!important;">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <label class="stat-label" for="round-commentary-{{ r }}">
+                                <i class="fa-solid fa-microphone-lines me-1"></i>ROUND {{ r }} COMMENTARY
+                            </label>
+                            <button type="button" class="round-commentary-btn btn btn-sm"
+                                    data-round="{{ r }}"
+                                    style="background:rgba(124,58,237,0.15);border:1px solid #7c3aed;color:#a78bfa;font-size:0.75rem;font-weight:700;letter-spacing:0.5px;">
+                                <i class="fa-solid fa-wand-magic-sparkles me-1"></i>GENERATE
+                            </button>
+                        </div>
+                        <textarea name="roundCommentary[{{ r }}]" id="round-commentary-{{ r }}"
+                                  class="form-control" rows="3"
+                                  style="background:#09090b;border:1px solid #3f3f46;color:#d4d4d8;border-radius:10px;padding:1rem;font-size:0.875rem;line-height:1.6;"
+                                  placeholder="Click GENERATE or type Round {{ r }} commentary...">{{ roundCommentaries[r] ?? '' }}</textarea>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
@@ -314,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i>AI SYNTHESIZING...';
             this.disabled = true;
 
-            const totalRounds = {{ result.roundNumber }};
+            const totalRounds = {{ result.roundNumber|default(result.scheduledRounds|default(12)) }};
 
             fetch('{{ path('app_result_generate_ai_stats', {'id': result.resultId}) }}', {
                 method: 'POST',
@@ -369,6 +388,35 @@ document.addEventListener('DOMContentLoaded', function() {
         const input = document.querySelector(`input[name="${name}"]`);
         if (input) input.value = val;
     }
+
+    function collectRoundStats(round, fighter) {
+        const fields = ['landed','thrown','right_landed','right_thrown','left_landed','left_thrown',
+                        'power_landed','power_thrown','jabs_landed','body_shots','kds'];
+        const stats = {};
+        fields.forEach(f => {
+            const el = document.querySelector(`input[name="stats[${round}][${fighter}][${f}]"]`);
+            stats[f] = el ? (parseInt(el.value) || 0) : 0;
+        });
+        return stats;
+    }
+
+    document.querySelectorAll('.round-commentary-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const round = this.dataset.round;
+            const orig  = this.innerHTML;
+            this.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-1"></i>GENERATING...';
+            this.disabled = true;
+
+            fetch('{{ path("app_result_generate_round_commentary", {"id": result.resultId}) }}', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({round: parseInt(round), f1: collectRoundStats(round,'f1'), f2: collectRoundStats(round,'f2')})
+            })
+            .then(r => r.json())
+            .then(data => { if (data.success) document.getElementById(`round-commentary-${round}`).value = data.commentary; })
+            .finally(() => { this.innerHTML = orig; this.disabled = false; });
+        });
+    });
 });
 </script>
 {% endblock %}

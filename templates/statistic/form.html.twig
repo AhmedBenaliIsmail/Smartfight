@@ -25,13 +25,10 @@
 .round-pill.active { background:var(--red);border-color:var(--red);color:#fff; }
 .round-pill.has-data { border-color:#22c55e;color:#22c55e; }
 .round-pill.active.has-data { background:#16a34a;border-color:#16a34a;color:#fff; }
-.itn-banner { background:linear-gradient(135deg,#991b1b,#7f1d1d);border-radius:8px;padding:1rem 1.25rem;margin-top:1.5rem; }
-.itn-title { font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:.4rem; }
-.itn-text { font-size:.875rem;color:#fff;line-height:1.6; }
-.itn-placeholder { color:rgba(255,255,255,.4);font-style:italic; }
-.ai-btn { background:rgba(139,92,246,.1);color:#8b5cf6;border:1px solid #8b5cf6;border-radius:8px;padding:.6rem 1.5rem;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.5rem; }
-.ai-btn:hover { background:rgba(139,92,246,.2); }
-.ai-btn:disabled { opacity:.5;cursor:not-allowed; }
+.commentary-btn { background:rgba(124,58,237,.15);color:#a78bfa;border:1px solid #7c3aed;border-radius:6px;padding:.4rem 1rem;font-size:.75rem;font-weight:700;letter-spacing:.5px;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;transition:background .2s; }
+.commentary-btn:hover { background:rgba(124,58,237,.28); }
+.commentary-btn:disabled { opacity:.5;cursor:not-allowed; }
+.commentary-textarea { background:#09090b;border:1px solid #3f3f46;color:#d4d4d8;border-radius:8px;padding:.875rem;font-size:.875rem;line-height:1.6;width:100%;resize:vertical; }
 .save-btn { background:var(--red);color:#fff;border:none;border-radius:8px;padding:.6rem 2rem;font-size:.9rem;font-weight:600;cursor:pointer;transition:opacity .2s; }
 .save-btn:hover { opacity:.85; }
 .error-hint { font-size:.7rem;color:var(--red);margin-top:.2rem;display:none; }
@@ -51,7 +48,12 @@
         <h1 class="h4 fw-bold mb-1" style="color:#fafafa">CompuBox Statistics Entry</h1>
         <p class="mb-0" style="color:#71717a;font-size:.8rem">{{ event.eventName }} — <span style="color:#ef4444">{{ fighter1.fullName }}</span> vs <span style="color:#3b82f6">{{ fighter2.fullName }}</span></p>
     </div>
-    <a href="{{ path('app_stat_new', {eventId: event.eventId}) }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;font-size:.8rem"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+    <div class="d-flex gap-2 align-items-center">
+        <button type="button" id="aiGenerateStatsBtn" class="commentary-btn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>GENERATE STATS
+        </button>
+        <a href="{{ path('app_stat_new', {eventId: event.eventId}) }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;font-size:.8rem"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+    </div>
 </div>
 
 {# Round Selector #}
@@ -259,13 +261,17 @@
         </div>
     </div>
 
-    {# ─── INSIDE THE NUMBERS ─── #}
+    {# ─── PER-ROUND COMMENTARY ─── #}
     <div class="col-12">
-        <div class="itn-banner">
-            <div class="itn-title"><i class="fa-solid fa-chart-bar me-2"></i>Inside The Numbers — Round {{ currentRound }}</div>
-            <div class="itn-text" id="itnText">
-                <span class="itn-placeholder">Click "AI Auto-Fill" to generate a CompuBox broadcast analysis of this round.</span>
+        <div class="cb-card" style="padding:1rem 1.25rem">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span style="font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#a1a1aa"><i class="fa-solid fa-microphone-lines me-2"></i>Round {{ currentRound }} Commentary</span>
+                <button type="button" id="commentaryGenerateBtn" class="commentary-btn">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>GENERATE
+                </button>
             </div>
+            <textarea name="roundCommentary" id="roundCommentaryTextarea" class="commentary-textarea" rows="3"
+                      placeholder="Click GENERATE for broadcast-style commentary, or type manually...">{{ roundCommentary ?? '' }}</textarea>
         </div>
     </div>
 
@@ -275,9 +281,6 @@
             <div style="padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
                 <p class="mb-0" style="color:#52525b;font-size:.78rem"><i class="fa-solid fa-circle-info me-1"></i>Right + Left Thrown must equal Total Thrown. Same rule applies for Landed.</p>
                 <div class="d-flex gap-2 align-items-center">
-                    <button type="button" id="aiAutoFillBtn" class="ai-btn">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>AI Auto-Fill
-                    </button>
                     <button type="submit" class="save-btn">
                         <i class="fa-solid fa-floppy-disk me-2"></i>Save Round {{ currentRound }}
                     </button>
@@ -342,77 +345,100 @@ function validate(p) {
     validate(p);
 });
 
-// ── AI Auto-Fill ─────────────────────────────────────────
-document.getElementById('aiAutoFillBtn').addEventListener('click', async function() {
+// ── AI Generate Stats ─────────────────────────────────────
+document.getElementById('aiGenerateStatsBtn').addEventListener('click', async function() {
     const btn = this;
+    const orig = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analyzing...';
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> GENERATING...';
 
     try {
-        const res = await fetch('{{ path("api_ai_stat_suggestions") }}', {
+        const res = await fetch('{{ path("app_result_generate_ai_stats", {"id": fight.resultId}) }}', {
             method: 'POST',
-            headers: {'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest'},
-            body: JSON.stringify({
-                fighter1_id: {{ fight.fighter1.fighterId }},
-                fighter2_id: {{ fight.fighter2.fighterId }},
-                round: {{ currentRound }}
-            })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ totalRounds: {{ currentRound }} })
         });
-
-        if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
+        if (data.success) {
+            const r = data.rounds[{{ currentRound }}];
+            if (r) {
+                set('s1_pt',  r.f1.punches_thrown);
+                set('s1_pl',  r.f1.punches_landed);
+                set('s1_rt',  r.f1.right_thrown);
+                set('s1_rl',  r.f1.right_landed);
+                set('s1_lt',  r.f1.left_thrown);
+                set('s1_ll',  r.f1.left_landed);
+                set('s1_pwt', r.f1.power_thrown);
+                set('s1_pwl', r.f1.power_landed);
+                set('s1_jt',  r.f1.jabs_thrown);
+                set('s1_jl',  r.f1.jabs_landed);
+                set('s1_bs',  r.f1.body_shots);
+                set('s1_kd',  r.f1.kds);
 
-        if (!data.success || !data.suggestions) {
-            throw new Error(data.error || 'No suggestions returned');
+                set('s2_pt',  r.f2.punches_thrown);
+                set('s2_pl',  r.f2.punches_landed);
+                set('s2_rt',  r.f2.right_thrown);
+                set('s2_rl',  r.f2.right_landed);
+                set('s2_lt',  r.f2.left_thrown);
+                set('s2_ll',  r.f2.left_landed);
+                set('s2_pwt', r.f2.power_thrown);
+                set('s2_pwl', r.f2.power_landed);
+                set('s2_jt',  r.f2.jabs_thrown);
+                set('s2_jl',  r.f2.jabs_landed);
+                set('s2_bs',  r.f2.body_shots);
+                set('s2_kd',  r.f2.kds);
+
+                validate('s1'); validate('s2');
+            }
         }
-
-        const sug = data.suggestions;
-
-        function fillCorner(prefix, f) {
-            if (!f) return;
-            // totals
-            const pt = f.punches_thrown || 0;
-            const pl = f.punches_landed || 0;
-            // right / left — use AI values if provided, else split 55/45
-            let rt = f.right_hand_thrown !== undefined ? f.right_hand_thrown : Math.round(pt * 0.55);
-            let lt = pt - rt; // ENFORCE math
-            let rl = f.right_hand_landed !== undefined ? f.right_hand_landed : Math.round(pl * 0.55);
-            let ll = pl - rl; // ENFORCE math
-
-            set(prefix+'_pt', pt);
-            set(prefix+'_pl', pl);
-            set(prefix+'_rt', rt);
-            set(prefix+'_rl', rl);
-            set(prefix+'_lt', lt);
-            set(prefix+'_ll', ll);
-            set(prefix+'_pwt', f.power_punches_thrown || 0);
-            set(prefix+'_pwl', f.power_punches_landed || 0);
-            set(prefix+'_jt',  f.jabs_thrown || 0);
-            set(prefix+'_jl',  f.jabs_landed || 0);
-            set(prefix+'_ut',  f.uppercuts_thrown || 0);
-            set(prefix+'_ul',  f.uppercuts_landed || 0);
-            set(prefix+'_bs',  f.body_shots_landed || 0);
-            set(prefix+'_kd',  f.knockdowns || 0);
-            validate(prefix);
-        }
-
-        fillCorner('s1', sug.fighter1);
-        fillCorner('s2', sug.fighter2);
-
-        // Inside The Numbers
-        const itn = sug.inside_the_numbers || sug.inside_the_numbers_text || '';
-        const itnEl = document.getElementById('itnText');
-        if (itnEl) {
-            itnEl.innerHTML = itn
-                ? `<span>${itn}</span>`
-                : `<span class="itn-placeholder">No broadcast analysis returned.</span>`;
-        }
-
     } catch (err) {
-        alert('AI Error: ' + err.message);
+        alert('Error generating stats: ' + err.message);
     } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> AI Auto-Fill';
+        btn.innerHTML = orig;
+    }
+});
+
+// ── Per-round commentary generator ───────────────────────
+function collectCornerStats(prefix) {
+    return {
+        landed:       val(prefix+'_pl'),
+        thrown:       val(prefix+'_pt'),
+        right_landed: val(prefix+'_rl'),
+        right_thrown: val(prefix+'_rt'),
+        left_landed:  val(prefix+'_ll'),
+        left_thrown:  val(prefix+'_lt'),
+        power_landed: val(prefix+'_pwl'),
+        power_thrown: val(prefix+'_pwt'),
+        jabs_landed:  val(prefix+'_jl'),
+        body_shots:   val(prefix+'_bs'),
+        kds:          val(prefix+'_kd')
+    };
+}
+
+document.getElementById('commentaryGenerateBtn').addEventListener('click', async function() {
+    const btn = this;
+    const orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> GENERATING...';
+
+    try {
+        const res = await fetch('{{ path("app_result_generate_round_commentary", {"id": fight.resultId}) }}', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                round: {{ currentRound }},
+                f1: collectCornerStats('s1'),
+                f2: collectCornerStats('s2')
+            })
+        });
+        const data = await res.json();
+        if (data.success) document.getElementById('roundCommentaryTextarea').value = data.commentary;
+    } catch (err) {
+        alert('Error generating commentary: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = orig;
     }
 });
 

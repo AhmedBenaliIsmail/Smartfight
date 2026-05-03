@@ -7,6 +7,7 @@ use App\Repository\FightResultRepository;
 use App\Entity\FightStatistic;
 use App\Service\FightResultService;
 use App\Service\FightStatisticService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -160,69 +161,10 @@ class ResultController extends AbstractController
     }
 
     #[Route('/{id}/stats', name: 'app_result_stats', methods: ['GET', 'POST'])]
-    public function stats(int $id, Request $request, FightResultRepository $resultRepo, FightStatisticService $statService): Response
+    public function stats(int $id): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        $fr = $resultRepo->find($id);
-        if (!$fr) throw $this->createNotFoundException();
-
-        if ($request->isMethod('POST')) {
-            $statsData = $request->request->all('stats');
-            $fr->setInsideTheNumbers($request->request->get('insideTheNumbers'));
-            
-            // Clear existing stats for this fight to avoid duplicates
-            $statService->clearStatsForFight($fr);
-            $endRound = $fr->getRoundNumber() ?: 12;
-
-            foreach ($statsData as $roundNum => $data) {
-                if ($roundNum > $endRound) continue; // Safety check: No stats after the fight ended
-
-                // Fighter 1 Round Stat
-                $s1 = new FightStatistic();
-                $s1->setFightResult($fr);
-                $s1->setFighter($fr->getFighter1());
-                $s1->setRound((int)$roundNum);
-                $s1->setPunchesThrown((int)($data['f1']['thrown'] ?? 0));
-                $s1->setPunchesLanded((int)($data['f1']['landed'] ?? 0));
-                $s1->setRightHandThrown((int)($data['f1']['right_thrown'] ?? 0));
-                $s1->setRightHandLanded((int)($data['f1']['right_landed'] ?? 0));
-                $s1->setLeftHandThrown((int)($data['f1']['left_thrown'] ?? 0));
-                $s1->setLeftHandLanded((int)($data['f1']['left_landed'] ?? 0));
-                $s1->setPowerPunchesThrown((int)($data['f1']['power_thrown'] ?? 0));
-                $s1->setPowerPunchesLanded((int)($data['f1']['power_landed'] ?? 0));
-                $s1->setJabsLanded((int)($data['f1']['jabs_landed'] ?? 0));
-                $s1->setBodyShotsLanded((int)($data['f1']['body_shots'] ?? 0));
-                $s1->setKnockdowns((int)($data['f1']['kds'] ?? 0));
-                $statService->addFightStatistic($s1);
-
-                // Fighter 2 Round Stat
-                $s2 = new FightStatistic();
-                $s2->setFightResult($fr);
-                $s2->setFighter($fr->getFighter2());
-                $s2->setRound((int)$roundNum);
-                $s2->setPunchesThrown((int)($data['f2']['thrown'] ?? 0));
-                $s2->setPunchesLanded((int)($data['f2']['landed'] ?? 0));
-                $s2->setRightHandThrown((int)($data['f2']['right_thrown'] ?? 0));
-                $s2->setRightHandLanded((int)($data['f2']['right_landed'] ?? 0));
-                $s2->setLeftHandThrown((int)($data['f2']['left_thrown'] ?? 0));
-                $s2->setLeftHandLanded((int)($data['f2']['left_landed'] ?? 0));
-                $s2->setPowerPunchesThrown((int)($data['f2']['power_thrown'] ?? 0));
-                $s2->setPowerPunchesLanded((int)($data['f2']['power_landed'] ?? 0));
-                $s2->setJabsLanded((int)($data['f2']['jabs_landed'] ?? 0));
-                $s2->setBodyShotsLanded((int)($data['f2']['body_shots'] ?? 0));
-                $s2->setKnockdowns((int)($data['f2']['kds'] ?? 0));
-                $statService->addFightStatistic($s2);
-            }
-
-            $this->addFlash('success', 'Fight statistics updated successfully.');
-            return $this->redirectToRoute('app_result_manage_card', ['id' => $fr->getEvent()->getEventId()]);
-        }
-
-        return $this->render('result/stats.html.twig', [
-            'result' => $fr,
-            'fighter1' => $fr->getFighter1(),
-            'fighter2' => $fr->getFighter2(),
-        ]);
+        return $this->redirectToRoute('app_stat_new', ['fightId' => $id]);
     }
 
     #[Route('/{id}/cancel', name: 'app_result_cancel', methods: ['POST'])]
@@ -255,6 +197,7 @@ class ResultController extends AbstractController
         // Group stats by fighter and round
         $fighterStats = [];
         foreach ($stats as $s) {
+            if ($s->getRound() === null) continue;
             $fid = $s->getFighter()->getFighterId();
             $fighterStats[$fid][$s->getRound()] = $s;
         }
@@ -262,7 +205,7 @@ class ResultController extends AbstractController
         return $this->render('result/show.html.twig', [
             'result' => $fr,
             'fighterStats' => $fighterStats,
-            'rounds' => $fr->getRoundNumber() ?: 12
+            'rounds' => $fr->getRoundNumber() ?: $fr->getScheduledRounds()
         ]);
     }
 
@@ -318,7 +261,7 @@ class ResultController extends AbstractController
     }
 
     #[Route('/{id}/generate-ai-stats', name: 'app_result_generate_ai_stats', methods: ['POST'])]
-    public function generateAIStats(int $id, FightResultRepository $resultRepo, \App\Service\AIService $aiService, Request $request): Response
+    public function generateAIStats(int $id, FightResultRepository $resultRepo, Request $request): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $fr = $resultRepo->find($id);
@@ -369,21 +312,32 @@ class ResultController extends AbstractController
             ];
         }
 
-        // Generate AI Insight based on the generated stats
-        $prompt = "Analyze these round-by-round boxing stats (Rounds 1-{$totalRounds}) and provide a 3-paragraph professional broadcast-style 'Inside the Numbers' breakdown. " .
-                  "Fighter 1 ({$fr->getFighter1()->getFullName()}) vs Fighter 2 ({$fr->getFighter2()->getFullName()}). " .
-                  "Summarize the tactical shifts and who dominated specific phases. Stats provided in round chunks.";
-        
-        $insideTheNumbers = "Data-driven analysis pending...";
-        try {
-            $aiResponse = $aiService->generateText($prompt);
-            if ($aiResponse) $insideTheNumbers = $aiResponse;
-        } catch (\Exception $e) {}
-
         return $this->json([
             'success' => true,
             'rounds' => $rounds,
-            'insideTheNumbers' => trim($insideTheNumbers)
         ]);
+    }
+
+    #[Route('/{id}/generate-round-commentary', name: 'app_result_generate_round_commentary', methods: ['POST'])]
+    public function generateRoundCommentary(
+        int $id,
+        FightResultRepository $resultRepo,
+        \App\Service\RoundCommentaryService $commentaryService,
+        Request $request
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $fr = $resultRepo->find($id);
+        if (!$fr) throw $this->createNotFoundException();
+
+        $data  = json_decode($request->getContent(), true);
+        $round = (int)($data['round'] ?? 1);
+
+        $commentary = $commentaryService->generateForRound(
+            $fr->getFighter1()->getFullName(), $data['f1'] ?? [],
+            $fr->getFighter2()->getFullName(), $data['f2'] ?? [],
+            $round
+        );
+
+        return $this->json(['success' => true, 'commentary' => $commentary]);
     }
 }
