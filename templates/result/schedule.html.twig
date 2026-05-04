@@ -82,9 +82,43 @@
                 </div>
             </div>
             
+            <div class="card mb-4" id="simulationCard" style="display:none; background:#09090b; border:1px solid #3b82f6;">
+                <div class="card-header" style="background:#1e3a8a; border-bottom:none;">
+                    <h4 class="card-title mb-0 text-white"><i class="fa-solid fa-robot me-2"></i>AI Fight Simulator</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row text-center mb-3">
+                        <div class="col-5">
+                            <h5 class="text-danger mb-1" id="simF1Prob">0%</h5>
+                            <small class="text-muted">Win Probability</small>
+                        </div>
+                        <div class="col-2 d-flex align-items-center justify-content-center">
+                            <span class="badge bg-secondary">VS</span>
+                        </div>
+                        <div class="col-5">
+                            <h5 class="text-primary mb-1" id="simF2Prob">0%</h5>
+                            <small class="text-muted">Win Probability</small>
+                        </div>
+                    </div>
+                    <div class="progress mb-4" style="height: 10px; background-color: #1e3a8a;">
+                        <div id="simProgressBar" class="progress-bar bg-danger" role="progressbar" style="width: 50%;"></div>
+                    </div>
+                    <div class="p-3 mb-3 rounded" style="background:rgba(255,255,255,0.05);">
+                        <h6 class="text-warning">Predicted Outcome</h6>
+                        <p class="mb-0 text-light fw-bold" id="simOutcome">-</p>
+                        <p class="mb-0 text-muted small mt-1" id="simKeyFactor">-</p>
+                    </div>
+                    <div class="p-3 rounded" style="background:rgba(255,255,255,0.05); border-left: 4px solid #8b5cf6;">
+                        <h6 style="color:#a855f7;">Simulation Narrative</h6>
+                        <p class="mb-0 text-light small" id="simNarrative">-</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="card" style="background:#18181b;border:1px solid #27272a;">
-                <div class="card-body p-3">
-                    <button type="submit" class="btn btn-danger w-100 py-2"><i class="fa-solid fa-calendar-check me-2"></i>Schedule Match</button>
+                <div class="card-body p-3 d-flex gap-2">
+                    <button type="button" class="btn btn-outline-primary py-2" id="btnSimulateFight" style="flex: 1;"><i class="fa-solid fa-gamepad me-2"></i>Simulate Fight</button>
+                    <button type="submit" class="btn btn-danger py-2" style="flex: 2;"><i class="fa-solid fa-calendar-check me-2"></i>Schedule Match</button>
                 </div>
             </div>
         </div>
@@ -156,6 +190,49 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error:', error);
             alert('❌ Error calling AI service: ' + error.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    });
+    // AI Match Simulator
+    document.getElementById('btnSimulateFight').addEventListener('click', async function(e) {
+        e.preventDefault();
+        const f1Id = document.querySelector('select[name="fighter1Id"]').value;
+        const f2Id = document.querySelector('select[name="fighter2Id"]').value;
+
+        if (!f1Id || !f2Id) {
+            return alert('Please select both fighters first.');
+        }
+
+        const btn = this;
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i>Simulating...';
+
+        try {
+            const response = await fetch('{{ path("api_ai_simulate") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fighter1_id: parseInt(f1Id), fighter2_id: parseInt(f2Id) })
+            });
+
+            const data = await response.json();
+            if (data.success && data.data) {
+                const sim = data.data;
+                document.getElementById('simulationCard').style.display = 'block';
+                document.getElementById('simF1Prob').innerText = sim.win_probability_f1 + '%';
+                document.getElementById('simF2Prob').innerText = sim.win_probability_f2 + '%';
+                document.getElementById('simProgressBar').style.width = sim.win_probability_f1 + '%';
+                document.getElementById('simOutcome').innerText = sim.predicted_outcome;
+                document.getElementById('simKeyFactor').innerText = sim.key_factor;
+                document.getElementById('simNarrative').innerText = sim.narrative;
+            } else {
+                alert('Error simulating fight: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Simulation error:', error);
+            alert('Failed to run simulation.');
         } finally {
             btn.disabled = false;
             btn.innerHTML = originalText;

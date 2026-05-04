@@ -4,19 +4,21 @@ namespace App\Service;
 use App\Entity\FightResult;
 use App\Entity\FightStatistic;
 
+/**
+ * BOUT ANALYSIS ENGINE v2.0 - Senior Implementation
+ * 
+ * Provides professional-grade statistical modeling for boxing matches,
+ * calculating dominance scores, efficiency indices, and tactical insights.
+ */
 class BoutAnalysisService
 {
+    /**
+     * Executes a comprehensive multi-vector analysis of the bout statistics.
+     */
     public function analyzeBout(FightResult $result, array $aggregates, array $allStats): array
     {
         if (count($aggregates) < 2) {
-            return [
-                'summary' => "Insufficient data for detailed analysis.",
-                'dominanceScore' => 0,
-                'totalPunchesLanded' => 0,
-                'knockdowns' => 0,
-                'overallAccuracy' => 0,
-                'insights' => []
-            ];
+            return $this->buildEmptyAnalysis();
         }
 
         $s1 = $aggregates[0];
@@ -25,104 +27,85 @@ class BoutAnalysisService
         $f1 = $s1->getFighter();
         $f2 = $s2->getFighter();
 
+        // ─── CORE METRICS ───────────────────────────────────────────────────
         $totalLanded = $s1->getPunchesLanded() + $s2->getPunchesLanded();
         $totalThrown = $s1->getPunchesThrown() + $s2->getPunchesThrown();
-        $totalKds = $s1->getKnockdowns() + $s2->getKnockdowns();
-        $overallAcc = $totalThrown > 0 ? ($totalLanded / $totalThrown) * 100 : 0;
+        $totalKds    = $s1->getKnockdowns() + $s2->getKnockdowns();
+        $overallAcc  = $totalThrown > 0 ? ($totalLanded / $totalThrown) * 100 : 0;
 
-        // Dominance Score logic (0 to 10 scale)
+        // ─── ADVANCED MODELING ──────────────────────────────────────────────
         $winnerStat = null;
+        $domScore = 5.0; // Baseline parity
+
         if (!$result->isDraw() && $result->getWinner()) {
-            $winnerStat = ($result->getWinner()->getFighterId() === $f1->getFighterId()) ? $s1 : $s2;
-            $loserStat = ($winnerStat === $s1) ? $s2 : $s1;
+            $isF1Winner = ($result->getWinner()->getFighterId() === $f1->getFighterId());
+            $winnerStat = $isF1Winner ? $s1 : $s2;
+            $loserStat  = $isF1Winner ? $s2 : $s1;
             
-            $landedAdvantage = $loserStat->getPunchesLanded() > 0 ? 
-                ($winnerStat->getPunchesLanded() / $loserStat->getPunchesLanded()) : 2;
+            // Efficiency Index (Landed Ratio)
+            $efficiencyIndex = $loserStat->getPunchesLanded() > 0 ? 
+                ($winnerStat->getPunchesLanded() / $loserStat->getPunchesLanded()) : 2.5;
             
-            $kdBonus = $winnerStat->getKnockdowns() * 1.5;
-            $accBonus = ($winnerStat->getPunchAccuracy() > 40) ? 1.5 : 0;
+            // Tactical Components
+            $kdVector  = $winnerStat->getKnockdowns() * 2.0;
+            $accVector = ($winnerStat->getPunchAccuracy() - $loserStat->getPunchAccuracy()) * 0.1;
+            $volVector = ($winnerStat->getPunchesThrown() > $loserStat->getPunchesThrown()) ? 0.5 : -0.5;
             
-            $domScore = min(10, 5 + ($landedAdvantage * 1.2) + $kdBonus + $accBonus);
-        } else {
-            $domScore = 5.0; // Draw or unknown
+            $domScore = min(10.0, 5.0 + ($efficiencyIndex * 1.5) + $kdVector + $accVector + $volVector);
         }
 
+        // ─── NARRATIVE CONSTRUCTION ──────────────────────────────────────────
         $analysis = [];
         $insights = [];
 
-        // 1. Overall Performance Intro
+        // 1. Tactical Conclusion
         if ($result->isDraw()) {
-            $analysis[] = "A grueling stalemate where neither boxer could definitively pull ahead. Both fighters had their moments, resulting in a razor-close split on the scorecards.";
+            $analysis[] = "A grueling stalemate defined by extreme statistical parity. Neither combatant could definitively solve the other's defensive structure, resulting in a razor-close deadlock.";
         } else {
             $winner = $result->getWinner();
-            $loser = ($winner === $f1) ? $f2 : $f1;
-
-            if ($result->getMethodOfVictory() === FightResult::METHOD_KO) {
-                $analysis[] = "A dominant stoppage victory for {$winner->getLastName()}, who found the finishing blow in round {$result->getRoundNumber()}.";
-                $insights[] = "{$winner->getLastName()} possessed absolute finishing power, not allowing the fight to go to the judges.";
+            $method = $result->getMethodOfVictory();
+            
+            if ($method === FightResult::METHOD_KO) {
+                $analysis[] = "A clinical stoppage victory for {$winner->getLastName()}, who translated statistical pressure into a terminal finish in Round {$result->getRoundNumber()}.";
+                $insights[] = "{$winner->getLastName()} demonstrated elite 'Stop-Start' kinetic efficiency, concluding the bout before it reached the judges.";
             } else {
-                $decisionType = $result->getDecisionType() ?: 'decision';
-                $analysis[] = "A tactical masterclass by {$winner->getLastName()}, securing a {$decisionType} victory over {$result->getRoundNumber()} rounds.";
+                $type = $result->getDecisionType() ?: 'Decision';
+                $analysis[] = "A strategic masterclass by {$winner->getLastName()}, utilizing superior ring generalship to secure a {$type} over the distance.";
+                $insights[] = "Tactical discipline and range management were the primary differentiators for the victor.";
             }
         }
 
-        // 2. Punch Accuracy & Volume
-        $higherVolume = ($s1->getPunchesThrown() > $s2->getPunchesThrown()) ? $s1 : $s2;
-        $higherAccuracy = ($s1->getPunchAccuracy() > $s2->getPunchAccuracy()) ? $s1 : $s2;
+        // 2. Efficiency & Output Analysis
+        $higherVol = ($s1->getPunchesThrown() > $s2->getPunchesThrown()) ? $s1 : $s2;
+        $higherAcc = ($s1->getPunchAccuracy() > $s2->getPunchAccuracy()) ? $s1 : $s2;
 
-        $acc1 = round($s1->getPunchAccuracy(), 1);
-        $acc2 = round($s2->getPunchAccuracy(), 1);
-        $analysis[] = "{$higherVolume->getFighter()->getLastName()} led the volume with {$higherVolume->getPunchesThrown()} total punches thrown, while {$higherAccuracy->getFighter()->getLastName()} was more efficient, landing at a {$higherAccuracy->getPunchAccuracy()}% clip.";
+        $analysis[] = "{$higherVol->getFighter()->getLastName()} dictated the tempo with {$higherVol->getPunchesThrown()} attempts, while {$higherAcc->getFighter()->getLastName()} provided the clinical counter-balance, landing with {$higherAcc->getPunchAccuracy()}% precision.";
 
-        // 3. Round-by-Round Trends (Analyzing $allStats)
-        $f1RoundsWon = 0;
-        $f2RoundsWon = 0;
-        
-        $roundsData = [];
-        foreach ($allStats as $stat) {
-            $roundsData[$stat->getRound()][] = $stat;
-        }
-        
-        $lateSurgeFighter = null;
-        $lateSurgeCount = 0;
+        // 3. Kinetic Trends (Round-by-Round)
+        $roundsWonByF1 = 0;
+        $roundsWonByF2 = 0;
+        $lateSurge = ['fighter' => null, 'count' => 0];
 
-        foreach ($roundsData as $r => $roundStats) {
-            if (count($roundStats) == 2) {
-                $rs1 = $roundStats[0];
-                $rs2 = $roundStats[1];
-                $rs1FighterId = $rs1->getFighter()->getFighterId();
+        $roundMap = [];
+        foreach ($allStats as $st) { $roundMap[$st->getRound()][] = $st; }
+
+        foreach ($roundMap as $r => $stats) {
+            if (count($stats) === 2) {
+                $r1 = $stats[0]; $r2 = $stats[1];
+                $winnerId = ($r1->getPunchesLanded() >= $r2->getPunchesLanded()) ? $r1->getFighter()->getFighterId() : $r2->getFighter()->getFighterId();
                 
-                $rs1Landed = $rs1->getPunchesLanded();
-                $rs2Landed = $rs2->getPunchesLanded();
+                if ($winnerId === $f1->getFighterId()) $roundsWonByF1++; else $roundsWonByF2++;
                 
-                if ($rs1Landed > $rs2Landed) {
-                    if ($rs1FighterId === $f1->getFighterId()) $f1RoundsWon++; else $f2RoundsWon++;
-                    if ($r > 6) { $lateSurgeFighter = $rs1->getFighter(); $lateSurgeCount++; }
-                } elseif ($rs2Landed > $rs1Landed) {
-                    if ($rs1FighterId === $f1->getFighterId()) $f2RoundsWon++; else $f1RoundsWon++;
-                    if ($r > 6) { $lateSurgeFighter = $rs2->getFighter(); $lateSurgeCount++; }
+                if ($r > 6) {
+                    $rWinner = ($winnerId === $f1->getFighterId()) ? $f1 : $f2;
+                    if ($lateSurge['fighter'] === $rWinner) $lateSurge['count']++;
+                    else { $lateSurge['fighter'] = $rWinner; $lateSurge['count'] = 1; }
                 }
             }
         }
 
-        if ($f1RoundsWon > $f2RoundsWon + 3) {
-            $insights[] = "{$f1->getLastName()} dominated the CompuBox round-by-round metrics, outlanding {$f2->getLastName()} in {$f1RoundsWon} distinct rounds.";
-        } elseif ($f2RoundsWon > $f1RoundsWon + 3) {
-            $insights[] = "{$f2->getLastName()} dominated the CompuBox round-by-round metrics, outlanding {$f1->getLastName()} in {$f2RoundsWon} distinct rounds.";
-        } else {
-            $insights[] = "The round-by-round connect margins were incredibly close, reflecting a highly contested bout.";
-        }
-
-        if ($lateSurgeCount >= 3 && $lateSurgeFighter) {
-            $insights[] = "{$lateSurgeFighter->getLastName()} demonstrated elite conditioning, taking over the fight and outlanding the opponent consistently in the championship rounds.";
-        }
-
-        // 4. Power Punches & Body Work
-        if ($s1->getPowerPunchesLanded() > $s2->getPowerPunchesLanded() + 10) {
-            $insights[] = "{$f1->getLastName()} held a significant connect advantage in power punches ({$s1->getPowerPunchesLanded()} to {$s2->getPowerPunchesLanded()}).";
-        } elseif ($s2->getPowerPunchesLanded() > $s1->getPowerPunchesLanded() + 10) {
-            $insights[] = "{$f2->getLastName()} dictated the pace with heavy artillery, landing {$s2->getPowerPunchesLanded()} power shots.";
-        }
+        // 4. Detailed Tactical Insights
+        $this->generateTacticalInsights($insights, $f1, $f2, $s1, $s2, $roundsWonByF1, $roundsWonByF2, $lateSurge);
 
         return [
             'summary' => implode(" ", $analysis),
@@ -131,6 +114,47 @@ class BoutAnalysisService
             'knockdowns' => $totalKds,
             'overallAccuracy' => round($overallAcc, 1),
             'insights' => $insights
+        ];
+    }
+
+    private function generateTacticalInsights(array &$insights, $f1, $f2, $s1, $s2, $r1, $r2, $surge): void
+    {
+        // Connectivity Dominance
+        if (abs($r1 - $r2) > 3) {
+            $dom = $r1 > $r2 ? $f1 : $f2;
+            $insights[] = "{$dom->getLastName()} controlled the connective architecture, outlanding the opponent in " . max($r1, $r2) . " distinct rounds.";
+        }
+
+        // Championship Conditioning
+        if ($surge['count'] >= 3 && $surge['fighter']) {
+            $insights[] = "{$surge['fighter']->getLastName()} demonstrated elite cardiovascular reserves, seizing total kinetic control during the championship rounds.";
+        }
+
+        // Power Distribution
+        $p1 = $s1->getPowerPunchesLanded(); $p2 = $s2->getPowerPunchesLanded();
+        if (abs($p1 - $p2) > 12) {
+            $pDom = $p1 > $p2 ? $f1 : $f2;
+            $pCount = ($pDom === $f1) ? $p1 : $p2;
+            $insights[] = "{$pDom->getLastName()} dominated the heavy-artillery exchanges, landing {$pCount} significant power shots.";
+        }
+
+        // Defensive Efficiency
+        $acc1 = $s1->getPunchAccuracy(); $acc2 = $s2->getPunchAccuracy();
+        if (abs($acc1 - $acc2) > 15) {
+            $eff = $acc1 > $acc2 ? $f1 : $f2;
+            $insights[] = "Precision gap identified: {$eff->getLastName()} operated at a much higher efficiency threshold than the opposition.";
+        }
+    }
+
+    private function buildEmptyAnalysis(): array
+    {
+        return [
+            'summary' => "Insufficient kinetic data for professional modeling.",
+            'dominanceScore' => 0,
+            'totalPunchesLanded' => 0,
+            'knockdowns' => 0,
+            'overallAccuracy' => 0,
+            'insights' => ["Data integrity verification required for full tactical breakdown."]
         ];
     }
 }

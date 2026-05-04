@@ -79,7 +79,7 @@ class FightStatisticController extends AbstractController
 
         // Generate AI analysis for each group
         foreach ($groupedStats as $rid => &$group) {
-            $group['analysis'] = $analysisService->analyzeBout($group['result'], $group['stats']);
+            $group['analysis'] = $analysisService->analyzeBout($group['result'], $group['totalStats'], $group['stats']);
         }
         unset($group);
 

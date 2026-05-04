@@ -104,6 +104,36 @@
   .sf-sidebar.sf-mobile-open { transform: translateX(0); }
   .sf-sidebar-backdrop { z-index: 1049; }
 }
+
+/* ── AI Style Tags ───────────────────────────────────────── */
+.ai-style-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  background: rgba(30, 58, 138, 0.15); /* Very dark blue tint */
+  border: 1px solid rgba(59, 130, 246, 0.4); /* Blueish border */
+  color: #60a5fa; /* Light blue text */
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
+  white-space: nowrap;
+}
+.ai-style-tag i {
+  margin-right: 0.35rem;
+  font-size: 0.7rem;
+}
+.ai-style-tag.champ {
+  background: rgba(180, 83, 9, 0.15);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.1);
+}
 </style>
 
 <div class="sf-admin-wrap">

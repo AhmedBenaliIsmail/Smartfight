@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\RankingRepository;
+use App\Repository\FightStatisticRepository;
 
 #[Route('/api/ai')]
 class AIController extends AbstractController
@@ -143,6 +145,185 @@ class AIController extends AbstractController
             'count'   => $created,
             'matches' => $matches,
         ]);
+    }
+
+    #[Route('/simulate', name: 'api_ai_simulate', methods: ['POST'])]
+    public function simulate(
+        Request $request,
+        AIService $aiService,
+        FighterRepository $fighterRepo,
+        FightResultRepository $resultRepo,
+        RankingRepository $rankingRepo
+    ): JsonResponse {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $data = json_decode($request->getContent(), true);
+        $fighter1Id = $data['fighter1_id'] ?? null;
+        $fighter2Id = $data['fighter2_id'] ?? null;
+
+        if (!$fighter1Id || !$fighter2Id) {
+            return $this->json(['error' => 'Missing fighter IDs'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $fighter1 = $fighterRepo->find($fighter1Id);
+        $fighter2 = $fighterRepo->find($fighter2Id);
+
+        if (!$fighter1 || !$fighter2) {
+            return $this->json(['error' => 'Fighter not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $f1Data = $this->buildFighterPayload($fighter1, $resultRepo, $rankingRepo);
+        $f2Data = $this->buildFighterPayload($fighter2, $resultRepo, $rankingRepo);
+
+        $result = $aiService->simulateFight($f1Data, $f2Data);
+
+        return $this->json($result);
+    }
+
+    #[Route('/scouting-report', name: 'api_ai_scouting_report', methods: ['POST'])]
+    public function scoutingReport(
+        Request $request,
+        AIService $aiService,
+        FighterRepository $fighterRepo,
+        FightResultRepository $resultRepo,
+        RankingRepository $rankingRepo
+    ): JsonResponse {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $data = json_decode($request->getContent(), true);
+        $subjectId = $data['subject_id'] ?? null;
+        $opponentId = $data['opponent_id'] ?? null;
+
+        if (!$subjectId || !$opponentId) {
+            return $this->json(['error' => 'Missing fighter IDs'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $subject = $fighterRepo->find($subjectId);
+        $opponent = $fighterRepo->find($opponentId);
+
+        if (!$subject || !$opponent) {
+            return $this->json(['error' => 'Fighter not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $subjectData = $this->buildFighterPayload($subject, $resultRepo, $rankingRepo);
+        $opponentData = $this->buildFighterPayload($opponent, $resultRepo, $rankingRepo);
+
+        $result = $aiService->generateScoutingReport($subjectData, $opponentData);
+
+        return $this->json($result);
+    }
+
+    #[Route('/post-fight-recap', name: 'api_ai_post_fight_recap', methods: ['POST'])]
+    public function postFightRecap(
+        Request $request,
+        AIService $aiService,
+        FighterRepository $fighterRepo,
+        FightResultRepository $resultRepo,
+        RankingRepository $rankingRepo,
+        FightStatisticRepository $statRepo
+    ): JsonResponse {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $data = json_decode($request->getContent(), true);
+        $fightId = $data['fight_id'] ?? null;
+
+        if (!$fightId) {
+            return $this->json(['error' => 'Missing fight ID'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $fight = $resultRepo->find($fightId);
+        if (!$fight) {
+            return $this->json(['error' => 'Fight not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $fighter1 = $fight->getFighter1();
+        $fighter2 = $fight->getFighter2();
+
+        $f1Data = $this->buildFighterPayload($fighter1, $resultRepo, $rankingRepo);
+        $f2Data = $this->buildFighterPayload($fighter2, $resultRepo, $rankingRepo);
+
+        $fightInfo = [
+            'event_name' => $fight->getEvent()?->getName() ?? 'Unknown Event',
+            'division' => $fight->getWeightDivision()?->getName() ?? 'Catchweight',
+            'winner_name' => $fight->getWinner()?->getFullName() ?? 'Draw',
+            'result_type' => $fight->getResultType() ?? 'Decision',
+            'end_round' => $fight->getEndRound() ?? 3
+        ];
+
+        // Aggregate stats
+        $stats = $statRepo->findBy(['fightResult' => $fight]);
+        $aggregateStats = [];
+        // Simple aggregation example
+        $aggregateStats['total_rounds_analyzed'] = count($stats);
+
+        $result = $aiService->generatePostFightRecap($fightInfo, $f1Data, $f2Data, $aggregateStats);
+
+        return $this->json($result);
+    }
+
+    #[Route('/compare-result', name: 'api_ai_compare_result', methods: ['POST'])]
+    public function compareResult(Request $request, FightResultRepository $resultRepo, RankingRepository $rankingRepo, AIService $aiService): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        try {
+            $data = json_decode($request->getContent(), true);
+            if (!isset($data['fight_id'])) {
+                return $this->json(['success' => false, 'error' => 'Missing fight_id'], 400);
+            }
+
+            $fight = $resultRepo->find($data['fight_id']);
+            if (!$fight || $fight->getStatus() !== 'COMPLETED') {
+                return $this->json(['success' => false, 'error' => 'Fight not found or not completed'], 404);
+            }
+
+            if (!$fight->getFighter1() || !$fight->getFighter2()) {
+                return $this->json(['success' => false, 'error' => 'Fight data incomplete (missing fighters)'], 400);
+            }
+
+            $f1Data = $this->buildFighterPayload($fight->getFighter1(), $resultRepo, $rankingRepo);
+            $f2Data = $this->buildFighterPayload($fight->getFighter2(), $resultRepo, $rankingRepo);
+
+            $realResultData = [
+                'winner' => $fight->getWinner() ? $fight->getWinner()->getFullName() : 'DRAW',
+                'method' => $fight->getMethodOfVictory() ?? 'N/A',
+                'round' => $fight->getRoundNumber() ?? 0
+            ];
+
+            $result = $aiService->comparePredictionVsReality($f1Data, $f2Data, $realResultData);
+            
+            return $this->json($result);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => 'An unexpected error occurred during analysis: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function buildFighterPayload($fighter, FightResultRepository $resultRepo, RankingRepository $rankingRepo): array
+    {
+        if (!$fighter) return [];
+
+        $fights = $resultRepo->findCompletedByFighter($fighter->getFighterId(), 5);
+        $ranking = $rankingRepo->findOneBy(['fighter' => $fighter]);
+        
+        $totalFights = $fighter->getWins() + $fighter->getLosses() + $fighter->getDraws();
+        $koRate = $fighter->getWins() > 0 ? round(($fighter->getKoWins() / $fighter->getWins()) * 100, 1) : 0;
+
+        return [
+            'name' => $fighter->getFullName(),
+            'style' => $fighter->getCalculatedFightingStyle(),
+            'height' => $fighter->getHeight() ?? 175,
+            'reach' => $fighter->getReach() ?? 180,
+            'weight' => $fighter->getWeight() ?? 155,
+            'wins' => $fighter->getWins(),
+            'losses' => $fighter->getLosses(),
+            'ko_rate' => $koRate,
+            'elo' => $fighter->getEloRating(),
+            'form' => $this->summarizeRecentFights($fights, $fighter->getFighterId()),
+            'isChampion' => $ranking ? $ranking->isChampion() : false
+        ];
     }
 
     private function calculateWinRate(array $fights, int $fighterId): float

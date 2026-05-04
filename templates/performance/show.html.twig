@@ -32,7 +32,16 @@
                 </div>
                 <div class="mb-3">
                     <h2 class="h1 fw-bold mb-0" style="color:#fbbf24;">{{ fighter.performanceScore|round(1) }}</h2>
-                    <div class="text-muted small">OVERALL AI SCORE</div>
+                    <div class="text-muted small mb-2">OVERALL AI SCORE</div>
+                    <div class="ai-style-tag">
+                        {{ fighter.aiStyleTag ?? fighter.calculatedFightingStyle }}
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <button class="btn btn-outline-primary btn-sm w-100 mb-2" data-bs-toggle="modal" data-bs-target="#scoutingModal" style="border-color: #3b82f6; color: #60a5fa;">
+                        <i class="fa-solid fa-user-secret me-2"></i>Pro Scouting Report
+                    </button>
                 </div>
                 
                 <div class="row g-2 mt-4">
@@ -194,4 +203,134 @@
         </table>
     </div>
 </div>
+
+<!-- Pro Scouting Report Modal -->
+<div class="modal fade" id="scoutingModal" tabindex="-1" aria-hidden="true" data-bs-theme="dark">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background:#09090b; border:1px solid #27272a;">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title text-light"><i class="fa-solid fa-user-secret me-2" style="color:#3b82f6;"></i>AI Scouting Report Generator</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-4">Select a potential opponent to generate a deep tactical analysis and game plan for {{ fighter.fullName }}.</p>
+                <div class="mb-3">
+                    <label class="form-label text-light">Select Opponent</label>
+                    <select class="form-select bg-dark text-light border-secondary" id="scoutOpponentSelect">
+                        <option value="">Choose an opponent...</option>
+                        <!-- Options would be dynamically loaded or provided by backend. For now, assuming standard setup. -->
+                        <option value="1">Load opponent dynamically via JS</option>
+                    </select>
+                </div>
+                <div class="text-center my-4 d-none" id="scoutLoading">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <div class="mt-2 text-muted small">DeepSeek analyzing fighting styles and physical metrics...</div>
+                </div>
+                <div id="scoutResults" class="d-none">
+                    <h5 class="text-danger fw-bold"><i class="fa-solid fa-triangle-exclamation me-2"></i>Critical Danger</h5>
+                    <div class="p-3 mb-3 rounded" style="background: rgba(220, 38, 38, 0.1); border: 1px dashed #dc2626; color: #fca5a5;" id="scoutWarning">
+                        <!-- Warning goes here -->
+                    </div>
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-success fw-bold">Opponent Strengths</h6>
+                            <ul class="text-light small ps-3" id="scoutStrengths"></ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-info fw-bold">Opponent Weaknesses</h6>
+                            <ul class="text-light small ps-3" id="scoutWeaknesses"></ul>
+                        </div>
+                    </div>
+                    
+                    <h5 class="text-primary fw-bold"><i class="fa-solid fa-chess-knight me-2"></i>Tactical Game Plan</h5>
+                    <div class="p-3 rounded" style="background: rgba(59, 130, 246, 0.1); border: 1px solid #3b82f6; color: #bfdbfe;" id="scoutGameplan">
+                        <!-- Gameplan goes here -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnGenerateScout"><i class="fa-solid fa-wand-magic-sparkles me-2"></i>Generate Report</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnGenerate = document.getElementById('btnGenerateScout');
+    const loading = document.getElementById('scoutLoading');
+    const results = document.getElementById('scoutResults');
+    const select = document.getElementById('scoutOpponentSelect');
+    
+    // Quick and dirty way to get fighters for the select (should ideally be passed from controller)
+    fetch('/fighters?q=')
+        .then(res => res.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const links = doc.querySelectorAll('a[href*="/fighters/"]');
+            const options = new Set();
+            links.forEach(l => {
+                const href = l.getAttribute('href');
+                const match = href.match(/\/fighters\/(\d+)\/edit/);
+                if(match && match[1] !== '{{ fighter.fighterId }}') {
+                    // Extract name from table row
+                    const name = l.closest('tr').querySelector('td:nth-child(2) .fw-bold').innerText;
+                    options.add(`<option value="${match[1]}">${name}</option>`);
+                }
+            });
+            select.innerHTML = '<option value="">Choose an opponent...</option>' + Array.from(options).join('');
+        })
+        .catch(e => console.warn('Could not load fighters list automatically.'));
+
+    if (btnGenerate) {
+        btnGenerate.addEventListener('click', function() {
+            const oppId = select.value;
+            if (!oppId) return alert('Please select an opponent first.');
+            
+            loading.classList.remove('d-none');
+            results.classList.add('d-none');
+            btnGenerate.disabled = true;
+            
+            fetch('/api/ai/scouting-report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    subject_id: {{ fighter.fighterId }},
+                    opponent_id: parseInt(oppId)
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                loading.classList.add('d-none');
+                btnGenerate.disabled = false;
+                
+                if (data.success && data.data) {
+                    const info = data.data;
+                    document.getElementById('scoutWarning').innerText = info.danger_warning || 'N/A';
+                    document.getElementById('scoutGameplan').innerText = info.tactical_gameplan || 'N/A';
+                    
+                    document.getElementById('scoutStrengths').innerHTML = (info.opponent_strengths || []).map(s => `<li>${s}</li>`).join('');
+                    document.getElementById('scoutWeaknesses').innerHTML = (info.opponent_weaknesses || []).map(s => `<li>${s}</li>`).join('');
+                    
+                    results.classList.remove('d-none');
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to generate report.'));
+                }
+            })
+            .catch(e => {
+                loading.classList.add('d-none');
+                btnGenerate.disabled = false;
+                alert('Network error.');
+            });
+        });
+    }
+});
+</script>
 {% endblock %}

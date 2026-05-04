@@ -17,10 +17,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 #[Route('/rankings')]
 class RankingController extends AbstractController
 {
-    // ─── Your LAN IP ────────────────────────────────────────────────────────
-    private const LAN_IP   = '192.168.1.14';
-    private const LAN_PORT = '8001';
-
     #[Route('', name: 'app_rankings')]
     public function index(Request $request, RankingService $rankingService): Response
     {
@@ -41,13 +37,9 @@ class RankingController extends AbstractController
 
         $lastUpdated = new \DateTime();
 
-        // QR → opens mobile-friendly view
-        $rankingUrl = sprintf(
-            'http://%s:%s%s',
-            self::LAN_IP,
-            self::LAN_PORT,
-            $this->generateUrl('app_ranking_mobile')
-        );
+        // QR → opens mobile-friendly view (URL dynamique basée sur la requête entrante)
+        $rankingUrl = $request->getSchemeAndHttpHost()
+            . $this->generateUrl('app_ranking_mobile');
         $qrSvg = $this->buildQrSvg($rankingUrl);
 
         return $this->render('ranking/index.html.twig', [
@@ -61,7 +53,7 @@ class RankingController extends AbstractController
 
     // ─── PUBLIC mobile view (no login — scanned from QR) ────────────────────
     #[Route('/mobile', name: 'app_ranking_mobile')]
-    public function mobile(RankingService $rankingService): Response
+    public function mobile(Request $request, RankingService $rankingService): Response
     {
         // No denyAccessUnlessGranted here — intentionally public
         $fighters = $rankingService->getRankedFighters();
@@ -72,12 +64,9 @@ class RankingController extends AbstractController
             $groupedRankings[$wd][] = $f;
         }
 
-        $pdfUrl = sprintf(
-            'http://%s:%s%s',
-            self::LAN_IP,
-            self::LAN_PORT,
-            $this->generateUrl('app_ranking_pdf')
-        );
+        // URL dynamique basée sur la requête entrante
+        $pdfUrl = $request->getSchemeAndHttpHost()
+            . $this->generateUrl('app_ranking_pdf');
 
         return $this->render('ranking/mobile.html.twig', [
             'groupedRankings' => $groupedRankings,
@@ -159,15 +148,11 @@ class RankingController extends AbstractController
     }
 
     #[Route('/qr-download', name: 'app_ranking_qr_download')]
-    public function qrDownload(): Response
+    public function qrDownload(Request $request): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
-        $url = sprintf(
-            'http://%s:%s%s',
-            self::LAN_IP,
-            self::LAN_PORT,
-            $this->generateUrl('app_ranking_mobile')
-        );
+        $url = $request->getSchemeAndHttpHost()
+            . $this->generateUrl('app_ranking_mobile');
         $svg = $this->buildQrSvg($url);
 
         return new Response($svg, 200, [
