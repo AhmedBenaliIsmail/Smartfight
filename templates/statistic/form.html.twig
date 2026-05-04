@@ -263,9 +263,7 @@
     <div class="col-12">
         <div class="itn-banner">
             <div class="itn-title"><i class="fa-solid fa-chart-bar me-2"></i>Inside The Numbers — Round {{ currentRound }}</div>
-            <div class="itn-text" id="itnText">
-                <span class="itn-placeholder">Click "AI Auto-Fill" to generate a CompuBox broadcast analysis of this round.</span>
-            </div>
+            <textarea name="roundCommentary" id="itnText" class="stat-input mt-2" style="height: 100px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);" placeholder="Enter broadcast analysis or click 'AI Auto-Fill'...">{{ stat1 ? stat1.commentary : '' }}</textarea>
         </div>
     </div>
 
@@ -403,9 +401,7 @@ document.getElementById('aiAutoFillBtn').addEventListener('click', async functio
         const itn = sug.inside_the_numbers || sug.inside_the_numbers_text || '';
         const itnEl = document.getElementById('itnText');
         if (itnEl) {
-            itnEl.innerHTML = itn
-                ? `<span>${itn}</span>`
-                : `<span class="itn-placeholder">No broadcast analysis returned.</span>`;
+            itnEl.value = itn;
         }
 
     } catch (err) {

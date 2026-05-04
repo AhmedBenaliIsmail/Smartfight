@@ -1,0 +1,175 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}AI Injury Predictions — SmartFight{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_performance') }}" style="color:#a1a1aa;text-decoration:none;">Performance</a></li>
+    <li class="breadcrumb-item active">Injury Predictions</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;"><i class="fa-solid fa-heart-pulse me-2" style="color:#ef5350;"></i>AI Injury Prediction Center</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Top 3 most at-risk fighters ranked by the SmartFight Biomechanical Algorithm</p>
+    </div>
+    <a href="{{ path('app_performance') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+</div>
+
+<!-- Algorithm Explanation Card -->
+<div class="card mb-4" style="background:#18181b;border:1px solid #27272a; border-left: 4px solid #ef5350;">
+    <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+        <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-code me-2" style="color:#ef5350;"></i>Injury Risk Algorithm</h3>
+    </div>
+    <div class="card-body p-4">
+        <div class="p-3 rounded mb-3" style="background:#09090b; font-family: monospace; border: 1px dashed #3f3f46; color: #f87171;">
+            R = 10 + AgeFactor + LoadFactor + TraumaFactor
+        </div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="p-3 rounded" style="background:#27272a;">
+                    <h6 class="fw-bold mb-1" style="color:#fafafa; font-size: 0.8rem;">AgeFactor</h6>
+                    <p class="text-muted small mb-0">max(0, (age - 30) × 3). Athletes over 30 carry exponentially higher orthopedic risk.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 rounded" style="background:#27272a;">
+                    <h6 class="fw-bold mb-1" style="color:#fafafa; font-size: 0.8rem;">LoadFactor</h6>
+                    <p class="text-muted small mb-0">total_fights × 0.8. Career volume directly correlates with cumulative stress injuries.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 rounded" style="background:#27272a;">
+                    <h6 class="fw-bold mb-1" style="color:#fafafa; font-size: 0.8rem;">TraumaFactor</h6>
+                    <p class="text-muted small mb-0">ko_losses × 15. Each KO/TKO loss is weighted heavily for neurological risk assessment.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top 3 At-Risk Fighters -->
+<h3 class="h4 mb-3 fw-bold" style="color:#fafafa;"><i class="fa-solid fa-ranking-star me-2" style="color:#fbbf24;"></i>Top 3 At-Risk Fighters</h3>
+<div class="row g-4 mb-4">
+    {% for p in predictions %}
+    <div class="col-lg-4">
+        <div class="card h-100" style="background:#0f0f13; border:1px solid {% if loop.index == 1 %}#ef5350{% elseif loop.index == 2 %}#f59e0b{% else %}#3b82f6{% endif %}; border-radius: 16px; overflow: hidden;">
+            <div class="card-body p-4">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width: 45px; height: 45px; background: rgba(239, 68, 68, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fa-solid fa-shield-heart fs-4" style="color: {% if loop.index == 1 %}#ef5350{% elseif loop.index == 2 %}#f59e0b{% else %}#3b82f6{% endif %};"></i>
+                        </div>
+                        <div>
+                            <h4 class="fw-black mb-0 text-white" style="font-size: 1rem; line-height: 1.1;">{{ p.fighter.fullName }}</h4>
+                            <div class="text-muted small mt-1" style="font-size: 0.7rem;">{{ p.fighter.calculatedFightingStyle }} • {{ p.fighter.wins }}-{{ p.fighter.losses }}</div>
+                        </div>
+                    </div>
+                    <span class="badge" style="background: {% if loop.index == 1 %}#ef5350{% elseif loop.index == 2 %}#f59e0b{% else %}#3b82f6{% endif %}; font-size: 0.7rem;">#{{ loop.index }}</span>
+                </div>
+
+                <!-- Risk Bar -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-end mb-2">
+                        <span class="text-muted fw-bold" style="font-size: 0.7rem; letter-spacing: 1px;">RISK LEVEL</span>
+                        <span class="fw-black" style="color: {% if p.risk_percentage > 70 %}#ef5350{% elseif p.risk_percentage > 35 %}#f59e0b{% else %}#00e676{% endif %}; font-size: 1rem;">{{ p.risk_percentage }}%</span>
+                    </div>
+                    <div class="progress" style="height: 5px; background: #1c1c24; border-radius: 10px;">
+                        <div class="progress-bar" style="background: {% if p.risk_percentage > 70 %}#ef5350{% elseif p.risk_percentage > 35 %}#f59e0b{% else %}#00e676{% endif %}; width: {{ p.risk_percentage }}%;"></div>
+                    </div>
+                </div>
+
+                <!-- Prediction + Alert -->
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <div class="p-2 text-center" style="background: #1c1c24; border-radius: 10px; border: 1px solid #2d2d35;">
+                            <div class="text-muted" style="font-size: 0.6rem; letter-spacing: 1px;">PREDICTION</div>
+                            <div class="text-warning fw-bold" style="font-size: 0.7rem;"><i class="fa-solid fa-hand-fist me-1"></i>{{ p.vulnerable_zone }}</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-2 text-center" style="background: #1c1c24; border-radius: 10px; border: 1px solid #2d2d35;">
+                            <div class="text-muted" style="font-size: 0.6rem; letter-spacing: 1px;">ALERT</div>
+                            <div class="text-danger fw-bold" style="font-size: 0.7rem;">{{ p.days_to_alert }} days</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommendation -->
+                <div class="p-2 mb-3 d-flex align-items-center gap-2" style="background: rgba(0, 230, 118, 0.05); border: 1px solid rgba(0, 230, 118, 0.2); border-radius: 10px;">
+                    <div style="width: 20px; height: 20px; background: #00e676; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i class="fa-solid fa-check text-dark" style="font-size: 8px;"></i>
+                    </div>
+                    <div class="text-white small" style="font-size: 0.7rem;">{{ p.mitigation_strategy }}</div>
+                </div>
+
+                <!-- Metrics -->
+                <div class="row text-center mb-3 border-top pt-3" style="border-color: #2d2d35 !important;">
+                    <div class="col-4">
+                        <div class="fw-black text-white" style="font-size: 0.85rem;">{{ p.accuracy|round }}%</div>
+                        <div class="text-muted" style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1px;">Accuracy</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-black text-white" style="font-size: 0.85rem;">3</div>
+                        <div class="text-muted" style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1px;">Weeks Early</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-black text-white" style="font-size: 0.85rem;">{{ p.roi }}%</div>
+                        <div class="text-muted" style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1px;">ROI</div>
+                    </div>
+                </div>
+
+                <!-- PDF Button -->
+                <a href="{{ path('app_injury_pdf', {id: p.fighter.fighterId}) }}" target="_blank" class="btn w-100 py-2 fw-bold text-uppercase" style="background: #ef5350; color: white; border-radius: 10px; letter-spacing: 1px; font-size: 0.75rem;">
+                    <i class="fa-solid fa-file-pdf me-2"></i>Download PDF Report
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Full Roster Table -->
+<h3 class="h4 mb-3 fw-bold" style="color:#fafafa;"><i class="fa-solid fa-list-check me-2"></i>Full Roster Risk Analysis</h3>
+<div class="card" style="background:#18181b;border:1px solid #27272a;">
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-hover mb-0 text-center">
+            <thead>
+            <tr>
+                <th class="text-start" style="padding:.75rem 1.25rem;">Fighter</th>
+                <th>Risk %</th>
+                <th>Level</th>
+                <th>Zone</th>
+                <th>Alert</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for p in allPredictions %}
+                <tr>
+                    <td class="text-start" style="padding:.75rem 1.25rem;">
+                        <a href="{{ path('app_performance_show', {id: p.fighter.fighterId}) }}" class="text-white text-decoration-none fw-bold">{{ p.fighter.fullName }}</a>
+                        <div class="text-muted small">{{ p.fighter.calculatedFightingStyle }}</div>
+                    </td>
+                    <td>
+                        <span class="fw-bold" style="color: {% if p.risk_percentage > 70 %}#ef5350{% elseif p.risk_percentage > 35 %}#f59e0b{% else %}#10b981{% endif %};">{{ p.risk_percentage }}%</span>
+                    </td>
+                    <td>
+                        <span class="badge {% if p.risk_level == 'High' %}bg-danger{% elseif p.risk_level == 'Medium' %}bg-warning text-dark{% else %}bg-success{% endif %}">{{ p.risk_level }}</span>
+                    </td>
+                    <td class="text-muted small">{{ p.vulnerable_zone }}</td>
+                    <td class="text-muted small">{{ p.days_to_alert }}d</td>
+                    <td>
+                        <a href="{{ path('app_injury_pdf', {id: p.fighter.fighterId}) }}" target="_blank" class="btn btn-sm" style="background: #27272a; color: #f87171; border: none;">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

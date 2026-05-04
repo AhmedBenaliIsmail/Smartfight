@@ -89,9 +89,15 @@
 <body>
 
     <div class="header">
-        <h1>World Standings</h1>
-        <p>Official Divisional Rankings</p>
-        <p>Generated at: {{ lastUpdated|date('M d, Y H:i:s') }}</p>
+        <div style="float: right; width: 80px; height: 80px;">
+            {{ qrSvg|raw }}
+        </div>
+        <div style="margin-right: 100px;">
+            <h1>World Standings</h1>
+            <p>Official Divisional Rankings</p>
+            <p>Generated at: {{ lastUpdated|date('M d, Y H:i:s') }}</p>
+        </div>
+        <div style="clear: both;"></div>
     </div>
 
     {% if groupedRankings|length > 0 %}

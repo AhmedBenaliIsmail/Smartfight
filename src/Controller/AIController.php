@@ -23,11 +23,12 @@ class AIController extends AbstractController
         Request $request,
         AIService $aiService,
         FighterRepository $fighterRepo,
-        FightResultRepository $resultRepo
+        FightResultRepository $resultRepo,
+        \App\Service\RoundCommentaryService $commentaryService
     ): JsonResponse {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        $data = json_decode($request->getContent(), true);
+        $data = json_decode($request->getContent(), true) ?? [];
         
         $fighter1Id = $data['fighter1_id'] ?? null;
         $fighter2Id = $data['fighter2_id'] ?? null;
@@ -67,6 +68,34 @@ class AIController extends AbstractController
         ];
 
         $result = $aiService->suggestFightStats($f1Data, $f2Data, $round);
+
+        // SYNC: Use RoundCommentaryService for the text instead of AI text
+        if (isset($result['suggestions'])) {
+            $sug = $result['suggestions'];
+            $sf1 = $sug['fighter1'] ?? [];
+            $sf2 = $sug['fighter2'] ?? [];
+
+            // Map suggestions to commentary service format
+            $map = function($f) {
+                return [
+                    'landed' => $f['punches_landed'] ?? 0,
+                    'thrown' => $f['punches_thrown'] ?? 0,
+                    'kds' => $f['knockdowns'] ?? 0,
+                    'power_landed' => $f['power_punches_landed'] ?? 0,
+                    'power_thrown' => $f['power_punches_thrown'] ?? 0,
+                    'body_shots' => $f['body_shots_landed'] ?? 0,
+                    'jabs_landed' => $f['jabs_landed'] ?? 0,
+                ];
+            };
+
+            $itnText = $commentaryService->generateForRound(
+                $fighter1->getLastName(), $map($sf1),
+                $fighter2->getLastName(), $map($sf2),
+                $round
+            );
+
+            $result['suggestions']['inside_the_numbers_text'] = $itnText;
+        }
 
         return $this->json($result);
     }
@@ -175,7 +204,7 @@ class AIController extends AbstractController
         $f1Data = $this->buildFighterPayload($fighter1, $resultRepo, $rankingRepo);
         $f2Data = $this->buildFighterPayload($fighter2, $resultRepo, $rankingRepo);
 
-        $result = $aiService->simulateFight($f1Data, $f2Data);
+        $result = $aiService->analyzeFightDynamics($f1Data, $f2Data);
 
         return $this->json($result);
     }
@@ -267,14 +296,16 @@ class AIController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         try {
-            $data = json_decode($request->getContent(), true);
-            if (!isset($data['fight_id'])) {
+            $data = json_decode($request->getContent(), true) ?? [];
+            $fightId = $data['fight_id'] ?? null;
+            
+            if (!$fightId) {
                 return $this->json(['success' => false, 'error' => 'Missing fight_id'], 400);
             }
 
-            $fight = $resultRepo->find($data['fight_id']);
-            if (!$fight || $fight->getStatus() !== 'COMPLETED') {
-                return $this->json(['success' => false, 'error' => 'Fight not found or not completed'], 404);
+            $fight = $resultRepo->find($fightId);
+            if (!$fight) {
+                return $this->json(['success' => false, 'error' => 'Fight not found'], 404);
             }
 
             if (!$fight->getFighter1() || !$fight->getFighter2()) {
@@ -299,6 +330,38 @@ class AIController extends AbstractController
                 'error' => 'An unexpected error occurred during analysis: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    #[Route('/predict-injury', name: 'api_ai_predict_injury', methods: ['POST'])]
+    public function predictInjury(
+        Request $request,
+        AIService $aiService,
+        FighterRepository $fighterRepo,
+        FightResultRepository $resultRepo,
+        RankingRepository $rankingRepo
+    ): JsonResponse {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $data = json_decode($request->getContent(), true);
+        $fighterId = $data['fighter_id'] ?? null;
+
+        if (!$fighterId) {
+            return $this->json(['error' => 'Missing fighter ID'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $fighter = $fighterRepo->find($fighterId);
+        if (!$fighter) {
+            return $this->json(['error' => 'Fighter not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $fighterData = $this->buildFighterPayload($fighter, $resultRepo, $rankingRepo);
+        $fighterData['age'] = $fighter->getAge() ?? 28;
+        $fighterData['total_fights'] = $fighter->getTotalFights();
+        $fighterData['ko_losses'] = $fighter->getKoLosses();
+
+        $result = $aiService->predictInjuryRisk($fighterData);
+
+        return $this->json($result);
     }
 
     private function buildFighterPayload($fighter, FightResultRepository $resultRepo, RankingRepository $rankingRepo): array

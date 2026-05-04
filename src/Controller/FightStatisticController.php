@@ -318,10 +318,10 @@ class FightStatisticController extends AbstractController
 
 
     #[Route('/selection', name: 'app_stat_selection')]
-    public function selection(): Response
+    public function selection(Request $request): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        return $this->redirectToRoute('app_stat_new');
+        return $this->redirectToRoute('app_stat_new', $request->query->all());
     }
 
     #[Route('/{id}/edit', name: 'app_stat_edit')]

@@ -38,8 +38,8 @@ class RankingController extends AbstractController
         $lastUpdated = new \DateTime();
 
         // QR → opens mobile-friendly view (URL dynamique basée sur la requête entrante)
-        $rankingUrl = $request->getSchemeAndHttpHost()
-            . $this->generateUrl('app_ranking_mobile');
+        $host = $_ENV['APP_MOBILE_SYNC_HOST'] ?? $request->getSchemeAndHttpHost();
+        $rankingUrl = $host . $this->generateUrl('app_ranking_mobile');
         $qrSvg = $this->buildQrSvg($rankingUrl);
 
         return $this->render('ranking/index.html.twig', [
@@ -77,7 +77,7 @@ class RankingController extends AbstractController
 
     // ─── PUBLIC PDF (no login — opened from mobile page or QR directly) ─────
     #[Route('/pdf', name: 'app_ranking_pdf')]
-    public function qrPdf(RankingService $rankingService): Response
+    public function qrPdf(Request $request, RankingService $rankingService): Response
     {
         // No denyAccessUnlessGranted — intentionally public for mobile access
         $fighters = $rankingService->getRankedFighters();
@@ -88,9 +88,15 @@ class RankingController extends AbstractController
             $groupedRankings[$wd][] = $f;
         }
 
+        // Generate QR code for the mobile view to include in PDF
+        $host = $_ENV['APP_MOBILE_SYNC_HOST'] ?? $request->getSchemeAndHttpHost();
+        $rankingUrl = $host . $this->generateUrl('app_ranking_mobile');
+        $qrSvg = $this->buildQrSvg($rankingUrl);
+
         $html = $this->renderView('ranking/pdf.html.twig', [
             'groupedRankings' => $groupedRankings,
             'lastUpdated'     => new \DateTime(),
+            'qrSvg'           => $qrSvg,
         ]);
 
         $options = new Options();
@@ -151,8 +157,8 @@ class RankingController extends AbstractController
     public function qrDownload(Request $request): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
-        $url = $request->getSchemeAndHttpHost()
-            . $this->generateUrl('app_ranking_mobile');
+        $host = $_ENV['APP_MOBILE_SYNC_HOST'] ?? $request->getSchemeAndHttpHost();
+        $url = $host . $this->generateUrl('app_ranking_mobile');
         $svg = $this->buildQrSvg($url);
 
         return new Response($svg, 200, [
@@ -169,8 +175,8 @@ class RankingController extends AbstractController
                 data: $url,
                 size: 200,
                 margin: 10,
-                foregroundColor: new Color(220, 38, 38),
-                backgroundColor: new Color(9, 9, 11),
+                foregroundColor: new Color(220, 38, 38), // High-contrast Red
+                backgroundColor: new Color(255, 255, 255), // Pure White for scanability
             );
             return $writer->write($qr)->getString();
         } catch (\Throwable) {

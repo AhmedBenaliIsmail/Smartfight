@@ -42,6 +42,11 @@
                     <button class="btn btn-outline-primary btn-sm w-100 mb-2" data-bs-toggle="modal" data-bs-target="#scoutingModal" style="border-color: #3b82f6; color: #60a5fa;">
                         <i class="fa-solid fa-user-secret me-2"></i>Pro Scouting Report
                     </button>
+                    {% if is_granted('ROLE_ADMIN') %}
+                    <button class="btn btn-outline-warning btn-sm w-100" id="btnPredictInjury" style="border-color: #f59e0b; color: #fbbf24;">
+                        <i class="fa-solid fa-heart-pulse me-2"></i>AI Injury Prediction
+                    </button>
+                    {% endif %}
                 </div>
                 
                 <div class="row g-2 mt-4">
@@ -257,6 +262,115 @@
     </div>
 </div>
 
+<!-- Injury Prediction Modal -->
+<div class="modal fade" id="injuryModal" tabindex="-1" aria-hidden="true" data-bs-theme="dark">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background:#0f0f13; border:1px solid #2d2d35; border-radius: 16px; overflow: hidden;">
+            <div class="modal-body p-4">
+                <div id="injuryLoading" class="text-center py-5 d-none">
+                    <div class="spinner-border text-danger" role="status"></div>
+                    <p class="mt-3 text-muted small">Synchronizing Biomechanical Vectors...</p>
+                </div>
+
+                <div id="injuryResults" class="d-none">
+                    <!-- Header with Dr. Profile -->
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div style="width: 45px; height: 45px; background: rgba(239, 68, 68, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa-solid fa-shield-heart text-danger fs-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="fw-black mb-0 text-white" style="letter-spacing: 1px; font-size: 1.1rem; line-height: 1.1;">INJURY PREDICTION ANALYST</h4>
+                                <div class="text-muted small mt-1" style="font-size: 0.75rem;">Dr. James Wong | <span class="text-white-50">PhD Biomechanics</span></div>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="p-2 rounded-3" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2);">
+                                <div class="text-warning mb-1" style="font-size: 8px;">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                                <div class="text-warning fw-bold" style="font-size: 8px; letter-spacing: 1px;">RECOMMENDED</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Level Bar -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-end mb-2">
+                            <span class="text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">RISK LEVEL</span>
+                            <span class="fw-black" id="injuryRiskScore" style="color: #00e676; font-size: 1.1rem;">0%</span>
+                        </div>
+                        <div class="progress" style="height: 6px; background: #1c1c24; border-radius: 10px;">
+                            <div id="injuryProgressBar" class="progress-bar" style="background: #00e676; width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Dual Insight Boxes -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="p-3 text-center h-100" style="background: #1c1c24; border-radius: 12px; border: 1px solid #2d2d35;">
+                                <div class="text-muted small mb-2 fw-bold" style="letter-spacing: 1px;">PREDICTION</div>
+                                <div class="text-warning fw-bold small d-flex align-items-center justify-content-center gap-1">
+                                    <i class="fa-solid fa-hand-fist"></i>
+                                    <span id="injuryZone" class="text-uppercase" style="font-size: 0.75rem;">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 text-center h-100" style="background: #1c1c24; border-radius: 12px; border: 1px solid #2d2d35;">
+                                <div class="text-muted small mb-2 fw-bold" style="letter-spacing: 1px;">ALERT</div>
+                                <div class="text-danger fw-bold" style="font-size: 0.85rem;"><span id="injuryAlertDays">0</span> days</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendation Banner -->
+                    <div class="p-3 mb-4 d-flex align-items-center gap-3" style="background: rgba(0, 230, 118, 0.05); border: 1px solid rgba(0, 230, 118, 0.2); border-radius: 12px;">
+                        <div style="width: 24px; height: 24px; background: #00e676; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="fa-solid fa-check text-dark" style="font-size: 10px;"></i>
+                        </div>
+                        <div>
+                            <div class="text-success fw-bold" style="font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase;">Recommendation</div>
+                            <div class="text-white small fw-bold" id="injuryMitigation" style="font-size: 0.8rem;">-</div>
+                        </div>
+                    </div>
+
+                    <!-- Metrics Footer -->
+                    <div class="row text-center mb-4 border-top border-secondary pt-4" style="border-style: dashed !important; border-width: 1px 0 0 0 !important;">
+                        <div class="col-4">
+                            <div class="h5 fw-black text-white mb-0" id="injuryAccuracy">0%</div>
+                            <div class="text-muted" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px;">Accuracy</div>
+                        </div>
+                        <div class="col-4 border-start border-secondary" style="border-left-style: dashed !important;">
+                            <div class="h5 fw-black text-white mb-0" id="injuryEarly">3</div>
+                            <div class="text-muted" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px;">Weeks Early</div>
+                        </div>
+                        <div class="col-4 border-start border-secondary" style="border-left-style: dashed !important;">
+                            <div class="h5 fw-black text-white mb-0" id="injuryRoi">0%</div>
+                            <div class="text-muted" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px;">ROI</div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Analysis Section (Hidden by default) -->
+                    <div id="injuryDetailedPanel" class="d-none mt-4 p-3 rounded" style="background: rgba(255,255,255,0.03); border: 1px solid #2d2d35; border-left: 3px solid #ef5350;">
+                        <h6 class="text-white small fw-bold mb-2" style="letter-spacing: 1px; text-transform: uppercase;">Deep Neural Scan Report</h6>
+                        <p class="text-muted small mb-0" id="injuryDetailedText" style="line-height: 1.5; font-family: 'Inter', sans-serif;">-</p>
+                    </div>
+
+                    <!-- CTA Button -->
+                    <button type="button" id="btnViewDetailed" class="btn w-100 py-3 mt-4 fw-black text-uppercase" style="background: #ef5350; color: white; border-radius: 12px; letter-spacing: 1px; font-size: 0.85rem;">
+                        <i class="fa-solid fa-chart-pie me-2"></i>View Detailed Analysis
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block javascripts %}
@@ -330,6 +444,74 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Network error.');
             });
         });
+    }
+
+    // Injury Prediction Logic
+    const btnInjury = document.getElementById('btnPredictInjury');
+    const injuryModalEl = document.getElementById('injuryModal');
+    const injuryLoading = document.getElementById('injuryLoading');
+    const injuryResults = document.getElementById('injuryResults');
+
+    if (btnInjury && injuryModalEl) {
+        const bootstrapObj = window.bootstrap || (window.tabler ? window.tabler : null);
+        const injuryModal = new bootstrapObj.Modal(injuryModalEl);
+
+        btnInjury.addEventListener('click', function() {
+            injuryLoading.classList.remove('d-none');
+            injuryResults.classList.add('d-none');
+            injuryModal.show();
+
+            fetch('/api/ai/predict-injury', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fighter_id: {{ fighter.fighterId }} })
+            })
+            .then(r => r.json())
+            .then(data => {
+                injuryLoading.classList.add('d-none');
+                if (data.success && data.data) {
+                    const info = data.data;
+                    document.getElementById('injuryRiskScore').innerText = info.risk_percentage + '%';
+                    document.getElementById('injuryProgressBar').style.width = info.risk_percentage + '%';
+                    document.getElementById('injuryZone').innerText = info.vulnerable_zone;
+                    document.getElementById('injuryMitigation').innerText = info.mitigation_strategy;
+                    document.getElementById('injuryAlertDays').innerText = info.days_to_alert;
+                    document.getElementById('injuryAccuracy').innerText = Math.round(info.accuracy) + '%';
+                    document.getElementById('injuryRoi').innerText = info.roi + '%';
+                    document.getElementById('injuryDetailedText').innerText = info.detailed_analysis;
+                    
+                    // Reset detailed panel on new analysis
+                    const panel = document.getElementById('injuryDetailedPanel');
+                    panel.classList.add('d-none');
+                    
+                    injuryResults.classList.remove('d-none');
+                } else {
+                    alert('Analysis failed: ' + (data.error || 'Unknown error'));
+                    injuryModal.hide();
+                }
+            })
+            .catch(e => {
+                injuryLoading.classList.add('d-none');
+                alert('Connection error.');
+                injuryModal.hide();
+            });
+        });
+
+        // Toggle Detailed Analysis
+        const btnDetailed = document.getElementById('btnViewDetailed');
+        if (btnDetailed) {
+            btnDetailed.addEventListener('click', function() {
+                const panel = document.getElementById('injuryDetailedPanel');
+                panel.classList.toggle('d-none');
+                
+                if (!panel.classList.contains('d-none')) {
+                    panel.scrollIntoView({ behavior: 'smooth' });
+                    this.innerHTML = '<i class="fa-solid fa-chevron-up me-2"></i>Hide Analysis';
+                } else {
+                    this.innerHTML = '<i class="fa-solid fa-chart-pie me-2"></i>View Detailed Analysis';
+                }
+            });
+        }
     }
 });
 </script>

@@ -112,6 +112,42 @@
         </div>
     </div>
 
+    {% if is_granted('ROLE_ADMIN') and topInjuries|default([]) is not empty %}
+    <!-- Admin Strategic Intelligence -->
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <h2 class="section-title mb-0"><i class="fa-solid fa-microchip me-2"></i>Admin Strategic Intelligence</h2>
+        <div class="d-flex gap-2">
+            <a href="{{ path('admin_contract_index') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3"><i class="fa-solid fa-file-signature me-1"></i>Contracts</a>
+            <a href="{{ path('admin_finance_index') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3"><i class="fa-solid fa-file-invoice-dollar me-1"></i>Finance</a>
+        </div>
+    </div>
+    
+    <div class="row g-4 mb-5">
+        {% for p in topInjuries %}
+        <div class="col-md-4">
+            <div class="fan-card p-3" style="border-left: 4px solid {% if p.risk_percentage > 70 %}#ef5350{% elseif p.risk_percentage > 35 %}#f59e0b{% else %}#10b981{% endif %}; background: rgba(24, 24, 27, 0.4);">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-user-shield text-muted" style="font-size: 0.8rem;"></i>
+                        <h6 class="mb-0 fw-bold small text-white text-uppercase" style="letter-spacing: 0.5px;">{{ p.fighter.lastName }}</h6>
+                    </div>
+                    <span class="fw-black" style="color: {% if p.risk_percentage > 70 %}#ef5350{% elseif p.risk_percentage > 35 %}#f59e0b{% else %}#10b981{% endif %}; font-size: 0.9rem;">{{ p.risk_percentage }}%</span>
+                </div>
+                
+                <div class="progress mb-3" style="height: 4px; background: rgba(255,255,255,0.05);">
+                    <div class="progress-bar" style="width: {{ p.risk_percentage }}%; background: {% if p.risk_percentage > 70 %}#ef5350{% elseif p.risk_percentage > 35 %}#f59e0b{% else %}#10b981{% endif %};"></div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted" style="font-size: 0.6rem; letter-spacing: 1px;"><i class="fa-solid fa-biohazard me-1"></i>ZONE: <span class="text-white fw-bold">{{ p.vulnerable_zone|upper }}</span></div>
+                    <a href="{{ path('app_performance_show', {id: p.fighter.fighterId}) }}" class="btn btn-sm py-0 px-2" style="font-size: 0.6rem; background: rgba(255,255,255,0.05); color: #888; border: 1px solid rgba(255,255,255,0.1);">VECTORS</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <!-- Elite Fighter Showcase (Top 3 by PerformanceScore) -->
     <h2 class="section-title"><i class="fa-solid fa-fire me-2"></i>Elite Fighter Showcase</h2>
     <div class="row g-4 mb-5">

@@ -262,7 +262,7 @@ class EventController extends AbstractController
         }
 
         // Auto-assign next available slot (1, 2 or 3)
-        $available = $resultRepo->getAvailableFightNumbers($id);
+        $available = $service->getAvailableFightNumbers($id);
         if (empty($available)) {
             return $this->json(['error' => 'This event card is already full (max 3 bouts).'], 400);
         }
@@ -273,8 +273,7 @@ class EventController extends AbstractController
                 $id,
                 $fightNumber,
                 $fighter1Id,
-                $fighter2Id,
-                isAiGenerated: true
+                $fighter2Id
             );
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 400);

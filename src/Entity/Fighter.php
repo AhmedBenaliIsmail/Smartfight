@@ -100,6 +100,12 @@ class Fighter
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $weight = null;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $age = null;
+
+    #[ORM\Column(name: 'ko_losses', type: 'integer', options: ['default' => 0])]
+    private int $koLosses = 0;
+
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: "manager_id", referencedColumnName: "userId", nullable: true)]
     private ?User $manager = null;
@@ -206,6 +212,12 @@ class Fighter
 
     public function getWeight(): ?int { return $this->weight; }
     public function setWeight(?int $v): self { $this->weight = $v; return $this; }
+
+    public function getAge(): ?int { return $this->age; }
+    public function setAge(?int $v): self { $this->age = $v; return $this; }
+
+    public function getKoLosses(): int { return $this->koLosses; }
+    public function setKoLosses(int $v): self { $this->koLosses = $v; return $this; }
 
     public function getManager(): ?User { return $this->manager; }
     public function setManager(?User $manager): self { $this->manager = $manager; return $this; }
