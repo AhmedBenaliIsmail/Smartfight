@@ -226,7 +226,7 @@
 
             <div class="avatar">
                 {% if f.photoFilename %}
-                    <img src="http://{{ '192.168.1.14' }}:8001/uploads/boxers/{{ f.photoFilename }}" alt="{{ f.fullName }}">
+                    <img src="{{ pdfUrl|replace({'/rankings/pdf': ''}) }}/uploads/boxers/{{ f.photoFilename }}" alt="{{ f.fullName }}">
                 {% else %}
                     👤
                 {% endif %}
