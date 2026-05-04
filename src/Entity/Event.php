@@ -22,7 +22,7 @@ class Event
     private ?\DateTimeInterface $eventDate = null;
 
     #[ORM\Column(length: 20, options: ['default' => 'INDEPENDENT'])]
-    #[Assert\Choice(choices: ['WBC', 'WBA', 'IBF', 'WBO', 'INDEPENDENT'], message: 'Invalid organization')]
+    #[Assert\Choice(choices: ['WBC', 'WBA', 'IBF', 'WBO', 'INDEPENDENT', 'UNDISPUTED', 'FAN CHOICE'], message: 'Invalid organization')]
     private string $organization = 'INDEPENDENT';
 
     #[ORM\Column(length: 200, nullable: true)]

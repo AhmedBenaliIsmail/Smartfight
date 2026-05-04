@@ -1,42 +1,313 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Event Flyer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ event.eventName }} — SmartFight Flyer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@300;400;500&display=swap">
     <style>
-        body { font-family: 'Helvetica', 'Arial', sans-serif; margin: 0; padding: 0; background: #000; color: #fff; }
-        .flyer-container { padding: 40px; text-align: center; border: 10px solid #dc2626; border-radius: 10px; margin: 20px; background: #18181b; }
-        .flyer-header { font-size: 48px; color: #dc2626; text-transform: uppercase; margin-bottom: 10px; font-weight: bold; }
-        .flyer-org { font-size: 24px; color: #fbbf24; margin-bottom: 30px; letter-spacing: 2px; }
-        .flyer-details { font-size: 20px; margin-bottom: 20px; }
-        .flyer-date { font-size: 28px; font-weight: bold; margin: 30px 0; color: #fff; }
-        .flyer-venue { font-size: 22px; color: #a1a1aa; }
-        .footer { margin-top: 50px; font-size: 14px; color: #52525b; border-top: 1px solid #3f3f46; padding-top: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #09090b;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px 60px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            width: 100%;
+            max-width: 620px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .toolbar a {
+            color: #a1a1aa;
+            text-decoration: none;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .toolbar a:hover { color: #fff; }
+        .btn-print {
+            background: #dc2626;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-print:hover { background: #ef4444; }
+
+        /* Flyer Card */
+        .flyer {
+            width: 100%;
+            max-width: 620px;
+            background: #18181b;
+            border: 2px solid #dc2626;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 0 80px rgba(220, 38, 38, 0.25), 0 20px 50px rgba(0,0,0,0.6);
+        }
+
+        /* Top band */
+        .flyer-top {
+            background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 50%, #991b1b 100%);
+            padding: 36px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .flyer-top::before {
+            content: '';
+            position: absolute;
+            top: -30px; right: -30px;
+            width: 160px; height: 160px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .flyer-top::after {
+            content: '';
+            position: absolute;
+            bottom: -40px; left: -20px;
+            width: 120px; height: 120px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+        }
+        .flyer-brand {
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 4px;
+            color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .flyer-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #fff;
+            text-transform: uppercase;
+            line-height: 1.1;
+            letter-spacing: 1px;
+        }
+        .flyer-org-badge {
+            display: inline-block;
+            margin-top: 14px;
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fbbf24;
+            padding: 5px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Main Body */
+        .flyer-body {
+            padding: 36px 40px;
+        }
+        .divider {
+            border: none;
+            border-top: 1px solid #27272a;
+            margin: 28px 0;
+        }
+
+        /* Info rows */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+        .info-block { }
+        .info-label {
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #71717a;
+            margin-bottom: 4px;
+        }
+        .info-value {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #fafafa;
+        }
+        .info-value.date-big {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.4rem;
+            color: #fff;
+        }
+
+        /* Status badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .status-SCHEDULED { background: rgba(220,38,38,0.15); color: #f87171; border: 1px solid rgba(220,38,38,0.3); }
+        .status-LIVE { background: rgba(234,179,8,0.15); color: #fbbf24; border: 1px solid rgba(234,179,8,0.3); }
+        .status-COMPLETED { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+        .status-CANCELLED { background: rgba(107,114,128,0.15); color: #9ca3af; border: 1px solid rgba(107,114,128,0.3); }
+
+        /* Capacity bar */
+        .capacity-section { }
+        .capacity-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #71717a;
+            margin-bottom: 6px;
+        }
+        .progress-bar-outer {
+            height: 6px;
+            background: #27272a;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-bar-inner {
+            height: 100%;
+            background: linear-gradient(90deg, #dc2626, #ef4444);
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        /* Footer */
+        .flyer-footer {
+            background: #09090b;
+            border-top: 1px solid #27272a;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .flyer-footer-brand {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .flyer-footer-brand span { color: #dc2626; }
+        .flyer-footer-right {
+            font-size: 0.75rem;
+            color: #52525b;
+            text-align: right;
+        }
+
+        /* Champions event banner */
+        .champion-banner {
+            background: linear-gradient(90deg, #78350f, #ca8a04, #78350f);
+            padding: 12px 40px;
+            text-align: center;
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #fff;
+        }
+
+        @media print {
+            body { background: #fff; padding: 0; }
+            .toolbar { display: none; }
+            .flyer {
+                box-shadow: none;
+                border-radius: 0;
+                max-width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="flyer-container">
-        <div class="flyer-header">{{ event.eventName }}</div>
-        <div class="flyer-org">{{ event.organization }} SANCTIONED EVENT</div>
-        
-        <div class="flyer-date">
-            {{ event.eventDate ? event.eventDate|date('l, F jS, Y') : 'Date To Be Determined' }}
+    <div class="toolbar">
+        <a href="javascript:history.back()">&#8592; Back to Events</a>
+        <button class="btn-print" onclick="window.print()">
+            🖨️ Print / Save as PDF
+        </button>
+    </div>
+
+    <div class="flyer">
+        {% if event.isChampionsEvent %}
+        <div class="champion-banner">
+            👑 World Championship Sanctioned Event
         </div>
-        
-        <div class="flyer-venue">
-            <div>{{ event.venue|default('Venue TBD') }}</div>
-            <div>{{ event.city|default('City TBD') }}</div>
-        </div>
-        
-        {% if event.seatCapacity %}
-            <div class="flyer-details" style="margin-top:20px;">
-                Capacity: {{ event.seatCapacity|number_format }} Seats
-            </div>
         {% endif %}
-        
-        <div class="footer">
-            SmartFight Management &copy; {{ "now"|date("Y") }}<br>
-            Book your tickets at smartfight.tn
+
+        <div class="flyer-top">
+            <div class="flyer-brand">SmartFight Presents</div>
+            <div class="flyer-title">{{ event.eventName }}</div>
+            {% if event.organization %}
+            <div class="flyer-org-badge">{{ event.organization }}</div>
+            {% endif %}
+        </div>
+
+        <div class="flyer-body">
+            <div class="info-grid">
+                <div class="info-block">
+                    <div class="info-label">📅 Date</div>
+                    <div class="info-value date-big">
+                        {{ event.eventDate ? event.eventDate|date('l') : 'TBD' }}<br>
+                        <span style="font-size:1rem; color:#a1a1aa;">{{ event.eventDate ? event.eventDate|date('M j, Y') : '' }}</span>
+                    </div>
+                </div>
+                <div class="info-block">
+                    <div class="info-label">📍 Venue</div>
+                    <div class="info-value">{{ event.venue|default('TBD') }}</div>
+                    <div style="color:#71717a; font-size:0.9rem; margin-top:4px;">{{ event.city|default('') }}</div>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+                <div class="info-block">
+                    <div class="info-label">Status</div>
+                    <div class="status-badge status-{{ event.status|default('SCHEDULED') }}">
+                        ● {{ event.status|default('SCHEDULED') }}
+                    </div>
+                </div>
+                {% if event.seatCapacity %}
+                <div class="info-block" style="flex:1; max-width:220px;">
+                    <div class="capacity-label">
+                        <span>Seat Capacity</span>
+                        <span>{{ event.seatCapacity|number_format }} seats</span>
+                    </div>
+                    <div class="progress-bar-outer">
+                        <div class="progress-bar-inner"></div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="flyer-footer">
+            <div class="flyer-footer-brand"><span>SMART</span>FIGHT</div>
+            <div class="flyer-footer-right">
+                Official Event Flyer<br>
+                &copy; {{ "now"|date("Y") }} SmartFight Management
+            </div>
         </div>
     </div>
 </body>

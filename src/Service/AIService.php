@@ -407,4 +407,107 @@ class AIService
             ];
         }
     }
+
+    /**
+     * Handle generic chat messages
+     */
+    public function chat(string $message, array $history = []): array
+    {
+        if (!$this->apiKey) {
+            return [
+                'success' => false,
+                'reply' => 'I am sorry, but my AI core is currently disconnected. Please configure the API key.'
+            ];
+        }
+
+        $messages = [
+            [
+                'role' => 'system',
+                'content' => 'You are the SmartFight AI Specialist, a friendly, knowledgeable, and highly analytical AI assistant integrated into the SmartFight MMA and Boxing platform. Your goal is to help fans, fighters, and admins by answering questions about MMA, boxing, events, and the platform. Keep your answers concise, engaging, and professional.'
+            ]
+        ];
+
+        foreach ($history as $msg) {
+            if (isset($msg['role']) && isset($msg['content'])) {
+                $messages[] = [
+                    'role' => $msg['role'],
+                    'content' => $msg['content']
+                ];
+            }
+        }
+
+        $messages[] = [
+            'role' => 'user',
+            'content' => $message
+        ];
+
+        try {
+            $response = $this->httpClient->request('POST', $this->apiUrl, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->apiKey,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'model' => 'deepseek-chat',
+                    'messages' => $messages,
+                    'temperature' => 0.7,
+                    'max_tokens' => 500,
+                ],
+                'timeout' => 30,
+            ]);
+
+            $content = $response->toArray();
+            
+            if (isset($content['choices'][0]['message']['content'])) {
+                return [
+                    'success' => true,
+                    'reply' => $content['choices'][0]['message']['content']
+                ];
+            }
+
+            return [
+                'success' => false,
+                'reply' => 'I encountered an error parsing the AI response.'
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'reply' => 'Connection error: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Generate plain text from a prompt (used by ResultController AI stats)
+     */
+    public function generateText(string $prompt): ?string
+    {
+        if (!$this->apiKey) {
+            return null;
+        }
+
+        try {
+            $response = $this->httpClient->request('POST', $this->apiUrl, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->apiKey,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'model' => 'deepseek-chat',
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'You are a professional boxing analyst. Be concise and data-driven.'],
+                        ['role' => 'user', 'content' => $prompt]
+                    ],
+                    'temperature' => 0.7,
+                    'max_tokens' => 600,
+                ],
+                'timeout' => 30,
+            ]);
+
+            $content = $response->toArray();
+            return $content['choices'][0]['message']['content'] ?? null;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
 }

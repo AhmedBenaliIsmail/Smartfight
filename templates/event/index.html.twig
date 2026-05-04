@@ -179,9 +179,14 @@
             <button type="submit" class="btn btn-outline-danger fw-bold"><i class="fa-solid fa-filter me-2"></i>Apply</button>
             <a href="{{ path('app_events') }}" class="btn btn-link text-muted text-decoration-none">Reset</a>
             
-            <a href="{{ path('app_event_calendar') }}" class="btn btn-outline-secondary fw-bold ms-auto text-white">
-                <i class="fa-solid fa-calendar me-2"></i>CALENDAR
-            </a>
+            <div class="ms-auto d-flex gap-2">
+                <a href="{{ path('app_event_map') }}" class="btn btn-outline-secondary fw-bold text-white">
+                    <i class="fa-solid fa-map-location-dot me-2"></i>MAP
+                </a>
+                <a href="{{ path('app_event_calendar') }}" class="btn btn-outline-secondary fw-bold text-white">
+                    <i class="fa-solid fa-calendar me-2"></i>CALENDAR
+                </a>
+            </div>
             {% if is_granted('ROLE_ADMIN') %}
             <a href="{{ path('app_event_new') }}" class="btn btn-danger px-4 fw-bold {% if not is_granted('ROLE_ADMIN') %}ms-auto{% endif %}">
                 <i class="fa-solid fa-plus me-2"></i>CREATE EVENT
@@ -229,6 +234,9 @@
                             <i class="fa-solid fa-wand-magic-sparkles"></i>
                             Manage Card
                         </a>
+                        <a href="{{ path('app_event_flyer', {'id': event.eventId}) }}" target="_blank" class="action-dot text-danger" title="Download Flyer">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </a>
                         {% if is_granted('ROLE_ADMIN') %}
                             <div class="dropdown">
                                 <button class="action-dot" data-bs-toggle="dropdown">
@@ -238,7 +246,7 @@
                                     <li><a class="dropdown-item text-white" href="{{ path('app_event_edit', {'id': event.eventId}) }}"><i class="fa-solid fa-pen me-2"></i>Edit Profile</a></li>
                                     <li><hr class="dropdown-divider border-secondary"></li>
                                     <li>
-                                        <form method="post" action="{{ path('app_event_delete', {'id': event.eventId}) }}" onsubmit="return confirm('Delete this event?');">
+                                        <form method="post" action="{{ path('app_event_delete', {'id': event.eventId}) }}">
                                             <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.eventId) }}">
                                             <button class="dropdown-item text-danger"><i class="fa-solid fa-trash me-2"></i>Remove Event</button>
                                         </form>

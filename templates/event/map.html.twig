@@ -1,0 +1,138 @@
+{% extends 'front/base_front.html.twig' %}
+
+{% block title %}Event Map — SmartFight{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 70vh;
+            border-radius: 12px;
+            border: 1px solid #27272a;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 1;
+        }
+        .leaflet-popup-content-wrapper {
+            background: #18181b;
+            color: #fafafa;
+            border: 1px solid #dc2626;
+            border-radius: 8px;
+        }
+        .leaflet-popup-tip {
+            background: #18181b;
+            border: 1px solid #dc2626;
+        }
+        .leaflet-popup-content {
+            margin: 15px;
+        }
+        .map-event-title {
+            font-family: 'Oswald', sans-serif;
+            color: #fff;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            border-bottom: 1px solid #27272a;
+            padding-bottom: 5px;
+        }
+        .map-event-meta {
+            color: #a1a1aa;
+            font-size: 0.85rem;
+            margin-bottom: 3px;
+        }
+        .map-btn {
+            display: inline-block;
+            background: #dc2626;
+            color: #fff !important;
+            padding: 5px 10px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+        .map-btn:hover {
+            background: #ef4444;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h2 fw-bold text-white mb-1" style="font-family: 'Oswald', sans-serif; letter-spacing: 1px;">
+                <i class="fa-solid fa-map-location-dot me-3 text-danger"></i>EVENT MAP
+            </h1>
+            <p class="text-muted mb-0">Discover boxing events across the globe.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ path('app_events') }}" class="btn btn-outline-secondary fw-bold text-white">
+                <i class="fa-solid fa-list me-2"></i>List View
+            </a>
+            <a href="{{ path('app_event_calendar') }}" class="btn btn-outline-secondary fw-bold text-white">
+                <i class="fa-solid fa-calendar me-2"></i>Calendar
+            </a>
+        </div>
+    </div>
+
+    <div id="map"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize map centered roughly on North America/Europe
+        const map = L.map('map').setView([40.0, -40.0], 3);
+
+        // Add Dark Matter tile layer
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        // Custom red marker icon
+        const redIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+        // Fetch events and geocode them
+        fetch('{{ path("app_event_api_map") }}')
+            .then(res => res.json())
+            .then(events => {
+                events.forEach(event => {
+                    if(event.city) {
+                        // Simple Nominatim geocoding (Note: usage policy limits to 1 req/sec in prod, this is just for demo)
+                        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(event.city)}`)
+                            .then(r => r.json())
+                            .then(data => {
+                                if(data && data.length > 0) {
+                                    const lat = data[0].lat;
+                                    const lon = data[0].lon;
+                                    
+                                    const marker = L.marker([lat, lon], {icon: redIcon}).addTo(map);
+                                    
+                                    const popupContent = `
+                                        <div class="map-event-title">${event.title}</div>
+                                        <div class="map-event-meta"><i class="fa-solid fa-building me-1"></i> ${event.venue}</div>
+                                        <div class="map-event-meta"><i class="fa-solid fa-calendar me-1"></i> ${event.date}</div>
+                                        <div class="map-event-meta"><i class="fa-solid fa-tag me-1"></i> ${event.organization}</div>
+                                        <a href="${event.url}" class="map-btn">View Event</a>
+                                    `;
+                                    marker.bindPopup(popupContent);
+                                }
+                            })
+                            .catch(e => console.error('Geocoding error:', e));
+                    }
+                });
+            });
+    });
+</script>
+{% endblock %}

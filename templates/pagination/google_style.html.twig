@@ -1,0 +1,154 @@
+{#
+  Google-Style Pagination Template — SmartFight
+  Variables from KNP Paginator: pageCount, current, pagesInRange, startPage, endPage,
+  previous, next, route, query, options, numItemsPerPage, totalCount
+#}
+{% if pageCount > 1 %}
+<nav class="sf-google-pagination" aria-label="Page navigation">
+    <div class="sf-pagination-info">
+        {% set itemEnd = current * numItemsPerPage %}
+        {% if itemEnd > totalCount %}{% set itemEnd = totalCount %}{% endif %}
+        Showing
+        <strong>{{ (current - 1) * numItemsPerPage + 1 }}</strong>–<strong>{{ itemEnd }}</strong>
+        of <strong>{{ totalCount }}</strong> results
+    </div>
+
+    <div class="sf-pagination-pages">
+
+        {# ◄ Previous #}
+        {% if previous is defined %}
+            <a href="{{ path(route, knp_pagination_query(query, previous, options)) }}"
+               class="sf-page-btn sf-arrow" aria-label="Previous page" rel="prev">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+            </a>
+        {% else %}
+            <span class="sf-page-btn sf-arrow sf-disabled" aria-disabled="true">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+            </span>
+        {% endif %}
+
+        {# First page + left ellipsis #}
+        {% if startPage > 1 %}
+            <a href="{{ path(route, knp_pagination_query(query, 1, options)) }}" class="sf-page-btn">1</a>
+            {% if startPage == 3 %}
+                <a href="{{ path(route, knp_pagination_query(query, 2, options)) }}" class="sf-page-btn">2</a>
+            {% elseif startPage > 2 %}
+                <span class="sf-ellipsis">…</span>
+            {% endif %}
+        {% endif %}
+
+        {# Window of pages around current #}
+        {% for page in pagesInRange %}
+            {% if page == current %}
+                <span class="sf-page-btn sf-active" aria-current="page">{{ page }}</span>
+            {% else %}
+                <a href="{{ path(route, knp_pagination_query(query, page, options)) }}"
+                   class="sf-page-btn">{{ page }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {# Right ellipsis + last page #}
+        {% if pageCount > endPage %}
+            {% if pageCount > endPage + 2 %}
+                <span class="sf-ellipsis">…</span>
+            {% elseif pageCount == endPage + 2 %}
+                <a href="{{ path(route, knp_pagination_query(query, pageCount - 1, options)) }}" class="sf-page-btn">{{ pageCount - 1 }}</a>
+            {% endif %}
+            <a href="{{ path(route, knp_pagination_query(query, pageCount, options)) }}" class="sf-page-btn">{{ pageCount }}</a>
+        {% endif %}
+
+        {# Next ► #}
+        {% if next is defined %}
+            <a href="{{ path(route, knp_pagination_query(query, next, options)) }}"
+               class="sf-page-btn sf-arrow" aria-label="Next page" rel="next">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </a>
+        {% else %}
+            <span class="sf-page-btn sf-arrow sf-disabled" aria-disabled="true">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+        {% endif %}
+
+    </div>
+</nav>
+
+<style>
+.sf-google-pagination {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 0 6px;
+}
+.sf-pagination-info {
+    font-size: 0.78rem;
+    color: #71717a;
+    letter-spacing: 0.02em;
+}
+.sf-pagination-info strong { color: #a1a1aa; font-weight: 600; }
+.sf-pagination-pages {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.sf-page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 4px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1;
+    text-decoration: none;
+    color: #a1a1aa;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+    cursor: pointer;
+    user-select: none;
+}
+.sf-page-btn:hover:not(.sf-disabled):not(.sf-active) {
+    background: rgba(220, 38, 38, 0.09);
+    border-color: rgba(220, 38, 38, 0.3);
+    color: #f87171;
+}
+.sf-page-btn.sf-active {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #fff !important;
+    font-weight: 700;
+    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
+    transform: scale(1.05);
+}
+.sf-page-btn.sf-disabled {
+    color: #3f3f46;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+.sf-page-btn.sf-arrow {
+    border: 1px solid #27272a;
+    color: #71717a;
+}
+.sf-page-btn.sf-arrow:hover:not(.sf-disabled) {
+    border-color: #dc2626;
+    color: #dc2626;
+    background: rgba(220, 38, 38, 0.07);
+}
+.sf-ellipsis {
+    display: inline-flex;
+    align-items: flex-end;
+    justify-content: center;
+    width: 28px;
+    height: 36px;
+    color: #52525b;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    padding-bottom: 6px;
+}
+</style>
+{% endif %}

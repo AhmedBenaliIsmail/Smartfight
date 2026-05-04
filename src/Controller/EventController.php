@@ -90,6 +90,38 @@ class EventController extends AbstractController
         return $this->json($data);
     }
 
+    #[Route('/api/map-events', name: 'app_event_api_map', methods: ['GET'])]
+    public function mapEvents(EventRepository $repo): Response
+    {
+        $events = $repo->findAll();
+        $data = [];
+
+        foreach ($events as $event) {
+            if ($event->getCity() && $event->getVenue()) {
+                $data[] = [
+                    'id'              => $event->getEventId(),
+                    'title'           => $event->getEventName(),
+                    'venue'           => $event->getVenue(),
+                    'city'            => $event->getCity(),
+                    'date'            => $event->getEventDate() ? $event->getEventDate()->format('Y-m-d') : 'TBD',
+                    'status'          => $event->getStatus(),
+                    'organization'    => $event->getOrganization(),
+                    'url'             => $this->generateUrl('app_event_fights', ['id' => $event->getEventId()]),
+                ];
+            }
+        }
+
+        return $this->json($data);
+    }
+
+    #[Route('/map', name: 'app_event_map', methods: ['GET'])]
+    public function map(): Response
+    {
+        return $this->render('event/map.html.twig', [
+            'title' => 'Event Map Locations'
+        ]);
+    }
+
     #[Route('', name: 'app_events')]
     public function index(EventRepository $eventRepo, FightResultRepository $resultRepo, PaginatorInterface $paginator, Request $request): Response
     {
@@ -158,6 +190,11 @@ class EventController extends AbstractController
             $e->setVenue(trim($request->request->get('venue', '')));
             $e->setCity(trim($request->request->get('city', '')));
             $e->setOrganization(trim($request->request->get('organization', 'INDEPENDENT')));
+            $e->setStatus($request->request->get('status', 'SCHEDULED'));
+            $cap = $request->request->get('seatCapacity', '');
+            if ($cap !== '') $e->setSeatCapacity((int)$cap);
+            $country = trim($request->request->get('country', ''));
+            if ($country) $e->setCountry(strtoupper(substr($country, 0, 2)));
             $em->persist($e);
             $em->flush();
             $this->addFlash('success', 'Boxing event card created.');
@@ -231,6 +268,11 @@ class EventController extends AbstractController
             $e->setVenue(trim($request->request->get('venue', '')));
             $e->setCity(trim($request->request->get('city', '')));
             $e->setOrganization(trim($request->request->get('organization', 'INDEPENDENT')));
+            $e->setStatus($request->request->get('status', $e->getStatus()));
+            $cap = $request->request->get('seatCapacity', '');
+            if ($cap !== '') $e->setSeatCapacity((int)$cap);
+            $country = trim($request->request->get('country', ''));
+            if ($country) $e->setCountry(strtoupper(substr($country, 0, 2)));
             $em->flush();
             $this->addFlash('success', 'Event updated.');
             return $this->redirectToRoute('app_events');
@@ -253,27 +295,9 @@ class EventController extends AbstractController
         $event = $repo->find($id);
         if (!$event) throw $this->createNotFoundException();
 
-        $html = $this->renderView('event/flyer.html.twig', [
+        return $this->render('event/flyer.html.twig', [
             'event' => $event
         ]);
-
-        $options = new \Dompdf\Options();
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isRemoteEnabled', true);
-        
-        $dompdf = new \Dompdf\Dompdf($options);
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
-
-        return new Response(
-            $dompdf->output(),
-            Response::HTTP_OK,
-            [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="SmartFight-Event-' . $event->getEventId() . '.pdf"'
-            ]
-        );
     }
 
     #[Route('/{id}/fights', name: 'app_event_fights')]

@@ -97,6 +97,19 @@
                                 {% endif %}
                             </select>
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Status</label>
+                            <select name="status" class="form-select">
+                                <option value="SCHEDULED" {{ event and event.status == 'SCHEDULED' ? 'selected' : (not event ? 'selected' : '') }}>Scheduled</option>
+                                <option value="LIVE" {{ event and event.status == 'LIVE' ? 'selected' : '' }}>Live</option>
+                                <option value="COMPLETED" {{ event and event.status == 'COMPLETED' ? 'selected' : '' }}>Completed</option>
+                                <option value="CANCELLED" {{ event and event.status == 'CANCELLED' ? 'selected' : '' }}>Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Seat Capacity</label>
+                            <input type="number" name="seatCapacity" class="form-control" placeholder="e.g. 20000" value="{{ event and event.seatCapacity ? event.seatCapacity : '' }}" min="1" />
+                        </div>
                     </div>
                 </div>
             </div>
