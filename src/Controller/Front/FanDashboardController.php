@@ -149,7 +149,6 @@ class FanDashboardController extends AbstractController
             'predictionLabels' => json_encode($labels),
             'predictionData' => json_encode($accuracyData),
             'topVoted' => $proposalRepo->findTopVoted(3),
-            'topInjuries' => $this->isGranted('ROLE_ADMIN') ? array_slice($predictions, 0, 3) : []
         ]);
     }
 

@@ -369,12 +369,41 @@
         </div>
         <div class="d-flex gap-3 align-items-center">
         {% if is_granted('ROLE_ADMIN') %}
+            <button id="runInjuryAiBtn" class="btn btn-outline-danger px-4 fw-bold">
+                <i class="fa-solid fa-bolt me-2"></i>PREDICT INJURIES AI
+            </button>
             <a href="{{ path('app_fighter_new') }}" class="btn btn-danger px-4 fw-bold">
                 <i class="fa-solid fa-plus me-2"></i>ADD BOXER
             </a>
         {% endif %}
     </div>
 </div>
+
+{% if is_granted('ROLE_ADMIN') %}
+<!-- Admin Strategic Intelligence (Dynamic AI Section) -->
+<div class="mb-5 d-none" id="injuryAiSection">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="section-title mb-0" style="font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #dc2626; border-left: 4px solid #dc2626; padding-left: 15px;"><i class="fa-solid fa-microchip me-2"></i>Strategic Intelligence</h2>
+        <div id="aiPagination">
+            <nav aria-label="Prediction Pagination">
+                <ul class="pagination pagination-sm mb-0" id="aiPaginationList">
+                    <!-- Pages will be injected here -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+    
+    <div id="aiLoading" class="p-5 text-center d-none" style="background: #18181b; border-radius: 16px; border: 1px solid #27272a;">
+        <div class="spinner-border text-danger mb-3" role="status"></div>
+        <h5 class="text-white">Simulating Stress Vectors...</h5>
+        <p class="text-muted small">Accessing biomechanical database and running deep neural heuristics.</p>
+    </div>
+
+    <div id="aiResultsContainer" class="row g-4 d-none">
+        <!-- AI Cards will be injected here -->
+    </div>
+</div>
+{% endif %}
 
 <!-- FILTERS BAR -->
 <div class="filter-bar">
@@ -943,4 +972,5 @@ document.addEventListener("DOMContentLoaded", function() {
     pagination.init();
 });
 </script>
+{% include 'partials/_injury_ai_js.html.twig' %}
 {% endblock %}

@@ -148,6 +148,41 @@
             </div>
         </div>
     </div>
+    
+    <!-- Admin Strategic Intelligence (Dynamic AI Section) -->
+    <div class="mb-5" id="injuryAiSection">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title mb-0" style="font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #dc2626; border-left: 4px solid #dc2626; padding-left: 15px;"><i class="fa-solid fa-microchip me-2"></i>Strategic Intelligence</h2>
+            <div id="aiPagination" class="d-none">
+                <nav aria-label="Prediction Pagination">
+                    <ul class="pagination pagination-sm mb-0" id="aiPaginationList">
+                        <!-- Pages will be injected here -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        
+        <div id="aiInitialState" class="chart-container p-5 text-center" style="background: linear-gradient(145deg, #18181b, #09090b); border: 1px dashed rgba(220, 38, 38, 0.3); border-radius: 16px;">
+            <div class="mb-4">
+                <i class="fa-solid fa-brain fa-3x text-danger opacity-50 mb-3" style="filter: drop-shadow(0 0 15px rgba(220, 38, 38, 0.4));"></i>
+                <h4 class="text-white fw-bold">NEURAL INJURY PREDICTION ENGINE</h4>
+                <p class="text-muted small mx-auto" style="max-width: 400px;">Execute a full biomechanical scan of the active roster using the SmartFight Neural-Hybrid Algorithm.</p>
+            </div>
+            <button id="runInjuryAiBtn" class="btn btn-danger rounded-pill px-5 py-2 fw-bold text-uppercase" style="letter-spacing: 1px; box-shadow: 0 10px 20px rgba(220, 38, 38, 0.2);">
+                <i class="fa-solid fa-bolt me-2"></i>PREDICT INJURIES AI
+            </button>
+        </div>
+
+        <div id="aiLoading" class="chart-container p-5 text-center d-none" style="background: #18181b; border-radius: 16px;">
+            <div class="spinner-border text-danger mb-3" role="status"></div>
+            <h5 class="text-white">Simulating Stress Vectors...</h5>
+            <p class="text-muted small">Accessing biomechanical database and running deep neural heuristics.</p>
+        </div>
+
+        <div id="aiResultsContainer" class="row g-4 d-none">
+            <!-- AI Cards will be injected here -->
+        </div>
+    </div>
 
     <!-- Fan Favorite Center -->
     <div class="row g-4 mb-5">
@@ -348,4 +383,5 @@
         });
     });
 </script>
+{% include 'partials/_injury_ai_js.html.twig' %}
 {% endblock %}
