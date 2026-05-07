@@ -13,48 +13,7 @@
         <link rel="stylesheet" href="{{ asset('frontoffice/css/style.css') }}">
         <link rel="stylesheet" href="{{ asset('frontoffice/css/pagination.css') }}">
         <link rel="stylesheet" href="{{ asset('css/design-system.css') }}">
-        <style>
-            /* Notification Panel Pro Styling */
-            .sf-notification-panel {
-                position: fixed;
-                top: 0;
-                left: -400px;
-                width: 380px;
-                height: 100vh;
-                background: rgba(18, 18, 20, 0.95);
-                backdrop-filter: blur(20px);
-                border-right: 1px solid rgba(255, 255, 255, 0.05);
-                z-index: 2000;
-                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-                box-shadow: 20px 0 50px rgba(0,0,0,0.5);
-            }
-            .sf-notification-panel.active {
-                left: 0;
-            }
-            .sf-notification-panel .panel-header {
-                padding: 30px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-            }
-            .btn-close-panel {
-                background: transparent;
-                border: none;
-                color: #71717a;
-                font-size: 1.2rem;
-                transition: color 0.2s;
-            }
-            .btn-close-panel:hover { color: #fff; }
-            .panel-body { padding: 30px; }
-            .icon-pulse { animation: sf-pulse 2s infinite; }
-            @keyframes sf-pulse {
-                0% { transform: scale(1); opacity: 0.5; }
-                50% { transform: scale(1.1); opacity: 1; }
-                100% { transform: scale(1); opacity: 0.5; }
-            }
-            .x-small { font-size: 0.65rem; }
-        </style>
+        <link rel="stylesheet" href="{{ asset('css/sf-shell.css') }}">
         {% block extra_css %}{% endblock %}
     {% endblock %}
 </head>

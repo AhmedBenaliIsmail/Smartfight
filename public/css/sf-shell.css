@@ -1,0 +1,152 @@
+/*
+ * sf-shell.css — Shared chrome styles for all SmartFight layouts
+ * Loaded by base.html.twig, admin/base_admin.html.twig, front/base_front.html.twig
+ */
+
+/* ── Navbar brand & link sizing (identical across all pages) ── */
+.sf-navbar .navbar-brand {
+  font-size: 1.6rem !important;
+  font-weight: 700 !important;
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.sf-navbar .nav-link {
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding-top: 28px !important;
+  padding-bottom: 28px !important;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+  position: relative;
+  color: #a1a1aa;
+  transition: color 0.2s ease;
+}
+
+/* Animated red underline on hover / active */
+.sf-navbar .nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  background: #dc2626;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+.sf-navbar .nav-link:hover,
+.sf-navbar .nav-link.active {
+  color: #fafafa;
+}
+
+.sf-navbar .nav-link:hover::after,
+.sf-navbar .nav-link.active::after {
+  transform: scaleX(1);
+}
+
+/* ── Footer layout — flush to content edges, never floating ── */
+.sf-footer {
+  border-top: 1px solid #27272a;
+  background: #09090b;
+  /* Prevent the footer from shrinking below content */
+  flex-shrink: 0;
+}
+
+.sf-footer .sf-footer-inner {
+  padding: 3rem 2rem 1.5rem;
+}
+
+.sf-footer-brand {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fafafa;
+}
+
+.sf-footer-brand span {
+  color: #dc2626;
+}
+
+/* ── Smooth transition when sidebar collapses/expands ── */
+.sf-fan-content,
+.sf-admin-content {
+  transition: margin-left 0.25s ease;
+}
+
+/* ── Notification panel (shared between layouts) ── */
+.sf-notification-panel {
+  position: fixed;
+  top: 0;
+  left: -400px;
+  width: 380px;
+  height: 100vh;
+  background: rgba(18, 18, 20, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  z-index: 2100;
+  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
+}
+
+.sf-notification-panel.active {
+  left: 0;
+}
+
+.sf-notification-panel .panel-header {
+  padding: 30px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.btn-close-panel {
+  background: transparent;
+  border: none;
+  color: #71717a;
+  font-size: 1.2rem;
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+.btn-close-panel:hover {
+  color: #fff;
+}
+
+.panel-body {
+  padding: 30px;
+}
+
+.icon-pulse {
+  animation: sf-pulse 2s infinite;
+}
+
+@keyframes sf-pulse {
+  0%   { transform: scale(1);   opacity: 0.5; }
+  50%  { transform: scale(1.1); opacity: 1;   }
+  100% { transform: scale(1);   opacity: 0.5; }
+}
+
+.x-small {
+  font-size: 0.65rem;
+}
+
+/* ── Hover utility (search results etc.) ── */
+.hover-bg-dark:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ── Breadcrumb divider colour ── */
+.breadcrumb-item + .breadcrumb-item::before {
+  color: #52525b;
+}

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% block title %}SmartFight Admin{% endblock %}</title>
     {% block stylesheets %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -13,6 +15,7 @@
     <link rel="stylesheet" href="{{ asset('css/smartfight-admin.css') }}" />
     <link rel="stylesheet" href="{{ asset('frontoffice/css/pagination.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/design-system.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/sf-shell.css') }}" />
     {% endblock %}
 </head>
 <body class="antialiased">
@@ -20,13 +23,21 @@
 <style>
 /* ── Admin sf-sidebar ───────────────────────────────────────── */
 .sf-sidebar {
+  position: fixed;
+  top: var(--sf-navbar-h, 72px);
+  left: 0;
+  height: calc(100vh - var(--sf-navbar-h, 72px));
   width: 240px; background: #09090b;
   border-right: 1px solid #27272a;
-  display: flex; flex-direction: column; flex-shrink: 0;
-  height: 100%; overflow: hidden;
-  transition: width .25s ease; z-index: 100;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  transition: width .25s ease, transform .25s ease; z-index: 100;
 }
 .sf-sidebar.sf-collapsed { width: 64px; }
+/* Push content to the right of the fixed sidebar */
+.sf-admin-body:has(#sfSidebar:not(.sf-collapsed)) .sf-admin-content { margin-left: 240px; }
+.sf-admin-body:has(#sfSidebar.sf-collapsed) .sf-admin-content { margin-left: 64px; }
+.sf-admin-content { transition: margin-left .25s ease; }
 .sf-sidebar-toggle {
   width: 36px; height: 36px; margin: 14px;
   background: #1f1f23; border: 1px solid #27272a; border-radius: 6px;
@@ -74,13 +85,12 @@
 .sf-sidebar.sf-collapsed .sf-sidebar-user-info { max-width: 0; opacity: 0; }
 .sf-sidebar-uname { font-size: .82rem; font-weight: 600; color: #fafafa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sf-sidebar-role { font-size: .72rem; color: #dc2626; font-weight: 700; white-space: nowrap; }
-.sf-sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 99; }
-.sf-sidebar-backdrop.sf-active { display: block; }
+.sf-sidebar-pts { font-size: .72rem; color: #dc2626; font-weight: 700; white-space: nowrap; }
 /* Layout wrappers */
 .sf-admin-wrap { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: #09090b; }
-.sf-admin-body { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+.sf-admin-body { display: flex; flex: 1; min-height: 0; }
 .sf-admin-content { flex: 1; min-width: 0; overflow-y: auto; background: #09090b; }
-/* Responsive — tablet: icon-only */
+/* Responsive — tablet: icon-only, fixed margin */
 @media (max-width: 991.98px) {
   .sf-sidebar { width: 64px !important; }
   .sf-sidebar .sf-sidebar-label,.sf-sidebar .sf-sidebar-user-info { max-width: 0 !important; opacity: 0 !important; }
@@ -88,11 +98,12 @@
   .sf-sidebar .sf-sidebar-link { padding-left: 0 !important; padding-right: 0 !important; justify-content: center !important; gap: 0 !important; }
   .sf-sidebar .sf-sidebar-footer { justify-content: center !important; padding: 14px 0 !important; }
   .sf-sidebar .sf-sidebar-section { max-height: 0 !important; opacity: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; }
+  .sf-admin-body .sf-admin-content { margin-left: 64px !important; }
 }
-/* Responsive — mobile: off-canvas overlay */
+/* Responsive — mobile: off-canvas overlay, no content margin */
 @media (max-width: 767.98px) {
   .sf-sidebar {
-    position: fixed !important; top: 0 !important; left: 0 !important;
+    top: 0 !important;
     height: 100vh !important; width: 240px !important; z-index: 1050 !important;
     transform: translateX(-100%); transition: transform .25s ease !important;
   }
@@ -103,6 +114,7 @@
   .sf-sidebar .sf-sidebar-section { max-height: 3rem !important; opacity: 1 !important; padding: 1.2rem 12px .4rem !important; }
   .sf-sidebar.sf-mobile-open { transform: translateX(0); }
   .sf-sidebar-backdrop { z-index: 1049; }
+  .sf-admin-body .sf-admin-content { margin-left: 0 !important; }
 }
 
 /* ── AI Style Tags ───────────────────────────────────────── */
@@ -144,150 +156,7 @@
     <div class="sf-admin-body">
 
         {% if show_sidebar|default(true) %}
-        <!-- Sidebar -->
-        <aside class="sf-sidebar sf-collapsed" id="sfSidebar">
-            <button class="sf-sidebar-toggle" id="sfSidebarToggle" aria-label="Toggle sidebar">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-
-            <nav class="sf-sidebar-nav">
-                {% set route = app.request.attributes.get('_route') %}
-
-                <div class="sf-sidebar-section">Management</div>
-
-                <a href="{{ path('app_dashboard') }}"
-                   class="sf-sidebar-link{{ route == 'app_dashboard' ? ' active' : '' }}"
-                   title="Dashboard">
-                    <i class="fa-solid fa-chart-line fa-fw"></i>
-                    <span class="sf-sidebar-label">Dashboard</span>
-                </a>
-
-                <a href="{{ path('app_users') }}"
-                   class="sf-sidebar-link{{ (route starts with 'app_users' and route != 'app_profile') ? ' active' : '' }}"
-                   title="{{ is_granted('ROLE_ADMIN') ? 'Users Management' : 'Community' }}">
-                    <i class="fa-solid {{ is_granted('ROLE_ADMIN') ? 'fa-users' : 'fa-user-group' }} fa-fw"></i>
-                    <span class="sf-sidebar-label">{{ is_granted('ROLE_ADMIN') ? 'Users Management' : 'Community' }}</span>
-                </a>
-
-                <a href="{{ path('app_fighters') }}"
-                   class="sf-sidebar-link{{ route starts with 'app_fighter' ? ' active' : '' }}"
-                   title="Boxers">
-                    <i class="fa-solid fa-mitten fa-fw"></i>
-                    <span class="sf-sidebar-label">Boxers</span>
-                </a>
-
-                <a href="{{ path('app_events') }}"
-                   class="sf-sidebar-link{{ (route starts with 'app_event' and route != 'app_event_champions_new') ? ' active' : '' }}"
-                   title="Events">
-                    <i class="fa-solid fa-calendar-days fa-fw"></i>
-                    <span class="sf-sidebar-label">Events</span>
-                </a>
-
-                {% if is_granted('ROLE_ADMIN') %}
-                <a href="{{ path('app_event_champions_new') }}"
-                   class="sf-sidebar-link{{ route == 'app_event_champions_new' ? ' active' : '' }}"
-                   title="Champions Event" style="{{ route == 'app_event_champions_new' ? '' : 'color:#fbbf24;' }}">
-                    <i class="fa-solid fa-crown fa-fw" style="color:#fbbf24;"></i>
-                    <span class="sf-sidebar-label" style="color:inherit;">Champions Event</span>
-                </a>
-                {% endif %}
-
-                <a href="{{ path('app_results') }}"
-                   class="sf-sidebar-link{{ route starts with 'app_result' ? ' active' : '' }}"
-                   title="Bout Results">
-                    <i class="fa-solid fa-trophy fa-fw"></i>
-                    <span class="sf-sidebar-label">Bout Results</span>
-                </a>
-
-                {% if is_granted('ROLE_ADMIN') %}
-                <a href="{{ path('admin_contract_index') }}"
-                   class="sf-sidebar-link{{ route starts with 'admin_contract' ? ' active' : '' }}"
-                   title="Purses & Contracts">
-                    <i class="fa-solid fa-file-invoice-dollar fa-fw" style="color:#22c55e;"></i>
-                    <span class="sf-sidebar-label">Purses &amp; Contracts</span>
-                </a>
-
-                <a href="{{ path('admin_finance_index') }}"
-                   class="sf-sidebar-link{{ route starts with 'admin_finance' ? ' active' : '' }}"
-                   title="Finance Department">
-                    <i class="fa-solid fa-vault fa-fw" style="color:#fbbf24;"></i>
-                    <span class="sf-sidebar-label">Finance Department</span>
-                </a>
-                {% endif %}
-
-                <a href="{{ path('app_stats') }}"
-                   class="sf-sidebar-link{{ route starts with 'app_stats' ? ' active' : '' }}"
-                   title="Statistics">
-                    <i class="fa-solid fa-chart-simple fa-fw"></i>
-                    <span class="sf-sidebar-label">Statistics</span>
-                </a>
-
-                <a href="{{ path('app_performance') }}"
-                   class="sf-sidebar-link{{ route starts with 'app_performance' ? ' active' : '' }}"
-                   title="Performance">
-                    <i class="fa-solid fa-bolt fa-fw"></i>
-                    <span class="sf-sidebar-label">Performance</span>
-                </a>
-
-                <a href="{{ path('app_rankings') }}"
-                   class="sf-sidebar-link{{ route starts with 'app_ranking' ? ' active' : '' }}"
-                   title="World Rankings">
-                    <i class="fa-solid fa-list-ol fa-fw"></i>
-                    <span class="sf-sidebar-label">World Rankings</span>
-                </a>
-
-                <div class="sf-sidebar-section">Fan Experience</div>
-
-                <a href="{{ is_granted('ROLE_ADMIN') ? path('admin_blog_index') : path('front_blog_index') }}"
-                   class="sf-sidebar-link{{ (route starts with 'admin_blog' or route starts with 'front_blog') ? ' active' : '' }}"
-                   title="Blog / News">
-                    <i class="fa-solid fa-newspaper fa-fw" style="color:#f97316;"></i>
-                    <span class="sf-sidebar-label">Blog / News</span>
-                </a>
-
-                <a href="{{ is_granted('ROLE_ADMIN') ? path('admin_booking_index') : path('front_booking_index') }}"
-                   class="sf-sidebar-link{{ (route starts with 'admin_booking' or route starts with 'front_booking') ? ' active' : '' }}"
-                   title="{{ is_granted('ROLE_ADMIN') ? 'Event Bookings' : 'Book Tickets' }}">
-                    <i class="fa-solid fa-ticket fa-fw" style="color:#a855f7;"></i>
-                    <span class="sf-sidebar-label">{{ is_granted('ROLE_ADMIN') ? 'Event Bookings' : 'Book Tickets' }}</span>
-                </a>
-
-                <a href="{{ is_granted('ROLE_ADMIN') ? path('admin_reaction_index') : path('front_reaction_index') }}"
-                   class="sf-sidebar-link{{ (route starts with 'admin_reaction' or route starts with 'front_reaction') ? ' active' : '' }}"
-                   title="Fan Reactions">
-                    <i class="fa-solid fa-fire fa-fw" style="color:#ef4444;"></i>
-                    <span class="sf-sidebar-label">Fan Reactions</span>
-                </a>
-
-                <a href="{{ is_granted('ROLE_ADMIN') ? path('app_match_proposal_index') : path('app_fan_dashboard') }}"
-                   class="sf-sidebar-link{{ (route == 'app_match_proposal_index' or route == 'app_fan_dashboard') ? ' active' : '' }}"
-                   title="{{ is_granted('ROLE_ADMIN') ? 'Voting Pool Admin' : 'Matchmaking Voting' }}">
-                    <i class="fa-solid fa-square-poll-vertical fa-fw" style="color:#6366f1;"></i>
-                    <span class="sf-sidebar-label">{{ is_granted('ROLE_ADMIN') ? 'Voting Pool Admin' : 'Matchmaking Voting' }}</span>
-                </a>
-
-                {% if is_granted('ROLE_USER') %}
-                <div class="sf-sidebar-section">Fantasy League</div>
-                <a href="{{ path('app_predictions') }}"
-                   class="sf-sidebar-link{{ route starts with 'app_prediction' ? ' active' : '' }}"
-                   title="Predictions">
-                    <i class="fa-solid fa-crystal-ball fa-fw" style="color:#60a5fa;"></i>
-                    <span class="sf-sidebar-label">Predictions</span>
-                </a>
-                {% endif %}
-
-            </nav>
-
-            {% if app.user %}
-            <div class="sf-sidebar-footer">
-                <div class="sf-sidebar-avatar">{{ app.user.username|first|upper }}</div>
-                <div class="sf-sidebar-user-info">
-                    <div class="sf-sidebar-uname">{{ app.user.username }}</div>
-                    <div class="sf-sidebar-role">{{ is_granted('ROLE_ADMIN') ? 'Admin' : 'Fan' }}</div>
-                </div>
-            </div>
-            {% endif %}
-        </aside>
+        {% include 'front/partials/sidebar.html.twig' %}
         {% endif %}
 
         <!-- Main content -->
@@ -311,11 +180,33 @@
 
                 {% block content %}{% endblock %}
             </main>
+
+            {% include 'front/partials/footer.html.twig' %}
         </div>
 
     </div>{# /.sf-admin-body #}
 
 </div>{# /.sf-admin-wrap #}
+
+<!-- Senior Notification Center Panel -->
+<div class="sf-notification-panel" id="sfNotificationPanel">
+    <div class="panel-header">
+        <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-bell text-danger"></i>
+            <h3 class="h6 fw-bold mb-0 text-white text-uppercase" style="letter-spacing: 1.5px;">Tactical Alerts</h3>
+        </div>
+        <button class="btn-close-panel" id="sfCloseNotifications"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="panel-body">
+        <div class="empty-notifications text-center py-5">
+            <div class="icon-pulse mb-3">
+                <i class="fa-solid fa-satellite-dish fa-2x text-muted opacity-25"></i>
+            </div>
+            <p class="text-muted small">No incoming transmission alerts detected.</p>
+            <div class="text-uppercase x-small fw-bold text-secondary" style="letter-spacing: 1px; font-size: 0.6rem;">Status: Synchronized</div>
+        </div>
+    </div>
+</div>
 
 <div class="sf-sidebar-backdrop" id="sfSidebarBackdrop"></div>
 
@@ -529,16 +420,23 @@
     var backdrop = document.getElementById('sfSidebarBackdrop');
     if (!sidebar || !toggle) return;
 
-    var STORAGE_KEY = 'sf_admin_sidebar_collapsed';
+    var STORAGE_KEY = 'sf_sidebar_collapsed';
 
     function isMobile() { return window.innerWidth < 768; }
     function isTablet() { return window.innerWidth >= 768 && window.innerWidth < 992; }
 
+    // Measure and apply navbar height CSS variable
+    var nav = document.querySelector('.sf-navbar');
+    if (nav) {
+        document.documentElement.style.setProperty('--sf-navbar-h', nav.offsetHeight + 'px');
+    }
+
+    // Expand only if user has NOT previously collapsed
     function applyDesktopState() {
-        if (localStorage.getItem(STORAGE_KEY) === '0') {
-            sidebar.classList.remove('sf-collapsed');
-        } else {
+        if (localStorage.getItem(STORAGE_KEY) === '1') {
             sidebar.classList.add('sf-collapsed');
+        } else {
+            sidebar.classList.remove('sf-collapsed');
         }
     }
 
@@ -566,18 +464,45 @@
     }
 
     window.addEventListener('resize', function () {
-        if (isMobile()) {
-            sidebar.classList.remove('sf-collapsed');
-        } else if (isTablet()) {
+        if (isMobile()) return;
+        if (isTablet()) {
             sidebar.classList.remove('sf-mobile-open');
             if (backdrop) backdrop.classList.remove('sf-active');
-        } else {
-            sidebar.classList.remove('sf-mobile-open');
-            if (backdrop) backdrop.classList.remove('sf-active');
-            applyDesktopState();
+            return;
         }
+        sidebar.classList.remove('sf-mobile-open');
+        if (backdrop) backdrop.classList.remove('sf-active');
+        applyDesktopState();
     });
 })();
+
+// ── Notification Center Trigger Logic ────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+    const trigger = document.getElementById('sfNotificationTrigger');
+    const panel = document.getElementById('sfNotificationPanel');
+    const closeBtn = document.getElementById('sfCloseNotifications');
+    const backdrop = document.getElementById('sfSidebarBackdrop');
+
+    if (trigger && panel) {
+        trigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            panel.classList.add('active');
+            if (backdrop) backdrop.classList.add('sf-active');
+        });
+
+        const closePanel = () => {
+            panel.classList.remove('active');
+            if (backdrop) {
+                if (!document.getElementById('sfSidebar').classList.contains('sf-mobile-open')) {
+                    backdrop.classList.remove('sf-active');
+                }
+            }
+        };
+
+        if (closeBtn) closeBtn.addEventListener('click', closePanel);
+        if (backdrop) backdrop.addEventListener('click', closePanel);
+    }
+});
 </script>
 {% endblock %}
 </body>
