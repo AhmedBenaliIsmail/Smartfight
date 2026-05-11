@@ -1,0 +1,374 @@
+{% extends 'front/base_front.html.twig' %}
+
+{% block title %}Broadcast Intelligence Hub — CompuBox Analytics{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-5">
+        <div class="header-broadcast">
+            <div class="live-signal mb-2">
+                <span class="pulse-dot"></span>
+                <span class="live-text">ANALYTICS COMMAND</span>
+            </div>
+            <h1 class="display-5 fw-bold text-white mb-0" style="font-family: 'Oswald', sans-serif; letter-spacing: 2px;">COMPUBOX ENTRY</h1>
+            <p class="text-muted mb-0 fs-6">Granular Performance Data: {{ result.event.eventName|upper }}</p>
+        </div>
+        <div class="d-flex gap-3">
+            <button type="button" class="btn-console-ai" id="aiAutoFillBtn">
+                <i class="fa-solid fa-wand-magic-sparkles me-2"></i> AI SYNTHESIS
+            </button>
+            <a href="{{ path('app_result_manage_card', {id: result.event.eventId}) }}" class="btn-console-back">
+                <i class="fa-solid fa-xmark me-2"></i> ABORT
+            </a>
+        </div>
+    </div>
+
+    <form method="post">
+        <div class="broadcast-intelligence-card">
+            <div class="nav-round-tabs">
+                <ul class="nav nav-tabs border-0" id="roundTabs" role="tablist">
+                    {% set totalRounds = result.roundNumber|default(result.scheduledRounds|default(12)) %}
+                    {% for r in 1..totalRounds %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if r == 1 %}active{% endif %}" id="round-{{ r }}-tab" data-bs-toggle="tab" data-bs-target="#round-{{ r }}" type="button" role="tab">RD {{ r }}</button>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% if result.roundNumber and result.roundNumber < (result.scheduledRounds|default(12)) %}
+                    <div class="ms-auto pe-4">
+                        <span class="status-pill-stop">STOPPAGE AT R{{ result.roundNumber }}</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="tab-content" id="roundTabsContent">
+                {% for r in 1..totalRounds %}
+                <div class="tab-pane fade {% if r == 1 %}show active{% endif %} p-5" id="round-{{ r }}" role="tabpanel">
+                    <div class="row g-5">
+                        {# Red Corner #}
+                        <div class="col-lg-6">
+                            <div class="corner-header red mb-4">
+                                <div class="corner-indicator">RED</div>
+                                <h3 class="fighter-name">{{ fighter1.lastName|upper }}</h3>
+                            </div>
+
+                            <div class="stat-grid">
+                                <div class="stat-box">
+                                    <label>TOTAL PUNCHES</label>
+                                    <div class="stat-inputs">
+                                        <input type="number" name="stats[{{ r }}][f1][landed]" class="stat-field" placeholder="L">
+                                        <span class="stat-sep">/</span>
+                                        <input type="number" name="stats[{{ r }}][f1][thrown]" class="stat-field" placeholder="T">
+                                    </div>
+                                </div>
+                                <div class="stat-box">
+                                    <label>POWER SHOTS</label>
+                                    <div class="stat-inputs">
+                                        <input type="number" name="stats[{{ r }}][f1][power_landed]" class="stat-field" placeholder="L">
+                                        <span class="stat-sep">/</span>
+                                        <input type="number" name="stats[{{ r }}][f1][power_thrown]" class="stat-field" placeholder="T">
+                                    </div>
+                                </div>
+                                <div class="stat-box">
+                                    <label>JAB ACCURACY</label>
+                                    <div class="stat-inputs">
+                                        <input type="number" name="stats[{{ r }}][f1][jabs_landed]" class="stat-field" placeholder="L">
+                                        <span class="stat-sep text-muted">/ --</span>
+                                    </div>
+                                </div>
+                                <div class="stat-box">
+                                    <label>RIGHT HAND</label>
+                                    <div class="stat-inputs">
+                                        <input type="number" name="stats[{{ r }}][f1][right_landed]" class="stat-field" placeholder="L">
+                                        <span class="stat-sep">/</span>
+                                        <input type="number" name="stats[{{ r }}][f1][right_thrown]" class="stat-field" placeholder="T">
+                                    </div>
+                                </div>
+                                <div class="stat-box">
+                                    <label>LEFT HAND</label>
+                                    <div class="stat-inputs">
+                                        <input type="number" name="stats[{{ r }}][f1][left_landed]" class="stat-field" placeholder="L">
+                                        <span class="stat-sep">/</span>
+                                        <input type="number" name="stats[{{ r }}][f1][left_thrown]" class="stat-field" placeholder="T">
+                                    </div>
+                                </div>
+                                <div class="stat-box-row">
+                                    <div class="stat-box-half">
+                                        <label>BODY</label>
+                                        <input type="number" name="stats[{{ r }}][f1][body_shots]" class="stat-field" placeholder="0">
+                                    </div>
+                                    <div class="stat-box-half">
+                                        <label>KD</label>
+                                        <input type="number" name="stats[{{ r }}][f1][kds]" class="stat-field" placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Blue Corner #}
+                        <div class="col-lg-6">
+                            <div class="corner-header blue mb-4">
+                                <div class="corner-indicator">BLUE</div>
+                                <h3 class="fighter-name">{{ fighter2.lastName|upper }}</h3>
+                            </div>
+
+                            <div class="stat-grid">
+                                <div class="stat-box">
+                                    <label>TOTAL PUNCHES</label>
+                                    <div class="stat-inputs">
+                                        <input type="number" name="stats[{{ r }}][f2][landed]" class="stat-field" placeholder="L">
+                                        <span class="stat-sep">/</span>
+                                        <input type="number" name="stats[{{ r }}][f2][thrown]" class="stat-field" placeholder="T">
+                                    </div>
+                                </div>
+                                <div class="stat-box">
+                                    <label>POWER SHOTS</label>
+                                    <div class="stat-inputs">
+                                        <input type="number" name="stats[{{ r }}][f2][power_landed]" class="stat-field" placeholder="L">
+                                        <span class="stat-sep">/</span>
+                                        <input type="number" name="stats[{{ r }}][f2][power_thrown]" class="stat-field" placeholder="T">
+                                    </div>
+                                </div>
+                                <div class="stat-box">
+                                    <label>JAB ACCURACY</label>
+                                    <div class="stat-inputs">
+                                        <input type="number" name="stats[{{ r }}][f2][jabs_landed]" class="stat-field" placeholder="L">
+                                        <span class="stat-sep text-muted">/ --</span>
+                                    </div>
+                                </div>
+                                <div class="stat-box">
+                                    <label>RIGHT HAND</label>
+                                    <div class="stat-inputs">
+                                        <input type="number" name="stats[{{ r }}][f2][right_landed]" class="stat-field" placeholder="L">
+                                        <span class="stat-sep">/</span>
+                                        <input type="number" name="stats[{{ r }}][f2][right_thrown]" class="stat-field" placeholder="T">
+                                    </div>
+                                </div>
+                                <div class="stat-box">
+                                    <label>LEFT HAND</label>
+                                    <div class="stat-inputs">
+                                        <input type="number" name="stats[{{ r }}][f2][left_landed]" class="stat-field" placeholder="L">
+                                        <span class="stat-sep">/</span>
+                                        <input type="number" name="stats[{{ r }}][f2][left_thrown]" class="stat-field" placeholder="T">
+                                    </div>
+                                </div>
+                                <div class="stat-box-row">
+                                    <div class="stat-box-half">
+                                        <label>BODY</label>
+                                        <input type="number" name="stats[{{ r }}][f2][body_shots]" class="stat-field" placeholder="0">
+                                    </div>
+                                    <div class="stat-box-half">
+                                        <label>KD</label>
+                                        <input type="number" name="stats[{{ r }}][f2][kds]" class="stat-field" placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="card-footer-console p-5">
+                <div class="ai-box mb-5">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <i class="fa-solid fa-microchip text-warning fs-4"></i>
+                        <label class="console-label text-warning mb-0">INSIDE THE NUMBERS — AI TACTICAL SYNTHESIS</label>
+                    </div>
+                    <textarea name="insideTheNumbers" class="console-textarea" rows="6" placeholder="AI will analyze round chunks to provide broadcast-ready tactical breakdown...">{{ result.insideTheNumbers }}</textarea>
+                </div>
+                
+                <button type="submit" class="btn-finalize-stats">
+                    <i class="fa-solid fa-cloud-arrow-up me-2"></i> COMMIT ANALYTICS LEDGER
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+.header-broadcast { border-left: 4px solid #dc2626; padding-left: 20px; }
+.pulse-dot { width: 8px; height: 8px; background: #dc2626; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #dc2626; animation: blink 1.5s infinite; }
+@keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+.live-text { font-size: 0.65rem; font-weight: 900; color: #dc2626; letter-spacing: 2px; margin-left: 8px; }
+
+.btn-console-back { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #a1a1aa; font-weight: 700; font-size: 0.8rem; padding: 10px 20px; border-radius: 8px; transition: all 0.3s; text-decoration: none; }
+.btn-console-back:hover { background: #27272a; color: #fff; }
+
+.btn-console-ai { background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3); transition: all 0.3s; }
+.btn-console-ai:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4); }
+
+.broadcast-intelligence-card { background: #121214; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; overflow: hidden; }
+
+.nav-round-tabs { background: #18181b; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; padding-left: 10px; }
+.nav-round-tabs .nav-link { color: #71717a; border: none; padding: 18px 24px; font-weight: 800; font-family: 'Oswald', sans-serif; font-size: 0.85rem; letter-spacing: 1px; transition: all 0.2s; position: relative; }
+.nav-round-tabs .nav-link.active { color: #dc2626; background: transparent; }
+.nav-round-tabs .nav-link.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: #dc2626; box-shadow: 0 -2px 10px rgba(220, 38, 38, 0.5); }
+
+.status-pill-stop { background: rgba(220, 38, 38, 0.1); color: #dc2626; font-size: 0.65rem; font-weight: 900; padding: 4px 12px; border-radius: 4px; letter-spacing: 1px; border: 1px solid rgba(220, 38, 38, 0.2); }
+
+/* Corner Headers */
+.corner-header { padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 15px; }
+.corner-header.red { background: linear-gradient(90deg, rgba(220, 38, 38, 0.1) 0%, transparent 100%); border-left: 4px solid #dc2626; }
+.corner-header.blue { background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%); border-left: 4px solid #3b82f6; }
+.corner-indicator { font-size: 0.6rem; font-weight: 900; letter-spacing: 2px; padding: 2px 8px; border-radius: 4px; color: #fff; }
+.corner-header.red .corner-indicator { background: #dc2626; }
+.corner-header.blue .corner-indicator { background: #3b82f6; }
+.fighter-name { font-family: 'Oswald', sans-serif; font-weight: 700; color: #fff; letter-spacing: 1px; margin-bottom: 0; font-size: 1.5rem; }
+
+/* Stats Grid */
+.stat-grid { display: flex; flex-direction: column; gap: 12px; }
+.stat-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+.stat-box label { font-size: 0.65rem; font-weight: 900; color: #71717a; letter-spacing: 1.5px; margin-bottom: 0; }
+.stat-inputs { display: flex; align-items: center; gap: 8px; }
+.stat-field { width: 50px; background: #09090b; border: 1px solid rgba(255,255,255,0.1); color: #fff; text-align: center; font-weight: 700; border-radius: 4px; padding: 4px; font-size: 0.9rem; }
+.stat-field:focus { outline: none; border-color: #dc2626; }
+.stat-sep { font-weight: 900; color: #3f3f46; font-size: 0.8rem; }
+
+.stat-box-row { display: flex; gap: 12px; }
+.stat-box-half { flex: 1; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+.stat-box-half label { font-size: 0.65rem; font-weight: 900; color: #71717a; margin-bottom: 0; }
+
+.card-footer-console { background: rgba(255,255,255,0.01); border-top: 1px solid rgba(255,255,255,0.05); }
+.console-textarea { width: 100%; background: #09090b; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 20px; border-radius: 12px; font-size: 0.95rem; line-height: 1.6; }
+.console-textarea:focus { outline: none; border-color: #fbbf24; }
+
+.btn-finalize-stats { width: 100%; background: #22c55e; color: #fff; border: none; padding: 18px; border-radius: 10px; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase; transition: all 0.3s; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3); }
+.btn-finalize-stats:hover { background: #16a34a; transform: translateY(-2px); box-shadow: 0 6px 25px rgba(34, 197, 94, 0.4); }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const aiBtn = document.getElementById('aiAutoFillBtn');
+    
+    if (aiBtn) {
+        aiBtn.addEventListener('click', function() {
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i> SYNTHESIZING...';
+            this.disabled = true;
+
+            const totalRounds = {{ result.roundNumber|default(result.scheduledRounds|default(12)) }};
+
+            fetch('{{ path('app_result_generate_ai_stats', {'id': result.resultId}) }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ totalRounds: totalRounds })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    Object.keys(data.rounds).forEach(r => {
+                        const roundData = data.rounds[r];
+                        if (r > totalRounds) return;
+                        
+                        // F1
+                        setInputVal(`stats[${r}][f1][landed]`, roundData.f1.punches_landed);
+                        setInputVal(`stats[${r}][f1][thrown]`, roundData.f1.punches_thrown);
+                        setInputVal(`stats[${r}][f1][right_landed]`, roundData.f1.right_landed);
+                        setInputVal(`stats[${r}][f1][right_thrown]`, roundData.f1.right_thrown);
+                        setInputVal(`stats[${r}][f1][left_landed]`, roundData.f1.left_landed);
+                        setInputVal(`stats[${r}][f1][left_thrown]`, roundData.f1.left_thrown);
+                        setInputVal(`stats[${r}][f1][power_landed]`, roundData.f1.power_landed);
+                        setInputVal(`stats[${r}][f1][power_thrown]`, roundData.f1.power_thrown);
+                        setInputVal(`stats[${r}][f1][jabs_landed]`, roundData.f1.jabs_landed);
+                        setInputVal(`stats[${r}][f1][body_shots]`, roundData.f1.body_shots);
+                        setInputVal(`stats[${r}][f1][kds]`, roundData.f1.kds);
+
+                        // F2
+                        setInputVal(`stats[${r}][f2][landed]`, roundData.f2.punches_landed);
+                        setInputVal(`stats[${r}][f2][thrown]`, roundData.f2.punches_thrown);
+                        setInputVal(`stats[${r}][f2][right_landed]`, roundData.f2.right_landed);
+                        setInputVal(`stats[${r}][f2][right_thrown]`, roundData.f2.right_thrown);
+                        setInputVal(`stats[${r}][f2][left_landed]`, roundData.f2.left_landed);
+                        setInputVal(`stats[${r}][f2][left_thrown]`, roundData.f2.left_thrown);
+                        setInputVal(`stats[${r}][f2][power_landed]`, roundData.f2.power_landed);
+                        setInputVal(`stats[${r}][f2][power_thrown]`, roundData.f2.power_thrown);
+                        setInputVal(`stats[${r}][f2][jabs_landed]`, roundData.f2.jabs_landed);
+                        setInputVal(`stats[${r}][f2][body_shots]`, roundData.f2.body_shots);
+                        setInputVal(`stats[${r}][f2][kds]`, roundData.f2.kds);
+                    });
+
+                    document.querySelector('textarea[name="insideTheNumbers"]').value = data.insideTheNumbers;
+                }
+            })
+            .finally(() => {
+                this.innerHTML = originalText;
+                this.disabled = false;
+            });
+        });
+    }
+
+    function setInputVal(name, val) {
+        const input = document.querySelector(`input[name="${name}"]`);
+        if (input) input.value = val;
+    }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const aiBtn = document.getElementById('aiAutoFillBtn');
+    
+    if (aiBtn) {
+        aiBtn.addEventListener('click', function() {
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i>AI SYNTHESIZING...';
+            this.disabled = true;
+
+            const totalRounds = {{ result.roundNumber|default(result.scheduledRounds|default(12)) }};
+
+            fetch('{{ path('app_result_generate_ai_stats', {'id': result.resultId}) }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ totalRounds: totalRounds })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    Object.keys(data.rounds).forEach(r => {
+                        const roundData = data.rounds[r];
+                        if (r > totalRounds) return;
+                        
+                        // F1
+                        setInputVal(`stats[${r}][f1][landed]`, roundData.f1.punches_landed);
+                        setInputVal(`stats[${r}][f1][thrown]`, roundData.f1.punches_thrown);
+                        setInputVal(`stats[${r}][f1][right_landed]`, roundData.f1.right_landed);
+                        setInputVal(`stats[${r}][f1][right_thrown]`, roundData.f1.right_thrown);
+                        setInputVal(`stats[${r}][f1][left_landed]`, roundData.f1.left_landed);
+                        setInputVal(`stats[${r}][f1][left_thrown]`, roundData.f1.left_thrown);
+                        setInputVal(`stats[${r}][f1][power_landed]`, roundData.f1.power_landed);
+                        setInputVal(`stats[${r}][f1][power_thrown]`, roundData.f1.power_thrown);
+                        setInputVal(`stats[${r}][f1][jabs_landed]`, roundData.f1.jabs_landed);
+                        setInputVal(`stats[${r}][f1][body_shots]`, roundData.f1.body_shots);
+                        setInputVal(`stats[${r}][f1][kds]`, roundData.f1.kds);
+
+                        // F2
+                        setInputVal(`stats[${r}][f2][landed]`, roundData.f2.punches_landed);
+                        setInputVal(`stats[${r}][f2][thrown]`, roundData.f2.punches_thrown);
+                        setInputVal(`stats[${r}][f2][right_landed]`, roundData.f2.right_landed);
+                        setInputVal(`stats[${r}][f2][right_thrown]`, roundData.f2.right_thrown);
+                        setInputVal(`stats[${r}][f2][left_landed]`, roundData.f2.left_landed);
+                        setInputVal(`stats[${r}][f2][left_thrown]`, roundData.f2.left_thrown);
+                        setInputVal(`stats[${r}][f2][power_landed]`, roundData.f2.power_landed);
+                        setInputVal(`stats[${r}][f2][power_thrown]`, roundData.f2.power_thrown);
+                        setInputVal(`stats[${r}][f2][jabs_landed]`, roundData.f2.jabs_landed);
+                        setInputVal(`stats[${r}][f2][body_shots]`, roundData.f2.body_shots);
+                        setInputVal(`stats[${r}][f2][kds]`, roundData.f2.kds);
+                    });
+
+                    document.querySelector('textarea[name="insideTheNumbers"]').value = data.insideTheNumbers;
+                }
+            })
+            .finally(() => {
+                this.innerHTML = originalText;
+                this.disabled = false;
+            });
+        });
+    }
+
+    function setInputVal(name, val) {
+        const input = document.querySelector(`input[name="${name}"]`);
+        if (input) input.value = val;
+    }
+});
+</script>
+{% endblock %}

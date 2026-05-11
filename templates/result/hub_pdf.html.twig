@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Helvetica', 'Arial', sans-serif; color: #18181b; line-height: 1.4; margin: 0; padding: 40px; background: #fff; }
+        .header { border-bottom: 4px solid #dc2626; padding-bottom: 20px; margin-bottom: 30px; position: relative; }
+        .header h1 { margin: 0; font-size: 28px; text-transform: uppercase; letter-spacing: 2px; color: #000; }
+        .header .subtitle { color: #dc2626; font-weight: bold; font-size: 12px; letter-spacing: 3px; margin-top: 5px; }
+        .header .meta { position: absolute; right: 0; top: 0; text-align: right; color: #71717a; font-size: 10px; }
+        
+        .event-section { margin-bottom: 40px; page-break-inside: avoid; }
+        .event-header { background: #f4f4f5; padding: 12px 20px; border-left: 5px solid #000; margin-bottom: 15px; }
+        .event-header h2 { margin: 0; font-size: 18px; color: #000; text-transform: uppercase; }
+        .event-header p { margin: 3px 0 0; font-size: 11px; color: #71717a; }
+        
+        .results-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .results-table th { border-bottom: 2px solid #e4e4e7; padding: 10px; font-size: 10px; text-transform: uppercase; color: #71717a; text-align: left; }
+        .results-table td { padding: 12px 10px; border-bottom: 1px solid #f1f1f4; font-size: 12px; }
+        
+        .winner-cell { font-weight: bold; color: #dc2626; }
+        .method-tag { font-size: 10px; background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        
+        .footer { position: fixed; bottom: 20px; left: 40px; right: 40px; border-top: 1px solid #e4e4e7; padding-top: 10px; text-align: center; font-size: 9px; color: #a1a1aa; }
+        
+        .corner-red { color: #ef4444; font-weight: bold; }
+        .corner-blue { color: #3b82f6; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>SMARTFIGHT ARCHIVE</h1>
+        <div class="subtitle">OFFICIAL RESULTS & ANALYTICS LEDGER</div>
+        <div class="meta">
+            GENREATED: {{ "now"|date('M d, Y H:i') }}<br>
+            REPORT REF: SF-ARCH-{{ "now"|date('U') }}
+        </div>
+    </div>
+
+    {% for event in events %}
+        {% set results = eventResults[event.eventId]|default([]) %}
+        {% if results|length > 0 %}
+            <div class="event-section">
+                <div class="event-header">
+                    <h2>{{ event.eventName }}</h2>
+                    <p>{{ event.venue }}, {{ event.city }} • {{ event.eventDate|date('l, F d, Y') }}</p>
+                </div>
+
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th width="5%">#</th>
+                            <th width="35%">MATCHUP</th>
+                            <th width="25%">WINNER</th>
+                            <th width="20%">METHOD</th>
+                            <th width="15%">ROUND</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for res in results %}
+                            <tr>
+                                <td>{{ res.fightNumber }}</td>
+                                <td>
+                                    <span class="corner-red">{{ res.fighter1.lastName|upper }}</span>
+                                    <span style="color:#71717a"> vs </span>
+                                    <span class="corner-blue">{{ res.fighter2.lastName|upper }}</span>
+                                </td>
+                                <td class="winner-cell">
+                                    {{ res.winner ? res.winner.fullName|upper : 'DRAW/NC' }}
+                                </td>
+                                <td><span class="method-tag">{{ res.methodOfVictory }}</span></td>
+                                <td>RD {{ res.roundNumber }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    <div class="footer">
+        This document is an official archived record of SmartFight events. 
+        All results are verified by the sanctioning commission and recorded in the technical archives.
+        Page 1 of 1
+    </div>
+</body>
+</html>

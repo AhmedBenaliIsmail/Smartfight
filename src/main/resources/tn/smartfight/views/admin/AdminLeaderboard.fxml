@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.smartfight.controller.AdminLeaderboardController"
+            fitToWidth="true" styleClass="scroll-pane">
+  <content>
+    <VBox spacing="0" style="-fx-background-color:#0d0d0d;">
+
+      <!-- Header -->
+      <VBox alignment="CENTER" spacing="6">
+        <padding><Insets top="32" bottom="16" left="24" right="24"/></padding>
+        <HBox alignment="CENTER_RIGHT">
+          <Region HBox.hgrow="ALWAYS"/>
+          <Label text="YEARLY PRIZE ACTIVE"
+                 style="-fx-background-color:#dc2626;-fx-text-fill:white;-fx-background-radius:12;-fx-padding:4 12;-fx-font-size:11;-fx-font-weight:bold;"/>
+        </HBox>
+        <Label text="ELITE LEADERBOARD"
+               style="-fx-font-size:36;-fx-font-weight:bold;-fx-text-fill:#ffffff;"/>
+        <Label text="2026 SEASON PERFORMANCE ANALYTICS"
+               style="-fx-font-size:13;-fx-text-fill:#6b7280;"/>
+      </VBox>
+
+      <!-- Podium + Rewards row -->
+      <HBox spacing="16">
+        <padding><Insets top="16" bottom="0" left="24" right="24"/></padding>
+
+        <!-- Left: Podium -->
+        <HBox spacing="16" HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER">
+
+          <!-- #2 -->
+          <VBox fx:id="podium2" styleClass="podium-2" spacing="10" alignment="CENTER"
+                HBox.hgrow="ALWAYS" minHeight="180">
+            <Label fx:id="rank2Init" text="?" style="-fx-background-color:#374151;-fx-text-fill:white;
+                   -fx-font-size:24;-fx-font-weight:bold;-fx-background-radius:40;
+                   -fx-min-width:60;-fx-min-height:60;-fx-max-width:60;-fx-max-height:60;-fx-alignment:center;"/>
+            <Label text="#2" style="-fx-font-size:20;-fx-font-weight:bold;-fx-text-fill:#9ca3af;"/>
+            <Label fx:id="rank2Name" text="—" style="-fx-font-size:13;-fx-font-weight:bold;-fx-text-fill:#ffffff;"/>
+            <Label fx:id="rank2Pts" text="0 PTS" style="-fx-font-size:12;-fx-text-fill:#9ca3af;"/>
+            <Label text="CONTENDER" style="-fx-font-size:10;-fx-text-fill:#6b7280;"/>
+          </VBox>
+
+          <!-- #1 (center, largest) -->
+          <VBox fx:id="podium1" styleClass="podium-1" spacing="10" alignment="CENTER"
+                HBox.hgrow="ALWAYS" minHeight="220">
+            <Label text="👑" style="-fx-font-size:24;"/>
+            <Label fx:id="rank1Init" text="?" style="-fx-background-color:#374151;-fx-text-fill:white;
+                   -fx-font-size:28;-fx-font-weight:bold;-fx-background-radius:50;
+                   -fx-min-width:70;-fx-min-height:70;-fx-max-width:70;-fx-max-height:70;-fx-alignment:center;"/>
+            <Label text="#1" style="-fx-font-size:24;-fx-font-weight:bold;-fx-text-fill:#f59e0b;"/>
+            <Label fx:id="rank1Name" text="—"
+                   style="-fx-font-size:16;-fx-font-weight:bold;-fx-text-fill:#ffffff;"/>
+            <Label fx:id="rank1Pts" text="0 PTS"
+                   style="-fx-font-size:14;-fx-text-fill:#f59e0b;-fx-font-weight:bold;"/>
+            <Label text="ELITE TIER" style="-fx-font-size:10;-fx-text-fill:#6b7280;"/>
+          </VBox>
+
+          <!-- #3 -->
+          <VBox fx:id="podium3" styleClass="podium-3" spacing="10" alignment="CENTER"
+                HBox.hgrow="ALWAYS" minHeight="160">
+            <Label fx:id="rank3Init" text="?" style="-fx-background-color:#374151;-fx-text-fill:white;
+                   -fx-font-size:20;-fx-font-weight:bold;-fx-background-radius:36;
+                   -fx-min-width:54;-fx-min-height:54;-fx-max-width:54;-fx-max-height:54;-fx-alignment:center;"/>
+            <Label text="#3" style="-fx-font-size:18;-fx-font-weight:bold;-fx-text-fill:#b45309;"/>
+            <Label fx:id="rank3Name" text="—" style="-fx-font-size:13;-fx-font-weight:bold;-fx-text-fill:#ffffff;"/>
+            <Label fx:id="rank3Pts" text="0 PTS" style="-fx-font-size:12;-fx-text-fill:#9ca3af;"/>
+            <Label text="IN CONTENTION" style="-fx-font-size:10;-fx-text-fill:#6b7280;"/>
+          </VBox>
+        </HBox>
+
+        <!-- Right: Rewards + Scoring -->
+        <VBox spacing="16" minWidth="240" maxWidth="300">
+          <!-- 2026 Rewards -->
+          <VBox styleClass="card" spacing="10">
+            <Label text="2026 REWARDS"
+                   style="-fx-font-size:13;-fx-font-weight:bold;-fx-text-fill:#f59e0b;"/>
+            <Label text="✓  Title Fight Travel" style="-fx-text-fill:#9ca3af;-fx-font-size:12;"/>
+            <Label text="✓  Ringside + Analyst" style="-fx-text-fill:#9ca3af;-fx-font-size:12;"/>
+            <Label text="✓  Fighter Analyst"    style="-fx-text-fill:#9ca3af;-fx-font-size:12;"/>
+          </VBox>
+          <!-- Scoring logic -->
+          <VBox styleClass="card" spacing="8">
+            <Label text="SCORING LOGIC"
+                   style="-fx-font-size:13;-fx-font-weight:bold;-fx-text-fill:#ffffff;"/>
+            <HBox spacing="8" alignment="CENTER_LEFT">
+              <Label text="▲ +5" style="-fx-text-fill:#16a34a;-fx-font-weight:bold;"/>
+              <Label text="Correct Winner" style="-fx-text-fill:#9ca3af;-fx-font-size:12;"/>
+            </HBox>
+            <HBox spacing="8" alignment="CENTER_LEFT">
+              <Label text="▲ +2" style="-fx-text-fill:#16a34a;-fx-font-weight:bold;"/>
+              <Label text="Method of Victory" style="-fx-text-fill:#9ca3af;-fx-font-size:12;"/>
+            </HBox>
+            <HBox spacing="8" alignment="CENTER_LEFT">
+              <Label text="▲ +2" style="-fx-text-fill:#16a34a;-fx-font-weight:bold;"/>
+              <Label text="Exact Round Bid" style="-fx-text-fill:#9ca3af;-fx-font-size:12;"/>
+            </HBox>
+            <HBox spacing="8" alignment="CENTER_LEFT">
+              <Label text="▲ +★" style="-fx-text-fill:#f59e0b;-fx-font-weight:bold;"/>
+              <Label text="Perfect Score Bonus" style="-fx-text-fill:#9ca3af;-fx-font-size:12;"/>
+            </HBox>
+          </VBox>
+        </VBox>
+      </HBox>
+
+      <!-- Search + full table -->
+      <VBox spacing="12">
+        <padding><Insets top="24" bottom="24" left="24" right="24"/></padding>
+        <HBox alignment="CENTER_LEFT" spacing="12">
+          <Label text="FULL SEASON STANDINGS"
+                 style="-fx-font-size:16;-fx-font-weight:bold;-fx-text-fill:#ffffff;"/>
+          <Region HBox.hgrow="ALWAYS"/>
+          <TextField fx:id="searchField" styleClass="search-field"
+                     promptText="Search contenders..." prefWidth="260" onAction="#onSearch"/>
+        </HBox>
+        <TableView fx:id="leaderTable" prefHeight="400">
+          <columns>
+            <TableColumn fx:id="colRank"   text="RANK"               prefWidth="70"/>
+            <TableColumn fx:id="colUser"   text="CONTENDER"          prefWidth="220"/>
+            <TableColumn fx:id="colPred"   text="PREDICTIVE AMOUNT"  prefWidth="180"/>
+            <TableColumn fx:id="colPoints" text="TOTAL POINTS"       prefWidth="120"/>
+            <TableColumn fx:id="colStatus" text="STATUS"             prefWidth="130"/>
+          </columns>
+          <placeholder><Label text="No contenders yet" styleClass="text-muted"/></placeholder>
+        </TableView>
+        <Label fx:id="statusLabel" styleClass="caption"/>
+      </VBox>
+    </VBox>
+  </content>
+</ScrollPane>

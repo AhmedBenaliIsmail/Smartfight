@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.smartfight.controller.AdminBlogFormController"
+      spacing="12" prefWidth="580">
+    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+
+    <Label text="Title" styleClass="caption"/>
+    <TextField fx:id="titleField"/>
+
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <VBox spacing="4" HBox.hgrow="ALWAYS">
+            <Label text="Category *" styleClass="caption"/>
+            <ComboBox fx:id="categoryCombo" maxWidth="Infinity"/>
+        </VBox>
+        <VBox spacing="4">
+            <Label text="Status" styleClass="caption"/>
+            <ComboBox fx:id="statusCombo" prefWidth="140"/>
+        </VBox>
+    </HBox>
+
+    <Label text="Summary" styleClass="caption"/>
+    <TextArea fx:id="summaryArea" prefRowCount="3" wrapText="true"/>
+
+    <Label text="Content" styleClass="caption"/>
+    <TextArea fx:id="contentArea" prefRowCount="10" wrapText="true" VBox.vgrow="ALWAYS"/>
+
+    <Label text="Image" styleClass="caption"/>
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <TextField fx:id="imagePathField" HBox.hgrow="ALWAYS" promptText="filename.jpg"/>
+        <Button text="Browse…" onAction="#onBrowseImage"/>
+    </HBox>
+
+    <Label text="Video" styleClass="caption"/>
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <TextField fx:id="videoPathField" HBox.hgrow="ALWAYS" promptText="filename.mp4"/>
+        <Button text="Browse…" onAction="#onBrowseVideo"/>
+    </HBox>
+
+    <HBox spacing="10">
+        <Button text="Save" onAction="#onSave" styleClass="btn-primary"/>
+        <Button text="Cancel" onAction="#onCancel" styleClass="button"/>
+    </HBox>
+
+    <Label fx:id="statusLabel" styleClass="caption"/>
+</VBox>

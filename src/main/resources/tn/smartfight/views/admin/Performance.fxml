@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.smartfight.controller.PerformanceListController"
+      spacing="12" styleClass="content-pane">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="Fighter Performance" styleClass="h2"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Recalculate All" onAction="#onRecalcAll" styleClass="btn-primary"/>
+        <Button text="Refresh" onAction="#onRefresh" styleClass="btn-outline"/>
+    </HBox>
+
+    <TableView fx:id="table" VBox.vgrow="ALWAYS">
+        <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+        <columns>
+            <TableColumn fx:id="colName"       text="Fighter"        prefWidth="180"/>
+            <TableColumn fx:id="colElo"        text="ELO"           prefWidth="80"/>
+            <TableColumn fx:id="colPerf"       text="Perf Score"    prefWidth="100"/>
+            <TableColumn fx:id="colEff"        text="Efficiency"    prefWidth="100"/>
+            <TableColumn fx:id="colMomentum"   text="Momentum"      prefWidth="110"/>
+            <TableColumn fx:id="colWinStreak"  text="Win Streak"    prefWidth="90"/>
+            <TableColumn fx:id="colRecord"     text="Record"        prefWidth="90"/>
+            <TableColumn fx:id="colTitleDef"   text="Defenses"      prefWidth="80"/>
+        </columns>
+    </TableView>
+
+    <Label fx:id="statusLabel" styleClass="caption" text="Loading..."/>
+</VBox>

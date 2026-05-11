@@ -1,0 +1,212 @@
+{% set route = app.request.attributes.get('_route') %}
+<aside class="sf-sidebar sf-collapsed" id="sfSidebar">
+
+    <button class="sf-sidebar-toggle" id="sfSidebarToggle" aria-label="Toggle sidebar">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <nav class="sf-sidebar-nav">
+
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_dashboard') }}"
+               class="sf-sidebar-link{{ route == 'app_dashboard' ? ' active' : '' }}"
+               title="Dashboard">
+                <i class="fa-solid fa-chart-line"></i>
+                <span class="sf-sidebar-label">Dashboard</span>
+            </a>
+        {% else %}
+            <a href="{{ path('app_fan_dashboard') }}"
+               class="sf-sidebar-link{{ route == 'app_fan_dashboard' ? ' active' : '' }}"
+               title="Dashboard">
+                <i class="fa-solid fa-gauge-high"></i>
+                <span class="sf-sidebar-label">Dashboard</span>
+            </a>
+        {% endif %}
+
+        {% if not is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('front_blog_index') }}"
+               class="sf-sidebar-link{{ route in ['front_blog_index', 'front_blog_show'] ? ' active' : '' }}"
+               title="Blog">
+                <i class="fa-solid fa-newspaper"></i>
+                <span class="sf-sidebar-label">Blog &amp; News</span>
+            </a>
+
+            <a href="{{ path('front_reaction_index') }}"
+               class="sf-sidebar-link{{ route == 'front_reaction_index' ? ' active' : '' }}"
+               title="Fan Reactions">
+                <i class="fa-solid fa-fire-flame-curved"></i>
+                <span class="sf-sidebar-label">Fan Reactions</span>
+            </a>
+        {% endif %}
+
+        <a href="{{ path('app_leaderboard') }}"
+           class="sf-sidebar-link{{ route == 'app_leaderboard' ? ' active' : '' }}"
+           title="Leaderboard">
+            <i class="fa-solid fa-ranking-star"></i>
+            <span class="sf-sidebar-label">Leaderboard</span>
+        </a>
+
+        <div class="sf-sidebar-sep"></div>
+
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_users') }}"
+               class="sf-sidebar-link{{ (route starts with 'app_users' and route != 'app_profile') ? ' active' : '' }}"
+               title="Users Management">
+                <i class="fa-solid fa-users"></i>
+                <span class="sf-sidebar-label">Users Management</span>
+            </a>
+        {% endif %}
+
+        <a href="{{ path('app_fighters') }}"
+           class="sf-sidebar-link{{ route starts with 'app_fighter' ? ' active' : '' }}"
+           title="Boxers">
+            <i class="fa-solid fa-person-running"></i>
+            <span class="sf-sidebar-label">Boxers</span>
+        </a>
+
+        <a href="{{ path('app_events') }}"
+           class="sf-sidebar-link{{ (route starts with 'app_event' and route != 'app_event_champions_new') ? ' active' : '' }}"
+           title="Events">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span class="sf-sidebar-label">Events</span>
+        </a>
+
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_event_champions_new') }}"
+               class="sf-sidebar-link{{ route == 'app_event_champions_new' ? ' active' : '' }}"
+               title="Champions Event" style="{{ route == 'app_event_champions_new' ? '' : 'color:#fbbf24;' }}">
+                <i class="fa-solid fa-crown" style="color:#fbbf24;"></i>
+                <span class="sf-sidebar-label" style="color:inherit;">Champions Event</span>
+            </a>
+        {% endif %}
+
+        <a href="{{ path('app_results') }}"
+           class="sf-sidebar-link{{ route starts with 'app_result' ? ' active' : '' }}"
+           title="Bout Results">
+            <i class="fa-solid fa-trophy"></i>
+            <span class="sf-sidebar-label">Bout Results</span>
+        </a>
+
+        {% if is_granted('ROLE_USER') %}
+            <div class="sf-sidebar-sep"></div>
+
+            <a href="{{ path('app_stats') }}"
+               class="sf-sidebar-link{{ route starts with 'app_stat' ? ' active' : '' }}"
+               title="Statistics">
+                <i class="fa-solid fa-chart-bar"></i>
+                <span class="sf-sidebar-label">Statistics</span>
+            </a>
+
+            <a href="{{ path('app_performance') }}"
+               class="sf-sidebar-link{{ route starts with 'app_performance' ? ' active' : '' }}"
+               title="Performance">
+                <i class="fa-solid fa-chart-line"></i>
+                <span class="sf-sidebar-label">Performance</span>
+            </a>
+
+            <a href="{{ path('app_rankings') }}"
+               class="sf-sidebar-link{{ route starts with 'app_ranking' ? ' active' : '' }}"
+               title="World Ranking">
+                <i class="fa-solid fa-medal"></i>
+                <span class="sf-sidebar-label">World Ranking</span>
+            </a>
+        {% endif %}
+
+        <div class="sf-sidebar-sep"></div>
+
+        <a href="{{ is_granted('ROLE_ADMIN') ? path('admin_blog_index') : path('front_blog_index') }}"
+           class="sf-sidebar-link{{ (route starts with 'admin_blog' or route starts with 'front_blog') ? ' active' : '' }}"
+           title="Blog / News">
+            <i class="fa-solid fa-newspaper" style="color:#f97316;"></i>
+            <span class="sf-sidebar-label">Blog / News</span>
+        </a>
+
+        <a href="{{ is_granted('ROLE_ADMIN') ? path('admin_booking_index') : path('front_booking_index') }}"
+           class="sf-sidebar-link{{ (route starts with 'admin_booking' or route starts with 'front_booking') ? ' active' : '' }}"
+           title="{{ is_granted('ROLE_ADMIN') ? 'Event Bookings' : 'Book Tickets' }}">
+            <i class="fa-solid fa-ticket" style="color:#a855f7;"></i>
+            <span class="sf-sidebar-label">{{ is_granted('ROLE_ADMIN') ? 'Event Bookings' : 'Book Tickets' }}</span>
+        </a>
+
+        <a href="{{ is_granted('ROLE_ADMIN') ? path('admin_reaction_index') : path('front_reaction_index') }}"
+           class="sf-sidebar-link{{ (route starts with 'admin_reaction' or route starts with 'front_reaction') ? ' active' : '' }}"
+           title="Fan Reactions">
+            <i class="fa-solid fa-fire-flame-curved" style="color:#ef4444;"></i>
+            <span class="sf-sidebar-label">Fan Reactions</span>
+        </a>
+
+        <a href="{{ is_granted('ROLE_ADMIN') ? path('app_match_proposal_index') : path('app_fan_dashboard') }}"
+           class="sf-sidebar-link{{ (route == 'app_match_proposal_index' or route == 'app_fan_dashboard') ? ' active' : '' }}"
+           title="{{ is_granted('ROLE_ADMIN') ? 'Voting Pool Admin' : 'Matchmaking Voting' }}">
+            <i class="fa-solid fa-square-poll-vertical" style="color:#6366f1;"></i>
+            <span class="sf-sidebar-label">{{ is_granted('ROLE_ADMIN') ? 'Voting Pool Admin' : 'Matchmaking Voting' }}</span>
+        </a>
+
+        {% if is_granted('ROLE_ADMIN') %}
+            <div class="sf-sidebar-sep"></div>
+
+            <a href="{{ path('admin_contract_index') }}"
+               class="sf-sidebar-link{{ route starts with 'admin_contract' ? ' active' : '' }}"
+               title="Purses &amp; Contracts">
+                <i class="fa-solid fa-file-invoice-dollar" style="color:#22c55e;"></i>
+                <span class="sf-sidebar-label">Purses &amp; Contracts</span>
+            </a>
+
+            <a href="{{ path('admin_finance_index') }}"
+               class="sf-sidebar-link{{ route starts with 'admin_finance' ? ' active' : '' }}"
+               title="Finance Department">
+                <i class="fa-solid fa-vault" style="color:#fbbf24;"></i>
+                <span class="sf-sidebar-label">Finance Department</span>
+            </a>
+
+            <a href="{{ path('app_injury_predictions') }}"
+               class="sf-sidebar-link{{ route == 'app_injury_predictions' ? ' active' : '' }}"
+               title="Prediction Center">
+                <i class="fa-solid fa-heart-pulse text-danger"></i>
+                <span class="sf-sidebar-label">Prediction Center</span>
+            </a>
+        {% endif %}
+
+        {% if is_granted('ROLE_USER') %}
+            <div class="sf-sidebar-sep"></div>
+
+            <a href="{{ path('app_predictions') }}"
+               class="sf-sidebar-link{{ route starts with 'app_prediction' ? ' active' : '' }}"
+               title="Predictions">
+                <i class="fa-solid fa-crystal-ball" style="color:#60a5fa;"></i>
+                <span class="sf-sidebar-label">Predictions</span>
+            </a>
+        {% endif %}
+
+        {% if app.user %}
+            <div class="sf-sidebar-sep"></div>
+
+            <a href="{{ path('app_profile') }}"
+               class="sf-sidebar-link{{ route == 'app_profile' ? ' active' : '' }}"
+               title="Account Settings">
+                <i class="fa-solid fa-user-gear"></i>
+                <span class="sf-sidebar-label">Account Settings</span>
+            </a>
+
+            <a href="javascript:void(0)"
+               id="sfNotificationTrigger"
+               class="sf-sidebar-link"
+               title="Notifications">
+                <i class="fa-solid fa-bell"></i>
+                <span class="sf-sidebar-label">Notifications</span>
+            </a>
+        {% endif %}
+
+    </nav>
+
+    {% if app.user %}
+    <div class="sf-sidebar-footer">
+        <div class="sf-sidebar-avatar">{{ app.user.username|first|upper }}</div>
+        <div class="sf-sidebar-user-info">
+            <div class="sf-sidebar-uname">{{ app.user.username }}</div>
+            <div class="sf-sidebar-pts">{{ is_granted('ROLE_ADMIN') ? 'Admin' : app.user.predictionPoints|default(0) ~ ' PTS' }}</div>
+        </div>
+    </div>
+    {% endif %}
+
+</aside>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SmartFight World Rankings</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #dc2626;
+            padding-bottom: 10px;
+        }
+        .header h1 {
+            margin: 0;
+            color: #dc2626;
+            font-size: 28px;
+            text-transform: uppercase;
+        }
+        .header p {
+            margin: 5px 0 0 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .division-title {
+            background-color: #f3f4f6;
+            color: #111827;
+            padding: 8px 12px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            border-left: 4px solid #fbbf24;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        th {
+            background-color: #1f2937;
+            color: #ffffff;
+            text-align: left;
+            padding: 10px;
+            text-transform: uppercase;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .rank {
+            font-weight: bold;
+            width: 50px;
+            text-align: center;
+        }
+        .top1 { background-color: #fef3c7; border-left: 4px solid #fbbf24; } /* Gold */
+        .top2 { background-color: #f1f5f9; border-left: 4px solid #94a3b8; } /* Silver */
+        .top3 { background-color: #ffedd5; border-left: 4px solid #c2855a; } /* Bronze */
+        .top1 .rank { color: #d97706; }
+        .top2 .rank { color: #475569; }
+        .top3 .rank { color: #9a3412; }
+        .points {
+            font-weight: bold;
+            color: #d97706;
+            text-align: center;
+        }
+        .record {
+            text-align: center;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 10px;
+            color: #9ca3af;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 10px;
+        }
+        /* Page break between divisions to avoid ugly splits if necessary */
+        .division-block {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div style="float: right; width: 80px; height: 80px;">
+            {{ qrSvg|raw }}
+        </div>
+        <div style="margin-right: 100px;">
+            <h1>World Standings</h1>
+            <p>Official Divisional Rankings</p>
+            <p>Generated at: {{ lastUpdated }}</p>
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+
+    {% if groupedRankings|length > 0 %}
+        {% for wd, fighters in groupedRankings %}
+            <div class="division-block">
+                <div class="division-title">
+                    {{ wd }} Division
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="rank">Rank</th>
+                            <th>Boxer</th>
+                            <th>Organization</th>
+                            <th class="points">Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in fighters %}
+                            {% set rank = loop.index %}
+                            <tr class="{% if rank == 1 %}top1{% elseif rank == 2 %}top2{% elseif rank == 3 %}top3{% endif %}">
+                                <td class="rank">#{{ rank }}</td>
+                                <td><strong>{{ f.fullName }}</strong></td>
+                                <td>{{ f.org }}</td>
+                                <td class="points">{{ f.pts }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="text-align: center; margin-top: 50px; color: #6b7280;">No boxers found in divisional records.</p>
+    {% endif %}
+
+    <div class="footer">
+        &copy; {{ year }} SmartFight. All rights reserved.<br>
+        Confidential & Proprietary.
+    </div>
+
+</body>
+</html>

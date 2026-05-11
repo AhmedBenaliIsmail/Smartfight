@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.smartfight.controller.FighterFormController"
+      spacing="10">
+    <padding><Insets top="16" bottom="16" left="20" right="20"/></padding>
+    <Label text="Fighter Details" styleClass="h2"/>
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+        <GridPane hgap="12" vgap="8">
+            <padding><Insets top="8" bottom="8"/></padding>
+
+            <Label text="First Name" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <TextField fx:id="firstNameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+            <Label text="Last Name" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <TextField fx:id="lastNameField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+            <Label text="Nickname" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <TextField fx:id="nicknameField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+            <Label text="Nationality (2-letter)" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <TextField fx:id="nationalityField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+            <Label text="Wins" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+            <TextField fx:id="winsField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+            <Label text="Losses" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+            <TextField fx:id="lossesField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+            <Label text="Draws" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+            <TextField fx:id="drawsField" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+            <Label text="KO Wins" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+            <TextField fx:id="koWinsField" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+
+            <Label text="Technical Wins" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+            <TextField fx:id="technicalWinsField" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+
+            <Label text="Decision Wins" GridPane.rowIndex="9" GridPane.columnIndex="0"/>
+            <TextField fx:id="decisionWinsField" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+
+            <Label text="KO Losses" GridPane.rowIndex="10" GridPane.columnIndex="0"/>
+            <TextField fx:id="koLossesField" GridPane.rowIndex="10" GridPane.columnIndex="1"/>
+
+            <Label text="ELO Rating" GridPane.rowIndex="11" GridPane.columnIndex="0"/>
+            <TextField fx:id="eloField" GridPane.rowIndex="11" GridPane.columnIndex="1"/>
+
+            <Label text="Height (cm)" GridPane.rowIndex="12" GridPane.columnIndex="0"/>
+            <TextField fx:id="heightField" GridPane.rowIndex="12" GridPane.columnIndex="1"/>
+
+            <Label text="Reach (cm)" GridPane.rowIndex="13" GridPane.columnIndex="0"/>
+            <TextField fx:id="reachField" GridPane.rowIndex="13" GridPane.columnIndex="1"/>
+
+            <Label text="Weight (kg)" GridPane.rowIndex="14" GridPane.columnIndex="0"/>
+            <TextField fx:id="weightField" GridPane.rowIndex="14" GridPane.columnIndex="1"/>
+
+            <Label text="Age" GridPane.rowIndex="15" GridPane.columnIndex="0"/>
+            <TextField fx:id="ageField" GridPane.rowIndex="15" GridPane.columnIndex="1"/>
+
+            <Label text="Win Streak" GridPane.rowIndex="16" GridPane.columnIndex="0"/>
+            <TextField fx:id="winStreakField" GridPane.rowIndex="16" GridPane.columnIndex="1"/>
+
+            <Label text="Performance Score" GridPane.rowIndex="17" GridPane.columnIndex="0"/>
+            <TextField fx:id="performanceScoreField" GridPane.rowIndex="17" GridPane.columnIndex="1"/>
+
+            <Label text="Strength of Schedule" GridPane.rowIndex="18" GridPane.columnIndex="0"/>
+            <TextField fx:id="strengthOfScheduleField" GridPane.rowIndex="18" GridPane.columnIndex="1"/>
+
+            <Label text="Title Defenses" GridPane.rowIndex="19" GridPane.columnIndex="0"/>
+            <TextField fx:id="titleDefensesField" GridPane.rowIndex="19" GridPane.columnIndex="1"/>
+
+            <Label text="Strikes Thrown" GridPane.rowIndex="20" GridPane.columnIndex="0"/>
+            <TextField fx:id="strikesthrownField" GridPane.rowIndex="20" GridPane.columnIndex="1"/>
+
+            <Label text="Strikes Landed" GridPane.rowIndex="21" GridPane.columnIndex="0"/>
+            <TextField fx:id="strikeslandedField" GridPane.rowIndex="21" GridPane.columnIndex="1"/>
+
+            <Label text="Last Fight Date" GridPane.rowIndex="22" GridPane.columnIndex="0"/>
+            <DatePicker fx:id="lastFightDatePicker" GridPane.rowIndex="22" GridPane.columnIndex="1"/>
+
+            <Label text="Strength" GridPane.rowIndex="23" GridPane.columnIndex="0"/>
+            <TextField fx:id="strengthField" GridPane.rowIndex="23" GridPane.columnIndex="1"/>
+
+            <Label text="Weakness" GridPane.rowIndex="24" GridPane.columnIndex="0"/>
+            <TextField fx:id="weaknessField" GridPane.rowIndex="24" GridPane.columnIndex="1"/>
+
+            <Label text="AI Style Tag" GridPane.rowIndex="25" GridPane.columnIndex="0"/>
+            <TextField fx:id="aiStyleTagField" GridPane.rowIndex="25" GridPane.columnIndex="1"/>
+
+            <Label text="AI Description" GridPane.rowIndex="26" GridPane.columnIndex="0"/>
+            <TextArea fx:id="aiDescriptionArea" GridPane.rowIndex="26" GridPane.columnIndex="1"
+                      prefRowCount="4" wrapText="true"/>
+
+            <Label text="Photo" GridPane.rowIndex="27" GridPane.columnIndex="0"/>
+            <HBox GridPane.rowIndex="27" GridPane.columnIndex="1" spacing="8" alignment="CENTER_LEFT">
+                <Button text="Choose Photo" onAction="#onChoosePhoto"/>
+                <Label fx:id="photoLabel" text="No photo selected" styleClass="caption"/>
+            </HBox>
+
+            <columnConstraints>
+                <ColumnConstraints minWidth="150" prefWidth="160"/>
+                <ColumnConstraints hgrow="ALWAYS" minWidth="200"/>
+            </columnConstraints>
+        </GridPane>
+    </ScrollPane>
+
+    <HBox spacing="8">
+        <Button text="Generate AI Profile" onAction="#onGenerateAiProfile" styleClass="btn-primary"/>
+        <Label fx:id="aiStatusLabel" styleClass="caption"/>
+    </HBox>
+
+    <HBox spacing="8" alignment="CENTER_RIGHT">
+        <Label fx:id="statusLabel" styleClass="caption" HBox.hgrow="ALWAYS"/>
+        <Button text="Cancel" onAction="#onCancel" styleClass="btn-outline"/>
+        <Button text="Save" onAction="#onSave" styleClass="btn-primary"/>
+    </HBox>
+</VBox>

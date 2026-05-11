@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.smartfight.controller.StatsBoutIndexController"
+      spacing="0" styleClass="content-pane">
+    <padding><Insets top="28" bottom="28" left="32" right="32"/></padding>
+
+    <!-- ToggleGroup must live in fx:define, NOT as a child node -->
+    <fx:define>
+        <ToggleGroup fx:id="sortGroup"/>
+    </fx:define>
+
+    <!-- ═══ HEADER ═══ -->
+    <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-border-color:transparent transparent transparent #dc2626;-fx-border-width:0 0 0 4;-fx-padding:0 0 0 18;">
+        <VBox spacing="4">
+            <Label text="● CENTRAL DATA ARCHIVE"
+                   style="-fx-font-size:9;-fx-font-weight:bold;-fx-text-fill:#dc2626;-fx-letter-spacing:2;"/>
+            <Label text="BOUT INTELLIGENCE HUB"
+                   style="-fx-font-size:26;-fx-font-weight:bold;-fx-text-fill:white;"/>
+            <Label text="AGGREGATED FIGHT PERFORMANCE &amp; ARCHIVE METRICS"
+                   style="-fx-font-size:11;-fx-text-fill:#52525b;-fx-letter-spacing:1;"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="+ APPEND ANALYTICS" onAction="#onNewStats"
+                style="-fx-background-color:#dc2626;-fx-text-fill:white;-fx-font-weight:bold;-fx-font-size:12;-fx-padding:10 22;-fx-background-radius:4;-fx-cursor:hand;-fx-letter-spacing:1;"/>
+    </HBox>
+
+    <!-- ═══ SEARCH + SORT BAR ═══ -->
+    <HBox alignment="CENTER_LEFT" spacing="16" style="-fx-padding:24 0 16 0;">
+        <TextField fx:id="searchField" promptText="SEARCH BY FIGHTER OR EVENT..."
+                   HBox.hgrow="ALWAYS"
+                   style="-fx-background-color:#121214;-fx-border-color:#27272a;-fx-border-width:1;-fx-border-radius:8;-fx-background-radius:8;-fx-text-fill:white;-fx-prompt-text-fill:#52525b;-fx-padding:12 18;-fx-font-weight:bold;-fx-font-size:12;"/>
+        <Label text="SORT BY:" style="-fx-font-size:9;-fx-font-weight:bold;-fx-text-fill:#52525b;"/>
+        <ToggleButton fx:id="btnSortDate" text="CHRONOLOGICAL" selected="true"
+                      toggleGroup="$sortGroup" onAction="#onSortDate"
+                      style="-fx-background-color:rgba(220,38,38,0.1);-fx-text-fill:white;-fx-border-color:#dc2626;-fx-border-width:1;-fx-border-radius:4;-fx-font-size:10;-fx-font-weight:bold;-fx-padding:6 14;-fx-cursor:hand;"/>
+        <ToggleButton fx:id="btnSortAlpha" text="ALPHABETICAL"
+                      toggleGroup="$sortGroup" onAction="#onSortAlpha"
+                      style="-fx-background-color:transparent;-fx-text-fill:#52525b;-fx-border-color:#27272a;-fx-border-width:1;-fx-border-radius:4;-fx-font-size:10;-fx-font-weight:bold;-fx-padding:6 14;-fx-cursor:hand;"/>
+    </HBox>
+
+    <!-- ═══ STATUS / LOADING ═══ -->
+    <Label fx:id="statusLabel" text="Loading archive..."
+           style="-fx-text-fill:#52525b;-fx-font-size:11;" wrapText="true"/>
+
+    <!-- ═══ BOUT LIST ═══ -->
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                style="-fx-background-color:transparent;-fx-background:transparent;-fx-border-color:transparent;">
+        <VBox fx:id="listContainer" spacing="10">
+            <padding><Insets top="4" bottom="8"/></padding>
+        </VBox>
+    </ScrollPane>
+</VBox>

@@ -1,0 +1,321 @@
+{% extends 'front/base_front.html.twig' %}
+
+{% block title %}{{ title|default('Events') }} — SmartFight{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .event-card-ultra {
+            background: linear-gradient(145deg, #18181b, #09090b);
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            height: 100%;
+            overflow: hidden;
+        }
+        .event-card-ultra:hover {
+            border-color: #dc2626;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(220, 38, 38, 0.1);
+            transform: translateY(-10px);
+        }
+        .event-card-ultra::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #dc2626, #fbbf24);
+            opacity: 0.6;
+        }
+        .org-tag-top {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(251, 191, 36, 0.15);
+            color: #fbbf24;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .event-title-pro {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #a1a1aa;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+        .status-box {
+            background: rgba(24, 24, 27, 0.8);
+            border: 1px solid #27272a;
+            border-radius: 16px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+        .ultra-manage-btn {
+            background: #dc2626;
+            color: #fff;
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none !important;
+        }
+        .ultra-manage-btn:hover {
+            background: #ef4444;
+            transform: scale(1.02);
+            color: #fff;
+        }
+        .action-dot {
+            width: 40px;
+            height: 40px;
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #71717a;
+            transition: all 0.2s;
+        }
+        .action-dot:hover {
+            background: #27272a;
+            color: #fff;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div>
+                <h1 class="h2 fw-bold text-white mb-1" style="font-family: 'Oswald', sans-serif; letter-spacing: 1px;">EVENT MANAGEMENT</h1>
+                <p class="text-muted mb-0">Directing professional boxing spectacles and world title events</p>
+            </div>
+        </div>
+        <div class="col-lg-4 d-flex gap-2 align-items-center justify-content-end">
+             <div class="d-flex gap-2">
+                <button class="btn btn-dark border-secondary" title="Sort by Date" onclick="window._eventFilter.sort('date', 'number', 'desc')"><i class="fa-solid fa-calendar-days"></i></button>
+                <button class="btn btn-dark border-secondary" title="Sort A-Z" onclick="window._eventFilter.sort('name', 'string', 'asc')"><i class="fa-solid fa-arrow-down-a-z"></i></button>
+            </div>
+            {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_event_new') }}" class="btn btn-danger px-4 fw-bold">
+                <i class="fa-solid fa-plus me-2"></i>CREATE EVENT
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row g-3 mb-5">
+        <div class="col-12">
+            <div class="position-relative sf-search-wrapper">
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent border-end-0" style="border-color:#27272a;"><i class="fa-solid fa-magnifying-glass" style="color:#71717a;"></i></span>
+                    <input type="text" id="eventSearchInput" class="form-control border-start-0" placeholder="Search event, venue, city..." style="background:#18181b;border-color:#27272a;color:#fafafa;padding: 12px;" />
+                </div>
+                <div id="eventSearchDropdown" class="sf-search-dropdown d-none">
+                    <div class="p-2 text-muted xsmall fw-bold border-bottom border-secondary mb-2" style="letter-spacing:1px;">EVENT DISCOVERY</div>
+                    <div id="eventSearchResults"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 event-grid">
+        {% for event in pagination %}
+            {% set fight_count = fightCounts[event.eventId]|default(0) %}
+            <div class="col-lg-4 col-md-6 event-card-col" 
+                 data-search-content="{{ event.eventName|lower }} {{ event.venue|lower }} {{ event.city|lower }} {{ event.organization|lower }}"
+                 data-sort-date="{{ event.eventDate ? event.eventDate|date('U') : 0 }}"
+                 data-sort-name="{{ event.eventName|lower }}">
+                <div class="event-card-ultra">
+                    <div class="event-title-pro">{{ event.eventName }}</div>
+                    
+                    {% if event.isChampionsEvent %}
+                        <div class="org-tag-top">
+                            <i class="fa-solid fa-crown"></i>
+                            {{ event.organization }} BELT
+                        </div>
+                    {% endif %}
+                    
+                    <div class="info-row">
+                        <i class="fa-solid fa-calendar-day text-danger"></i>
+                        <span>{{ event.eventDate ? event.eventDate|date('l, M d, Y') : 'Date TBD' }}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <i class="fa-solid fa-map-pin text-danger"></i>
+                        <span>{{ event.venue|default('TBD') }}, {{ event.city|default('TBD') }}</span>
+                    </div>
+
+                    <div class="status-box">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small text-muted fw-bold uppercase">Sanctioning Progress</span>
+                            <span class="text-white small fw-bold">{{ fight_count }}/3 BOUTS</span>
+                        </div>
+                        <div class="progress" style="height: 6px; background: #09090b; border-radius: 10px;">
+                            <div class="progress-bar bg-danger" style="width: {{ (fight_count/3*100) }}%; border-radius: 10px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <a href="{{ path('app_event_fights', {'id': event.eventId}) }}" class="ultra-manage-btn flex-grow-1">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            Manage Card
+                        </a>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <div class="dropdown">
+                                <button class="action-dot" data-bs-toggle="dropdown">
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end bg-dark border-secondary">
+                                    <li><a class="dropdown-item text-white" href="{{ path('app_event_edit', {'id': event.eventId}) }}"><i class="fa-solid fa-pen me-2"></i>Edit Profile</a></li>
+                                    <li><hr class="dropdown-divider border-secondary"></li>
+                                    <li>
+                                        <form method="post" action="{{ path('app_event_delete', {'id': event.eventId}) }}" onsubmit="return confirm('Delete this event?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.eventId) }}">
+                                            <button class="dropdown-item text-danger"><i class="fa-solid fa-trash me-2"></i>Remove Event</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <i class="fa-solid fa-calendar-xmark fa-3x text-muted mb-3"></i>
+                <h3 class="text-white">No Sanctioned Events</h3>
+                <p class="text-muted">Start by scheduling a professional boxing card.</p>
+            </div>
+        {% endfor %}
+    <div class="d-flex justify-content-center mt-5">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('eventSearchInput');
+    const dropdown = document.getElementById('eventSearchDropdown');
+    const results = document.getElementById('eventSearchResults');
+    const items = document.querySelectorAll('.event-card-col');
+
+    // Pagination initialization
+    const pagination = new SmartPagination({
+        containerSelector: '.event-grid',
+        itemSelector: '.event-card-col',
+        paginationContainerId: 'paginationControls',
+        itemsPerPage: 6
+    });
+
+    // Advanced Filter initialization
+    window._eventFilter = new AdvancedFilter('.event-grid', '.event-card-col', (visibleItems) => {
+        pagination.setFilteredItems(visibleItems);
+    });
+
+    searchInput.addEventListener('input', function(e) {
+        const q = e.target.value.toLowerCase().trim();
+        window._eventFilter.search(q);
+
+        if (q.length < 1) {
+            dropdown.classList.add('d-none');
+            return;
+        }
+
+        results.innerHTML = '';
+        let found = 0;
+
+        items.forEach(item => {
+            const content = item.getAttribute('data-search-content');
+            if (content.includes(q)) {
+                found++;
+                const div = document.createElement('div');
+                div.className = 'sf-search-item p-2 rounded-3 mb-1';
+                div.style.cursor = 'pointer';
+                
+                const title = item.querySelector('.event-title-pro').innerText;
+                const location = item.querySelector('.info-row:nth-child(4) span').innerText;
+                
+                div.innerHTML = `
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div style="flex: 1;">
+                            <div class="text-white fw-bold" style="font-size:0.85rem;">${title}</div>
+                            <div class="text-muted xsmall" style="font-size:0.65rem;">${location}</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-muted" style="font-size:0.6rem;"></i>
+                    </div>
+                `;
+                div.onclick = () => {
+                    item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    item.querySelector('.event-card-ultra').classList.add('sf-highlight-pulse');
+                    setTimeout(() => item.querySelector('.event-card-ultra').classList.remove('sf-highlight-pulse'), 3000);
+                    dropdown.classList.add('d-none');
+                    searchInput.value = title;
+                };
+                results.appendChild(div);
+            }
+        });
+
+        if (found > 0) {
+            dropdown.classList.remove('d-none');
+        } else {
+            dropdown.classList.add('d-none');
+        }
+    });
+});
+</script>
+<style>
+.sf-search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #121214;
+    border: 1px solid #27272a;
+    border-radius: 12px;
+    margin-top: 8px;
+    z-index: 1050;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    max-height: 350px;
+    overflow-y: auto;
+    padding: 10px;
+}
+.sf-search-item:hover { background: rgba(220, 38, 38, 0.08); }
+.sf-highlight-pulse { animation: highlightPulse 2s ease-in-out; }
+@keyframes highlightPulse {
+    0% { border-color: rgba(220, 38, 38, 0.5); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+    50% { border-color: #dc2626; box-shadow: 0 0 20px 5px rgba(220, 38, 38, 0.2); }
+    100% { border-color: rgba(220, 38, 38, 0.4); box-shadow: none; }
+}
+.xsmall { font-size: 0.65rem; }
+</style>
+{% endblock %}

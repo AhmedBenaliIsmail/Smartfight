@@ -1,0 +1,77 @@
+{% extends 'admin/base_admin.html.twig' %}
+{% set breadcrumb_title = 'Issue Ticket' %}
+
+{% block title %}Issue Ticket | Admin Dashboard{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h1 class="h3 mb-0" style="color:#fafafa;">Manually Issue Ticket</h1>
+            <p class="text-muted small">Bypass payment gateway and directly issue an event ticket to a user.</p>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{{ path('admin_booking_index') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left me-1"></i>Back to Bookings
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card" style="background:#18181b; border: 1px solid #27272a;">
+                <div class="card-body p-4">
+                    <form method="post">
+                        <div class="mb-4">
+                            <label class="form-label" style="color:#a1a1aa;">Select User (Fan)</label>
+                            <select name="user_id" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;" required>
+                                <option value="">Choose a user...</option>
+                                {% for u in users %}
+                                    <option value="{{ u.userId }}">{{ u.fullName }} ({{ u.email }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label" style="color:#a1a1aa;">Select Event</label>
+                            <select name="event_id" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;" required>
+                                <option value="">Choose an event...</option>
+                                {% for event in events %}
+                                    <option value="{{ event.id }}">
+                                        {{ event.name }} — {{ event.startDate ? event.startDate|date('M d, Y') : 'TBD' }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text text-muted mt-2">
+                                <i class="fa-solid fa-circle-info me-1"></i> Dynamic pricing rules apply to capacity limits.
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label" style="color:#a1a1aa;">Ticket Tier</label>
+                            <select name="ticket_type" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;" required>
+                                {% for key, label in ticketTypes %}
+                                    <option value="{{ key }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label" style="color:#a1a1aa;">Quantity</label>
+                            <input type="number" name="quantity" class="form-control" value="1" min="1" max="10" style="background:#09090b;border-color:#27272a;color:#fff;" required>
+                        </div>
+
+                        <hr style="border-color: #27272a;">
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-ticket me-2"></i>Issue Ticket
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

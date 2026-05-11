@@ -1,0 +1,159 @@
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const runBtn = document.getElementById('runInjuryAiBtn');
+        const initialState = document.getElementById('aiInitialState');
+        const loadingState = document.getElementById('aiLoading');
+        const resultsContainer = document.getElementById('aiResultsContainer');
+        const pagination = document.getElementById('aiPagination');
+        const paginationList = document.getElementById('aiPaginationList');
+        
+        let allPredictions = [];
+        const itemsPerPage = 3;
+        let currentPage = 1;
+
+        if (!runBtn) return;
+
+        runBtn.addEventListener('click', async function() {
+            if (initialState) initialState.classList.add('d-none');
+            const section = document.getElementById('injuryAiSection');
+            if (section) section.classList.remove('d-none');
+            
+            loadingState.classList.remove('d-none');
+            
+            try {
+                const response = await fetch('{{ path("api_injury_predict_top") }}');
+                const data = await response.json();
+                
+                if (data.success) {
+                    allPredictions = data.predictions;
+                    renderPredictions();
+                    setupPagination();
+                    
+                    loadingState.classList.add('d-none');
+                    resultsContainer.classList.remove('d-none');
+                    pagination.classList.remove('d-none');
+                }
+            } catch (error) {
+                console.error('Error fetching predictions:', error);
+                alert('Failed to run AI simulation. Please check your connection.');
+                initialState.classList.remove('d-none');
+                loadingState.classList.add('d-none');
+            }
+        });
+
+        function renderPredictions() {
+            resultsContainer.innerHTML = '';
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageItems = allPredictions.slice(start, end);
+            
+            pageItems.forEach((p, index) => {
+                const col = document.createElement('div');
+                col.className = 'col-md-4';
+                
+                const borderColor = p.risk_percentage > 70 ? '#ef5350' : (p.risk_percentage > 35 ? '#f59e0b' : '#3b82f6');
+                const riskColor = p.risk_percentage > 70 ? '#ef5350' : (p.risk_percentage > 35 ? '#f59e0b' : '#00e676');
+                
+                const photoHtml = p.photo 
+                    ? `<img src="/uploads/boxers/${p.photo}" class="rounded-circle border border-2" style="width:45px;height:45px;object-fit:cover;border-color:${borderColor} !important;">`
+                    : `<div style="width:45px;height:45px;background:rgba(255,255,255,0.05);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid ${borderColor};"><i class="fa-solid fa-user text-muted"></i></div>`;
+
+                col.innerHTML = `
+                    <div class="fan-card h-100 p-4" style="background:#0f0f13; border:1px solid ${borderColor}; border-radius:16px; position:relative; overflow:hidden; transition: all 0.4s ease;">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex align-items-center gap-3">
+                                ${photoHtml}
+                                <div>
+                                    <h4 class="fw-black mb-0 text-white" style="font-size: 1rem; line-height: 1.1; text-transform:uppercase;">${p.name}</h4>
+                                    <div class="text-muted small mt-1" style="font-size: 0.7rem;">${p.style} • ${p.record}</div>
+                                </div>
+                            </div>
+                            <span class="badge" style="background: ${borderColor}; font-size: 0.7rem;">#${start + index + 1}</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-end mb-2">
+                                <span class="text-muted fw-bold" style="font-size: 0.65rem; letter-spacing: 1px;">RISK LEVEL</span>
+                                <span class="fw-black" style="color: ${riskColor}; font-size: 1.1rem;">${p.risk_percentage}%</span>
+                            </div>
+                            <div class="progress" style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                                <div class="progress-bar" style="background: ${riskColor}; width: ${p.risk_percentage}%; box-shadow: 0 0 10px ${riskColor}66;"></div>
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <div class="p-2 text-center" style="background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                    <div class="text-muted" style="font-size: 0.55rem; letter-spacing: 1px; text-transform:uppercase;">Prediction</div>
+                                    <div class="text-warning fw-bold" style="font-size: 0.75rem;"><i class="fa-solid fa-hand-fist me-1"></i>${p.vulnerable_zone}</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-2 text-center" style="background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                    <div class="text-muted" style="font-size: 0.55rem; letter-spacing: 1px; text-transform:uppercase;">Alert</div>
+                                    <div class="text-danger fw-bold" style="font-size: 0.75rem;">${p.days_to_alert} Days</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-2 mb-3 d-flex align-items-center gap-2" style="background: rgba(0, 230, 118, 0.05); border: 1px solid rgba(0, 230, 118, 0.2); border-radius: 10px;">
+                            <div style="width: 20px; height: 20px; background: #00e676; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <i class="fa-solid fa-check text-dark" style="font-size: 8px;"></i>
+                            </div>
+                            <div class="text-white small" style="font-size: 0.7rem;">${p.mitigation_strategy}</div>
+                        </div>
+
+                        <div class="row text-center mb-3 border-top pt-3" style="border-color: rgba(255,255,255,0.05) !important;">
+                            <div class="col-4">
+                                <div class="fw-black text-white" style="font-size: 0.85rem;">${Math.round(p.accuracy)}%</div>
+                                <div class="text-muted" style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1px;">Accuracy</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="fw-black text-white" style="font-size: 0.85rem;">3</div>
+                                <div class="text-muted" style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1px;">Weeks Early</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="fw-black text-white" style="font-size: 0.85rem;">${p.roi}%</div>
+                                <div class="text-muted" style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1px;">ROI</div>
+                            </div>
+                        </div>
+
+                        <a href="/performance/injury-pdf/${p.id}" target="_blank" class="btn btn-danger w-100 py-2 fw-bold text-uppercase" style="border-radius: 10px; letter-spacing: 1px; font-size: 0.75rem;">
+                            <i class="fa-solid fa-file-pdf me-2"></i>Detailed Analysis
+                        </a>
+                        
+                        <div class="mt-2 text-center">
+                            <span class="text-muted" style="font-size: 0.5rem; letter-spacing: 1px;">ANALYST: ${p.analyst}</span>
+                        </div>
+                    </div>
+                `;
+                resultsContainer.appendChild(col);
+            });
+            
+            resultsContainer.classList.remove('d-none');
+            resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function setupPagination() {
+            const pageCount = Math.ceil(allPredictions.length / itemsPerPage);
+            paginationList.innerHTML = '';
+            
+            for (let i = 1; i <= pageCount; i++) {
+                const li = document.createElement('li');
+                li.className = `page-item ${currentPage === i ? 'active' : ''}`;
+                const a = document.createElement('a');
+                a.className = 'page-link bg-dark border-secondary text-white';
+                a.href = '#';
+                a.innerText = i;
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentPage = i;
+                    renderPredictions();
+                    setupPagination();
+                });
+                li.appendChild(a);
+                paginationList.appendChild(li);
+            }
+        }
+    });
+</script>

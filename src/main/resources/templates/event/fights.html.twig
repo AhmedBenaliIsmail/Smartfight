@@ -1,0 +1,609 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Manage Boxing Card - {{ event.eventName }} — SmartFight Admin{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_events') }}" style="color:#a1a1aa;text-decoration:none;">Schedule</a></li>
+    <li class="breadcrumb-item active">Manage Card</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Manage Card: {{ event.eventName }}</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Building the professional boxing card (Max 3 bouts)</p>
+    </div>
+    <a href="{{ path('app_events') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back Schedule</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <!-- Scheduled Fights (Cinematic List) -->
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h3 class="h5 mb-0 fw-bold" style="color:#fafafa;"><i class="fa-solid fa-list me-2" style="color:#dc2626;"></i>Scheduled Bouts ({{ fights|length }}/3)</h3>
+        </div>
+
+        <div class="row g-3">
+            {% for fight in fights %}
+                <div class="col-12 mb-3">
+                    <div class="card glass-card combat-stat-card" style="border-radius: 12px; border-left: 5px solid {{ fight.status == 'COMPLETED' ? '#22c55e' : (fight.status == 'LIVE' ? '#dc2626' : '#3b82f6') }}; overflow: hidden; background:#18181b; border:1px solid #27272a;">
+                        <div class="card-body p-4">
+                            <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-4">
+                                <!-- Bout Number Ribbon -->
+                                <div class="d-flex align-items-center justify-content-center px-3" style="background:rgba(220,38,38,0.1); border-right: 1px solid #27272a; min-width: 80px;">
+                                    <div class="text-center">
+                                        <div class="text-muted xsmall" style="font-size: 10px; font-weight: 800; text-transform: uppercase;">Bout</div>
+                                        <div class="h3 mb-0 fw-black text-danger">#{{ fight.fightNumber }}</div>
+                                    </div>
+                                </div>
+
+                                <!-- Fighter Matchup Area -->
+                                <div class="flex-grow-1 p-3 d-flex align-items-center justify-content-between">
+                                    <!-- Red Corner -->
+                                    <div class="d-flex align-items-center" style="flex: 1;">
+                                        <div class="me-3">
+                                            {% if fight.fighter1.photoFilename %}
+                                                <img src="{{ asset('uploads/boxers/' ~ fight.fighter1.photoFilename) }}" class="rounded-circle" style="width:60px; height:60px; object-fit:cover; border:2px solid #ef4444;" alt="">
+                                            {% else %}
+                                                <div class="rounded-circle d-flex align-items-center justify-content-center bg-dark" style="width:60px; height:60px; border:2px solid #ef4444;">
+                                                    <i class="fa-solid fa-user text-muted"></i>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-white">{{ fight.fighter1.fullName }}</div>
+                                            <div class="text-muted xsmall" style="font-size: 0.7rem;">{{ fight.fighter1.wins }}-{{ fight.fighter1.losses }}-{{ fight.fighter1.draws }} • {{ fight.fighter1.weightDivision.name }}</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- VS Divider -->
+                                    <div class="px-3 text-center">
+                                        <div class="badge bg-dark border border-secondary text-muted mb-1" style="font-size: 0.6rem;">VS</div>
+                                        {% if fight.status == 'COMPLETED' %}
+                                            <div class="text-success xsmall fw-bold">FINAL</div>
+                                        {% else %}
+                                            <div class="text-warning xsmall fw-bold">LIVE</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Blue Corner -->
+                                    <div class="d-flex align-items-center flex-row-reverse" style="flex: 1; text-align: right;">
+                                        <div class="ms-3">
+                                            {% if fight.fighter2.photoFilename %}
+                                                <img src="{{ asset('uploads/boxers/' ~ fight.fighter2.photoFilename) }}" class="rounded-circle" style="width:60px; height:60px; object-fit:cover; border:2px solid #3b82f6;" alt="">
+                                            {% else %}
+                                                <div class="rounded-circle d-flex align-items-center justify-content-center bg-dark" style="width:60px; height:60px; border:2px solid #3b82f6;">
+                                                    <i class="fa-solid fa-user text-muted"></i>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-white">{{ fight.fighter2.fullName }}</div>
+                                            <div class="text-muted xsmall" style="font-size: 0.7rem;">{{ fight.fighter2.wins }}-{{ fight.fighter2.losses }}-{{ fight.fighter2.draws }} • {{ fight.fighter2.weightDivision.name }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="d-flex align-items-center px-4" style="background:rgba(255,255,255,0.02); border-left: 1px solid #27272a;">
+                                    {% if is_granted('ROLE_ADMIN') and fight.status == 'SCHEDULED' %}
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-sm btn-simulate" data-f1="{{ fight.fighter1.fighterId }}" data-f2="{{ fight.fighter2.fighterId }}" title="Simulate Match with AI" style="background:rgba(59,130,246,0.1); color:#3b82f6; border:1px solid rgba(59,130,246,0.2); border-radius: 8px; width: 40px; height: 40px;">
+                                                <i class="fa-solid fa-robot"></i>
+                                            </button>
+                                            <form action="{{ path('app_event_fight_delete', {'fightId': fight.resultId}) }}" method="post" onsubmit="return confirm('Remove scheduled bout from card?');">
+                                                <input type="hidden" name="eventId" value="{{ event.eventId }}">
+                                                <button type="submit" class="btn btn-sm" style="background:rgba(220,38,38,0.1); color:#dc2626; border:1px solid rgba(220,38,38,0.2); border-radius: 8px; width: 40px; height: 40px;" title="Remove Bout">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    {% else %}
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-green-lt">VERIFIED</span>
+                                            {% if is_granted('ROLE_ADMIN') and fight.status == 'COMPLETED' %}
+                                                <button type="button" class="btn btn-sm btn-compare" data-fight-id="{{ fight.resultId }}" title="AI vs Reality Analysis" style="background:rgba(245,158,11,0.1); color:#f59e0b; border:1px solid rgba(245,158,11,0.2); border-radius: 8px; width: 40px; height: 40px;">
+                                                    <i class="fa-solid fa-code-compare"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+            <div class="col-12">
+                <div class="card py-5 text-center" style="background:#18181b; border:1px dashed #27272a; border-radius: 12px;">
+                    <i class="fa-solid fa-ghost fa-3x text-muted mb-3" style="opacity:0.2;"></i>
+                    <p class="text-muted mb-0">No bouts scheduled for this card yet.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% if is_granted('ROLE_ADMIN') %}
+    <div class="col-lg-4">
+        <!-- Add Fight Form -->
+        {% if availableNumbers|length > 0 %}
+        <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header d-flex align-items-center justify-content-between" style="background:#18181b;border-bottom:1px solid #27272a;">
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-plus me-2" style="color:#3b82f6;"></i>Schedule Bout</h3>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" id="aiMatchmakeBtn" class="btn btn-xs" style="background:rgba(139,92,246,.15);color:#8b5cf6;border:none;font-size:.75rem;">
+                        <i class="fa-solid fa-robot me-1"></i>AI Match
+                    </button>
+                    <i class="fa-solid fa-circle-info text-muted" style="font-size:.75rem;" 
+                       title="AI logic: Groups by weight class, then calculates a similarity score based on Win/Loss parity, Height/Reach compatibility, and KO percentage."></i>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <form action="{{ path('app_event_fight_add', {'id': event.eventId}) }}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Position on Card</label>
+                        <select name="fightNumber" class="form-select" required>
+                            {% for num in availableNumbers %}
+                                <option value="{{ num }}">Fight {{ num }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Boxer 1 (Red Corner)</label>
+                        <div class="position-relative">
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                <input type="text" id="f1Search" class="form-control" placeholder="Type boxer name..." autocomplete="off" style="background:#18181b; border-color:#3f3f46; color:#fafafa;">
+                            </div>
+                            <div id="f1Results" class="position-absolute w-100 shadow-lg d-none" style="background:#18181b; border:1px solid #3f3f46; border-radius:8px; z-index:100; max-height:250px; overflow-y:auto; top:100%; margin-top:5px;"></div>
+                            <select name="fighter1Id" id="fighter1Id" class="d-none" required>
+                                <option value="">Select...</option>
+                                {% for f in availableFighters %}
+                                    <option value="{{ f.fighterId }}" data-name="{{ f.fullName }}" data-weight-id="{{ f.weightDivision.id|default(0) }}" data-weight-name="{{ f.weightDivision ? f.weightDivision.name : 'Unknown' }}">
+                                        {{ f.fullName }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Boxer 2 (Blue Corner)</label>
+                        <div class="position-relative">
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                <input type="text" id="f2Search" class="form-control" placeholder="Select Red Corner first..." autocomplete="off" style="background:#18181b; border-color:#3f3f46; color:#fafafa;" disabled>
+                            </div>
+                            <div id="f2Results" class="position-absolute w-100 shadow-lg d-none" style="background:#18181b; border:1px solid #3f3f46; border-radius:8px; z-index:100; max-height:250px; overflow-y:auto; top:100%; margin-top:5px;"></div>
+                            <select name="fighter2Id" id="fighter2Id" class="d-none" required>
+                                <option value="">Select...</option>
+                                {% for f in availableFighters %}
+                                    <option value="{{ f.fighterId }}" data-name="{{ f.fullName }}" data-weight-id="{{ f.weightDivision.id|default(0) }}" data-weight-name="{{ f.weightDivision ? f.weightDivision.name : 'Unknown' }}">
+                                        {{ f.fullName }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <small class="text-muted">Only boxers in the same weight class will be shown.</small>
+                    </div>
+                    <button type="submit" class="btn w-100" style="background:#dc2626;color:#fff;border:none;"><i class="fa-solid fa-calendar-plus me-2"></i>Schedule Bout</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info" style="background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.2);color:#60a5fa;">
+            <i class="fa-solid fa-info-circle me-2"></i> This event card is full (Max 3 bouts).
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Simulation Modal -->
+<div class="modal fade" id="simulationModal" tabindex="-1" aria-hidden="true" data-bs-theme="dark">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background:#09090b; border:1px solid #3b82f6;">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title text-white"><i class="fa-solid fa-robot me-2" style="color:#3b82f6;"></i>AI Fight Simulator</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div id="simLoading" class="text-center py-5 d-none">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-3 text-muted">Deep AI Heuristic Analysis in progress...</p>
+                </div>
+                
+                <div id="simResults" class="d-none">
+                    <div class="text-center mb-4">
+                        <span class="badge bg-primary-lt px-3 py-2 mb-3" style="font-size: 0.7rem; letter-spacing: 1px;">
+                            <i class="fa-solid fa-microchip me-1"></i>HYBRID HEURISTIC ENGINE v2.0
+                        </span>
+                        <h5 class="text-uppercase fw-bold mb-0" style="letter-spacing: 2px;">Simulation Result</h5>
+                    </div>
+                    
+                    <div class="row text-center mb-3">
+                        <div class="col-5">
+                            <h5 class="text-danger mb-1" id="simF1Prob">0%</h5>
+                            <small class="text-muted">Win Probability</small>
+                        </div>
+                        <div class="col-2 d-flex align-items-center justify-content-center">
+                            <span class="badge bg-secondary">VS</span>
+                        </div>
+                        <div class="col-5">
+                            <h5 class="text-primary mb-1" id="simF2Prob">0%</h5>
+                            <small class="text-muted">Win Probability</small>
+                        </div>
+                    </div>
+
+                    <div class="progress mb-4" style="height: 10px; background-color: #1e3a8a;">
+                        <div id="simProgressBar" class="progress-bar bg-danger" role="progressbar" style="width: 50%;"></div>
+                    </div>
+
+                    <div class="p-3 mb-3 rounded" style="background:rgba(255,255,255,0.05);">
+                        <h6 class="text-warning">Predicted Outcome</h6>
+                        <p class="mb-0 text-light fw-bold" id="simOutcome">-</p>
+                        <p class="mb-0 text-muted small mt-1" id="simKeyFactor">-</p>
+                    </div>
+
+                    <div class="p-3 rounded" style="background:rgba(255,255,255,0.05); border-left: 4px solid #8b5cf6;">
+                        <h6 style="color:#a855f7;">Simulation Narrative</h6>
+                        <p class="mb-0 text-light small" id="simNarrative">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Comparison Modal -->
+<div class="modal fade" id="comparisonModal" tabindex="-1" aria-hidden="true" data-bs-theme="dark">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background:#09090b; border:1px solid #f59e0b;">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title text-white"><i class="fa-solid fa-code-compare me-2" style="color:#f59e0b;"></i>AI Analysis: Prediction vs Reality</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center d-none" id="compLoading">
+                <div class="spinner-border text-warning my-4" role="status"></div>
+                <p class="text-muted">Analyzing pre-fight algorithms vs actual outcome...</p>
+            </div>
+            <div class="modal-body p-4 d-none" id="compResults">
+                <div class="p-3 mb-3 rounded" style="background:rgba(255,255,255,0.05); border-left: 4px solid #3b82f6;">
+                    <h6 style="color:#60a5fa;">The Algorithmic Prediction</h6>
+                    <p class="mb-0 text-light small" id="compPrediction">-</p>
+                </div>
+                <div class="p-3 mb-3 rounded" style="background:rgba(255,255,255,0.05); border-left: 4px solid #f59e0b;">
+                    <h6 style="color:#fbbf24;">The Reality & Contrast</h6>
+                    <p class="mb-0 text-light small" id="compComparison">-</p>
+                </div>
+                <div class="text-center">
+                    <span class="badge px-3 py-2" id="compAccuracy" style="font-size: 0.9rem; letter-spacing: 1px;">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const bootstrapObj = window.bootstrap || (window.tabler ? window.tabler : null);
+    if (!bootstrapObj || !bootstrapObj.Modal) {
+        console.error('Bootstrap Modal constructor not found.');
+    }
+
+    const f1Select = document.getElementById('fighter1Id');
+    const f2Select = document.getElementById('fighter2Id');
+    const f1Search = document.getElementById('f1Search');
+    const f2Search = document.getElementById('f2Search');
+    const f1Results = document.getElementById('f1Results');
+    const f2Results = document.getElementById('f2Results');
+    
+    function setupAutocomplete(input, resultsContainer, select, filterFn = null) {
+        if (!input) return;
+        input.addEventListener('input', function() {
+            const q = this.value.toLowerCase().trim();
+            resultsContainer.innerHTML = '';
+            
+            if (q.length < 1) {
+                resultsContainer.classList.add('d-none');
+                return;
+            }
+            
+            let matchCount = 0;
+            Array.from(select.options).forEach(opt => {
+                if (opt.value === "") return;
+                
+                const name = opt.getAttribute('data-name').toLowerCase();
+                const matchesSearch = name.includes(q);
+                const matchesConstraint = filterFn ? filterFn(opt) : true;
+                
+                if (matchesSearch && matchesConstraint) {
+                    matchCount++;
+                    const item = document.createElement('div');
+                    item.className = 'p-3 border-bottom hover-bg-dark cursor-pointer text-white small';
+                    item.style.borderColor = '#27272a';
+                    item.style.cursor = 'pointer';
+                    item.innerHTML = `
+                        <div class="fw-bold">${opt.getAttribute('data-name')}</div>
+                        <div class="text-muted" style="font-size:11px;">${opt.getAttribute('data-weight-name')}</div>
+                    `;
+                    item.onclick = () => {
+                        select.value = opt.value;
+                        input.value = opt.getAttribute('data-name');
+                        resultsContainer.classList.add('d-none');
+                        select.dispatchEvent(new Event('change'));
+                    };
+                    resultsContainer.appendChild(item);
+                }
+            });
+            
+            if (matchCount > 0) {
+                resultsContainer.classList.remove('d-none');
+            } else {
+                resultsContainer.innerHTML = '<div class="p-3 text-muted small">No boxers found</div>';
+                resultsContainer.classList.remove('d-none');
+            }
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!input.contains(e.target) && !resultsContainer.contains(e.target)) {
+                resultsContainer.classList.add('d-none');
+            }
+        });
+    }
+
+    if (f1Search) setupAutocomplete(f1Search, f1Results, f1Select);
+
+    if (f1Select) {
+        f1Select.addEventListener('change', function() {
+            const selectedF1 = f1Select.options[f1Select.selectedIndex];
+            const f1Id = f1Select.value;
+            
+            if (!f1Id) {
+                if (f2Search) {
+                    f2Search.disabled = true;
+                    f2Search.placeholder = "Select Red Corner first...";
+                    f2Search.value = "";
+                }
+                f2Select.value = "";
+                return;
+            }
+            
+            const weightId = selectedF1.getAttribute('data-weight-id');
+            const weightName = selectedF1.getAttribute('data-weight-name');
+            
+            if (f2Search) {
+                f2Search.disabled = false;
+                f2Search.placeholder = `Search for a ${weightName}...`;
+                f2Search.value = "";
+                f2Select.value = "";
+                
+                setupAutocomplete(f2Search, f2Results, f2Select, (opt) => {
+                    const optWeightId = opt.getAttribute('data-weight-id');
+                    return (optWeightId === weightId) && (opt.value !== f1Id);
+                });
+            }
+        });
+    }
+
+    const aiBtn = document.getElementById('aiMatchmakeBtn');
+    if (aiBtn) {
+        aiBtn.addEventListener('click', async function() {
+            aiBtn.disabled = true;
+            aiBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i>AI thinking...';
+            
+            try {
+                const response = await fetch("{{ path('app_event_fight_ai', {id: event.eventId}) }}");
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    const f1 = data.fighter1;
+                    const f2 = data.fighter2;
+                    const quality = data.matchQuality;
+
+                    const modalHtml = `
+                        <div id="aiMatchModal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(8px);animation:fadeIn 0.3s ease;">
+                            <div style="background:#09090b;border:1px solid #27272a;border-top:4px solid #dc2626;width:90%;max-width:550px;border-radius:12px;padding:32px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);position:relative;">
+                                <div style="display:flex;align-items:center;margin-bottom:24px;">
+                                    <div style="background:rgba(220,38,38,0.1);padding:10px;border-radius:8px;margin-right:15px;">
+                                        <i class="fa-solid fa-robot" style="color:#dc2626;font-size:24px;"></i>
+                                    </div>
+                                    <div>
+                                        <h2 style="color:#fff;margin:0;font-size:20px;font-weight:700;letter-spacing:-0.025em;">AI Matchmaker Suggestion</h2>
+                                        <p style="color:#a1a1aa;margin:0;font-size:13px;">Multi-Vector Heuristic Analysis Complete</p>
+                                    </div>
+                                </div>
+
+                                <div style="display:flex;justify-content:space-between;align-items:center;background:#18181b;padding:20px;border-radius:8px;margin-bottom:24px;border:1px solid #27272a;">
+                                    <div style="text-align:center;flex:1;">
+                                        <p style="color:#fff;font-weight:600;margin-bottom:2px;font-size:15px;">${f1.name}</p>
+                                        <p style="color:#3b82f6;font-size:10px;font-weight:800;text-transform:uppercase;margin-bottom:4px;letter-spacing:1px;">${f1.style}</p>
+                                        <p style="color:#a1a1aa;font-size:12px;margin:0;">${f1.stats.record} • ${f1.stats.height} • ${f1.stats.accuracy} Acc</p>
+                                    </div>
+                                    <div style="color:#dc2626;font-weight:900;font-style:italic;padding:0 15px;font-size:14px;">VS</div>
+                                    <div style="text-align:center;flex:1;">
+                                        <p style="color:#fff;font-weight:600;margin-bottom:2px;font-size:15px;">${f2.name}</p>
+                                        <p style="color:#3b82f6;font-size:10px;font-weight:800;text-transform:uppercase;margin-bottom:4px;letter-spacing:1px;">${f2.style}</p>
+                                        <p style="color:#a1a1aa;font-size:12px;margin:0;">${f2.stats.record} • ${f2.stats.height} • ${f2.stats.accuracy} Acc</p>
+                                    </div>
+                                </div>
+
+                                <div style="margin-bottom:24px;">
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                                        <span style="color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;">Match Quality</span>
+                                        <span style="color:#22c55e;font-size:12px;font-weight:700;background:rgba(34,197,94,0.1);padding:2px 8px;border-radius:4px;">${quality}</span>
+                                    </div>
+                                    <div style="height:6px;background:#27272a;border-radius:3px;overflow:hidden;">
+                                        <div style="width:${quality === 'EXCELLENT' ? '95%' : (quality === 'GOOD' ? '85%' : '65%')};height:100%;background:linear-gradient(90deg, #dc2626, #ef4444);border-radius:3px;"></div>
+                                    </div>
+                                </div>
+
+                                <div style="background:rgba(59,130,246,0.05);border-left:3px solid #3b82f6;padding:15px;margin-bottom:24px;">
+                                    <h4 style="color:#60a5fa;font-size:11px;font-weight:700;margin-top:0;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">7-Vector Matchmaking Logic</h4>
+                                    <ul style="color:#93c5fd;font-size:11px;margin:0;padding-left:15px;line-height:1.4;">
+                                        <li><strong>Weight Integrity:</strong> Strictly matched within official divisions.</li>
+                                        <li><strong>Record Parity:</strong> Minimizes gap in career wins/losses.</li>
+                                        <li><strong>Physicality:</strong> Heuristic balance of Height and Reach.</li>
+                                        <li><strong>Lethality:</strong> Matches similar KO/Finishing ratios.</li>
+                                        <li><strong>Precision:</strong> Aligns technical Strike Accuracy percentages.</li>
+                                        <li><strong>Diversity:</strong> Penalizes weight classes already on card.</li>
+                                        <li><strong>Sampling:</strong> Randomly selects from the Top 5 candidates.</li>
+                                    </ul>
+                                </div>
+
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                                    <button id="closeAiModal" style="background:transparent;border:1px solid #27272a;color:#fff;padding:12px;border-radius:6px;cursor:pointer;font-weight:600;transition:all 0.2s;">Discard</button>
+                                    <button id="applyAiMatch" style="background:#dc2626;border:none;color:#fff;padding:12px;border-radius:6px;cursor:pointer;font-weight:600;transition:all 0.2s;">Apply Match</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+                    document.getElementById('closeAiModal').onclick = () => document.getElementById('aiMatchModal').remove();
+                    document.getElementById('applyAiMatch').onclick = async () => {
+                        const applyBtn = document.getElementById('applyAiMatch');
+                        applyBtn.disabled = true;
+                        applyBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i>Applying...';
+
+                        try {
+                            const applyRes = await fetch("{{ path('app_event_fight_ai_apply', {id: event.eventId}) }}", {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ fighter1Id: f1.id, fighter2Id: f2.id })
+                            });
+                            const applyData = await applyRes.json();
+                            if (applyData.success) {
+                                window.location.href = applyData.redirect;
+                            } else {
+                                alert(applyData.error || 'Failed to apply match');
+                                applyBtn.disabled = false;
+                                applyBtn.innerText = 'Apply Match';
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            alert('Connection error while applying match.');
+                            applyBtn.disabled = false;
+                            applyBtn.innerText = 'Apply Match';
+                        }
+                    };
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Matchmaking failed. Please try manually.');
+            } finally {
+                aiBtn.disabled = false;
+                aiBtn.innerHTML = '<i class="fa-solid fa-robot me-1"></i>AI Match';
+            }
+        });
+    }
+
+    // AI Simulator Logic
+    const simModalEl = document.getElementById('simulationModal');
+    if (simModalEl && bootstrapObj) {
+        const simModal = new bootstrapObj.Modal(simModalEl);
+        document.querySelectorAll('.btn-simulate').forEach(btn => {
+            btn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const f1Id = this.getAttribute('data-f1');
+                const f2Id = this.getAttribute('data-f2');
+                
+                document.getElementById('simLoading').classList.remove('d-none');
+                document.getElementById('simResults').classList.add('d-none');
+                simModal.show();
+                
+                try {
+                    const response = await fetch('{{ path("api_ai_simulate") }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ fighter1_id: parseInt(f1Id), fighter2_id: parseInt(f2Id) })
+                    });
+
+                    const data = await response.json();
+                    document.getElementById('simLoading').classList.add('d-none');
+                    
+                    if (data.success && data.data) {
+                        const sim = data.data;
+                        document.getElementById('simResults').classList.remove('d-none');
+                        document.getElementById('simF1Prob').innerText = sim.win_probability_f1 + '%';
+                        document.getElementById('simF2Prob').innerText = sim.win_probability_f2 + '%';
+                        document.getElementById('simProgressBar').style.width = sim.win_probability_f1 + '%';
+                        document.getElementById('simOutcome').innerText = sim.predicted_outcome;
+                        document.getElementById('simKeyFactor').innerText = sim.key_factor;
+                        document.getElementById('simNarrative').innerText = sim.narrative;
+                    } else {
+                        alert('Error simulating fight: ' + (data.error || 'Unknown error'));
+                        simModal.hide();
+                    }
+                } catch (error) {
+                    console.error('Simulation error:', error);
+                    alert('Failed to run simulation.');
+                    simModal.hide();
+                }
+            });
+        });
+    }
+
+    // AI Comparison Logic
+    const compModalEl = document.getElementById('comparisonModal');
+    if (compModalEl && bootstrapObj) {
+        const compModal = new bootstrapObj.Modal(compModalEl);
+        document.querySelectorAll('.btn-compare').forEach(btn => {
+            btn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const fightId = this.getAttribute('data-fight-id');
+                
+                document.getElementById('compLoading').classList.remove('d-none');
+                document.getElementById('compResults').classList.add('d-none');
+                compModal.show();
+                
+                try {
+                    const response = await fetch('{{ path("api_ai_compare_result") }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ fight_id: parseInt(fightId) })
+                    });
+
+                    const data = await response.json();
+                    document.getElementById('compLoading').classList.add('d-none');
+                    
+                    if (data.success && data.data) {
+                        const comp = data.data;
+                        document.getElementById('compResults').classList.remove('d-none');
+                        document.getElementById('compPrediction').innerText = comp.ai_prediction;
+                        document.getElementById('compComparison').innerText = comp.comparison;
+                        
+                        const accBadge = document.getElementById('compAccuracy');
+                        accBadge.innerText = comp.accuracy_rating;
+                        
+                        const rating = comp.accuracy_rating.toUpperCase();
+                        if (rating.includes('SPOT ON') || rating.includes('CORRECT')) {
+                            accBadge.className = 'badge bg-success px-3 py-2';
+                        } else if (rating.includes('OFF')) {
+                            accBadge.className = 'badge bg-danger px-3 py-2';
+                        } else {
+                            accBadge.className = 'badge bg-warning text-dark px-3 py-2';
+                        }
+                    } else {
+                        alert('Error analyzing fight: ' + (data.error || 'Unknown error'));
+                        compModal.hide();
+                    }
+                } catch (error) {
+                    console.error('Comparison error:', error);
+                    alert('Failed to run comparison analysis.');
+                    compModal.hide();
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

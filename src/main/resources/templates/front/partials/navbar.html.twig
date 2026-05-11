@@ -1,0 +1,65 @@
+<nav class="sf-navbar navbar navbar-expand-lg sticky-top" style="background: rgba(9, 9, 11, 0.9); backdrop-filter: blur(20px); border-bottom: 1px solid var(--sf-border);">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand oswald fw-bold fs-3" href="{{ path('app_dashboard') }}" style="letter-spacing: 2px;">
+            <span class="text-danger">SMART</span><span class="text-white">FIGHT</span>
+        </a>
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#sfNavCollapse">
+            <i class="fa-solid fa-bars text-white"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="sfNavCollapse">
+            <!-- Global Search (Cinematic) -->
+            <div class="ms-lg-5 me-auto d-none d-lg-block" style="width: 400px;">
+                {% include 'front/partials/global_search.html.twig' %}
+            </div>
+
+            <ul class="navbar-nav ms-auto align-items-center gap-3">
+                <li class="nav-item">
+                    <a class="nav-link {{ app.request.get('_route') starts with 'front_blog' ? 'active' : '' }}" href="{{ path('front_blog_index') }}">NEWS</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ app.request.get('_route') starts with 'app_rankings' ? 'active' : '' }}" href="{{ path('app_rankings') }}">RANKINGS</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ app.request.get('_route') starts with 'app_stats' ? 'active' : '' }}" href="{{ path('app_stats') }}">ANALYTICS</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ app.request.get('_route') starts with 'app_results' ? 'active' : '' }}" href="{{ path('app_results') }}">RESULTS</a>
+                </li>
+                
+                {% if is_granted('ROLE_ADMIN') %}
+                <li class="nav-item">
+                    <a class="nav-link text-danger fw-bold" href="{{ path('app_dashboard') }}">
+                        <i class="fa-solid fa-shield-halved me-1"></i>ADMIN
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if app.user %}
+                    <li class="nav-item ms-lg-2">
+                        <div class="dropdown">
+                            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="sf-sidebar-avatar me-2" style="width:32px; height:32px; font-size:0.75rem;">{{ app.user.username|first|upper }}</div>
+                                <div class="d-none d-xl-block ps-1 text-start">
+                                    <div class="fw-bold text-white small leading-tight">{{ app.user.username }}</div>
+                                    <div class="text-muted extra-small" style="font-size:0.65rem;">{{ is_granted('ROLE_ADMIN') ? 'ADMIN PORTAL' : 'FIGHTER PASS' }}</div>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-3 p-2" style="background: #18181b; border: 1px solid var(--sf-border) !important; border-radius: 12px; width: 220px;">
+                                <li><a class="dropdown-item rounded-2 py-2" href="{{ path('app_profile') }}"><i class="fa-solid fa-user-circle me-2 opacity-50"></i>Profile</a></li>
+                                <li><a class="dropdown-item rounded-2 py-2" href="{{ path('app_predictions') }}"><i class="fa-solid fa-crystal-ball me-2 opacity-50"></i>My Predictions</a></li>
+                                <li><hr class="dropdown-divider border-secondary opacity-10"></li>
+                                <li><a class="dropdown-item rounded-2 py-2 text-danger" href="{{ path('app_logout') }}"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign Out</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="btn btn-premium btn-premium-danger btn-sm" href="{{ path('app_login') }}">SIGN IN</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

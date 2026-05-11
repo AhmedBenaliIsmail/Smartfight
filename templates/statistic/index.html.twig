@@ -1,0 +1,238 @@
+{% extends 'front/base_front.html.twig' %}
+
+{% block title %}Bout Intelligence — SmartFight Console{% endblock %}
+
+{% block content %}
+<div class="sf-broadcast-container py-4">
+    {# Header Section #}
+    <div class="container-fluid px-lg-5">
+        <div class="d-flex align-items-end justify-content-between mb-5">
+            <div class="header-console">
+                <div class="live-signal mb-2">
+                    <span class="pulse-dot"></span>
+                    <span class="live-text">CENTRAL DATA ARCHIVE</span>
+                </div>
+                <h1 class="display-4 fw-bold text-white mb-0" style="font-family: 'Oswald', sans-serif; letter-spacing: 3px;">BOUT INTELLIGENCE HUB</h1>
+                <p class="text-muted mb-0 fs-6" style="letter-spacing: 1px;">AGGREGATED FIGHT PERFORMANCE & ARCHIVE METRICS</p>
+            </div>
+            {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_stat_selection') }}" class="sf-btn-premium">
+                <i class="fa-solid fa-plus-circle me-2"></i> APPEND ANALYTICS
+            </a>
+            {% endif %}
+        </div>
+
+        {# Search Console #}
+        <div class="search-console mb-5">
+            <div class="row g-3">
+                <div class="col-lg-6">
+                    <div class="sf-search-wrapper">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="statsSearchInput" class="sf-console-input" placeholder="SEARCH BY BOUT, FIGHTER, OR WEIGHT CLASS..." />
+                    </div>
+                </div>
+                <div class="col-lg-6 d-flex gap-3 justify-content-end align-items-center">
+                    <span class="text-muted x-small fw-bold">SORT BY:</span>
+                    <button id="sortChronological" class="sf-btn-sort active">CHRONOLOGICAL</button>
+                    <button id="sortAlphabetical" class="sf-btn-sort">ALPHABETICAL</button>
+                </div>
+            </div>
+        </div>
+
+        {# Main Grid #}
+        <div id="stats-container" class="row g-4">
+            {% for rid, group in groupedStats %}
+            {% set event = group.event|default(null) %}
+            {% set s1 = group.totalStats[0]|default(null) %}{% set s2 = group.totalStats[1]|default(null) %}
+            <div class="col-12 sf-bout-entry" 
+                 data-search="{{ event ? event.eventName|lower : '' }} {{ s1 and s1.fighter ? s1.fighter.fullName|lower : '' }} {{ s2 and s2.fighter ? s2.fighter.fullName|lower : '' }}"
+                 data-sort-date="{{ group.result.fightDate|date('Y-m-d') }}"
+                 data-sort-event="{{ event ? event.eventName|lower : '' }}">
+                <div class="sf-entry-card">
+                    <div class="card-left-strip"></div>
+                    <div class="card-main-content">
+                        <div class="row align-items-center">
+                            {# Event Meta #}
+                            <div class="col-lg-3 border-end border-secondary border-opacity-10 py-3">
+                                <div class="bout-number mb-2">ARCHIVE_ID: #{{ group.result.resultId + 1000 }}</div>
+                                <h3 class="event-name mb-1">{{ (event ? event.eventName : 'UNKNOWN EVENT')|upper }}</h3>
+                                <div class="event-date-loc">
+                                    <i class="fa-solid fa-calendar me-2"></i> {{ group.result.fightDate|date('M d, Y') }}
+                                </div>
+                            </div>
+
+                            {# Matchup Area #}
+                            <div class="col-lg-6 py-3 px-lg-5">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    {# Fighter 1 #}
+                                    <div class="mini-fighter-module text-center">
+                                        <div class="name">{{ s1 and s1.fighter ? s1.fighter.lastName|upper : 'N/A' }}</div>
+                                        <div class="accuracy text-danger">{{ (s1 ? s1.punchAccuracy : 0)|round(0) }}% ACC</div>
+                                    </div>
+
+                                    {# Central Stats #}
+                                    <div class="central-stats text-center">
+                                        <div class="stat-row">
+                                            <span class="val">{{ s1 ? s1.punchesLanded : 0 }}</span>
+                                            <span class="lbl">LANDED</span>
+                                            <span class="val">{{ s2 ? s2.punchesLanded : 0 }}</span>
+                                        </div>
+                                        <div class="vs-text">VS</div>
+                                    </div>
+
+                                    {# Fighter 2 #}
+                                    <div class="mini-fighter-module text-center">
+                                        <div class="name">{{ s2 and s2.fighter ? s2.fighter.lastName|upper : 'N/A' }}</div>
+                                        <div class="accuracy text-primary">{{ (s2 ? s2.punchAccuracy : 0)|round(0) }}% ACC</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {# Actions Area #}
+                            <div class="col-lg-3 text-lg-end py-3">
+                                <div class="d-flex flex-column gap-2">
+                                    <a href="{{ path('app_stat_show', {'fightId': rid}) }}" class="sf-btn-view">
+                                        OPEN DOSSIER <i class="fa-solid fa-folder-open ms-2"></i>
+                                    </a>
+                                    {% if is_granted('ROLE_ADMIN') %}
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <a href="{{ path('app_stat_new', {'fightId': rid}) }}" class="sf-btn-mini-admin"><i class="fa-solid fa-pen"></i></a>
+                                        <form action="{{ path('app_stat_delete_fight', {'fightId': rid}) }}" method="post" onsubmit="return confirm('PURGE RECORDS?');">
+                                            <button type="submit" class="sf-btn-mini-admin text-danger"><i class="fa-solid fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center py-5">
+                <div class="empty-state">
+                    <i class="fa-solid fa-satellite-dish mb-4"></i>
+                    <h2>NO DATA DETECTED</h2>
+                    <p>SYSTEM AWAITING ARCHIVE SYNCHRONIZATION</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.sf-broadcast-container { min-vh: 100vh; background: #09090b; }
+
+.header-console { border-left: 4px solid #dc2626; padding-left: 20px; }
+.live-signal { display: flex; align-items: center; gap: 8px; }
+.pulse-dot { width: 8px; height: 8px; background: #dc2626; border-radius: 50%; box-shadow: 0 0 10px #dc2626; animation: blink 1.5s infinite; }
+@keyframes blink { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
+.live-text { font-size: 0.65rem; font-weight: 800; color: #dc2626; letter-spacing: 2px; }
+
+.sf-btn-premium {
+    background: #dc2626; color: #fff; font-weight: 900; padding: 12px 25px; border-radius: 4px; letter-spacing: 1px;
+    border: none; transition: all 0.3s; font-size: 0.8rem; text-decoration: none !important;
+}
+.sf-btn-premium:hover { background: #ef4444; box-shadow: 0 0 25px rgba(220, 38, 38, 0.4); color: #fff; }
+
+.sf-search-wrapper { position: relative; }
+.sf-search-wrapper i { position: absolute; left: 20px; top: 18px; color: #52525b; }
+.sf-console-input {
+    background: #121214; border: 1px solid #27272a; color: #fff; padding: 15px 20px 15px 50px;
+    border-radius: 8px; width: 100%; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px;
+}
+.sf-console-input:focus { outline: none; border-color: #dc2626; background: #18181b; }
+
+.sf-btn-sort {
+    background: transparent; border: 1px solid #27272a; color: #52525b; padding: 8px 16px;
+    border-radius: 4px; font-size: 0.7rem; font-weight: 900; letter-spacing: 1px; transition: all 0.2s;
+}
+.sf-btn-sort.active { border-color: #dc2626; color: #fff; background: rgba(220, 38, 38, 0.1); }
+.sf-btn-sort:hover:not(.active) { color: #a1a1aa; border-color: #52525b; }
+
+.sf-entry-card {
+    background: #121214; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;
+    display: flex; overflow: hidden; transition: all 0.3s ease;
+}
+.sf-entry-card:hover { transform: scale(1.005); border-color: rgba(220, 38, 38, 0.2); background: #18181b; }
+
+.card-left-strip { width: 4px; background: #27272a; transition: background 0.3s; }
+.sf-entry-card:hover .card-left-strip { background: #dc2626; }
+
+.card-main-content { flex: 1; padding: 20px 30px; }
+
+.bout-number { font-size: 0.65rem; font-weight: 900; color: #52525b; letter-spacing: 2px; }
+.event-name { font-family: 'Oswald', sans-serif; font-size: 1.5rem; color: #fff; }
+.event-date-loc { font-size: 0.75rem; color: #71717a; font-weight: 600; }
+
+.mini-fighter-module .name { font-family: 'Oswald', sans-serif; font-size: 1.4rem; color: #fff; line-height: 1; margin-bottom: 5px; }
+.mini-fighter-module .accuracy { font-size: 0.65rem; font-weight: 900; letter-spacing: 1px; }
+
+.central-stats .stat-row { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 5px; }
+.central-stats .val { font-family: 'Oswald', sans-serif; font-size: 1.8rem; color: #fff; min-width: 50px; }
+.central-stats .lbl { font-size: 0.6rem; font-weight: 900; color: #52525b; letter-spacing: 2px; }
+.central-stats .vs-text { font-family: 'Oswald', sans-serif; font-size: 1rem; color: #27272a; font-weight: 900; }
+
+.sf-btn-view {
+    background: transparent; border: 1px solid #dc2626; color: #dc2626; padding: 10px;
+    border-radius: 4px; font-weight: 900; font-size: 0.75rem; letter-spacing: 2px;
+    text-decoration: none !important; text-align: center; transition: all 0.3s;
+}
+.sf-btn-view:hover { background: #dc2626; color: #fff; box-shadow: 0 0 20px rgba(220, 38, 38, 0.3); }
+
+.sf-btn-mini-admin {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+    width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; color: #52525b; transition: all 0.2s; font-size: 0.8rem;
+}
+.sf-btn-mini-admin:hover { background: #27272a; color: #fff; }
+
+.empty-state { opacity: 0.2; padding: 100px 0; }
+.empty-state i { font-size: 5rem; color: #52525b; }
+.empty-state h2 { font-family: 'Oswald', sans-serif; color: #fff; letter-spacing: 3px; }
+.empty-state p { font-weight: 900; font-size: 0.7rem; color: #52525b; letter-spacing: 2px; }
+
+.x-small { font-size: 0.65rem; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Standardize using the global AdvancedFilter system
+        window._statsFilter = new AdvancedFilter('#stats-container', '.sf-bout-entry');
+
+        const searchInput = document.getElementById('statsSearchInput');
+        const btnChrono = document.getElementById('sortChronological');
+        const btnAlpha = document.getElementById('sortAlphabetical');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => window._statsFilter.search(e.target.value));
+        }
+
+        if (btnChrono) {
+            btnChrono.addEventListener('click', () => {
+                btnChrono.classList.add('active');
+                btnAlpha.classList.remove('active');
+                window._statsFilter.sort('date', 'string', 'desc');
+            });
+        }
+
+        if (btnAlpha) {
+            btnAlpha.addEventListener('click', () => {
+                btnAlpha.classList.add('active');
+                btnChrono.classList.remove('active');
+                window._statsFilter.sort('event', 'string', 'asc');
+            });
+        }
+
+        // Initial sort to sync UI
+        window._statsFilter.sort('date', 'string', 'desc');
+    });
+</script>
+{% endblock %}
+
+

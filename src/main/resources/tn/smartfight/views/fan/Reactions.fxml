@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<HBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.smartfight.controller.ReactionsController"
+      spacing="0"
+      style="-fx-background-color:#0d0d0d;">
+
+    <!-- LEFT: reaction feed -->
+    <VBox HBox.hgrow="ALWAYS" style="-fx-background-color:#0d0d0d;">
+
+        <VBox style="-fx-background-color:#111113;-fx-border-color:#27272a;-fx-border-width:0 0 1 0;-fx-padding:16 24;">
+            <Label text="FAN REACTIONS" styleClass="h2"/>
+            <Label text="React to fight results — share your take with the community"
+                   style="-fx-text-fill:#71717a;-fx-font-size:12px;-fx-padding:4 0 0 0;"/>
+        </VBox>
+
+        <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true"
+                    style="-fx-background-color:#0d0d0d;-fx-background:#0d0d0d;-fx-border-width:0;">
+            <VBox fx:id="feedContainer" spacing="12" style="-fx-padding:16;"/>
+        </ScrollPane>
+    </VBox>
+
+    <!-- RIGHT: post form -->
+    <VBox minWidth="300" maxWidth="300"
+          style="-fx-background-color:#111113;-fx-border-color:#27272a;-fx-border-width:0 0 0 1;">
+
+        <Label text="POST A REACTION"
+               style="-fx-text-fill:#a1a1aa;-fx-font-size:11px;-fx-font-weight:bold;-fx-padding:16 16 8 16;"/>
+
+        <VBox spacing="12" style="-fx-padding:8 16 16 16;">
+
+            <!-- Fight selector -->
+            <VBox spacing="4">
+                <Label text="Fight" style="-fx-text-fill:#71717a;-fx-font-size:11px;"/>
+                <ComboBox fx:id="fightCombo" maxWidth="Infinity"
+                          style="-fx-background-color:#18181b;-fx-border-color:#27272a;"/>
+            </VBox>
+
+            <!-- Reaction type toggles -->
+            <VBox spacing="4">
+                <Label text="Reaction" style="-fx-text-fill:#71717a;-fx-font-size:11px;"/>
+                <VBox fx:id="reactionTypeBox" spacing="6"/>
+            </VBox>
+
+            <!-- Comment -->
+            <VBox spacing="4">
+                <Label text="Comment (max 140 chars)" style="-fx-text-fill:#71717a;-fx-font-size:11px;"/>
+                <TextArea fx:id="commentArea" prefRowCount="4" wrapText="true"
+                          style="-fx-background-color:#18181b;-fx-border-color:#27272a;-fx-text-fill:#fafafa;-fx-prompt-text-fill:#52525b;"
+                          promptText="Your take on this fight…"/>
+                <Label fx:id="charCountLabel" text="0 / 140"
+                       style="-fx-text-fill:#52525b;-fx-font-size:10px;-fx-alignment:CENTER_RIGHT;"/>
+            </VBox>
+
+            <Button text="Post Reaction" onAction="#onPostReaction" styleClass="btn-primary" maxWidth="Infinity"/>
+            <Label fx:id="postStatusLabel" styleClass="caption" wrapText="true"/>
+        </VBox>
+    </VBox>
+</HBox>

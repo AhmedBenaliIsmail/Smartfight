@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Helvetica', 'Arial', sans-serif; color: #333; line-height: 1.4; margin: 0; padding: 20px; }
+        .header { text-align: center; border-bottom: 2px solid #dc2626; padding-bottom: 15px; margin-bottom: 20px; }
+        .header h1 { margin: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 20px; }
+        
+        .summary-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .summary-table th { background: #18181b; color: #fff; text-align: left; padding: 8px; font-size: 10px; text-transform: uppercase; }
+        .summary-table td { padding: 8px; border-bottom: 1px solid #e4e4e7; font-size: 11px; }
+        
+        .status-badge { padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; text-transform: uppercase; }
+        .paid { background: #dcfce7; color: #166534; }
+        .pending { background: #fef2f2; color: #991b1b; }
+        
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>SMARTFIGHT CONTRACT LEDGER</h1>
+        <p style="font-size: 10px; color: #71717a; margin-top: 5px;">INTERNAL FINANCIAL AUDIT REPORT • {{ "now"|date('F d, Y') }}</p>
+    </div>
+
+    <table class="summary-table">
+        <thead>
+            <tr>
+                <th>FIGHTER</th>
+                <th>EVENT</th>
+                <th>BASE PAY</th>
+                <th>WIN BONUS</th>
+                <th>STATUS</th>
+                <th>FINAL PAYOUT</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contract in contracts %}
+            <tr>
+                <td><strong>{{ contract.fighter.fullName }}</strong></td>
+                <td>{{ contract.event.eventName }}</td>
+                <td>${{ contract.basePay|number_format(0) }}</td>
+                <td>${{ contract.winBonus|number_format(0) }}</td>
+                <td>
+                    {% if contract.isPaid %}
+                        <span class="status-badge paid">PAID</span>
+                    {% else %}
+                        <span class="status-badge pending">UNPAID</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if contract.calculatedPayout is not null %}
+                        <strong>${{ contract.calculatedPayout|number_format(0) }}</strong>
+                    {% else %}
+                        ---
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

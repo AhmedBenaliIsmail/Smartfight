@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.smartfight.controller.EventsListController"
+      style="-fx-background-color:#0d0d0d;" spacing="0">
+
+    <!-- Header -->
+    <HBox styleClass="page-header" alignment="CENTER_LEFT" spacing="12">
+        <padding><Insets top="24" bottom="16" left="24" right="24"/></padding>
+        <VBox spacing="4">
+            <Label text="EVENT MANAGEMENT" styleClass="page-title"/>
+            <Label text="Directing professional boxing spectacles and world title events"
+                   styleClass="page-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="+ CREATE EVENT" styleClass="btn-primary" onAction="#onCreateEvent"/>
+    </HBox>
+
+    <!-- Filter + stats bar -->
+    <HBox styleClass="filter-bar" alignment="CENTER_LEFT" spacing="12">
+        <TextField fx:id="searchField" styleClass="search-field"
+                   promptText="Search event, venue..." prefWidth="260"
+                   onAction="#onFilter"/>
+        <Button text="FILTER" styleClass="btn-primary" onAction="#onFilter"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <!-- stat chips -->
+        <HBox spacing="8" alignment="CENTER">
+            <VBox alignment="CENTER" style="-fx-background-color:#1a1a1a;-fx-background-radius:6;-fx-padding:4 12;">
+                <Label text="TOTAL" style="-fx-font-size:9;-fx-text-fill:#6b7280;-fx-font-weight:bold;"/>
+                <Label fx:id="lblTotal" text="0" style="-fx-font-size:16;-fx-font-weight:bold;-fx-text-fill:#fff;"/>
+            </VBox>
+            <VBox alignment="CENTER" style="-fx-background-color:#1a1a1a;-fx-background-radius:6;-fx-padding:4 12;">
+                <Label text="UPCOMING" style="-fx-font-size:9;-fx-text-fill:#6b7280;-fx-font-weight:bold;"/>
+                <Label fx:id="lblUpcoming" text="0" style="-fx-font-size:16;-fx-font-weight:bold;-fx-text-fill:#16a34a;"/>
+            </VBox>
+            <VBox alignment="CENTER" style="-fx-background-color:#1a1a1a;-fx-background-radius:6;-fx-padding:4 12;">
+                <Label text="PAST" style="-fx-font-size:9;-fx-text-fill:#6b7280;-fx-font-weight:bold;"/>
+                <Label fx:id="lblPast" text="0" style="-fx-font-size:16;-fx-font-weight:bold;-fx-text-fill:#9ca3af;"/>
+            </VBox>
+            <VBox alignment="CENTER" style="-fx-background-color:#1a1a1a;-fx-background-radius:6;-fx-padding:4 12;">
+                <Label text="CHAMPIONS" style="-fx-font-size:9;-fx-text-fill:#6b7280;-fx-font-weight:bold;"/>
+                <Label fx:id="lblChamps" text="0" style="-fx-font-size:16;-fx-font-weight:bold;-fx-text-fill:#f59e0b;"/>
+            </VBox>
+        </HBox>
+    </HBox>
+
+    <Label fx:id="statusLabel" styleClass="caption">
+        <padding><Insets top="0" bottom="0" left="24" right="24"/></padding>
+    </Label>
+
+    <!-- Scrollable card grid -->
+    <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="scroll-pane">
+        <content>
+            <FlowPane fx:id="eventsFlow" hgap="16" vgap="16"
+                      style="-fx-background-color:#0d0d0d;">
+                <padding><Insets top="16" bottom="16" left="24" right="24"/></padding>
+            </FlowPane>
+        </content>
+    </ScrollPane>
+</VBox>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.smartfight.controller.BookingsController"
+      spacing="0"
+      style="-fx-background-color:#0d0d0d;">
+
+    <!-- Header -->
+    <VBox style="-fx-background-color:#111113;-fx-border-color:#27272a;-fx-border-width:0 0 1 0;-fx-padding:16 24;">
+        <Label text="MY BOOKINGS" styleClass="h2"/>
+        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding:12 0 0 0;">
+            <Button text="🎟  View Ticket" onAction="#onViewTicket" styleClass="btn-primary"/>
+            <Button text="✕  Cancel"       onAction="#onCancelBooking"
+                    style="-fx-background-color:#3f1010;-fx-text-fill:#f87171;-fx-border-color:#7f1d1d;" styleClass="btn-outline"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="statusLabel" styleClass="caption"/>
+        </HBox>
+    </VBox>
+
+    <TableView fx:id="bookingsTable" VBox.vgrow="ALWAYS"
+               style="-fx-background-color:#0d0d0d;-fx-border-width:0;">
+        <columns>
+            <TableColumn fx:id="eventCol"  text="Event"       prefWidth="200"/>
+            <TableColumn fx:id="dateCol"   text="Date"        prefWidth="110"/>
+            <TableColumn fx:id="refCol"    text="Reference"   prefWidth="130"/>
+            <TableColumn fx:id="typeCol"   text="Ticket Type" prefWidth="110"/>
+            <TableColumn fx:id="qtyCol"    text="Qty"         prefWidth="50"/>
+            <TableColumn fx:id="priceCol"  text="Total"       prefWidth="80"/>
+            <TableColumn fx:id="statusCol" text="Status"      prefWidth="100"/>
+        </columns>
+        <placeholder><Label text="No bookings found" style="-fx-text-fill:#52525b;"/></placeholder>
+    </TableView>
+</VBox>

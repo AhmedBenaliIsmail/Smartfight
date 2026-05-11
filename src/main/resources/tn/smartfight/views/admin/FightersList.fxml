@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.lang.String?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.smartfight.controller.FightersListController"
+      style="-fx-background-color:#0d0d0d;" spacing="0">
+
+    <!-- Header -->
+    <HBox styleClass="page-header" alignment="CENTER_LEFT" spacing="12">
+        <padding><Insets top="24" bottom="16" left="24" right="24"/></padding>
+        <VBox spacing="4">
+            <Label text="ORGANIZATION ROSTER" styleClass="page-title"/>
+            <Label text="Managing professional combatant portfolios" styleClass="page-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="🩺 PREDICT INJURIES AI" styleClass="button" onAction="#onInjuryAI"/>
+        <Button text="+ ADD BOXER" styleClass="btn-primary" onAction="#onCreateFighter"/>
+    </HBox>
+
+    <!-- Filter bar -->
+    <HBox styleClass="filter-bar" alignment="CENTER_LEFT" spacing="10">
+        <TextField fx:id="searchField" styleClass="search-field"
+                   promptText="Search for a fighter..." prefWidth="240"
+                   onAction="#onFilter"/>
+        <ComboBox fx:id="styleFilter" promptText="All Styles" prefWidth="150">
+            <items>
+                <javafx.collections.FXCollections fx:factory="observableArrayList">
+                    <String fx:value="All Styles"/>
+                    <String fx:value="SLUGGER"/>
+                    <String fx:value="TACTICIAN"/>
+                    <String fx:value="BOXER"/>
+                    <String fx:value="BRAWLER"/>
+                    <String fx:value="COUNTER-PUNCHER"/>
+                </javafx.collections.FXCollections>
+            </items>
+        </ComboBox>
+        <TextField fx:id="eloMinField" promptText="ELO Min" prefWidth="80"/>
+        <TextField fx:id="winRateField" promptText="Win% Min" prefWidth="80"/>
+        <Button text="FILTER" styleClass="btn-primary" onAction="#onFilter"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="⟳ RECALC RANKINGS" styleClass="button" onAction="#onRecalcRankings"/>
+        <Label fx:id="statusLabel" styleClass="caption"/>
+    </HBox>
+
+    <!-- Scrollable card grid -->
+    <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="scroll-pane">
+        <content>
+            <FlowPane fx:id="fightersFlow" hgap="16" vgap="16"
+                      style="-fx-background-color:#0d0d0d;">
+                <padding><Insets top="16" bottom="16" left="24" right="24"/></padding>
+            </FlowPane>
+        </content>
+    </ScrollPane>
+</VBox>

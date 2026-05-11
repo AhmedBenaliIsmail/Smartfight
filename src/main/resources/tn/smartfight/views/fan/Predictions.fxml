@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<HBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.smartfight.controller.PredictionsController"
+      spacing="0"
+      style="-fx-background-color:#0d0d0d;">
+
+    <!-- ══════════ LEFT: fight selector + prediction form ══════════ -->
+    <VBox HBox.hgrow="ALWAYS" style="-fx-background-color:#0d0d0d;">
+
+        <!-- Header bar -->
+        <VBox style="-fx-background-color:#111113;-fx-border-color:#27272a;-fx-border-width:0 0 1 0;-fx-padding:16 24;">
+            <Label text="FIGHT PREDICTIONS" styleClass="h2"/>
+            <HBox spacing="12" alignment="CENTER_LEFT" style="-fx-padding:12 0 0 0;">
+                <ComboBox fx:id="fightCombo" prefWidth="400"
+                          promptText="— select a scheduled fight —"
+                          style="-fx-background-color:#18181b;-fx-border-color:#27272a;"/>
+                <Label fx:id="statusLabel" styleClass="caption" wrapText="true"/>
+            </HBox>
+        </VBox>
+
+        <!-- Scrollable prediction form, populated dynamically -->
+        <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true"
+                    style="-fx-background-color:#0d0d0d;-fx-background:#0d0d0d;-fx-border-width:0;">
+            <VBox fx:id="predictionFormContainer" spacing="16" style="-fx-padding:24;"/>
+        </ScrollPane>
+    </VBox>
+
+    <!-- ══════════ RIGHT: recent history sidebar ══════════ -->
+    <VBox minWidth="268" maxWidth="268"
+          style="-fx-background-color:#111113;-fx-border-color:#27272a;-fx-border-width:0 0 0 1;">
+
+        <Label text="YOUR HISTORY"
+               style="-fx-text-fill:#a1a1aa;-fx-font-size:11px;-fx-font-weight:bold;-fx-padding:16 16 8 16;"/>
+
+        <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true"
+                    style="-fx-background-color:#111113;-fx-background:#111113;-fx-border-width:0;">
+            <VBox fx:id="historyContainer" spacing="8" style="-fx-padding:8;"/>
+        </ScrollPane>
+    </VBox>
+</HBox>

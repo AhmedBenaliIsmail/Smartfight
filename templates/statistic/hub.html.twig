@@ -1,0 +1,356 @@
+{% extends 'front/base_front.html.twig' %}
+
+{% block title %}Statistics Hub — SmartFight{% endblock %}
+
+{% block content %}
+<div class="sf-broadcast-container py-5">
+    {# Header Section #}
+    <div class="container mb-5">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="live-indicator">
+                        <span class="dot"></span>
+                        <span class="text">DATA STREAM ACTIVE</span>
+                    </div>
+                    <div class="sf-badge-glass">VERIFIED METRICS</div>
+                </div>
+                <h1 class="display-3 fw-bold text-white mb-2" style="font-family: 'Oswald', sans-serif; letter-spacing: 4px;">
+                    SMART<span class="text-danger">FIGHT</span> ANALYTICS
+                </h1>
+                <p class="text-muted fs-5 mb-0" style="max-width: 600px;">
+                    High-fidelity performance tracking, AI-driven tactical insights, and comprehensive bout records.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end d-none d-lg-block">
+                <div class="clock-display">
+                    <div class="time" id="sfClock">00:00:00</div>
+                    <div class="label">GLOBAL BROADCAST TIME</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Main Hub Content #}
+    <div class="container">
+        <div class="row g-4">
+            {# Left Column: Action Cards #}
+            <div class="col-lg-7">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <a href="{{ path('app_stat_selection') }}" class="sf-hub-card action-card">
+                            <div class="card-glow"></div>
+                            <div class="card-content">
+                                <div class="icon-box mb-4">
+                                    <i class="fa-solid fa-crosshairs"></i>
+                                </div>
+                                <h3 class="h4 fw-bold text-white mb-3">SELECT BY EVENT</h3>
+                                <p class="text-muted small mb-4">Browse fight cards and select specific bouts for deep-dive analysis.</p>
+                                <div class="sf-btn-outline-danger w-100">ACCESS RECORDS</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{{ path('app_stats') }}" class="sf-hub-card action-card">
+                            <div class="card-glow blue"></div>
+                            <div class="card-content">
+                                <div class="icon-box blue mb-4">
+                                    <i class="fa-solid fa-microchip"></i>
+                                </div>
+                                <h3 class="h4 fw-bold text-white mb-3">ALL BOUT DATA</h3>
+                                <p class="text-muted small mb-4">The complete historical ledger of every tracked punch and tactical shift.</p>
+                                <div class="sf-btn-outline-primary w-100">OPEN LEDGER</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                {# Statistics Summary Table (Mini Preview) #}
+                <div class="sf-hub-card mt-4 p-0 overflow-hidden">
+                    <div class="p-4 border-bottom border-secondary border-opacity-10 d-flex justify-content-between align-items-center">
+                        <h4 class="h6 fw-bold text-white mb-0 text-uppercase" style="letter-spacing: 1px;">Live Network Feed</h4>
+                        <span class="badge bg-success-lt">STABLE</span>
+                    </div>
+                    <div class="p-0">
+                        <div class="list-group list-group-flush">
+                            {% for item in feed %}
+                            <div class="list-group-item bg-transparent border-secondary border-opacity-10 py-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="feed-icon"><i class="fa-solid {{ item.icon }} {{ item.color }}"></i></div>
+                                        <div>
+                                            <div class="text-white small fw-bold">{{ item.title }}</div>
+                                            <div class="text-muted x-small">{{ item.subtitle }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-muted x-small">{{ item.time }}</div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="p-4 text-center text-muted small">No recent activity detected</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Right Column: Stats Overview #}
+            <div class="col-lg-5">
+                <div class="sf-hub-card h-100">
+                    <div class="card-content p-4">
+                        <h3 class="h5 fw-bold text-white mb-4" style="font-family: 'Oswald', sans-serif;">PLATFORM PERFORMANCE</h3>
+                        
+                        <div class="metric-grid mb-5">
+                            <div class="metric-item">
+                                <div class="label">BOUTS TRACKED</div>
+                                <div class="value">{{ totalBouts|default(842) }}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="label">ACCURACY RATE</div>
+                                <div class="value text-success">{{ avgAccuracy|default('99.8') }}%</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="label">AI INSIGHTS</div>
+                                <div class="value">{{ totalInsights|default('4.2K') }}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="label">DATA NODES</div>
+                                <div class="value">{{ dataNodes > 1000 ? (dataNodes / 1000)|round(1) ~ 'K' : dataNodes }}</div>
+                            </div>
+                        </div>
+
+                        <div class="console-box p-3 rounded-3 mb-4">
+                            <div class="text-danger x-small fw-bold mb-2">SYSTEM CONSOLE [LOGS]</div>
+                            <code class="text-success small d-block mb-1">> Initializing AI analyzer...</code>
+                            <code class="text-success small d-block mb-1">> Loading historical bout templates...</code>
+                            <code class="text-success small d-block mb-1">> Connecting to global broadcast feed...</code>
+                            <code class="text-success small d-block">> System optimized for 4K analytics.</code>
+                        </div>
+
+                        <div class="sf-banner-pro p-4 rounded-4">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="pro-icon"><i class="fa-solid fa-crown text-warning"></i></div>
+                                <div>
+                                    <div class="text-white fw-bold">PRO ANALYTICS UNLOCKED</div>
+                                    <p class="text-muted x-small mb-0">You are accessing the administrative-grade data portal.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.sf-broadcast-container {
+    background: radial-gradient(circle at 10% 20%, rgba(220, 38, 38, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.03) 0%, transparent 40%);
+}
+
+.live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(220, 38, 38, 0.1);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.live-indicator .dot {
+    width: 8px;
+    height: 8px;
+    background: #dc2626;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #dc2626;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+
+.live-indicator .text {
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: #dc2626;
+    letter-spacing: 1px;
+}
+
+.sf-badge-glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(5px);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #a1a1aa;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.clock-display {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 15px 25px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: inline-block;
+}
+
+.clock-display .time {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.8rem;
+    color: #fff;
+    letter-spacing: 2px;
+    line-height: 1;
+}
+
+.clock-display .label {
+    font-size: 0.6rem;
+    color: #52525b;
+    font-weight: 900;
+    margin-top: 5px;
+    letter-spacing: 1.5px;
+}
+
+.sf-hub-card {
+    background: rgba(18, 18, 20, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 32px;
+    position: relative;
+    overflow: hidden;
+    display: block;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sf-hub-card:hover {
+    transform: translateY(-10px);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+}
+
+.card-glow {
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 150px;
+    background: radial-gradient(circle at 50% 0%, rgba(220, 38, 38, 0.15), transparent 70%);
+    z-index: 1;
+}
+
+.card-glow.blue {
+    background: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15), transparent 70%);
+}
+
+.card-content {
+    position: relative;
+    z-index: 2;
+    padding: 40px;
+}
+
+.icon-box {
+    width: 64px;
+    height: 64px;
+    background: rgba(220, 38, 38, 0.1);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #dc2626;
+    font-size: 1.5rem;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.icon-box.blue {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.sf-btn-outline-danger {
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.action-card:hover .sf-btn-outline-danger {
+    background: #dc2626;
+    border-color: #dc2626;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
+}
+
+.sf-btn-outline-primary {
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.action-card:hover .sf-btn-outline-primary {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.metric-item .label {
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: #52525b;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.metric-item .value {
+    font-family: 'Oswald', sans-serif;
+    font-size: 2rem;
+    color: #fff;
+    line-height: 1;
+}
+
+.console-box {
+    background: #09090b;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sf-banner-pro {
+    background: linear-gradient(90deg, #18181b, #27272a);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.x-small { font-size: 0.65rem; }
+.bg-success-lt { background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); }
+</style>
+
+<script>
+function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const s = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('sfClock').textContent = `${h}:${m}:${s}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+</script>
+{% endblock %}
+

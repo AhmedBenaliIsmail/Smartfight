@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.smartfight.controller.FanDashboardController"
+            fitToWidth="true"
+            style="-fx-background-color:#09090b; -fx-border-color:transparent; -fx-background:transparent;">
+  <content>
+    <VBox fx:id="mainContainer" spacing="28"
+          style="-fx-background-color:#09090b;">
+      <padding><Insets top="28" bottom="40" left="28" right="28"/></padding>
+
+      <!-- Status / loading indicator -->
+      <Label fx:id="statusLabel" text="Loading dashboard..." styleClass="caption"/>
+
+      <!-- ═══ WELCOME HEADER ═══ -->
+      <HBox alignment="CENTER_LEFT" spacing="16">
+        <VBox spacing="6">
+          <Label fx:id="welcomeLabel" text="Welcome back!" styleClass="h1"/>
+          <Label fx:id="pointsSubtitle" text="Your prediction points" styleClass="text-muted"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="pointsBadge" text="0 PTS"
+               style="-fx-background-color:#dc2626;-fx-text-fill:#ffffff;-fx-font-weight:bold;-fx-font-size:13px;-fx-background-radius:20;-fx-padding:7 18;"/>
+        <Label text="PRO FAN"
+               style="-fx-background-color:#f59e0b;-fx-text-fill:#000000;-fx-font-weight:bold;-fx-font-size:11px;-fx-background-radius:20;-fx-padding:7 14;"/>
+      </HBox>
+
+      <!-- ═══ ELITE FIGHTERS ═══ -->
+      <VBox spacing="12">
+        <Label text="ELITE FIGHTERS"
+               style="-fx-font-size:11px;-fx-font-weight:bold;-fx-text-fill:#dc2626;"/>
+        <HBox fx:id="fightersRow" spacing="16"/>
+      </VBox>
+
+      <!-- ═══ COMMUNITY VOTING + UPCOMING EVENTS ═══ -->
+      <HBox spacing="20">
+        <VBox fx:id="votingContainer" spacing="12" HBox.hgrow="ALWAYS">
+          <Label text="COMMUNITY VOTING"
+                 style="-fx-font-size:11px;-fx-font-weight:bold;-fx-text-fill:#dc2626;"/>
+        </VBox>
+        <VBox fx:id="eventsContainer" spacing="12" minWidth="270.0">
+          <Label text="UPCOMING EVENTS"
+                 style="-fx-font-size:11px;-fx-font-weight:bold;-fx-text-fill:#dc2626;"/>
+        </VBox>
+      </HBox>
+
+      <!-- ═══ RECENT RESULTS ═══ -->
+      <VBox spacing="12">
+        <Label text="RECENT RESULTS"
+               style="-fx-font-size:11px;-fx-font-weight:bold;-fx-text-fill:#dc2626;"/>
+        <VBox fx:id="resultsContainer" spacing="8"/>
+      </VBox>
+
+      <!-- ═══ BLOG HIGHLIGHTS ═══ -->
+      <VBox spacing="12">
+        <Label text="BLOG HIGHLIGHTS"
+               style="-fx-font-size:11px;-fx-font-weight:bold;-fx-text-fill:#dc2626;"/>
+        <HBox fx:id="blogContainer" spacing="12"/>
+      </VBox>
+
+    </VBox>
+  </content>
+</ScrollPane>

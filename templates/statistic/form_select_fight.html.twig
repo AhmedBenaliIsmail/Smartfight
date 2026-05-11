@@ -1,0 +1,314 @@
+{% extends 'front/base_front.html.twig' %}
+
+{% block title %}Select Fight — SmartFight Statistics{% endblock %}
+
+{% block content %}
+<div class="sf-broadcast-container py-5">
+    {# Header Section #}
+    <div class="container mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div class="header-console">
+                <div class="path-indicator mb-2">
+                    <a href="{{ path('app_stat_selection') }}" class="text-muted text-decoration-none">EVENT</a>
+                    <span class="sep">/</span>
+                    <span class="active">BOUT SELECTION</span>
+                    <span class="sep">/</span>
+                    <span>ANALYTICS</span>
+                </div>
+                <h1 class="display-5 fw-bold text-white mb-1" style="font-family: 'Oswald', sans-serif; letter-spacing: 2px;">BOUT SELECTION FLOW</h1>
+                <p class="text-muted mb-0">Event: <span class="text-danger fw-bold">{{ event.eventName|upper }}</span></p>
+            </div>
+            <a href="{{ path('app_stat_selection') }}" class="sf-btn-outline-back">
+                <i class="fa-solid fa-chevron-left me-2"></i> SYSTEM RECALL
+            </a>
+        </div>
+    </div>
+
+    {# Matchups Grid #}
+    <div class="container">
+        <div class="row g-4">
+            {% for fight in fights %}
+            <div class="col-lg-6">
+                <div class="sf-matchup-panel">
+                    <div class="panel-header d-flex justify-content-between align-items-center">
+                        <div class="bout-id">BOUT_ID: {{ fight.resultId + 5000 }}</div>
+                        <div class="division-tag">{{ fight.fighter1.weightDivision ? fight.fighter1.weightDivision.name|upper : 'N/A' }}</div>
+                    </div>
+
+                    <div class="matchup-visual">
+                        {# Fighter 1 (Red) #}
+                        <div class="fighter-module red-side">
+                            <div class="photo-hex">
+                                <div class="photo-inner">
+                                    {% if fight.fighter1 and fight.fighter1.photoFilename %}
+                                        <img src="{{ asset('uploads/boxers/' ~ fight.fighter1.photoFilename) }}" alt="">
+                                    {% else %}
+                                        <i class="fa-solid fa-user"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="hex-border"></div>
+                            </div>
+                            <div class="fighter-info mt-3">
+                                <div class="name">{{ fight.fighter1.lastName|upper }}</div>
+                                <div class="record">{{ fight.fighter1.wins }}W - {{ fight.fighter1.losses }}L</div>
+                            </div>
+                        </div>
+
+                        {# VS Divider #}
+                        <div class="vs-core">
+                            <div class="vs-line"></div>
+                            <div class="vs-box">VS</div>
+                            <div class="vs-line"></div>
+                        </div>
+
+                        {# Fighter 2 (Blue) #}
+                        <div class="fighter-module blue-side text-end">
+                            <div class="photo-hex ms-auto">
+                                <div class="photo-inner">
+                                    {% if fight.fighter2 and fight.fighter2.photoFilename %}
+                                        <img src="{{ asset('uploads/boxers/' ~ fight.fighter2.photoFilename) }}" alt="">
+                                    {% else %}
+                                        <i class="fa-solid fa-user"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="hex-border blue"></div>
+                            </div>
+                            <div class="fighter-info mt-3">
+                                <div class="name">{{ fight.fighter2.lastName|upper }}</div>
+                                <div class="record">{{ fight.fighter2.wins }}W - {{ fight.fighter2.losses }}L</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Result Section #}
+                    <div class="result-ticker mb-4">
+                        <div class="ticker-content">
+                            <i class="fa-solid fa-trophy text-warning me-2"></i>
+                            <span class="winner-text">
+                                {{ fight.winner ? fight.winner.fullName|upper : 'DRAW' }}
+                            </span>
+                            <span class="method-text">
+                                // {{ fight.methodOfVictory }} (R{{ fight.roundNumber }})
+                            </span>
+                        </div>
+                    </div>
+
+                    {# Action Dock #}
+                    <div class="action-dock">
+                        <a href="{{ path('app_stat_show', {fightId: fight.resultId}) }}" class="sf-btn-primary w-100">
+                            INITIALIZE ANALYTICS <i class="fa-solid fa-chart-simple ms-2"></i>
+                        </a>
+                        {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('app_stat_new', {fightId: fight.resultId}) }}" class="sf-btn-icon-admin" title="Append Data">
+                            <i class="fa-solid fa-database"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center py-5">
+                <div class="empty-state-console">
+                    <i class="fa-solid fa-microchip mb-4"></i>
+                    <h2>NO ARCHIVED BOUTS</h2>
+                    <p>Archived data is pending for this event cycle.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+.sf-broadcast-container { min-height: 100vh; }
+
+.header-console { border-left: 4px solid #dc2626; padding-left: 25px; }
+.path-indicator { font-size: 0.65rem; font-weight: 900; color: #52525b; letter-spacing: 2px; }
+.path-indicator .active { color: #dc2626; }
+.path-indicator .sep { margin: 0 8px; color: #27272a; }
+
+.sf-btn-outline-back {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #a1a1aa;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    text-decoration: none !important;
+    transition: all 0.3s ease;
+}
+
+.sf-btn-outline-back:hover {
+    background: #27272a;
+    color: #fff;
+    border-color: #fff;
+}
+
+/* Matchup Panel */
+.sf-matchup-panel {
+    background: #121214;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 32px;
+    padding: 35px;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sf-matchup-panel:hover {
+    transform: translateY(-10px);
+    border-color: rgba(220, 38, 38, 0.3);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+}
+
+.panel-header { margin-bottom: 40px; }
+
+.bout-id {
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: #52525b;
+    letter-spacing: 2px;
+}
+
+.division-tag {
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: #a1a1aa;
+    letter-spacing: 2px;
+    background: rgba(255,255,255,0.05);
+    padding: 4px 12px;
+    border-radius: 6px;
+}
+
+.matchup-visual {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+
+.fighter-module { flex: 1; }
+
+.photo-hex {
+    width: 100px;
+    height: 100px;
+    position: relative;
+}
+
+.photo-inner {
+    width: 100%;
+    height: 100%;
+    background: #18181b;
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+}
+
+.photo-inner img { width: 100%; height: 100%; object-fit: cover; }
+.photo-inner i { font-size: 2rem; color: #27272a; }
+
+.hex-border {
+    position: absolute;
+    inset: -3px;
+    border: 2px solid #dc2626;
+    border-radius: 22px;
+    opacity: 0.3;
+    z-index: 1;
+}
+
+.hex-border.blue { border-color: #3b82f6; }
+
+.fighter-info .name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.4rem;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.fighter-info .record {
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: #52525b;
+}
+
+.vs-core {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 30px;
+}
+
+.vs-line { width: 1px; height: 30px; background: rgba(255,255,255,0.1); }
+.vs-box {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #27272a;
+    padding: 10px 0;
+}
+
+/* Result Ticker */
+.result-ticker {
+    background: #09090b;
+    border-radius: 12px;
+    padding: 12px 20px;
+    border-left: 3px solid #fbbf24;
+}
+
+.winner-text { color: #fff; font-weight: 900; font-size: 0.8rem; letter-spacing: 1px; }
+.method-text { color: #52525b; font-size: 0.75rem; font-weight: 700; margin-left: 10px; }
+
+/* Action Dock */
+.action-dock { display: flex; gap: 10px; }
+
+.sf-btn-primary {
+    background: #dc2626;
+    color: #fff;
+    border: none;
+    padding: 15px;
+    border-radius: 16px;
+    font-weight: 900;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-decoration: none !important;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.sf-btn-primary:hover {
+    background: #ef4444;
+    box-shadow: 0 10px 30px rgba(220, 38, 38, 0.4);
+    transform: translateY(-2px);
+}
+
+.sf-btn-icon-admin {
+    width: 54px;
+    height: 54px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #a1a1aa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    text-decoration: none !important;
+}
+
+.sf-btn-icon-admin:hover {
+    background: #22c55e;
+    color: #fff;
+    border-color: #22c55e;
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+}
+
+.empty-state-console { opacity: 0.3; padding: 100px 0; }
+.empty-state-console i { font-size: 4rem; color: #52525b; }
+.empty-state-console h2 { font-family: 'Oswald', sans-serif; color: #fff; letter-spacing: 2px; }
+</style>
+{% endblock %}

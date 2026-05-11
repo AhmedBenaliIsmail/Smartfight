@@ -1,0 +1,79 @@
+<aside class="navbar navbar-vertical navbar-expand-lg admin-sidebar" style="background:#09090b;border-right:1px solid #27272a;width:260px;min-height:100vh;position:fixed;top:0;left:0;z-index:100;overflow-y:auto;">
+    <div class="container-fluid flex-column align-items-stretch p-0">
+        <div class="p-3 border-bottom" style="border-color:#27272a!important">
+            <a href="{{ path('admin_blog_index') }}" style="text-decoration:none;display:flex;align-items:center;gap:.75rem;">
+                <div style="width:36px;height:36px;background:#dc2626;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;">
+                    <i class="fa-solid fa-fist-raised"></i>
+                </div>
+                <span style="font-family:'Oswald',sans-serif;font-weight:700;font-size:1.2rem;color:#fff;letter-spacing:1px;">SMART<span style="color:#dc2626;">FIGHT</span></span>
+            </a>
+        </div>
+
+        <nav class="flex-fill py-2">
+            <div style="padding:.5rem 1rem;font-size:.7rem;font-weight:600;color:#52525b;text-transform:uppercase;letter-spacing:.1em;">Fan Experience</div>
+            <ul class="navbar-nav flex-column px-2 gap-1">
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'blog' %}active{% endif %}" href="{{ path('admin_blog_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-newspaper fa-fw"></i></span>
+                        <span class="nav-link-title">Blog / News</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'predictions' %}active{% endif %}" href="{{ path('app_predictions') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span>
+                        <span class="nav-link-title">Predictions</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'bookings' %}active{% endif %}" href="{{ path('admin_booking_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-ticket fa-fw"></i></span>
+                        <span class="nav-link-title">Bookings</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'reactions' %}active{% endif %}" href="{{ path('admin_reaction_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-fire fa-fw"></i></span>
+                        <span class="nav-link-title">Reactions</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'notifications' %}active{% endif %}" href="javascript:void(0)">
+                        <span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span>
+                        <span class="nav-link-title">Notifications</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div style="padding:1rem 1rem .4rem;font-size:.7rem;font-weight:600;color:#52525b;text-transform:uppercase;letter-spacing:.1em;">Operations</div>
+            <ul class="navbar-nav flex-column px-2 gap-1">
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'finance' %}active{% endif %}" href="{{ path('admin_finance_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-vault fa-fw"></i></span>
+                        <span class="nav-link-title">Finance</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'contracts' %}active{% endif %}" href="{{ path('admin_contract_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-file-invoice-dollar fa-fw"></i></span>
+                        <span class="nav-link-title">Contracts</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'match_proposals' %}active{% endif %}" href="{{ path('app_match_proposal_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-square-poll-vertical fa-fw"></i></span>
+                        <span class="nav-link-title">Match Proposals</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="p-3 border-top" style="border-color:#27272a!important">
+            {% if app.user %}
+                <div style="font-size:.8rem;color:#71717a;margin-bottom:.5rem;">{{ app.user.fullName }}</div>
+            {% endif %}
+            <a href="{{ path('app_logout') }}" class="nav-link text-muted">
+                <i class="fa-solid fa-right-from-bracket fa-fw me-2"></i> Logout
+            </a>
+        </div>
+    </div>
+</aside>

@@ -1,0 +1,310 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Manage Event Card — {{ event.eventName }}{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_results') }}" style="color:#a1a1aa;text-decoration:none;">Results</a></li>
+    <li class="breadcrumb-item active">Manage Card</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <span class="badge {{ event.organization != 'INDEPENDENT' ? 'bg-yellow-lt' : 'bg-primary-lt' }} mb-2">
+                <i class="fa-solid {{ event.organization != 'INDEPENDENT' ? 'fa-crown text-yellow' : 'fa-calendar' }} me-1"></i>
+                {{ event.organization != 'INDEPENDENT' ? event.organization ~ ' EVENT' : 'STANDARD EVENT' }}
+            </span>
+            <h1 class="h2 mb-1 fw-bold" style="color:#fafafa;">{{ event.eventName }}</h1>
+            <p class="mb-0" style="color:#a1a1aa;"><i class="fa-solid fa-location-dot me-1"></i>{{ event.venue }}, {{ event.city }} — {{ event.eventDate|date('l, F d, Y') }}</p>
+        </div>
+        <div class="d-flex gap-3 align-items-center">
+            <a href="{{ path('app_results') }}" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="row g-4" id="fightCardGrid">
+        {% for fight in fights %}
+            {% set f1 = fight.fighter1 %}
+            {% set f2 = fight.fighter2 %}
+            {% set winner = fight.winner %}
+            
+            <div class="col-xl-4 col-md-6 fight-item">
+                <div class="card h-100" style="background:#18181b; border: 1px solid {{ fight.status == 'COMPLETED' ? '#22c55e' : '#27272a' }}; position: relative; overflow: hidden;">
+                    
+                    {# Card Header #}
+                    <div class="card-header d-flex justify-content-between align-items-center" style="background: rgba(255,255,255,0.02); border-bottom: 1px solid #27272a;">
+                        <span class="fw-bold small" style="color:#71717a;">BOUT #{{ fight.fightNumber }}</span>
+                        {% if fight.status == 'COMPLETED' %}
+                            <span class="badge bg-success-lt">COMPLETED</span>
+                        {% elseif fight.status == 'CANCELLED' %}
+                            <span class="badge bg-danger-lt">CANCELLED</span>
+                        {% else %}
+                            <span class="badge bg-warning-lt">SCHEDULED</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-body p-4 text-center">
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            {# Fighter 1 #}
+                            <div style="flex: 1;">
+                                <div class="mb-2 d-flex justify-content-center">
+                                    <div style="width: 50px; height: 50px; border-radius: 10px; overflow: hidden; background: #27272a; border: 1px solid rgba(255,255,255,0.1);">
+                                        {% if f1 and f1.photoFilename %}
+                                            <img src="{{ asset('uploads/boxers/' ~ f1.photoFilename) }}" style="width:100%; height:100%; object-fit:cover;">
+                                        {% else %}
+                                            <i class="fa-solid fa-user mt-2 text-muted" style="font-size:1.5rem;"></i>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <h4 class="mb-1 fw-bold" style="font-size: 0.9rem; color: {{ winner and winner.fighterId == f1.fighterId ? '#22c55e' : '#fafafa' }};">
+                                    {{ f1 ? f1.fullName : 'Unknown' }}
+                                </h4>
+                                <small class="text-danger d-block fw-bold" style="font-size: 0.65rem;">RED CORNER</small>
+                            </div>
+
+                            {# VS #}
+                            <div class="px-2">
+                                <div style="width: 30px; height: 30px; border-radius: 50%; background: #27272a; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10px; color: #71717a; border: 1px solid #3f3f46;">VS</div>
+                            </div>
+
+                            {# Fighter 2 #}
+                            <div style="flex: 1;">
+                                <div class="mb-2 d-flex justify-content-center">
+                                    <div style="width: 50px; height: 50px; border-radius: 10px; overflow: hidden; background: #27272a; border: 1px solid rgba(255,255,255,0.1);">
+                                        {% if f2 and f2.photoFilename %}
+                                            <img src="{{ asset('uploads/boxers/' ~ f2.photoFilename) }}" style="width:100%; height:100%; object-fit:cover;">
+                                        {% else %}
+                                            <i class="fa-solid fa-user mt-2 text-muted" style="font-size:1.5rem;"></i>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <h4 class="mb-1 fw-bold" style="font-size: 0.9rem; color: {{ winner and winner.fighterId == f2.fighterId ? '#22c55e' : '#fafafa' }};">
+                                    {{ f2 ? f2.fullName : 'Unknown' }}
+                                </h4>
+                                <small class="text-primary d-block fw-bold" style="font-size: 0.65rem;">BLUE CORNER</small>
+                            </div>
+                        </div>
+
+                        {% if fight.status == 'COMPLETED' %}
+                            <div class="p-2 rounded mt-2" style="background: rgba(34, 197, 94, 0.05); border: 1px dashed rgba(34,197,94,0.3);">
+                                <div class="small text-white fw-bold">{{ fight.methodOfVictory }} — R{{ fight.roundNumber }}</div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {# Actions #}
+                    <div class="card-footer p-3 d-flex flex-column gap-2" style="background: transparent; border-top: 1px solid #27272a;">
+                        {% if is_granted('ROLE_ADMIN') %}
+                            {% if fight.status == 'SCHEDULED' %}
+                                <a href="{{ path('app_result_enter', {id: fight.resultId}) }}" class="btn btn-success w-100 fw-bold">
+                                    <i class="fa-solid fa-gavel me-2"></i>ENTER RESULT
+                                </a>
+                                <button type="button" class="btn btn-outline-primary w-100 fw-bold btn-simulate" data-f1="{{ f1.fighterId }}" data-f2="{{ f2.fighterId }}">
+                                    <i class="fa-solid fa-robot me-2"></i>SIMULATE BOUT
+                                </button>
+                            {% elseif fight.status == 'COMPLETED' %}
+                                <a href="{{ path('app_stat_new', {fightId: fight.resultId}) }}" class="btn btn-primary w-100 fw-bold">
+                                    <i class="fa-solid fa-chart-line me-2"></i>STATISTICS CONTROL
+                                </a>
+                                <button type="button" class="btn btn-outline-warning w-100 fw-bold btn-compare" data-fight-id="{{ fight.resultId }}">
+                                    <i class="fa-solid fa-code-compare me-2"></i>AI VS REALITY
+                                </button>
+                            {% endif %}
+                        {% endif %}
+                        
+                        <div class="d-flex gap-2">
+                            <a href="{{ path('app_performance_show', {id: f1.fighterId}) }}" class="btn btn-sm btn-outline-secondary flex-fill"><i class="fa-solid fa-user me-1"></i>RED</a>
+                            <a href="{{ path('app_performance_show', {id: f2.fighterId}) }}" class="btn btn-sm btn-outline-secondary flex-fill"><i class="fa-solid fa-user me-1"></i>BLUE</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Simulation Modal -->
+<div class="modal fade" id="simulationModal" tabindex="-1" aria-hidden="true" data-bs-theme="dark">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background:#09090b; border:1px solid #3b82f6;">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title text-white"><i class="fa-solid fa-robot me-2" style="color:#3b82f6;"></i>AI Fight Simulator</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center d-none" id="simLoading">
+                <div class="spinner-border text-primary my-4" role="status"></div>
+                <p class="text-muted">Simulating bout...</p>
+            </div>
+            <div class="modal-body p-4 d-none" id="simResults">
+                <div class="row text-center mb-3">
+                    <div class="col-5">
+                        <h5 class="text-danger mb-1" id="simF1Prob">0%</h5>
+                        <small class="text-muted">Win Probability</small>
+                    </div>
+                    <div class="col-2 d-flex align-items-center justify-content-center">
+                        <span class="badge bg-secondary">VS</span>
+                    </div>
+                    <div class="col-5">
+                        <h5 class="text-primary mb-1" id="simF2Prob">0%</h5>
+                        <small class="text-muted">Win Probability</small>
+                    </div>
+                </div>
+                <div class="progress mb-4" style="height: 10px; background-color: #1e3a8a;">
+                    <div id="simProgressBar" class="progress-bar bg-danger" role="progressbar" style="width: 50%;"></div>
+                </div>
+                <div class="p-3 mb-3 rounded" style="background:rgba(255,255,255,0.05);">
+                    <h6 class="text-warning">Predicted Outcome</h6>
+                    <p class="mb-0 text-light fw-bold" id="simOutcome">-</p>
+                    <p class="mb-0 text-muted small mt-1" id="simKeyFactor">-</p>
+                </div>
+                <div class="p-3 rounded" style="background:rgba(255,255,255,0.05); border-left: 4px solid #8b5cf6;">
+                    <h6 style="color:#a855f7;">Simulation Narrative</h6>
+                    <p class="mb-0 text-light small" id="simNarrative">-</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Comparison Modal -->
+<div class="modal fade" id="comparisonModal" tabindex="-1" aria-hidden="true" data-bs-theme="dark">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background:#09090b; border:1px solid #f59e0b;">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title text-white"><i class="fa-solid fa-code-compare me-2" style="color:#f59e0b;"></i>AI Analysis: Prediction vs Reality</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center d-none" id="compLoading">
+                <div class="spinner-border text-warning my-4" role="status"></div>
+                <p class="text-muted">Analyzing pre-fight algorithms vs actual outcome...</p>
+            </div>
+            <div class="modal-body p-4 d-none" id="compResults">
+                <div class="p-3 mb-3 rounded" style="background:rgba(255,255,255,0.05); border-left: 4px solid #3b82f6;">
+                    <h6 style="color:#60a5fa;">The Algorithmic Prediction</h6>
+                    <p class="mb-0 text-light small" id="compPrediction">-</p>
+                </div>
+                <div class="p-3 mb-3 rounded" style="background:rgba(255,255,255,0.05); border-left: 4px solid #f59e0b;">
+                    <h6 style="color:#fbbf24;">The Reality & Contrast</h6>
+                    <p class="mb-0 text-light small" id="compComparison">-</p>
+                </div>
+                <div class="text-center">
+                    <span class="badge px-3 py-2" id="compAccuracy" style="font-size: 0.9rem; letter-spacing: 1px;">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const bootstrapObj = window.bootstrap || (window.tabler ? window.tabler : null);
+    if (!bootstrapObj || !bootstrapObj.Modal) {
+        console.error('Bootstrap Modal constructor not found.');
+    }
+
+    const simModalEl = document.getElementById('simulationModal');
+    if (simModalEl && bootstrapObj) {
+        const simModal = new bootstrapObj.Modal(simModalEl);
+        document.querySelectorAll('.btn-simulate').forEach(btn => {
+            btn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const f1Id = this.getAttribute('data-f1');
+                const f2Id = this.getAttribute('data-f2');
+                
+                document.getElementById('simLoading').classList.remove('d-none');
+                document.getElementById('simResults').classList.add('d-none');
+                simModal.show();
+                
+                try {
+                    const response = await fetch('{{ path("api_ai_simulate") }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ fighter1_id: parseInt(f1Id), fighter2_id: parseInt(f2Id) })
+                    });
+
+                    const data = await response.json();
+                    document.getElementById('simLoading').classList.add('d-none');
+                    
+                    if (data.success && data.data) {
+                        const sim = data.data;
+                        document.getElementById('simResults').classList.remove('d-none');
+                        document.getElementById('simF1Prob').innerText = sim.win_probability_f1 + '%';
+                        document.getElementById('simF2Prob').innerText = sim.win_probability_f2 + '%';
+                        document.getElementById('simProgressBar').style.width = sim.win_probability_f1 + '%';
+                        document.getElementById('simOutcome').innerText = sim.predicted_outcome;
+                        document.getElementById('simKeyFactor').innerText = sim.key_factor;
+                        document.getElementById('simNarrative').innerText = sim.narrative;
+                    } else {
+                        alert('Error simulating fight: ' + (data.error || 'Unknown error'));
+                        simModal.hide();
+                    }
+                } catch (error) {
+                    console.error('Simulation error:', error);
+                    alert('Failed to run simulation.');
+                    simModal.hide();
+                }
+            });
+        });
+    }
+
+    const compModalEl = document.getElementById('comparisonModal');
+    if (compModalEl && bootstrapObj) {
+        const compModal = new bootstrapObj.Modal(compModalEl);
+        document.querySelectorAll('.btn-compare').forEach(btn => {
+            btn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const fightId = this.getAttribute('data-fight-id');
+                
+                document.getElementById('compLoading').classList.remove('d-none');
+                document.getElementById('compResults').classList.add('d-none');
+                compModal.show();
+                
+                try {
+                    const response = await fetch('{{ path("api_ai_compare_result") }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ fight_id: parseInt(fightId) })
+                    });
+
+                    const data = await response.json();
+                    document.getElementById('compLoading').classList.add('d-none');
+                    
+                    if (data.success && data.data) {
+                        const comp = data.data;
+                        document.getElementById('compResults').classList.remove('d-none');
+                        document.getElementById('compPrediction').innerText = comp.ai_prediction;
+                        document.getElementById('compComparison').innerText = comp.comparison;
+                        
+                        const accBadge = document.getElementById('compAccuracy');
+                        accBadge.innerText = comp.accuracy_rating;
+                        
+                        // Style badge based on rating
+                        const rating = comp.accuracy_rating.toUpperCase();
+                        if (rating.includes('SPOT ON') || rating.includes('CORRECT')) {
+                            accBadge.className = 'badge bg-success px-3 py-2';
+                        } else if (rating.includes('OFF')) {
+                            accBadge.className = 'badge bg-danger px-3 py-2';
+                        } else {
+                            accBadge.className = 'badge bg-warning text-dark px-3 py-2';
+                        }
+                    } else {
+                        alert('Error analyzing fight: ' + (data.error || 'Unknown error'));
+                        compModal.hide();
+                    }
+                } catch (error) {
+                    console.error('Comparison error:', error);
+                    alert('Failed to run comparison analysis.');
+                    compModal.hide();
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

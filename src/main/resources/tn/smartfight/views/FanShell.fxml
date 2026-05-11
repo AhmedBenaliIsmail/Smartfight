@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.smartfight.controller.FanShellController"
+            styleClass="root">
+
+    <!-- ══════════ TOP NAVBAR ══════════ -->
+    <top>
+        <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="10">
+            <padding><Insets top="0" bottom="0" left="20" right="20"/></padding>
+            <Label text="SMARTFIGHT" styleClass="logo-label"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="welcomeLabel" styleClass="caption"/>
+            <Label fx:id="pointsLabel"
+                   style="-fx-background-color:rgba(220,38,38,0.15);-fx-text-fill:#dc2626;-fx-font-weight:bold;-fx-font-size:11px;-fx-padding:3 8;-fx-background-radius:12;"/>
+            <StackPane>
+                <Button fx:id="bellBtn" text="🔔" onAction="#onBellClick" styleClass="btn-icon"/>
+                <Label fx:id="badgeLabel" text="0"
+                       style="-fx-background-color:#dc2626;-fx-text-fill:white;-fx-font-size:9;-fx-background-radius:8;-fx-padding:1 4;"
+                       visible="false" StackPane.alignment="TOP_RIGHT" translateX="6" translateY="-4"/>
+            </StackPane>
+            <Button text="⏻  Logout" onAction="#onLogout" styleClass="nav-btn"
+                    style="-fx-text-fill:#dc2626;"/>
+        </HBox>
+    </top>
+
+    <!-- ══════════ LEFT SIDEBAR ══════════ -->
+    <left>
+        <VBox fx:id="sidebarBox" styleClass="sidebar" spacing="0">
+            <HBox alignment="CENTER" style="-fx-padding:8 0 4 0;">
+                <Button fx:id="sidebarToggle" text="«" styleClass="sidebar-toggle"
+                        onAction="#onToggleSidebar"/>
+            </HBox>
+
+            <!-- Group 1: Overview -->
+            <Button fx:id="btnDashboard"   text="⊞  Dashboard"      onAction="#onShowDashboard"   styleClass="nav-btn" maxWidth="Infinity"/>
+            <Button fx:id="btnLeaderboard" text="🏆  Leaderboard"    onAction="#onShowLeaderboard" styleClass="nav-btn" maxWidth="Infinity"/>
+
+            <Pane styleClass="sidebar-divider" maxWidth="Infinity">
+                <VBox.margin><Insets top="8" bottom="8" left="16" right="16"/></VBox.margin>
+            </Pane>
+
+            <!-- Group 2: Combat data -->
+            <Button fx:id="btnBoxers"   text="🥊  Boxers"           onAction="#onShowBoxers"  styleClass="nav-btn" maxWidth="Infinity"/>
+            <Button fx:id="btnEvents"   text="📅  Events"            onAction="#onShowEvents"  styleClass="nav-btn" maxWidth="Infinity"/>
+            <Button fx:id="btnResults"  text="📋  Bout Results"      onAction="#onShowResults" styleClass="nav-btn" maxWidth="Infinity"/>
+
+            <Pane styleClass="sidebar-divider" maxWidth="Infinity">
+                <VBox.margin><Insets top="8" bottom="8" left="16" right="16"/></VBox.margin>
+            </Pane>
+
+            <!-- Group 3: Analytics -->
+            <Button fx:id="btnStats"    text="📊  Statistics"        onAction="#onShowStats"   styleClass="nav-btn" maxWidth="Infinity"/>
+
+            <Pane styleClass="sidebar-divider" maxWidth="Infinity">
+                <VBox.margin><Insets top="8" bottom="8" left="16" right="16"/></VBox.margin>
+            </Pane>
+
+            <!-- Group 4: Community -->
+            <Button fx:id="btnBlog"      text="📰  Blog / News"      onAction="#onShowBlog"      styleClass="nav-btn" maxWidth="Infinity"/>
+            <Button fx:id="btnTickets"   text="🎫  Book Tickets"     onAction="#onShowEvents"    styleClass="nav-sub-btn" maxWidth="Infinity"/>
+            <Button fx:id="btnBookings"  text="🎟  My Bookings"      onAction="#onShowBookings"  styleClass="nav-btn" maxWidth="Infinity"/>
+            <Button fx:id="btnReactions" text="💬  Fan Reactions"    onAction="#onShowReactions" styleClass="nav-btn" maxWidth="Infinity"/>
+            <Button fx:id="btnVoting"    text="🗳  Matchmaking Vote" onAction="#onShowVoting"    styleClass="nav-btn" maxWidth="Infinity"/>
+
+            <Pane styleClass="sidebar-divider" maxWidth="Infinity">
+                <VBox.margin><Insets top="8" bottom="8" left="16" right="16"/></VBox.margin>
+            </Pane>
+
+            <!-- Group 5: Predictions -->
+            <Button fx:id="btnPredictions" text="🔮  Predictions"   onAction="#onShowPredictions" styleClass="nav-btn" maxWidth="Infinity"/>
+
+            <Pane styleClass="sidebar-divider" maxWidth="Infinity">
+                <VBox.margin><Insets top="8" bottom="8" left="16" right="16"/></VBox.margin>
+            </Pane>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <!-- Bottom: Account -->
+            <Button fx:id="btnProfile" text="👤  My Profile"         onAction="#onShowProfile"  styleClass="nav-btn" maxWidth="Infinity"/>
+            <Button text="⏻  Logout"                                  onAction="#onLogout"
+                    styleClass="nav-btn" maxWidth="Infinity"
+                    style="-fx-text-fill:#dc2626;"/>
+        </VBox>
+    </left>
+
+    <!-- ══════════ CONTENT HOST ══════════ -->
+    <center>
+        <StackPane fx:id="contentHost" style="-fx-background-color:#0d0d0d;"/>
+    </center>
+</BorderPane>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.lang.String?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.smartfight.controller.AdminUsersController"
+      style="-fx-background-color:#0d0d0d;" spacing="0">
+
+    <!-- Header -->
+    <HBox styleClass="page-header" alignment="CENTER_LEFT" spacing="12">
+        <padding><Insets top="24" bottom="16" left="24" right="24"/></padding>
+        <VBox spacing="4">
+            <Label text="USERS" styleClass="page-title"/>
+            <Label text="Manage admin and fan accounts" styleClass="page-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="+ REGISTER ADMIN" styleClass="btn-primary" onAction="#onRegisterAdmin"/>
+    </HBox>
+
+    <!-- Filter Bar -->
+    <HBox styleClass="filter-bar" alignment="CENTER_LEFT" spacing="10">
+        <TextField fx:id="searchField" styleClass="search-field"
+                   promptText="Search accounts..." prefWidth="280"
+                   onAction="#onSearch"/>
+        <ComboBox fx:id="roleFilter" promptText="All Roles" prefWidth="140">
+            <items>
+                <javafx.collections.FXCollections fx:factory="observableArrayList">
+                    <String fx:value="All Roles"/>
+                    <String fx:value="ROLE_ADMIN"/>
+                    <String fx:value="ROLE_USER"/>
+                </javafx.collections.FXCollections>
+            </items>
+        </ComboBox>
+        <Button text="APPLY" styleClass="btn-primary" onAction="#onSearch"/>
+    </HBox>
+
+    <!-- Users Table -->
+    <TableView fx:id="usersTable" VBox.vgrow="ALWAYS"
+               style="-fx-background-color:#111111;" styleClass="table-view">
+        <padding><Insets top="0" bottom="0" left="16" right="16"/></padding>
+        <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+        <columns>
+            <TableColumn fx:id="colId"       text="ID"             prefWidth="60"/>
+            <TableColumn fx:id="colUsername" text="USERNAME"       prefWidth="160"/>
+            <TableColumn fx:id="colEmail"    text="EMAIL"          prefWidth="220"/>
+            <TableColumn fx:id="colPoints"   text="PREDICTION PTS" prefWidth="120"/>
+            <TableColumn fx:id="colRole"     text="ROLE"           prefWidth="120"/>
+            <TableColumn fx:id="colCreated"  text="CREATED AT"     prefWidth="140"/>
+            <TableColumn fx:id="colActions"  text="ACTIONS"        prefWidth="120"/>
+        </columns>
+        <placeholder><Label text="No users found" styleClass="text-muted"/></placeholder>
+    </TableView>
+
+    <Label fx:id="statusLabel" styleClass="caption">
+        <padding><Insets top="6" bottom="6" left="24" right="24"/></padding>
+    </Label>
+</VBox>

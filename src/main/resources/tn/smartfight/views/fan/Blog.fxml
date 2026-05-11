@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="tn.smartfight.controller.BlogController"
+           style="-fx-background-color:#0d0d0d;">
+
+    <!-- ══ Main layout ══ -->
+    <HBox spacing="0">
+
+        <!-- LEFT: article grid -->
+        <VBox HBox.hgrow="ALWAYS" spacing="0" style="-fx-background-color:#0d0d0d;">
+
+            <!-- Header + search row -->
+            <VBox style="-fx-background-color:#111113;-fx-border-color:#27272a;-fx-border-width:0 0 1 0;-fx-padding:16 24;">
+                <Label text="BLOG &amp; NEWS" styleClass="h2"/>
+                <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding:12 0 0 0;">
+                    <TextField fx:id="searchField" promptText="Search articles…"
+                               prefWidth="260"
+                               style="-fx-background-color:#18181b;-fx-border-color:#27272a;-fx-text-fill:#fafafa;-fx-prompt-text-fill:#52525b;"/>
+                    <Button text="Search" onAction="#onSearch" styleClass="btn-primary"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="statusLabel" styleClass="caption"/>
+                </HBox>
+            </VBox>
+
+            <!-- Article tiles -->
+            <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true"
+                        style="-fx-background-color:#0d0d0d;-fx-background:#0d0d0d;-fx-border-width:0;">
+                <VBox fx:id="articlesContainer" spacing="0" style="-fx-padding:0;"/>
+            </ScrollPane>
+        </VBox>
+
+        <!-- RIGHT: category sidebar -->
+        <VBox minWidth="220" maxWidth="220"
+              style="-fx-background-color:#111113;-fx-border-color:#27272a;-fx-border-width:0 0 0 1;">
+            <Label text="CATEGORIES"
+                   style="-fx-text-fill:#a1a1aa;-fx-font-size:11px;-fx-font-weight:bold;-fx-padding:16 16 8 16;"/>
+            <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true"
+                        style="-fx-background-color:#111113;-fx-background:#111113;-fx-border-width:0;">
+                <VBox fx:id="categoryList" spacing="4" style="-fx-padding:8;"/>
+            </ScrollPane>
+        </VBox>
+    </HBox>
+
+    <!-- ══ Article detail overlay (hidden by default) ══ -->
+    <StackPane fx:id="articleDetail" visible="false" managed="false"
+               style="-fx-background-color:rgba(0,0,0,0.88);">
+        <VBox maxWidth="700" spacing="0"
+              style="-fx-background-color:#111113;-fx-border-color:#27272a;-fx-border-radius:12;-fx-background-radius:12;">
+
+            <!-- detail header -->
+            <HBox alignment="CENTER_LEFT" spacing="12"
+                  style="-fx-padding:16 20;-fx-border-color:#27272a;-fx-border-width:0 0 1 0;">
+                <Label fx:id="detailCategory"
+                       style="-fx-background-color:rgba(220,38,38,0.15);-fx-text-fill:#dc2626;-fx-font-size:11px;-fx-font-weight:bold;-fx-padding:3 8;-fx-background-radius:12;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="✕ Close" onAction="#onCloseDetail" styleClass="btn-icon"
+                        style="-fx-text-fill:#a1a1aa;-fx-font-size:13px;"/>
+            </HBox>
+
+            <!-- cover image -->
+            <StackPane fx:id="detailImagePane" minHeight="200" maxHeight="200">
+                <Label fx:id="detailImagePlaceholder" text="📰"
+                       style="-fx-font-size:48px;-fx-text-fill:#374151;"/>
+            </StackPane>
+
+            <!-- detail body -->
+            <ScrollPane fitToWidth="true" prefHeight="380"
+                        style="-fx-background-color:#111113;-fx-background:#111113;-fx-border-width:0;">
+                <VBox fx:id="detailContent" spacing="12" style="-fx-padding:20;">
+                    <Label fx:id="detailTitle"
+                           style="-fx-text-fill:#fafafa;-fx-font-size:20px;-fx-font-weight:bold;"
+                           wrapText="true"/>
+                    <HBox spacing="12" alignment="CENTER_LEFT">
+                        <Label fx:id="detailMeta" style="-fx-text-fill:#71717a;-fx-font-size:11px;"/>
+                        <Label fx:id="detailViews" style="-fx-text-fill:#52525b;-fx-font-size:11px;"/>
+                    </HBox>
+                    <Label fx:id="detailSummary"
+                           style="-fx-text-fill:#d4d4d8;-fx-font-size:13px;-fx-font-style:italic;"
+                           wrapText="true"/>
+                    <Label fx:id="detailBody"
+                           style="-fx-text-fill:#a1a1aa;-fx-font-size:13px;"
+                           wrapText="true"/>
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </StackPane>
+</StackPane>

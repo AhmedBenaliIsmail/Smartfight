@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% set show_sidebar = false %}
+
+{% block title %}Register - SmartFight Admin{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        body { background: #09090b; display: flex; align-items: center; min-height: 100vh; overflow: hidden; }
+        .login-card { background: #18181b; border: 1px solid #27272a; border-radius: 12px; max-width: 420px; margin: auto; padding: 2.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); position: relative; z-index: 10; }
+        .bg-element { position: absolute; border-radius: 50%; filter: blur(100px); z-index: 0; opacity: 0.15; }
+        .bg-blue { background: #3b82f6; width: 600px; height: 600px; top: -200px; right: -200px; }
+        .bg-purple { background: #8b5cf6; width: 500px; height: 500px; bottom: -100px; left: -100px; }
+        .btn-google-pro {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: #ffffff;
+            color: #1f2937;
+            font-weight: 600;
+            padding: 0.75rem;
+            border-radius: 8px;
+            text-decoration: none;
+            width: 100%;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .btn-google-pro:hover {
+            background: #f9fafb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            color: #111827;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-element bg-blue"></div>
+<div class="bg-element bg-purple"></div>
+
+<div class="container-tight py-4" style="position: relative; z-index: 1;">
+    <div class="login-card w-100 sf-card">
+        <div class="text-center mb-4">
+            <h2 class="h2 text-center" style="color:#fafafa;">Create Account</h2>
+        </div>
+        
+        {% for label, msgs in app.flashes %}
+            {% for msg in msgs %}
+                <div class="alert alert-{{ label == 'error' ? 'danger' : label }}">{{ msg }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        {{ form_start(registrationForm, {'attr': {'autocomplete': 'off'}}) }}
+            <div class="mb-3">
+                {{ form_row(registrationForm.username) }}
+            </div>
+            <div class="mb-3">
+                {{ form_row(registrationForm.email) }}
+            </div>
+            <div class="mb-4">
+                {{ form_row(registrationForm.password.first) }}
+            </div>
+            <div class="mb-4">
+                {{ form_row(registrationForm.password.second) }}
+            </div>
+            
+            <div class="form-footer">
+                <button type="submit" class="btn btn-premium btn-premium-danger w-100 py-2 fs-5">Sign Up</button>
+            </div>
+
+            <div class="hr-text" style="color: #52525b; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Or continue with</div>
+            <div class="row">
+                <div class="col">
+                    <a href="{{ path('connect_google') }}" class="btn-google-pro">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48">
+                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/>
+                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                            <path fill="none" d="M0 0h48v48H0z"/>
+                        </svg>
+                        <span>Sign up with Google</span>
+                    </a>
+                </div>
+            </div>
+        {{ form_end(registrationForm) }}
+        
+        <div class="text-center text-muted mt-4">
+            Already have account? <a href="{{ path('app_login') }}" class="text-danger text-decoration-none">Sign in</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

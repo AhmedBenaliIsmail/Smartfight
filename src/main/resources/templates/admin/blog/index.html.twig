@@ -1,0 +1,187 @@
+{% extends 'admin/base_admin.html.twig' %}
+{% set breadcrumb_title = 'Article Inventory' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .executive-table th {
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            color: #71717a;
+            padding: 1.25rem;
+            border-bottom: 2px solid #27272a;
+        }
+        .executive-table td {
+            padding: 1.25rem;
+            vertical-align: middle;
+            color: #e4e4e7;
+            border-bottom: 1px solid #1f1f23;
+        }
+        .executive-table tr:hover td {
+            background: rgba(220, 38, 38, 0.02);
+            color: #fff;
+        }
+        .status-pill {
+            padding: 0.4rem 0.8rem;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .pill-published { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+        .pill-draft { background: rgba(113, 113, 122, 0.1); color: #a1a1aa; border: 1px solid rgba(113, 113, 122, 0.2); }
+        .pill-archived { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+        
+        .empty-studio {
+            padding: 6rem 2rem;
+            text-align: center;
+            background: radial-gradient(circle at center, #18181b, #09090b);
+            border-radius: 16px;
+            border: 1px solid #27272a;
+        }
+        .studio-search-bar {
+            background: #09090b;
+            border: 1px solid #27272a;
+            color: #fff;
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+        }
+        .studio-search-bar:focus {
+            border-color: #dc2626;
+            background: #111114;
+            box-shadow: none;
+            color: #fff;
+        }
+    </style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-5">
+        <div>
+            <h1 class="h2 fw-bold text-white mb-1">ARTICLE INVENTORY</h1>
+            <p class="text-muted mb-0">Manage and curate your platform's editorial content</p>
+        </div>
+        <a href="{{ path('admin_blog_new') }}" class="btn btn-danger btn-lg px-4 fw-bold" style="background:#dc2626;">
+            <i class="fa-solid fa-plus me-2"></i>CREATE NEW ARTICLE
+        </a>
+    </div>
+
+    <!-- Filters Hub -->
+    <div class="card mb-5" style="background:#18181b;border:1px solid #27272a;border-radius:16px;">
+        <div class="card-body p-4">
+            <form method="GET" class="row g-3">
+                <div class="col-lg-4">
+                    <input type="text" name="search" class="form-control studio-search-bar" 
+                           placeholder="Search headlines or authors..." value="{{ filters.search|default('') }}"
+                           data-live-search=".executive-table tbody" data-live-search-item="tr">
+                </div>
+                <div class="col-lg-3">
+                    <select name="category" class="form-select studio-search-bar">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.id }}" {% if filters.category|default('') == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-3">
+                    <select name="status" class="form-select studio-search-bar">
+                        <option value="">All Statuses</option>
+                        <option value="DRAFT" {% if filters.status|default('') == 'DRAFT' %}selected{% endif %}>Draft</option>
+                        <option value="PUBLISHED" {% if filters.status|default('') == 'PUBLISHED' %}selected{% endif %}>Published</option>
+                        <option value="ARCHIVED" {% if filters.status|default('') == 'ARCHIVED' %}selected{% endif %}>Archived</option>
+                    </select>
+                </div>
+                <div class="col-lg-2">
+                    <button type="submit" class="btn btn-outline-danger w-100 py-2 fw-bold">APPLY FILTERS</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Table Hub -->
+    {% if pagination|length > 0 %}
+    <div class="card" style="background:#18181b;border:1px solid #27272a;border-radius:16px;overflow:hidden;">
+        <div class="table-responsive">
+            <table class="table mb-0 executive-table">
+                <thead>
+                    <tr>
+                        <th>Headline & Context</th>
+                        <th>Category</th>
+                        <th>Engagement</th>
+                        <th>Status</th>
+                        <th>Release Date</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for article in pagination %}
+                    <tr>
+                        <td>
+                            <div class="fw-bold text-white mb-1">{{ article.title }}</div>
+                            <div class="small text-muted">Author: {{ article.author.fullName }}</div>
+                        </td>
+                        <td>
+                            <span class="badge bg-dark border border-secondary text-muted px-2 py-1">{{ article.category.name }}</span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-eye text-muted small"></i>
+                                <span class="fw-bold">{{ article.viewCount }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            {% if article.status == 'PUBLISHED' %}
+                                <span class="status-pill pill-published">PUBLISHED</span>
+                            {% elseif article.status == 'DRAFT' %}
+                                <span class="status-pill pill-draft">DRAFT</span>
+                            {% else %}
+                                <span class="status-pill pill-archived">ARCHIVED</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted small">
+                            {{ article.createdAt|date('M d, Y') }}
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex gap-2 justify-content-end">
+                                <a href="{{ path('admin_blog_edit', {id: article.id}) }}" class="btn btn-sm btn-outline-blue">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                                <form method="POST" action="{{ path('admin_blog_delete', {id: article.id}) }}" 
+                                      onsubmit="return confirm('Archive this article permanently?')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if pagination.pageCount > 1 %}
+        <div class="card-footer d-flex justify-content-center p-4" style="border-top:1px solid #27272a;background:#111114;">
+            {{ knp_pagination_render(pagination) }}
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <!-- Pro Empty State -->
+    <div class="empty-studio">
+        <div class="mb-4">
+            <i class="fa-solid fa-newspaper fs-1 text-danger opacity-50"></i>
+        </div>
+        <h2 class="text-white fw-bold mb-3">YOUR STUDIO IS EMPTY</h2>
+        <p class="text-muted mb-5 mx-auto" style="max-width: 400px;">Start building your platform's voice. Create your first high-fidelity article with 720p media support now.</p>
+        <a href="{{ path('admin_blog_new') }}" class="btn btn-danger btn-lg px-5 fw-bold">
+            <i class="fa-solid fa-plus me-2"></i>CREATE FIRST ARTICLE
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

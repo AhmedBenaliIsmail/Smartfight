@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.smartfight.controller.InjuryPredictionsController"
+      spacing="16" styleClass="content-pane">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <Label text="AI Injury Predictions" styleClass="h2"/>
+
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="Select Fighter:"/>
+        <ComboBox fx:id="fighterCombo" prefWidth="260"/>
+        <Button text="Analyze" onAction="#onAnalyze" styleClass="btn-primary"/>
+        <Button text="Analyze All" onAction="#onAnalyzeAll" styleClass="btn-outline"/>
+    </HBox>
+
+    <ProgressBar fx:id="progressBar" prefWidth="400" progress="0" visible="false"/>
+    <Label fx:id="progressLabel" styleClass="caption" text=""/>
+
+    <VBox fx:id="resultPane" visible="false" managed="false" spacing="10"
+          styleClass="card" style="-fx-padding:16;">
+        <Label text="Injury Risk Analysis" styleClass="h3"/>
+        <GridPane hgap="16" vgap="8">
+            <Label text="Fighter:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="caption"/>
+            <Label fx:id="lblFighterName" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <Label text="Risk Level:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="caption"/>
+            <Label fx:id="lblRiskLevel" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            <Label text="Total Risk:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="caption"/>
+            <Label fx:id="lblTotalRisk" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            <Label text="Injury Zone:" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="caption"/>
+            <Label fx:id="lblZone" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+            <Label text="Days to Alert:" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="caption"/>
+            <Label fx:id="lblDaysToAlert" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+            <Label text="Mitigation:" GridPane.rowIndex="5" GridPane.columnIndex="0" styleClass="caption"/>
+            <Label fx:id="lblMitigation" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+            <Label text="AI Accuracy:" GridPane.rowIndex="6" GridPane.columnIndex="0" styleClass="caption"/>
+            <Label fx:id="lblAccuracy" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+            <Label text="ROI (USD):" GridPane.rowIndex="7" GridPane.columnIndex="0" styleClass="caption"/>
+            <Label fx:id="lblRoi" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+        </GridPane>
+        <Button text="Export PDF Report" onAction="#onExportPdf" styleClass="btn-outline"/>
+    </VBox>
+
+    <TableView fx:id="allResultsTable" VBox.vgrow="ALWAYS" visible="false" managed="false">
+        <columns>
+            <TableColumn fx:id="colFighterAll"  text="Fighter"     prefWidth="200"/>
+            <TableColumn fx:id="colRiskAll"     text="Risk Level"  prefWidth="100"/>
+            <TableColumn fx:id="colRiskPctAll"  text="Risk %"      prefWidth="80"/>
+            <TableColumn fx:id="colZoneAll"     text="Zone"        prefWidth="130"/>
+            <TableColumn fx:id="colDaysAll"     text="Days Alert"  prefWidth="90"/>
+        </columns>
+    </TableView>
+
+    <Label fx:id="statusLabel" styleClass="caption" text="Select a fighter and click Analyze."/>
+</VBox>

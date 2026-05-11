@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Helvetica', 'Arial', sans-serif; color: #333; line-height: 1.6; margin: 0; padding: 40px; }
+        .header { text-align: center; border-bottom: 2px solid #dc2626; padding-bottom: 20px; margin-bottom: 30px; }
+        .header h1 { margin: 0; text-transform: uppercase; letter-spacing: 2px; color: #000; font-size: 28px; }
+        .header p { margin: 5px 0 0; color: #71717a; font-weight: bold; }
+
+        .contract-title { text-align: center; background: #f4f4f5; padding: 10px; margin-bottom: 30px; border: 1px solid #e4e4e7; }
+        .contract-title h2 { margin: 0; font-size: 18px; text-transform: uppercase; }
+
+        .section { margin-bottom: 25px; }
+        .section-title { font-weight: bold; text-transform: uppercase; font-size: 14px; border-bottom: 1px solid #e4e4e7; padding-bottom: 5px; margin-bottom: 10px; color: #dc2626; }
+
+        .grid { display: table; width: 100%; border-collapse: collapse; }
+        .row { display: table-row; }
+        .col { display: table-cell; padding: 8px 0; vertical-align: top; }
+        .label { font-weight: bold; width: 150px; color: #71717a; font-size: 13px; }
+        .value { color: #000; font-weight: 500; font-size: 14px; }
+
+        .financial-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .financial-table th { background: #18181b; color: #fff; text-align: left; padding: 10px; font-size: 12px; text-transform: uppercase; }
+        .financial-table td { padding: 12px 10px; border-bottom: 1px solid #e4e4e7; font-size: 14px; }
+        .financial-table .amount { text-align: right; font-weight: bold; }
+
+        .total-row { background: #fef2f2; }
+        .total-row td { border-top: 2px solid #dc2626; font-size: 16px; color: #dc2626; }
+
+        .legal-text { font-size: 11px; color: #52525b; text-align: justify; margin-top: 40px; }
+
+        .signatures { margin-top: 60px; display: table; width: 100%; }
+        .sig-block { display: table-cell; width: 50%; }
+        .sig-line { border-top: 1px solid #000; width: 80%; margin-top: 40px; }
+        .sig-label { font-size: 12px; font-weight: bold; margin-top: 5px; }
+        .sig-sub { font-size: 10px; color: #71717a; }
+
+        .watermark { position: fixed; top: 30%; left: 10%; font-size: 100px; color: rgba(220, 38, 38, 0.05); transform: rotate(-45deg); z-index: -1; }
+    </style>
+</head>
+<body>
+    <div class="watermark">SMARTFIGHT</div>
+
+    <div class="header">
+        <h1>SMARTFIGHT ORGANIZATION</h1>
+        <p>OFFICIAL BOUT AGREEMENT &amp; PURSE CONTRACT</p>
+    </div>
+
+    <div class="contract-title">
+        <h2>FIGHTER PERFORMANCE AGREEMENT</h2>
+    </div>
+
+    <div class="section">
+        <div class="section-title">I. PARTIES &amp; EVENT DETAILS</div>
+        <div class="grid">
+            <div class="row">
+                <div class="col label">FIGHTER NAME:</div>
+                <div class="col value">{{ fighterName }}</div>
+            </div>
+            <div class="row">
+                <div class="col label">EVENT NAME:</div>
+                <div class="col value">{{ eventName }}</div>
+            </div>
+            <div class="row">
+                <div class="col label">EVENT DATE:</div>
+                <div class="col value">{{ eventDate }}</div>
+            </div>
+            <div class="row">
+                <div class="col label">WEIGHT DIVISION:</div>
+                <div class="col value">{{ divisionName }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">II. FINANCIAL COMPENSATION (PURSE)</div>
+        <table class="financial-table">
+            <thead>
+                <tr>
+                    <th>DESCRIPTION</th>
+                    <th class="amount">AMOUNT (USD)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Guaranteed Show Purse (Base Pay)</td>
+                    <td class="amount">${{ basePay }}</td>
+                </tr>
+                <tr>
+                    <td>Win Incentive Bonus</td>
+                    <td class="amount">${{ winBonus }}</td>
+                </tr>
+                {% if hasPayout %}
+                <tr class="total-row">
+                    <td><strong>TOTAL CALCULATED PAYOUT</strong></td>
+                    <td class="amount"><strong>${{ calculatedPayout }}</strong></td>
+                </tr>
+                {% else %}
+                <tr class="total-row">
+                    <td><strong>MAXIMUM POTENTIAL PURSE</strong></td>
+                    <td class="amount"><strong>${{ maxPurse }}</strong></td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="section-title">III. TERMS &amp; CONDITIONS</div>
+        <div class="legal-text">
+            This agreement confirms that the Athlete listed above is contracted to compete in the specified Event.
+            The Guaranteed Show Purse is payable regardless of the outcome, provided the Athlete makes weight and competes.
+            The Win Incentive Bonus is only payable upon the official declaration of the Athlete as the winner by the presiding commission.
+            All payments are subject to local taxes and sanctioning body fees. The Athlete agrees to abide by all SmartFight Organization
+            rules, medical requirements, and anti-doping protocols. Failure to appear or breach of conduct may result in purse forfeiture.
+        </div>
+    </div>
+
+    <div class="signatures">
+        <div class="sig-block">
+            <div class="sig-line"></div>
+            <div class="sig-label">ATHLETE / REPRESENTATIVE</div>
+            <div class="sig-sub">Date: ____________________</div>
+        </div>
+        <div class="sig-block">
+            <div class="sig-line"></div>
+            <div class="sig-label">FOR SMARTFIGHT ORGANIZATION</div>
+            <div class="sig-sub">Date: {{ today }}</div>
+        </div>
+    </div>
+
+</body>
+</html>

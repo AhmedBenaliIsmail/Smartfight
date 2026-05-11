@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.smartfight.controller.BookingFormController"
+      spacing="16" maxWidth="500" alignment="TOP_CENTER">
+    <padding><Insets top="40" bottom="40" left="40" right="40"/></padding>
+
+    <Label text="Book Event Tickets" styleClass="h2"/>
+
+    <VBox spacing="8">
+        <Label text="Select Event"/>
+        <ComboBox fx:id="eventCombo" maxWidth="Infinity"/>
+    </VBox>
+    <VBox spacing="8">
+        <Label text="Ticket Type"/>
+        <ComboBox fx:id="ticketTypeCombo" maxWidth="Infinity"/>
+    </VBox>
+    <VBox spacing="8">
+        <Label text="Quantity (max 4)"/>
+        <Spinner fx:id="quantitySpinner" editable="false"/>
+    </VBox>
+
+    <Label fx:id="totalLabel" styleClass="h3"/>
+    <Button text="Book Now" onAction="#onBook" styleClass="btn-primary" maxWidth="Infinity"/>
+    <Label fx:id="statusLabel" styleClass="caption" wrapText="true"/>
+</VBox>

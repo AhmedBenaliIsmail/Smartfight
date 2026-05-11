@@ -1,0 +1,30 @@
+<header class="admin-topbar">
+    <div class="container-fluid px-4">
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ path('admin_blog_index') }}" class="text-decoration-none d-flex align-items-center gap-2">
+                <div style="width:32px;height:32px;background:#dc2626;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;">
+                    <i class="fa-solid fa-fist-raised"></i>
+                </div>
+                <span style="font-family:'Oswald',sans-serif;font-weight:700;font-size:1rem;color:#fff;letter-spacing:1px;">SMART<span style="color:#dc2626;">FIGHT</span></span>
+            </a>
+
+            <nav aria-label="breadcrumb" class="ms-2">
+                <ol class="breadcrumb mb-0" style="font-size:.85rem;">
+                    <li class="breadcrumb-item"><a href="{{ path('admin_blog_index') }}" style="color:#71717a;">Admin</a></li>
+                    {% if breadcrumb_title is defined %}
+                        <li class="breadcrumb-item active" style="color:#a1a1aa;">{{ breadcrumb_title }}</li>
+                    {% endif %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="d-flex align-items-center gap-3 ms-auto">
+            {% if app.user %}
+                <span style="color:#a1a1aa;font-size:.875rem;">{{ app.user.fullName }}</span>
+            {% endif %}
+            <a href="{{ path('front_blog_index') }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                <i class="fa-solid fa-arrow-up-right-from-square fa-fw"></i> View Site
+            </a>
+        </div>
+    </div>
+</header>

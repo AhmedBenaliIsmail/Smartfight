@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}SmartFight Admin{% endblock %}</title>
+    {% block stylesheets %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+    <link rel="stylesheet" href="{{ asset('backoffice/css/smartfight-admin.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/smartfight-admin.css') }}" />
+    <link rel="stylesheet" href="{{ asset('frontoffice/css/pagination.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/design-system.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/sf-shell.css') }}" />
+    {% endblock %}
+</head>
+<body class="antialiased">
+
+<style>
+/* ── Admin sf-sidebar ───────────────────────────────────────── */
+.sf-sidebar {
+  position: fixed;
+  top: var(--sf-navbar-h, 72px);
+  left: 0;
+  height: calc(100vh - var(--sf-navbar-h, 72px));
+  width: 240px; background: #09090b;
+  border-right: 1px solid #27272a;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  transition: width .25s ease, transform .25s ease; z-index: 100;
+}
+.sf-sidebar.sf-collapsed { width: 64px; }
+/* Push content to the right of the fixed sidebar */
+.sf-admin-body:has(#sfSidebar:not(.sf-collapsed)) .sf-admin-content { margin-left: 240px; }
+.sf-admin-body:has(#sfSidebar.sf-collapsed) .sf-admin-content { margin-left: 64px; }
+.sf-admin-content { transition: margin-left .25s ease; }
+.sf-sidebar-toggle {
+  width: 36px; height: 36px; margin: 14px;
+  background: #1f1f23; border: 1px solid #27272a; border-radius: 6px;
+  color: #a1a1aa; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: background .15s, color .15s, border-color .15s, margin .25s;
+}
+.sf-sidebar.sf-collapsed .sf-sidebar-toggle { margin-left: auto; margin-right: auto; }
+.sf-sidebar-toggle:hover { background: rgba(220,38,38,.15); color: #dc2626; border-color: #dc2626; }
+.sf-sidebar-nav {
+  flex: 1; display: flex; flex-direction: column;
+  padding: 0 8px; gap: 2px;
+  overflow-y: auto; overflow-x: hidden;
+}
+.sf-sidebar-link {
+  display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 6px;
+  color: #a1a1aa; text-decoration: none; font-size: .875rem; font-weight: 500;
+  white-space: nowrap; transition: background .15s, color .15s, padding .25s, gap .25s;
+}
+.sf-sidebar-link i { width: 20px; text-align: center; font-size: 1rem; flex-shrink: 0; }
+.sf-sidebar-link:hover { background: #1f1f23; color: #fafafa; }
+.sf-sidebar-link.active { background: rgba(220,38,38,.15); color: #dc2626; font-weight: 600; }
+.sf-sidebar.sf-collapsed .sf-sidebar-link { padding-left: 0; padding-right: 0; justify-content: center; gap: 0; }
+.sf-sidebar-label { overflow: hidden; max-width: 200px; opacity: 1; transition: max-width .25s ease, opacity .15s; }
+.sf-sidebar.sf-collapsed .sf-sidebar-label { max-width: 0; opacity: 0; }
+.sf-sidebar-section {
+  font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+  color: #52525b; padding: 1.2rem 12px .4rem; white-space: nowrap;
+  overflow: hidden; max-height: 3rem;
+  transition: max-height .25s ease, opacity .15s, padding .25s;
+}
+.sf-sidebar.sf-collapsed .sf-sidebar-section { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; }
+.sf-sidebar-sep { height: 1px; background: #27272a; margin: 6px 10px; flex-shrink: 0; }
+.sf-sidebar-footer {
+  display: flex; align-items: center; gap: 10px; padding: 14px;
+  border-top: 1px solid #27272a; overflow: hidden; flex-shrink: 0; transition: padding .25s;
+}
+.sf-sidebar.sf-collapsed .sf-sidebar-footer { justify-content: center; padding: 14px 0; }
+.sf-sidebar-avatar {
+  width: 32px; height: 32px; border-radius: 50%; background: #dc2626; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: .8rem; flex-shrink: 0;
+}
+.sf-sidebar-user-info { overflow: hidden; max-width: 160px; opacity: 1; transition: max-width .25s ease, opacity .15s; }
+.sf-sidebar.sf-collapsed .sf-sidebar-user-info { max-width: 0; opacity: 0; }
+.sf-sidebar-uname { font-size: .82rem; font-weight: 600; color: #fafafa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sf-sidebar-role { font-size: .72rem; color: #dc2626; font-weight: 700; white-space: nowrap; }
+.sf-sidebar-pts { font-size: .72rem; color: #dc2626; font-weight: 700; white-space: nowrap; }
+/* Layout wrappers */
+.sf-admin-wrap { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: #09090b; }
+.sf-admin-body { display: flex; flex: 1; min-height: 0; }
+.sf-admin-content { flex: 1; min-width: 0; overflow-y: auto; background: #09090b; }
+/* Responsive — tablet: icon-only, fixed margin */
+@media (max-width: 991.98px) {
+  .sf-sidebar { width: 64px !important; }
+  .sf-sidebar .sf-sidebar-label,.sf-sidebar .sf-sidebar-user-info { max-width: 0 !important; opacity: 0 !important; }
+  .sf-sidebar .sf-sidebar-toggle { margin-left: auto !important; margin-right: auto !important; }
+  .sf-sidebar .sf-sidebar-link { padding-left: 0 !important; padding-right: 0 !important; justify-content: center !important; gap: 0 !important; }
+  .sf-sidebar .sf-sidebar-footer { justify-content: center !important; padding: 14px 0 !important; }
+  .sf-sidebar .sf-sidebar-section { max-height: 0 !important; opacity: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; }
+  .sf-admin-body .sf-admin-content { margin-left: 64px !important; }
+}
+/* Responsive — mobile: off-canvas overlay, no content margin */
+@media (max-width: 767.98px) {
+  .sf-sidebar {
+    top: 0 !important;
+    height: 100vh !important; width: 240px !important; z-index: 1050 !important;
+    transform: translateX(-100%); transition: transform .25s ease !important;
+  }
+  .sf-sidebar .sf-sidebar-label,.sf-sidebar .sf-sidebar-user-info { max-width: 160px !important; opacity: 1 !important; }
+  .sf-sidebar .sf-sidebar-toggle { margin: 14px !important; }
+  .sf-sidebar .sf-sidebar-link { padding: 10px !important; justify-content: flex-start !important; gap: 10px !important; }
+  .sf-sidebar .sf-sidebar-footer { padding: 14px !important; justify-content: flex-start !important; }
+  .sf-sidebar .sf-sidebar-section { max-height: 3rem !important; opacity: 1 !important; padding: 1.2rem 12px .4rem !important; }
+  .sf-sidebar.sf-mobile-open { transform: translateX(0); }
+  .sf-sidebar-backdrop { z-index: 1049; }
+  .sf-admin-body .sf-admin-content { margin-left: 0 !important; }
+}
+
+/* ── AI Style Tags ───────────────────────────────────────── */
+.ai-style-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  background: rgba(30, 58, 138, 0.15); /* Very dark blue tint */
+  border: 1px solid rgba(59, 130, 246, 0.4); /* Blueish border */
+  color: #60a5fa; /* Light blue text */
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
+  white-space: nowrap;
+}
+.ai-style-tag i {
+  margin-right: 0.35rem;
+  font-size: 0.7rem;
+}
+.ai-style-tag.champ {
+  background: rgba(180, 83, 9, 0.15);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.1);
+}
+</style>
+
+<div class="sf-admin-wrap">
+    {% if show_navbar|default(true) %}
+    {% include 'front/partials/navbar.html.twig' %}
+    {% endif %}
+
+    <div class="sf-admin-body">
+
+        {% if show_sidebar|default(true) %}
+        {% include 'front/partials/sidebar.html.twig' %}
+        {% endif %}
+
+        <!-- Main content -->
+        <div class="sf-admin-content">
+            <main class="p-4">
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible" role="alert">
+                            <div class="d-flex">
+                                <div>
+                                    <i class="fa-solid fa-{{ label == 'error' ? 'circle-exclamation' : 'circle-check' }} fa-fw me-2"></i>
+                                </div>
+                                <div>
+                                    {{ message }}
+                                </div>
+                            </div>
+                            <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
+                {% block content %}{% endblock %}
+            </main>
+
+            {% include 'front/partials/footer.html.twig' %}
+        </div>
+
+    </div>{# /.sf-admin-body #}
+
+</div>{# /.sf-admin-wrap #}
+
+<!-- Senior Notification Center Panel -->
+<div class="sf-notification-panel" id="sfNotificationPanel">
+    <div class="panel-header">
+        <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-bell text-danger"></i>
+            <h3 class="h6 fw-bold mb-0 text-white text-uppercase" style="letter-spacing: 1.5px;">Tactical Alerts</h3>
+        </div>
+        <button class="btn-close-panel" id="sfCloseNotifications"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="panel-body">
+        <div class="empty-notifications text-center py-5">
+            <div class="icon-pulse mb-3">
+                <i class="fa-solid fa-satellite-dish fa-2x text-muted opacity-25"></i>
+            </div>
+            <p class="text-muted small">No incoming transmission alerts detected.</p>
+            <div class="text-uppercase x-small fw-bold text-secondary" style="letter-spacing: 1px; font-size: 0.6rem;">Status: Synchronized</div>
+        </div>
+    </div>
+</div>
+
+<div class="sf-sidebar-backdrop" id="sfSidebarBackdrop"></div>
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="{{ asset('frontoffice/js/pagination.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Flatpickr Init
+        if (typeof flatpickr !== 'undefined') {
+            flatpickr(".datepicker", {
+                dateFormat: "Y-m-d",
+                theme: "dark",
+                allowInput: true
+            });
+        }
+
+        // ── Advanced Reusable Filter & Sort System ───────────────────────────────
+        class AdvancedFilter {
+            constructor(containerSelector, itemSelector, onUpdate = null) {
+                this.container = document.querySelector(containerSelector);
+                this.itemSelector = itemSelector;
+                this.onUpdate = onUpdate;
+                this.customFilter = null; // New: Hook for custom filtering logic
+                if (!this.container) return;
+                
+                this.items = Array.from(this.container.querySelectorAll(itemSelector));
+                this.activeFilters = {};
+                this.activeSort = { key: null, order: 'asc' };
+                this.searchQuery = '';
+            }
+
+            filter(key, value) {
+                if (value === '' || value === 'all') {
+                    delete this.activeFilters[key];
+                } else {
+                    this.activeFilters[key] = value.toLowerCase();
+                }
+                this.apply();
+            }
+
+            search(query) {
+                this.searchQuery = query.toLowerCase().trim();
+                this.apply();
+            }
+
+            sort(key, type = 'string', order = 'asc') {
+                if (this.activeSort.key === key) {
+                    this.activeSort.order = this.activeSort.order === 'asc' ? 'desc' : 'asc';
+                } else {
+                    this.activeSort = { key, type, order };
+                }
+                this.apply();
+            }
+
+            apply() {
+                if (!this.container) return;
+
+                // 1. Filter
+                let visibleItems = this.items.filter(item => {
+                    // Text Search check
+                    const textMatch = item.innerText.toLowerCase().includes(this.searchQuery) || 
+                                     (item.getAttribute('data-search-content') && item.getAttribute('data-search-content').toLowerCase().includes(this.searchQuery));
+                    
+                    if (!textMatch) return false;
+
+                    // Attribute Filters check
+                    for (const [key, value] of Object.entries(this.activeFilters)) {
+                        const attrVal = item.getAttribute(`data-filter-${key}`);
+                        if (attrVal && attrVal.toLowerCase() !== value) return false;
+                    }
+
+                    // Custom Filter check
+                    if (this.customFilter && !this.customFilter(item)) return false;
+
+                    return true;
+                });
+
+                // 2. Sort
+                if (this.activeSort.key) {
+                    visibleItems.sort((a, b) => {
+                        let valA = a.getAttribute(`data-sort-${this.activeSort.key}`) || '';
+                        let valB = b.getAttribute(`data-sort-${this.activeSort.key}`) || '';
+
+                        if (this.activeSort.type === 'number') {
+                            valA = parseFloat(valA) || 0;
+                            valB = parseFloat(valB) || 0;
+                        }
+
+                        if (valA < valB) return this.activeSort.order === 'asc' ? -1 : 1;
+                        if (valA > valB) return this.activeSort.order === 'asc' ? 1 : -1;
+                        return 0;
+                    });
+                }
+
+                // 3. Render
+                if (this.onUpdate) {
+                    this.onUpdate(visibleItems);
+                } else {
+                    this.container.innerHTML = '';
+                    this.items.forEach(item => item.style.display = 'none');
+                    visibleItems.forEach(item => {
+                        item.style.display = '';
+                        this.container.appendChild(item);
+                    });
+                }
+
+                // Handle empty state
+                const emptyMsg = this.container.querySelector('.sf-empty-msg');
+                if (visibleItems.length === 0) {
+                    if (!emptyMsg) {
+                        const div = document.createElement('div');
+                        div.className = 'col-12 text-center py-5 text-muted sf-empty-msg';
+                        div.innerHTML = '<i class="fa-solid fa-magnifying-glass fa-3x mb-3 opacity-25"></i><p>No matches found for your criteria.</p>';
+                        this.container.appendChild(div);
+                    }
+                } else if (emptyMsg) {
+                    emptyMsg.remove();
+                }
+            }
+        }
+
+        window.AdvancedFilter = AdvancedFilter;
+
+        // Auto-init search inputs with data-live-search
+        document.querySelectorAll('[data-live-search]').forEach(input => {
+            const containerSelector = input.getAttribute('data-live-search');
+            const itemSelector = input.getAttribute('data-live-search-item') || 'tr';
+            const filter = new AdvancedFilter(containerSelector, itemSelector);
+            
+            input.addEventListener('input', (e) => filter.search(e.target.value));
+            
+            // Expose for external control (dropdowns etc)
+            input._sfFilter = filter;
+        });
+
+        // Global Search Logic (remains same)
+        const gSearchInput = document.getElementById('globalSearchInput');
+        const gSearchResults = document.getElementById('globalSearchResults');
+        const gSearchSpinner = document.getElementById('globalSearchSpinner');
+        let searchTimeout;
+
+        if (gSearchInput) {
+            gSearchInput.addEventListener('input', function() {
+                const q = this.value.trim();
+                clearTimeout(searchTimeout);
+
+                if (q.length < 2) {
+                    gSearchResults.classList.add('d-none');
+                    return;
+                }
+
+                gSearchSpinner.classList.remove('d-none');
+
+                searchTimeout = setTimeout(async () => {
+                    try {
+                        const response = await fetch(`/api/global-search?q=${encodeURIComponent(q)}`);
+                        const data = await response.json();
+
+                        gSearchSpinner.classList.add('d-none');
+                        gSearchResults.innerHTML = '';
+
+                        if (data.results.length > 0) {
+                            data.results.forEach(res => {
+                                const item = document.createElement('a');
+                                item.href = res.url;
+                                item.className = 'd-flex align-items-center gap-3 p-3 text-decoration-none border-bottom hover-bg-dark';
+                                item.style.borderColor = '#27272a';
+                                item.innerHTML = `
+                                    <div style="width:32px; height:32px; background:rgba(220,38,38,0.1); border-radius:6px; display:flex; align-items:center; justify-content:center; color:#dc2626;">
+                                        <i class="fa-solid ${res.icon}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-white fw-bold small">${res.title}</div>
+                                        <div class="text-muted" style="font-size:0.7rem;">${res.type} • ${res.subtitle}</div>
+                                    </div>
+                                `;
+                                gSearchResults.appendChild(item);
+                            });
+                            gSearchResults.classList.remove('d-none');
+                        } else {
+                            gSearchResults.innerHTML = '<div class="p-4 text-center text-muted small"><i class="fa-solid fa-face-frown mb-2 d-block fa-2x opacity-25"></i>No matches found for "' + q + '"</div>';
+                            gSearchResults.classList.remove('d-none');
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        gSearchSpinner.classList.add('d-none');
+                    }
+                }, 300);
+            });
+
+            // Close search results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!gSearchInput.contains(e.target) && !gSearchResults.contains(e.target)) {
+                    gSearchResults.classList.add('d-none');
+                }
+            });
+        }
+    });
+</script>
+<style>
+    .hover-bg-dark:hover { background: rgba(255,255,255,0.05); }
+    .breadcrumb-item + .breadcrumb-item::before { color: #52525b; }
+</style>
+
+<script>
+(function () {
+    var sidebar  = document.getElementById('sfSidebar');
+    var toggle   = document.getElementById('sfSidebarToggle');
+    var backdrop = document.getElementById('sfSidebarBackdrop');
+    if (!sidebar || !toggle) return;
+
+    var STORAGE_KEY = 'sf_sidebar_collapsed';
+
+    function isMobile() { return window.innerWidth < 768; }
+    function isTablet() { return window.innerWidth >= 768 && window.innerWidth < 992; }
+
+    // Measure and apply navbar height CSS variable
+    var nav = document.querySelector('.sf-navbar');
+    if (nav) {
+        document.documentElement.style.setProperty('--sf-navbar-h', nav.offsetHeight + 'px');
+    }
+
+    // Expand only if user has NOT previously collapsed
+    function applyDesktopState() {
+        if (localStorage.getItem(STORAGE_KEY) === '1') {
+            sidebar.classList.add('sf-collapsed');
+        } else {
+            sidebar.classList.remove('sf-collapsed');
+        }
+    }
+
+    if (!isMobile() && !isTablet()) {
+        applyDesktopState();
+    }
+
+    toggle.addEventListener('click', function () {
+        if (isMobile()) {
+            sidebar.classList.toggle('sf-mobile-open');
+            if (backdrop) backdrop.classList.toggle('sf-active');
+        } else {
+            sidebar.classList.toggle('sf-collapsed');
+            if (!isTablet()) {
+                localStorage.setItem(STORAGE_KEY, sidebar.classList.contains('sf-collapsed') ? '1' : '0');
+            }
+        }
+    });
+
+    if (backdrop) {
+        backdrop.addEventListener('click', function () {
+            sidebar.classList.remove('sf-mobile-open');
+            backdrop.classList.remove('sf-active');
+        });
+    }
+
+    window.addEventListener('resize', function () {
+        if (isMobile()) return;
+        if (isTablet()) {
+            sidebar.classList.remove('sf-mobile-open');
+            if (backdrop) backdrop.classList.remove('sf-active');
+            return;
+        }
+        sidebar.classList.remove('sf-mobile-open');
+        if (backdrop) backdrop.classList.remove('sf-active');
+        applyDesktopState();
+    });
+})();
+
+// ── Notification Center Trigger Logic ────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+    const trigger = document.getElementById('sfNotificationTrigger');
+    const panel = document.getElementById('sfNotificationPanel');
+    const closeBtn = document.getElementById('sfCloseNotifications');
+    const backdrop = document.getElementById('sfSidebarBackdrop');
+
+    if (trigger && panel) {
+        trigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            panel.classList.add('active');
+            if (backdrop) backdrop.classList.add('sf-active');
+        });
+
+        const closePanel = () => {
+            panel.classList.remove('active');
+            if (backdrop) {
+                if (!document.getElementById('sfSidebar').classList.contains('sf-mobile-open')) {
+                    backdrop.classList.remove('sf-active');
+                }
+            }
+        };
+
+        if (closeBtn) closeBtn.addEventListener('click', closePanel);
+        if (backdrop) backdrop.addEventListener('click', closePanel);
+    }
+});
+</script>
+{% endblock %}
+</body>
+</html>

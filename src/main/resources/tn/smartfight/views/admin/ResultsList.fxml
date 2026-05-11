@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.lang.String?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.smartfight.controller.ResultsListController"
+      style="-fx-background-color:#0d0d0d;" spacing="0">
+
+    <!-- Header -->
+    <HBox styleClass="page-header" alignment="CENTER_LEFT" spacing="12">
+        <padding><Insets top="24" bottom="16" left="24" right="24"/></padding>
+        <VBox spacing="4">
+            <Label text="FIGHT RESULTS" styleClass="page-title"/>
+            <Label text="Event result archive and bout management" styleClass="page-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="EXPORT CSV"   styleClass="button"      onAction="#onExportCsv"/>
+        <Button text="BOUT STATS"   styleClass="button"      onAction="#onBoutStats"/>
+        <Button text="SCHEDULE"     styleClass="btn-primary"  onAction="#onScheduleFight"/>
+        <Button text="PDF REPORT"   styleClass="button"      onAction="#onPdfReport"/>
+    </HBox>
+
+    <!-- Filter bar -->
+    <HBox styleClass="filter-bar" alignment="CENTER_LEFT" spacing="12">
+        <padding><Insets top="0" bottom="0" left="24" right="24"/></padding>
+        <TextField fx:id="searchField" styleClass="search-field"
+                   promptText="Search events, boxers, or venues..." prefWidth="300"
+                   onAction="#onFilter"/>
+        <ComboBox fx:id="orgFilter" promptText="Organization" prefWidth="160">
+            <items>
+                <javafx.collections.FXCollections fx:factory="observableArrayList">
+                    <String fx:value="ALL"/>
+                    <String fx:value="WBC"/>
+                    <String fx:value="WBA"/>
+                    <String fx:value="IBF"/>
+                    <String fx:value="WBO"/>
+                    <String fx:value="UNDISPUTED"/>
+                </javafx.collections.FXCollections>
+            </items>
+        </ComboBox>
+        <ComboBox fx:id="statusFilter" promptText="Status" prefWidth="140">
+            <items>
+                <javafx.collections.FXCollections fx:factory="observableArrayList">
+                    <String fx:value="ALL"/>
+                    <String fx:value="SCHEDULED"/>
+                    <String fx:value="COMPLETED"/>
+                    <String fx:value="PENDING"/>
+                </javafx.collections.FXCollections>
+            </items>
+        </ComboBox>
+        <Button text="FILTER" styleClass="btn-primary" onAction="#onFilter"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="statusLabel" styleClass="caption"/>
+    </HBox>
+
+    <!-- Scrollable event-card grid -->
+    <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="scroll-pane">
+        <content>
+            <FlowPane fx:id="resultsFlow" hgap="16" vgap="16"
+                      style="-fx-background-color:#0d0d0d;">
+                <padding><Insets top="16" bottom="24" left="24" right="24"/></padding>
+            </FlowPane>
+        </content>
+    </ScrollPane>
+</VBox>

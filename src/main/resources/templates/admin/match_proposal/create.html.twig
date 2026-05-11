@@ -1,0 +1,88 @@
+{% extends 'admin/base_admin.html.twig' %}
+{% set breadcrumb_title = 'Create Match Proposal' %}
+
+{% block title %}Create Match Proposal | Admin Dashboard{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h1 class="h3 mb-0" style="color:#fafafa;">Create Match Proposal</h1>
+            <p class="text-muted small">Propose a fight for the fans to vote on.</p>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{{ path('admin_proposal_index') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left me-1"></i>Back to Proposals
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card" style="background:#18181b; border: 1px solid #27272a;">
+                <div class="card-body p-4">
+                    <!-- Step 1: Select Weight Class -->
+                    <form method="get" class="mb-4 pb-4" style="border-bottom: 1px solid #27272a;">
+                        <label class="form-label fw-bold" style="color:#fafafa;">1. Select Division</label>
+                        <div class="input-group">
+                            <select name="weight_class" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;" onchange="this.form.submit()">
+                                <option value="">Choose a weight class to filter fighters...</option>
+                                {% for wc in weightClasses %}
+                                    <option value="{{ wc }}" {% if selectedWeightClass == wc %}selected{% endif %}>{{ wc }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-text text-muted mt-2">
+                            <i class="fa-solid fa-circle-info me-1"></i> Fighters must be in the same weight division to ensure a fair matchmaking rating.
+                        </div>
+                    </form>
+
+                    <!-- Step 2: Select Fighters -->
+                    {% if selectedWeightClass %}
+                        <form method="post">
+                            <label class="form-label fw-bold" style="color:#fafafa;">2. Select Combatants</label>
+                            
+                            <div class="row g-4 mt-2">
+                                <div class="col-md-5">
+                                    <label class="form-label small" style="color:#a1a1aa;">Fighter 1 (Red Corner)</label>
+                                    <select name="fighter1" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;" required>
+                                        <option value="">Select Fighter...</option>
+                                        {% for f in fighters %}
+                                            <option value="{{ f.fighterId }}">{{ f.fullName }} (ELO: {{ f.eloRating|round }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-2 d-flex align-items-center justify-content-center">
+                                    <div class="badge bg-danger p-2 px-3 fs-5">VS</div>
+                                </div>
+                                
+                                <div class="col-md-5">
+                                    <label class="form-label small" style="color:#a1a1aa;">Fighter 2 (Blue Corner)</label>
+                                    <select name="fighter2" class="form-select" style="background:#09090b;border-color:#27272a;color:#fff;" required>
+                                        <option value="">Select Fighter...</option>
+                                        {% for f in fighters %}
+                                            <option value="{{ f.fighterId }}">{{ f.fullName }} (ELO: {{ f.eloRating|round }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 text-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-bullhorn me-2"></i>Publish Proposal to Fans
+                                </button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-scale-balanced fa-3x mb-3" style="opacity: 0.2;"></i>
+                            <p>Please select a division first to load eligible fighters.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

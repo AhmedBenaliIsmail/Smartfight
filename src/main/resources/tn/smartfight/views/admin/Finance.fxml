@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.smartfight.controller.FinanceController"
+      spacing="16" styleClass="content-pane">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="Finance Overview" styleClass="h2"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Refresh" onAction="#onRefresh" styleClass="btn-outline"/>
+    </HBox>
+
+    <HBox spacing="16">
+        <Label text="Total Revenue (30d):"/>
+        <Label fx:id="lblTotalRevenue" styleClass="h3"/>
+        <Label text="  Total Bookings:"/>
+        <Label fx:id="lblTotalBookings"/>
+    </HBox>
+
+    <HBox spacing="16" VBox.vgrow="ALWAYS">
+        <LineChart fx:id="revenueChart" title="Daily Revenue (30 days)"
+                   HBox.hgrow="ALWAYS" prefHeight="280">
+            <xAxis><CategoryAxis label="Date"/></xAxis>
+            <yAxis><NumberAxis label="Revenue ($)"/></yAxis>
+        </LineChart>
+
+        <PieChart fx:id="pieChart" title="Revenue by Ticket Type"
+                  HBox.hgrow="SOMETIMES" prefHeight="280"/>
+    </HBox>
+
+    <BarChart fx:id="barChart" title="Revenue by Event" prefHeight="220" VBox.vgrow="SOMETIMES">
+        <xAxis><CategoryAxis label="Event"/></xAxis>
+        <yAxis><NumberAxis label="Revenue ($)"/></yAxis>
+    </BarChart>
+
+    <Label fx:id="statusLabel" styleClass="caption" text="Loading..."/>
+</VBox>

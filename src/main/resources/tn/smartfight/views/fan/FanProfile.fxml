@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.smartfight.controller.FanProfileController"
+            fitToWidth="true"
+            style="-fx-background-color:#0d0d0d;-fx-background:#0d0d0d;-fx-border-color:transparent;">
+  <content>
+    <VBox spacing="24" style="-fx-background-color:#0d0d0d;">
+      <padding><Insets top="0" bottom="40" left="0" right="0"/></padding>
+
+      <!-- Header -->
+      <VBox style="-fx-background-color:#111113;-fx-border-color:#27272a;-fx-border-width:0 0 1 0;-fx-padding:24;">
+        <Label text="MY PROFILE" styleClass="h2"/>
+        <HBox spacing="12" alignment="CENTER_LEFT" style="-fx-padding:8 0 0 0;">
+          <Label fx:id="pointsBadge"
+                 style="-fx-background-color:#dc2626;-fx-text-fill:#ffffff;-fx-font-weight:bold;-fx-font-size:13px;-fx-padding:5 14;-fx-background-radius:20;"/>
+          <Label text="PRO FAN"
+                 style="-fx-background-color:#f59e0b;-fx-text-fill:#000000;-fx-font-weight:bold;-fx-font-size:11px;-fx-padding:5 12;-fx-background-radius:20;"/>
+        </HBox>
+      </VBox>
+
+      <!-- Two cards side by side -->
+      <HBox spacing="20" style="-fx-padding:0 24;">
+
+        <!-- Card 1: Identity -->
+        <VBox HBox.hgrow="ALWAYS" spacing="14"
+              style="-fx-background-color:#18181b;-fx-border-color:#27272a;-fx-border-radius:10;-fx-background-radius:10;-fx-padding:20;">
+          <Label text="IDENTITY"
+                 style="-fx-text-fill:#dc2626;-fx-font-size:11px;-fx-font-weight:bold;"/>
+          <VBox spacing="4">
+            <Label text="Username" style="-fx-text-fill:#71717a;-fx-font-size:11px;"/>
+            <TextField fx:id="usernameField"
+                       style="-fx-background-color:#111111;-fx-border-color:#27272a;-fx-text-fill:#fafafa;-fx-prompt-text-fill:#52525b;"/>
+          </VBox>
+          <VBox spacing="4">
+            <Label text="Email address" style="-fx-text-fill:#71717a;-fx-font-size:11px;"/>
+            <TextField fx:id="emailField"
+                       style="-fx-background-color:#111111;-fx-border-color:#27272a;-fx-text-fill:#fafafa;-fx-prompt-text-fill:#52525b;"/>
+          </VBox>
+          <Button text="UPDATE IDENTITY" onAction="#onUpdateInfo"
+                  styleClass="btn-primary" maxWidth="Infinity"/>
+          <Label fx:id="infoStatusLabel" styleClass="caption" wrapText="true"/>
+        </VBox>
+
+        <!-- Card 2: Password -->
+        <VBox HBox.hgrow="ALWAYS" spacing="14"
+              style="-fx-background-color:#18181b;-fx-border-color:#27272a;-fx-border-radius:10;-fx-background-radius:10;-fx-padding:20;">
+          <Label text="SECURITY"
+                 style="-fx-text-fill:#dc2626;-fx-font-size:11px;-fx-font-weight:bold;"/>
+          <VBox spacing="4">
+            <Label text="New password" style="-fx-text-fill:#71717a;-fx-font-size:11px;"/>
+            <PasswordField fx:id="newPasswordField"
+                           style="-fx-background-color:#111111;-fx-border-color:#27272a;-fx-text-fill:#fafafa;"/>
+          </VBox>
+          <VBox spacing="4">
+            <Label text="Confirm password" style="-fx-text-fill:#71717a;-fx-font-size:11px;"/>
+            <PasswordField fx:id="confirmPasswordField"
+                           style="-fx-background-color:#111111;-fx-border-color:#27272a;-fx-text-fill:#fafafa;"/>
+          </VBox>
+          <Button text="UPDATE PASSCODE" onAction="#onUpdatePassword"
+                  styleClass="btn-primary" maxWidth="Infinity"/>
+          <Label fx:id="pwStatusLabel" styleClass="caption" wrapText="true"/>
+        </VBox>
+      </HBox>
+
+    </VBox>
+  </content>
+</ScrollPane>

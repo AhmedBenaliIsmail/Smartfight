@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}SmartFight Admin{% endblock %}</title>
+    {% block stylesheets %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+    <link rel="stylesheet" href="{{ asset('backoffice/css/smartfight-admin.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/smartfight-admin.css') }}" />
+    <link rel="stylesheet" href="{{ asset('frontoffice/css/pagination.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/design-system.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/sf-shell.css') }}" />
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/sidebar_addition.css') }}" />
+    {% endblock %}
+</head>
+<body class="antialiased admin-shell">
+
+<style>
+  :root {
+    --bg-dark: #09090b;
+    --bg-surface: #18181b;
+    --border-color: #27272a;
+    --text-primary: #fafafa;
+    --text-muted: #a1a1aa;
+    --primary: #dc2626;
+    --primary-light: rgba(220, 38, 38, 0.15);
+    --transition-base: 250ms ease;
+    --transition-fast: 150ms ease;
+    --radius-md: 8px;
+    --z-sticky: 1020;
+  }
+  .admin-shell {
+    background: var(--bg-dark);
+    min-height: 100vh;
+  }
+  .admin-content {
+    flex: 1;
+    min-width: 0;
+    padding: 1.5rem;
+    background: var(--bg-dark);
+  }
+  @media (max-width: 991.98px) {
+    .admin-content { padding: 1rem; }
+  }
+</style>
+
+{% include 'front/partials/navbar.html.twig' %}
+
+<div class="sf-fan-layout">
+        {% include 'front/partials/sidebar.html.twig' %}
+
+        <div class="sf-fan-content">
+                <main class="admin-content">
+                        {% for label, messages in app.flashes %}
+                                {% for message in messages %}
+                                        <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible" role="alert">
+                                                <div class="d-flex">
+                                                        <div>
+                                                                <i class="fa-solid fa-{{ label == 'error' ? 'circle-exclamation' : 'circle-check' }} fa-fw me-2"></i>
+                                                        </div>
+                                                        <div>
+                                                                {{ message }}
+                                                        </div>
+                                                </div>
+                                                <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                                        </div>
+                                {% endfor %}
+                        {% endfor %}
+
+                        {% block admin_content %}{% endblock %}
+                </main>
+
+                {% include 'front/partials/footer.html.twig' %}
+        </div>
+</div>
+
+<div class="sf-sidebar-backdrop" id="sfSidebarBackdrop"></div>
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="{{ asset('frontoffice/js/pagination.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var nav = document.querySelector('.sf-navbar');
+        if (nav) {
+            document.documentElement.style.setProperty('--sf-navbar-h', nav.offsetHeight + 'px');
+        }
+
+        (function () {
+            var sidebar = document.getElementById('sfSidebar');
+            var toggle = document.getElementById('sfSidebarToggle');
+            var backdrop = document.getElementById('sfSidebarBackdrop');
+            if (!sidebar || !toggle) return;
+
+            var STORAGE_KEY = 'sf_sidebar_collapsed';
+
+            function isMobile() { return window.innerWidth < 768; }
+            function isTablet() { return window.innerWidth >= 768 && window.innerWidth < 992; }
+
+            function applyDesktopState() {
+                if (localStorage.getItem(STORAGE_KEY) === '1') {
+                    sidebar.classList.add('sf-collapsed');
+                } else {
+                    sidebar.classList.remove('sf-collapsed');
+                }
+            }
+
+            if (!isMobile() && !isTablet()) {
+                applyDesktopState();
+            }
+
+            toggle.addEventListener('click', function () {
+                if (isMobile()) {
+                    sidebar.classList.toggle('sf-mobile-open');
+                    if (backdrop) backdrop.classList.toggle('sf-active');
+                } else {
+                    sidebar.classList.toggle('sf-collapsed');
+                    if (!isTablet()) {
+                        localStorage.setItem(STORAGE_KEY, sidebar.classList.contains('sf-collapsed') ? '1' : '0');
+                    }
+                }
+            });
+
+            if (backdrop) {
+                backdrop.addEventListener('click', function () {
+                    sidebar.classList.remove('sf-mobile-open');
+                    backdrop.classList.remove('sf-active');
+                });
+            }
+
+            window.addEventListener('resize', function () {
+                if (isMobile()) return;
+                if (isTablet()) {
+                    sidebar.classList.remove('sf-mobile-open');
+                    if (backdrop) backdrop.classList.remove('sf-active');
+                    return;
+                }
+                applyDesktopState();
+            });
+        })();
+
+        if (typeof flatpickr !== 'undefined') {
+            flatpickr(".datepicker", {
+                dateFormat: "Y-m-d",
+                theme: "dark",
+                allowInput: true
+            });
+        }
+
+        class AdvancedFilter {
+            constructor(containerSelector, itemSelector, onUpdate = null) {
+                this.container = document.querySelector(containerSelector);
+                this.itemSelector = itemSelector;
+                this.onUpdate = onUpdate;
+                this.customFilter = null;
+                if (!this.container) return;
+
+                this.items = Array.from(this.container.querySelectorAll(itemSelector));
+                this.activeFilters = {};
+                this.activeSort = { key: null, order: 'asc' };
+                this.searchQuery = '';
+            }
+
+            filter(key, value) {
+                if (value === '' || value === 'all') {
+                    delete this.activeFilters[key];
+                } else {
+                    this.activeFilters[key] = value.toLowerCase();
+                }
+                this.apply();
+            }
+
+            search(query) {
+                this.searchQuery = query.toLowerCase().trim();
+                this.apply();
+            }
+
+            sort(key, type = 'string', order = 'asc') {
+                if (this.activeSort.key === key) {
+                    this.activeSort.order = this.activeSort.order === 'asc' ? 'desc' : 'asc';
+                } else {
+                    this.activeSort = { key, type, order };
+                }
+                this.apply();
+            }
+
+            apply() {
+                if (!this.container) return;
+
+                let visibleItems = this.items.filter(item => {
+                    const textMatch = item.innerText.toLowerCase().includes(this.searchQuery) ||
+                                     (item.getAttribute('data-search-content') && item.getAttribute('data-search-content').toLowerCase().includes(this.searchQuery));
+
+                    if (!textMatch) return false;
+
+                    for (const [key, value] of Object.entries(this.activeFilters)) {
+                        const attrVal = item.getAttribute(`data-filter-${key}`);
+                        if (attrVal && attrVal.toLowerCase() !== value) return false;
+                    }
+
+                    if (this.customFilter && !this.customFilter(item)) return false;
+
+                    return true;
+                });
+
+                if (this.activeSort.key) {
+                    visibleItems.sort((a, b) => {
+                        let valA = a.getAttribute(`data-sort-${this.activeSort.key}`) || '';
+                        let valB = b.getAttribute(`data-sort-${this.activeSort.key}`) || '';
+
+                        if (this.activeSort.type === 'number') {
+                            valA = parseFloat(valA) || 0;
+                            valB = parseFloat(valB) || 0;
+                        }
+
+                        if (valA < valB) return this.activeSort.order === 'asc' ? -1 : 1;
+                        if (valA > valB) return this.activeSort.order === 'asc' ? 1 : -1;
+                        return 0;
+                    });
+                }
+
+                if (this.onUpdate) {
+                    this.onUpdate(visibleItems);
+                } else {
+                    this.container.innerHTML = '';
+                    this.items.forEach(item => item.style.display = 'none');
+                    visibleItems.forEach(item => {
+                        item.style.display = '';
+                        this.container.appendChild(item);
+                    });
+                }
+
+                const emptyMsg = this.container.querySelector('.sf-empty-msg');
+                if (visibleItems.length === 0) {
+                    if (!emptyMsg) {
+                        const div = document.createElement('div');
+                        div.className = 'col-12 text-center py-5 text-muted sf-empty-msg';
+                        div.innerHTML = '<i class="fa-solid fa-magnifying-glass fa-3x mb-3 opacity-25"></i><p>No matches found for your criteria.</p>';
+                        this.container.appendChild(div);
+                    }
+                } else if (emptyMsg) {
+                    emptyMsg.remove();
+                }
+            }
+        }
+
+        window.AdvancedFilter = AdvancedFilter;
+
+        document.querySelectorAll('[data-live-search]').forEach(input => {
+            const containerSelector = input.getAttribute('data-live-search');
+            const itemSelector = input.getAttribute('data-live-search-item') || 'tr';
+            const filter = new AdvancedFilter(containerSelector, itemSelector);
+            input.addEventListener('input', () => filter.search(input.value));
+        });
+    });
+</script>
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,518 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Boxing Analytics — {{ fighter.fullName }}{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_performance') }}" style="color:#a1a1aa;text-decoration:none;">Performance</a></li>
+    <li class="breadcrumb-item active">{{ fighter.fullName }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">{{ fighter.fullName }} Performance Analysis</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">SmartFight Analytics & AI Engine Factors</p>
+    </div>
+    <a href="{{ path('app_performance') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-4">
+        <div class="card h-100" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-body p-4 text-center">
+                <div class="mb-4">
+                    {% if fighter.photoFilename %}
+                        <img src="{{ asset('uploads/boxers/' ~ fighter.photoFilename) }}" class="rounded shadow-sm" style="width:120px; height:120px; object-fit:cover; border:3px solid #27272a;" alt="Boxer Photo" />
+                    {% else %}
+                        <div class="rounded d-inline-flex align-items-center justify-content-center shadow-sm" style="width:120px; height:120px; background:#27272a; color:#52525b;">
+                            <i class="fa-solid fa-user fa-3x"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <h2 class="h1 fw-bold mb-0" style="color:#fbbf24;">{{ fighter.performanceScore|round(1) }}</h2>
+                    <div class="text-muted small mb-2">OVERALL AI SCORE</div>
+                    <div class="ai-style-tag">
+                        {{ fighter.aiStyleTag ?? fighter.calculatedFightingStyle }}
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <button class="btn btn-outline-primary btn-sm w-100 mb-2" data-bs-toggle="modal" data-bs-target="#scoutingModal" style="border-color: #3b82f6; color: #60a5fa;">
+                        <i class="fa-solid fa-user-secret me-2"></i>Pro Scouting Report
+                    </button>
+                    {% if is_granted('ROLE_ADMIN') %}
+                    <button class="btn btn-outline-warning btn-sm w-100" id="btnPredictInjury" style="border-color: #f59e0b; color: #fbbf24;">
+                        <i class="fa-solid fa-heart-pulse me-2"></i>AI Injury Prediction
+                    </button>
+                    {% endif %}
+                </div>
+                
+                <div class="row g-2 mt-4">
+                    <div class="col-6">
+                        <div class="p-3 rounded" style="background:#27272a;">
+                            <div class="fw-bold" style="color:#fafafa;">{{ fighter.wins }}-{{ fighter.losses }}</div>
+                            <div class="small text-muted">RECORD</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded" style="background:#27272a;">
+                            <div class="fw-bold" style="color:#fafafa;">{{ fighter.titleDefenses }}</div>
+                            <div class="small text-muted">DEFENSES</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card h-100" style="background:#18181b;border:1px solid #27272a;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-calculator me-2" style="color:#3b82f6;"></i>Hybrid Boxing Ranking Engine</h3>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span style="color:#fafafa;">BoxRec Computerized Rating (40%)</span>
+                        <span class="fw-bold" style="color:#3b82f6;">{{ ((fighter.eloRating / 20 + fighter.performanceScore * 2) * 0.40)|round(1) }} pts</span>
+                    </div>
+                    <p class="text-muted small mb-0">Factor: Combined ELO and SmartFight performance metrics. Official computerized logic.</p>
+                </div>
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span style="color:#fafafa;">PageRank Strength of Schedule (30%)</span>
+                        <span class="fw-bold" style="color:#10b981;">{{ (fighter.strengthOfSchedule / 1500 * 100 * 0.30)|round(1) }} pts</span>
+                    </div>
+                    <p class="text-muted small mb-0">Factor: Every win is a "vote" weighted by opponent caliber. Rewards era-defining challenges.</p>
+                </div>
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span style="color:#fafafa;">FightFax Title Pedigree (20%)</span>
+                        <span class="fw-bold" style="color:#a855f7;">{{ (fighter.titleDefenses * 15 * 0.20)|round(1) }} pts</span>
+                    </div>
+                    <p class="text-muted small mb-0">Factor: World Title defenses and Match Type multipliers. Rewards championship dominance.</p>
+                </div>
+                <div class="mb-0">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span style="color:#fafafa;">Activity & Recency (10%)</span>
+                        <span class="fw-bold" style="color:#f59e0b;">{{ (max(0, (18 - (fighter.lastFightDate ? date().diff(fighter.lastFightDate).m + date().diff(fighter.lastFightDate).y*12 : 18)) * 5) * 0.10)|round(1) }} pts</span>
+                    </div>
+                    <p class="text-muted small mb-0">Factor: Time since last bout. 18-month inactivity triggers complete ranking removal.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card" style="background:#18181b;border:1px solid #27272a; border-left: 4px solid #3b82f6;">
+            <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-code me-2" style="color:#3b82f6;"></i>ELO Rating Algorithm</h3>
+            </div>
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-12">
+                        <div class="p-3 rounded mb-3" style="background:#09090b; font-family: monospace; border: 1px dashed #3f3f46; color: #60a5fa;">
+                            R_new = (R_old + K * (S - E)) * MethodMult * MatchMult + RoundBonus
+                        </div>
+                        <ul class="list-unstyled small" style="color:#a1a1aa;">
+                            <li class="mb-2"><strong style="color: #fafafa;">MatchMult:</strong> 1.3x for World Title bouts (FightFax).</li>
+                            <li class="mb-2"><strong style="color: #fafafa;">MethodMult:</strong> 1.5x for KO, 1.2x for Unanimous Decision.</li>
+                            <li class="mb-2"><strong style="color: #fafafa;">RoundBonus:</strong> Up to +24 pts for early round stoppages (Decision Round Factor).</li>
+                            <li class="mb-0"><strong style="color: #fafafa;">PageRank SOS:</strong> Wins over higher-rated opponents carry 20% more weight.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3 class="h4 mb-3 fw-bold" style="color:#fafafa;"><i class="fa-solid fa-history me-2"></i>Career Bout History & SmartFight Stats</h3>
+<div class="card" style="background:#18181b;border:1px solid #27272a;">
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-hover mb-0 text-center">
+            <thead>
+            <tr>
+                <th class="text-start" style="padding:.75rem 1.25rem;">Event & Bout</th>
+                <th>Result</th>
+                <th>Punches (L/T)</th>
+                <th>Power (L/T)</th>
+                <th>Jabs (L/T)</th>
+                <th>Knockdowns</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in fightData %}
+                <tr {% if item.event and item.event.organization != 'INDEPENDENT' %}style="background: rgba(201, 139, 39, 0.08); border-left: 3px solid #fbbf24;" title="World Title Bout"{% endif %}>
+                    <td class="text-start" style="padding:.75rem 1.25rem;">
+                        <div class="fw-bold" style="color:#fafafa;">
+                            {{ item.event ? item.event.eventName : 'Unknown Event' }}
+                            {% if item.event and item.event.organization != 'INDEPENDENT' %}
+                                <i class="fa-solid fa-crown ms-1" style="color:#fbbf24; font-size: 0.7rem;"></i>
+                            {% endif %}
+                        </div>
+                        <div class="text-muted small">Bout #{{ item.fight.fightNumber }} ({{ item.fight.fightDate ? item.fight.fightDate|date('Y-m-d') : 'N/A' }})</div>
+                    </td>
+                    <td>
+                        {% if item.fight.winner and item.fight.winner.fighterId == fighter.fighterId %}
+                            <span class="badge bg-success">WIN</span>
+                        {% elseif item.fight.isDraw %}
+                            <span class="badge bg-secondary">DRAW</span>
+                        {% else %}
+                            <span class="badge bg-danger">LOSS</span>
+                        {% endif %}
+                        <div class="text-muted small mt-1">{{ item.fight.methodOfVictory }}{{ item.fight.decisionType ? ' (' ~ item.fight.decisionType ~ ')' : '' }}</div>
+                    </td>
+                    <td>
+                        {% if item.stats %}
+                            <div class="fw-bold" style="color:#fafafa;">{{ item.stats.punchesLanded }}/{{ item.stats.punchesThrown }}</div>
+                            <div class="small text-muted">{{ item.stats.punchAccuracy|round }}% Acc</div>
+                        {% else %}
+                            <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.stats %}
+                            <div class="fw-bold" style="color:#fafafa;">{{ item.stats.powerPunchesLanded }}/{{ item.stats.powerPunchesThrown }}</div>
+                            <div class="small text-muted">{{ item.stats.powerAccuracy|round }}% Acc</div>
+                        {% else %}
+                            <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.stats %}
+                            <div class="fw-bold" style="color:#fafafa;">{{ item.stats.jabsLanded }}/{{ item.stats.jabsThrown }}</div>
+                            <div class="small text-muted">{{ item.stats.jabAccuracy|round }}% Acc</div>
+                        {% else %}
+                            <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.stats %}
+                            <span class="badge bg-primary me-1">{{ item.stats.knockdowns }} KD</span>
+                        {% else %}
+                            <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">No completed bout statistics found.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pro Scouting Report Modal -->
+<div class="modal fade" id="scoutingModal" tabindex="-1" aria-hidden="true" data-bs-theme="dark">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background:#09090b; border:1px solid #27272a;">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title text-light"><i class="fa-solid fa-user-secret me-2" style="color:#3b82f6;"></i>AI Scouting Report Generator</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-4">Select a potential opponent to generate a deep tactical analysis and game plan for {{ fighter.fullName }}.</p>
+                <div class="mb-3">
+                    <label class="form-label text-light">Select Opponent</label>
+                    <select class="form-select bg-dark text-light border-secondary" id="scoutOpponentSelect">
+                        <option value="">Choose an opponent...</option>
+                        <!-- Options would be dynamically loaded or provided by backend. For now, assuming standard setup. -->
+                        <option value="1">Load opponent dynamically via JS</option>
+                    </select>
+                </div>
+                <div class="text-center my-4 d-none" id="scoutLoading">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <div class="mt-2 text-muted small">DeepSeek analyzing fighting styles and physical metrics...</div>
+                </div>
+                <div id="scoutResults" class="d-none">
+                    <h5 class="text-danger fw-bold"><i class="fa-solid fa-triangle-exclamation me-2"></i>Critical Danger</h5>
+                    <div class="p-3 mb-3 rounded" style="background: rgba(220, 38, 38, 0.1); border: 1px dashed #dc2626; color: #fca5a5;" id="scoutWarning">
+                        <!-- Warning goes here -->
+                    </div>
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-success fw-bold">Opponent Strengths</h6>
+                            <ul class="text-light small ps-3" id="scoutStrengths"></ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-info fw-bold">Opponent Weaknesses</h6>
+                            <ul class="text-light small ps-3" id="scoutWeaknesses"></ul>
+                        </div>
+                    </div>
+                    
+                    <h5 class="text-primary fw-bold"><i class="fa-solid fa-chess-knight me-2"></i>Tactical Game Plan</h5>
+                    <div class="p-3 rounded" style="background: rgba(59, 130, 246, 0.1); border: 1px solid #3b82f6; color: #bfdbfe;" id="scoutGameplan">
+                        <!-- Gameplan goes here -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnGenerateScout"><i class="fa-solid fa-wand-magic-sparkles me-2"></i>Generate Report</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Injury Prediction Modal -->
+<div class="modal fade" id="injuryModal" tabindex="-1" aria-hidden="true" data-bs-theme="dark">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background:#0f0f13; border:1px solid #2d2d35; border-radius: 16px; overflow: hidden;">
+            <div class="modal-body p-4">
+                <div id="injuryLoading" class="text-center py-5 d-none">
+                    <div class="spinner-border text-danger" role="status"></div>
+                    <p class="mt-3 text-muted small">Synchronizing Biomechanical Vectors...</p>
+                </div>
+
+                <div id="injuryResults" class="d-none">
+                    <!-- Header with Dr. Profile -->
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div style="width: 45px; height: 45px; background: rgba(239, 68, 68, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa-solid fa-shield-heart text-danger fs-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="fw-black mb-0 text-white" style="letter-spacing: 1px; font-size: 1.1rem; line-height: 1.1;">INJURY PREDICTION ANALYST</h4>
+                                <div class="text-muted small mt-1" style="font-size: 0.75rem;">Dr. James Wong | <span class="text-white-50">PhD Biomechanics</span></div>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="p-2 rounded-3" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2);">
+                                <div class="text-warning mb-1" style="font-size: 8px;">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                                <div class="text-warning fw-bold" style="font-size: 8px; letter-spacing: 1px;">RECOMMENDED</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Level Bar -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-end mb-2">
+                            <span class="text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">RISK LEVEL</span>
+                            <span class="fw-black" id="injuryRiskScore" style="color: #00e676; font-size: 1.1rem;">0%</span>
+                        </div>
+                        <div class="progress" style="height: 6px; background: #1c1c24; border-radius: 10px;">
+                            <div id="injuryProgressBar" class="progress-bar" style="background: #00e676; width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Dual Insight Boxes -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="p-3 text-center h-100" style="background: #1c1c24; border-radius: 12px; border: 1px solid #2d2d35;">
+                                <div class="text-muted small mb-2 fw-bold" style="letter-spacing: 1px;">PREDICTION</div>
+                                <div class="text-warning fw-bold small d-flex align-items-center justify-content-center gap-1">
+                                    <i class="fa-solid fa-hand-fist"></i>
+                                    <span id="injuryZone" class="text-uppercase" style="font-size: 0.75rem;">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 text-center h-100" style="background: #1c1c24; border-radius: 12px; border: 1px solid #2d2d35;">
+                                <div class="text-muted small mb-2 fw-bold" style="letter-spacing: 1px;">ALERT</div>
+                                <div class="text-danger fw-bold" style="font-size: 0.85rem;"><span id="injuryAlertDays">0</span> days</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendation Banner -->
+                    <div class="p-3 mb-4 d-flex align-items-center gap-3" style="background: rgba(0, 230, 118, 0.05); border: 1px solid rgba(0, 230, 118, 0.2); border-radius: 12px;">
+                        <div style="width: 24px; height: 24px; background: #00e676; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="fa-solid fa-check text-dark" style="font-size: 10px;"></i>
+                        </div>
+                        <div>
+                            <div class="text-success fw-bold" style="font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase;">Recommendation</div>
+                            <div class="text-white small fw-bold" id="injuryMitigation" style="font-size: 0.8rem;">-</div>
+                        </div>
+                    </div>
+
+                    <!-- Metrics Footer -->
+                    <div class="row text-center mb-4 border-top border-secondary pt-4" style="border-style: dashed !important; border-width: 1px 0 0 0 !important;">
+                        <div class="col-4">
+                            <div class="h5 fw-black text-white mb-0" id="injuryAccuracy">0%</div>
+                            <div class="text-muted" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px;">Accuracy</div>
+                        </div>
+                        <div class="col-4 border-start border-secondary" style="border-left-style: dashed !important;">
+                            <div class="h5 fw-black text-white mb-0" id="injuryEarly">3</div>
+                            <div class="text-muted" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px;">Weeks Early</div>
+                        </div>
+                        <div class="col-4 border-start border-secondary" style="border-left-style: dashed !important;">
+                            <div class="h5 fw-black text-white mb-0" id="injuryRoi">0%</div>
+                            <div class="text-muted" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px;">ROI</div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Analysis Section (Hidden by default) -->
+                    <div id="injuryDetailedPanel" class="d-none mt-4 p-3 rounded" style="background: rgba(255,255,255,0.03); border: 1px solid #2d2d35; border-left: 3px solid #ef5350;">
+                        <h6 class="text-white small fw-bold mb-2" style="letter-spacing: 1px; text-transform: uppercase;">Deep Neural Scan Report</h6>
+                        <p class="text-muted small mb-0" id="injuryDetailedText" style="line-height: 1.5; font-family: 'Inter', sans-serif;">-</p>
+                    </div>
+
+                    <!-- CTA Button -->
+                    <button type="button" id="btnViewDetailed" class="btn w-100 py-3 mt-4 fw-black text-uppercase" style="background: #ef5350; color: white; border-radius: 12px; letter-spacing: 1px; font-size: 0.85rem;">
+                        <i class="fa-solid fa-chart-pie me-2"></i>View Detailed Analysis
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnGenerate = document.getElementById('btnGenerateScout');
+    const loading = document.getElementById('scoutLoading');
+    const results = document.getElementById('scoutResults');
+    const select = document.getElementById('scoutOpponentSelect');
+    
+    // Quick and dirty way to get fighters for the select (should ideally be passed from controller)
+    fetch('/fighters?q=')
+        .then(res => res.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const links = doc.querySelectorAll('a[href*="/fighters/"]');
+            const options = new Set();
+            links.forEach(l => {
+                const href = l.getAttribute('href');
+                const match = href.match(/\/fighters\/(\d+)\/edit/);
+                if(match && match[1] !== '{{ fighter.fighterId }}') {
+                    // Extract name from table row
+                    const name = l.closest('tr').querySelector('td:nth-child(2) .fw-bold').innerText;
+                    options.add(`<option value="${match[1]}">${name}</option>`);
+                }
+            });
+            select.innerHTML = '<option value="">Choose an opponent...</option>' + Array.from(options).join('');
+        })
+        .catch(e => console.warn('Could not load fighters list automatically.'));
+
+    if (btnGenerate) {
+        btnGenerate.addEventListener('click', function() {
+            const oppId = select.value;
+            if (!oppId) return alert('Please select an opponent first.');
+            
+            loading.classList.remove('d-none');
+            results.classList.add('d-none');
+            btnGenerate.disabled = true;
+            
+            fetch('/api/ai/scouting-report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    subject_id: {{ fighter.fighterId }},
+                    opponent_id: parseInt(oppId)
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                loading.classList.add('d-none');
+                btnGenerate.disabled = false;
+                
+                if (data.success && data.data) {
+                    const info = data.data;
+                    document.getElementById('scoutWarning').innerText = info.danger_warning || 'N/A';
+                    document.getElementById('scoutGameplan').innerText = info.tactical_gameplan || 'N/A';
+                    
+                    document.getElementById('scoutStrengths').innerHTML = (info.opponent_strengths || []).map(s => `<li>${s}</li>`).join('');
+                    document.getElementById('scoutWeaknesses').innerHTML = (info.opponent_weaknesses || []).map(s => `<li>${s}</li>`).join('');
+                    
+                    results.classList.remove('d-none');
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to generate report.'));
+                }
+            })
+            .catch(e => {
+                loading.classList.add('d-none');
+                btnGenerate.disabled = false;
+                alert('Network error.');
+            });
+        });
+    }
+
+    // Injury Prediction Logic
+    const btnInjury = document.getElementById('btnPredictInjury');
+    const injuryModalEl = document.getElementById('injuryModal');
+    const injuryLoading = document.getElementById('injuryLoading');
+    const injuryResults = document.getElementById('injuryResults');
+
+    if (btnInjury && injuryModalEl) {
+        const bootstrapObj = window.bootstrap || (window.tabler ? window.tabler : null);
+        const injuryModal = new bootstrapObj.Modal(injuryModalEl);
+
+        btnInjury.addEventListener('click', function() {
+            injuryLoading.classList.remove('d-none');
+            injuryResults.classList.add('d-none');
+            injuryModal.show();
+
+            fetch('/api/ai/predict-injury', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fighter_id: {{ fighter.fighterId }} })
+            })
+            .then(r => r.json())
+            .then(data => {
+                injuryLoading.classList.add('d-none');
+                if (data.success && data.data) {
+                    const info = data.data;
+                    document.getElementById('injuryRiskScore').innerText = info.risk_percentage + '%';
+                    document.getElementById('injuryProgressBar').style.width = info.risk_percentage + '%';
+                    document.getElementById('injuryZone').innerText = info.vulnerable_zone;
+                    document.getElementById('injuryMitigation').innerText = info.mitigation_strategy;
+                    document.getElementById('injuryAlertDays').innerText = info.days_to_alert;
+                    document.getElementById('injuryAccuracy').innerText = Math.round(info.accuracy) + '%';
+                    document.getElementById('injuryRoi').innerText = info.roi + '%';
+                    document.getElementById('injuryDetailedText').innerText = info.detailed_analysis;
+                    
+                    // Reset detailed panel on new analysis
+                    const panel = document.getElementById('injuryDetailedPanel');
+                    panel.classList.add('d-none');
+                    
+                    injuryResults.classList.remove('d-none');
+                } else {
+                    alert('Analysis failed: ' + (data.error || 'Unknown error'));
+                    injuryModal.hide();
+                }
+            })
+            .catch(e => {
+                injuryLoading.classList.add('d-none');
+                alert('Connection error.');
+                injuryModal.hide();
+            });
+        });
+
+        // Toggle Detailed Analysis
+        const btnDetailed = document.getElementById('btnViewDetailed');
+        if (btnDetailed) {
+            btnDetailed.addEventListener('click', function() {
+                const panel = document.getElementById('injuryDetailedPanel');
+                panel.classList.toggle('d-none');
+                
+                if (!panel.classList.contains('d-none')) {
+                    panel.scrollIntoView({ behavior: 'smooth' });
+                    this.innerHTML = '<i class="fa-solid fa-chevron-up me-2"></i>Hide Analysis';
+                } else {
+                    this.innerHTML = '<i class="fa-solid fa-chart-pie me-2"></i>View Detailed Analysis';
+                }
+            });
+        }
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.lang.String?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.smartfight.controller.AdminFanReactionsController"
+      style="-fx-background-color:#0d0d0d;" spacing="0">
+
+    <!-- Header -->
+    <HBox styleClass="page-header" alignment="CENTER_LEFT" spacing="12">
+        <padding><Insets top="24" bottom="16" left="24" right="24"/></padding>
+        <VBox spacing="4">
+            <Label text="FAN REACTIONS" styleClass="page-title"/>
+            <Label fx:id="totalLabel" text="0 reactions" styleClass="page-subtitle"/>
+        </VBox>
+    </HBox>
+
+    <!-- Filter bar -->
+    <HBox styleClass="filter-bar" alignment="CENTER_LEFT" spacing="12">
+        <padding><Insets top="0" bottom="0" left="24" right="24"/></padding>
+        <TextField fx:id="searchField" styleClass="search-field"
+                   promptText="Search reactions..." prefWidth="220"
+                   onAction="#onFilter"/>
+        <ComboBox fx:id="fightFilter" promptText="All Fights" prefWidth="200"/>
+        <ComboBox fx:id="typeFilter" promptText="All Types" prefWidth="140">
+            <items>
+                <javafx.collections.FXCollections fx:factory="observableArrayList">
+                    <String fx:value="ALL"/>
+                    <String fx:value="FIRE"/>
+                    <String fx:value="LOVE"/>
+                    <String fx:value="SHOCK"/>
+                    <String fx:value="DOMINANT"/>
+                    <String fx:value="UPSET"/>
+                </javafx.collections.FXCollections>
+            </items>
+        </ComboBox>
+        <Button text="FILTER" styleClass="btn-primary" onAction="#onFilter"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="statusLabel" styleClass="caption"/>
+    </HBox>
+
+    <!-- Reaction card grid -->
+    <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="scroll-pane">
+        <content>
+            <FlowPane fx:id="reactionsFlow" hgap="16" vgap="16"
+                      style="-fx-background-color:#0d0d0d;">
+                <padding><Insets top="16" bottom="24" left="24" right="24"/></padding>
+            </FlowPane>
+        </content>
+    </ScrollPane>
+</VBox>

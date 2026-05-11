@@ -1,0 +1,33 @@
+<footer class="sf-footer mt-auto">
+    <div class="sf-footer-inner">
+    <div class="container-fluid px-0">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="sf-footer-brand mb-2">SMART<span>FIGHT</span></div>
+                <p class="text-muted small">The ultimate MMA fan experience platform. Follow fights, make predictions, and climb the leaderboard.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h6 class="text-uppercase mb-3" style="color:#dc2626;font-family:'Oswald',sans-serif;letter-spacing:1px;">Fan Zone</h6>
+                <ul class="list-unstyled">
+                    <li><a href="{{ path('front_blog_index') }}" class="text-muted text-decoration-none">Blog & News</a></li>
+                    <li><a href="{{ path('app_predictions') }}" class="text-muted text-decoration-none">Predictions</a></li>
+                    <li><a href="{{ path('app_leaderboard') }}" class="text-muted text-decoration-none">Leaderboard</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h6 class="text-uppercase mb-3" style="color:#dc2626;font-family:'Oswald',sans-serif;letter-spacing:1px;">Account</h6>
+                <ul class="list-unstyled">
+                    {% if app.user %}
+                        <li><a href="#" class="text-muted text-decoration-none">Notifications</a></li>
+                        <li><a href="{{ path('app_logout') }}" class="text-muted text-decoration-none">Logout</a></li>
+                    {% else %}
+                        <li><a href="{{ path('app_login') }}" class="text-muted text-decoration-none">Login</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        <hr style="border-color:#27272a;">
+        <p class="text-center text-muted small mb-0">&copy; {{ "now"|date("Y") }} SmartFight. ESPRIT PIDEV 3A 2025–2026.</p>
+    </div>
+    </div>
+</footer>

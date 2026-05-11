@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #09090b; color: #fff; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #18181b; padding: 30px; border-radius: 8px; margin-top: 40px; }
+        .header { text-align: center; border-bottom: 1px solid #27272a; padding-bottom: 20px; margin-bottom: 20px; }
+        .logo { font-size: 24px; font-weight: bold; color: #dc2626; letter-spacing: 2px; }
+        .content { line-height: 1.6; color: #d4d4d8; }
+        .ticket-card { background-color: #27272a; padding: 20px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #dc2626; }
+        .ticket-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #fff; }
+        .ticket-detail { margin: 5px 0; font-size: 14px; }
+        .label { color: #a1a1aa; display: inline-block; width: 80px; }
+        .value { color: #fff; font-weight: bold; }
+        .total { margin-top: 15px; padding-top: 15px; border-top: 1px solid #3f3f46; font-size: 18px; color: #c9a227; font-weight: bold; }
+        .ref-code { background-color: #000; padding: 15px; text-align: center; font-size: 22px; font-family: monospace; letter-spacing: 4px; border-radius: 4px; margin-top: 20px; color: #fff; border: 1px dashed #52525b; }
+        .qr-section { text-align: center; margin: 20px 0; }
+        .qr-section img { border: 4px solid #27272a; border-radius: 8px; }
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #71717a; border-top: 1px solid #27272a; padding-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">SMARTFIGHT</div>
+        </div>
+
+        <div class="content">
+            <h2 style="color: #fff; margin-top: 0;">Hello {{ booking.user.fullName }},</h2>
+            <p>Thank you for your confidence in us! Your booking has been successfully confirmed. We hope you enjoy the night of combat!</p>
+
+            <div class="ticket-card">
+                <div class="ticket-title">{{ booking.event.name }}</div>
+
+                <div class="ticket-detail">
+                    <span class="label">Date:</span>
+                    <span class="value">{{ booking.event.eventDate }}</span>
+                </div>
+                <div class="ticket-detail">
+                    <span class="label">Venue:</span>
+                    <span class="value">{{ booking.event.city }}</span>
+                </div>
+                <div class="ticket-detail">
+                    <span class="label">Type:</span>
+                    <span class="value" style="background:#dc2626; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 5px;">{{ booking.ticketType }}</span>
+                </div>
+                <div class="ticket-detail">
+                    <span class="label">Quantity:</span>
+                    <span class="value">{{ booking.ticketQuantity }}</span>
+                </div>
+
+                <div class="total">
+                    Total Paid: ${{ booking.totalPrice }}
+                </div>
+            </div>
+
+            <p>Present this reference code or scan the QR code upon arrival at the venue:</p>
+
+            <div class="ref-code">{{ booking.bookingReference }}</div>
+
+            {% if qrDataUri is not empty %}
+            <div class="qr-section">
+                <img src="data:image/png;base64,{{ qrDataUri }}" width="180" height="180" alt="Ticket QR Code"/>
+            </div>
+            {% endif %}
+
+            <p style="margin-top: 30px;">If you have any questions, please contact our support team.</p>
+        </div>
+
+        <div class="footer">
+            &copy; {{ year }} SmartFight MMA Organization. All rights reserved.<br>
+            This is an automated message. Please do not reply.
+        </div>
+    </div>
+</body>
+</html>

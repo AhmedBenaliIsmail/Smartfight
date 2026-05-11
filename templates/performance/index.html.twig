@@ -1,0 +1,104 @@
+{% extends 'front/base_front.html.twig' %}
+
+{% block title %}Boxing Analytics — SmartFight{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Analytics Engine - Performance Scores</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">SmartFight Stats: Punch/Power Accuracy, Jab Rates, KO Efficiency, and Title Defenses.</p>
+    </div>
+    {% if is_granted('ROLE_ADMIN') %}
+    <form action="{{ path('app_performance_recalc') }}" method="post">
+        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-microchip me-2"></i>Recalculate AI Performance</button>
+    </form>
+    {% endif %}
+</div>
+
+<div class="card mb-3" style="background:#18181b;border:1px solid #27272a;">
+    <div class="card-body py-3">
+        <form method="get" action="{{ path('app_performance') }}">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" name="q" class="form-control" placeholder="Search boxers..." value="{{ q }}" data-live-search="tbody" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select name="sort" class="form-select">
+                        <option value="performance_desc" {{ sort == 'performance_desc' ? 'selected' : '' }}>Sort by Highest Performance</option>
+                        <option value="performance_asc" {{ sort == 'performance_asc' ? 'selected' : '' }}>Sort by Lowest Performance</option>
+                        <option value="elo_desc" {{ sort == 'elo_desc' ? 'selected' : '' }}>Sort by Highest ELO</option>
+                        <option value="streak_desc" {{ sort == 'streak_desc' ? 'selected' : '' }}>Sort by Longest Streak</option>
+                        <option value="sos_desc" {{ sort == 'sos_desc' ? 'selected' : '' }}>Sort by Strength of Schedule</option>
+                    </select>
+                </div>
+                <div class="col-md-2 offset-md-1">
+                    <button type="submit" class="btn w-100" style="background:#dc2626;color:#fff;border:none;"><i class="fa-solid fa-sort me-1"></i>Apply</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card" style="background:#18181b;border:1px solid #27272a;">
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-hover mb-0 text-center">
+            <thead>
+            <tr>
+                <th class="text-start" style="padding:.75rem 1.25rem;">Boxer</th>
+                <th>Performance Score</th>
+                <th>ELO Rating</th>
+                <th>Win Streak</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for f in fighters %}
+                <tr>
+                    <td class="text-start" style="padding:.75rem 1.25rem;font-size:.875rem;font-weight:600;">{{ f.fullName }}</td>
+                    <td>
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <span class="fw-bold {% if f.performanceScore > 80 %}text-success{% elseif f.performanceScore > 50 %}text-warning{% else %}text-danger{% endif %}">{{ f.performanceScore|round(1) }}</span>
+                            {% if f.titleDefenses >= 1 %}<i class="fa-solid fa-crown text-warning small ms-1" title="Championship Bonus"></i>{% endif %}
+                        </div>
+                    </td>
+                    <td><span class="badge" style="background:rgba(59,130,246,.15);color:#3b82f6;">{{ f.eloRating|round }}</span></td>
+                    <td>
+                        {% if f.winStreak >= 3 %}🔥 <span class="text-danger fw-bold">{{ f.winStreak }}W</span>
+                        {% else %}{{ f.winStreak }}{% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ path('app_performance_show', {id: f.fighterId}) }}" class="btn btn-sm btn-outline-info">
+                            <i class="fa-solid fa-chart-line me-1"></i>Analyze
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="text-center" style="padding: 2rem;">No performance data found.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination Controls -->
+<div id="paginationControls" class="pagination-container"></div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    new SmartPagination({
+        containerSelector: 'table tbody',
+        itemSelector: 'tr',
+        paginationContainerId: 'paginationControls',
+        itemsPerPage: 6
+    });
+});
+</script>
+{% endblock %}

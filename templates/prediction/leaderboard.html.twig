@@ -1,0 +1,305 @@
+{% extends 'front/base_front.html.twig' %}
+
+{% block title %}Elite Rankings — SmartFight Fantasy{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    {# Header Section #}
+    <div class="d-flex align-items-center justify-content-between mb-5">
+        <div class="broadcast-header">
+            <div class="status-indicator mb-2">
+                <span class="pulse-ring"></span>
+                <span class="status-label">GLOBAL RANKINGS LIVE</span>
+            </div>
+            <h1 class="display-5 fw-bold text-white mb-0" style="font-family: 'Oswald', sans-serif; letter-spacing: 2px;">ELITE LEADERBOARD</h1>
+            <p class="text-muted mb-0 fs-6" style="letter-spacing: 1px;">2026 SEASON PERFORMANCE ANALYTICS</p>
+        </div>
+        <div class="prize-pool-badge">
+            <i class="fa-solid fa-trophy me-2 text-warning"></i>
+            <span class="fw-bold text-white">YEARLY PRIZE ACTIVE</span>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            {# Podium Section #}
+            <div class="row g-3 mb-4">
+                {% for topUser in users|slice(0, 3) %}
+                <div class="col-md-4">
+                    <div class="podium-card rank-{{ loop.index }}">
+                        <div class="rank-crown">
+                            {% if loop.index == 1 %}<i class="fa-solid fa-crown text-warning"></i>{% endif %}
+                            {% if loop.index == 2 %}<i class="fa-solid fa-medal text-secondary"></i>{% endif %}
+                            {% if loop.index == 3 %}<i class="fa-solid fa-medal text-orange"></i>{% endif %}
+                        </div>
+                        <div class="podium-avatar mb-3">
+                            {{ topUser.username|first|upper }}
+                        </div>
+                        <h4 class="podium-name">{{ topUser.username|upper }}</h4>
+                        <div class="podium-points">{{ topUser.predictionPoints }} PTS</div>
+                        <div class="podium-tier">ELITE TIER</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {# Search & Sort Console #}
+            <div class="card mb-4" style="background:#121214; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;">
+                <div class="card-body p-3">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0" style="border-color:#27272a;"><i class="fa-solid fa-magnifying-glass" style="color:#71717a;"></i></span>
+                                <input type="text" id="leaderboardSearch" class="form-control border-start-0" placeholder="Search contenders..." style="background:#18181b;border-color:#27272a;color:#fafafa;" />
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-flex gap-2 justify-content-end align-items-center">
+                            <span class="text-muted x-small fw-bold">SORT:</span>
+                            <button class="btn btn-dark btn-sm border-secondary" title="Sort by Rank" onclick="window._leaderFilter.sort('rank', 'number', 'asc')"><i class="fa-solid fa-list-ol"></i></button>
+                            <button class="btn btn-dark btn-sm border-secondary" title="Sort by Points" onclick="window._leaderFilter.sort('points', 'number', 'desc')"><i class="fa-solid fa-ranking-star"></i></button>
+                            <button class="btn btn-dark btn-sm border-secondary" title="Sort A-Z" onclick="window._leaderFilter.sort('name', 'string', 'asc')"><i class="fa-solid fa-arrow-down-a-z"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Rankings Table #}
+            <div class="card leaderboard-console-card">
+                <div class="card-header border-0 bg-transparent py-4 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-white fw-bold" style="font-family: 'Oswald', sans-serif;"><i class="fa-solid fa-list-ol me-3 text-danger"></i>FULL SEASON STANDINGS</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-console mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">RANK</th>
+                                <th>CONTENDER</th>
+                                <th class="text-center">ANALYTICS ACCURACY</th>
+                                <th class="text-center">TOTAL POINTS</th>
+                                <th class="pe-4 text-end">STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                                <tr class="ranking-row {{ loop.index <= 3 ? 'top-rank' : '' }}"
+                                    data-sort-rank="{{ loop.index }}"
+                                    data-sort-name="{{ user.username|lower }}"
+                                    data-sort-points="{{ user.predictionPoints }}">
+                                    <td class="ps-4 rank-cell">
+                                        <span class="rank-number">#{{ loop.index }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="contender-avatar-mini me-3">{{ user.username|first|upper }}</div>
+                                            <div>
+                                                <div class="fw-bold text-white fs-6">{{ user.username|upper }}</div>
+                                                <div class="text-muted xsmall">MEMBER SINCE {{ user.createdDate|date('Y') }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="accuracy-progress">
+                                            <div class="progress-bg">
+                                                <div class="progress-fill" style="width: {{ min(100, (user.predictionPoints / 10)|round) }}%"></div>
+                                            </div>
+                                            <span class="accuracy-val">HIGH</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="points-display">{{ user.predictionPoints }}</div>
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        {% if loop.index <= 3 %}
+                                            <span class="badge-premium gold">VIP CONTENDER</span>
+                                        {% elseif user.predictionPoints > 500 %}
+                                            <span class="badge-premium purple">PRO ANALYST</span>
+                                        {% else %}
+                                            <span class="badge-premium grey">CONTENDER</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="5" class="text-center p-5 text-muted">SEASON DATA INITIALIZING...</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination Controls -->
+                <div id="paginationControls" class="pagination-container p-4"></div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            {# Prize Pool Card #}
+            <div class="broadcast-side-card mb-4">
+                <div class="side-card-header gold-edge">
+                    <h5 class="mb-0 fw-bold" style="font-family: 'Oswald', sans-serif;"><i class="fa-solid fa-gift me-2"></i>2026 REWARDS</h5>
+                </div>
+                <div class="side-card-body p-4">
+                    <div class="reward-item mb-4">
+                        <div class="reward-icon"><i class="fa-solid fa-plane"></i></div>
+                        <div class="reward-content">
+                            <div class="reward-title">TITLE FIGHT TRAVEL</div>
+                            <div class="reward-desc">ALL-EXPENSE TRIP TO LAS VEGAS FOR THE FINALS.</div>
+                        </div>
+                    </div>
+                    <div class="reward-item mb-4">
+                        <div class="reward-icon"><i class="fa-solid fa-ticket"></i></div>
+                        <div class="reward-content">
+                            <div class="reward-title">RINGSIDE ACCESS</div>
+                            <div class="reward-desc">TWO VIP FRONT ROW TICKETS FOR THE CHAMPIONSHIP NIGHT.</div>
+                        </div>
+                    </div>
+                    <div class="reward-item">
+                        <div class="reward-icon"><i class="fa-solid fa-user-shield"></i></div>
+                        <div class="reward-content">
+                            <div class="reward-title">VERIFIED ANALYST</div>
+                            <div class="reward-desc">EXCLUSIVE STATUS AND BADGE ACROSS THE NETWORK.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Scoring Rules #}
+            <div class="broadcast-side-card">
+                <div class="side-card-header red-edge">
+                    <h5 class="mb-0 fw-bold" style="font-family: 'Oswald', sans-serif;"><i class="fa-solid fa-chart-line me-2"></i>SCORING LOGIC</h5>
+                </div>
+                <div class="side-card-body p-4">
+                    <div class="scoring-row">
+                        <span>CORRECT WINNER</span>
+                        <span class="pts-val">+10</span>
+                    </div>
+                    <div class="scoring-row">
+                        <span>METHOD OF VICTORY</span>
+                        <span class="pts-val">+10</span>
+                    </div>
+                    <div class="scoring-row">
+                        <span>EXACT ROUND (KO)</span>
+                        <span class="pts-val">+20</span>
+                    </div>
+                    <div class="scoring-row highlight">
+                        <span>PERFECT SCORE BONUS</span>
+                        <span class="pts-val">+10</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Broadcast Console Aesthetic */
+.broadcast-header { border-left: 4px solid #dc2626; padding-left: 25px; }
+.status-indicator { display: flex; align-items: center; gap: 10px; }
+.pulse-ring { width: 10px; height: 10px; background: #dc2626; border-radius: 50%; box-shadow: 0 0 12px #dc2626; animation: pulse 2s infinite; }
+@keyframes pulse { 0% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.2; transform: scale(0.8); } }
+.status-label { font-size: 0.65rem; font-weight: 900; color: #dc2626; letter-spacing: 2px; }
+
+.prize-pool-badge {
+    background: rgba(201, 162, 39, 0.1);
+    border: 1px solid rgba(201, 162, 39, 0.2);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+/* Podium Cards */
+.podium-card {
+    background: linear-gradient(145deg, #18181b, #09090b);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 20px;
+    padding: 30px 20px;
+    text-align: center;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+.podium-card:hover { transform: translateY(-10px); }
+.rank-1 { border-color: #c9a227; box-shadow: 0 10px 30px rgba(201, 162, 39, 0.1); }
+.rank-2 { border-color: #a1a1aa; }
+.rank-3 { border-color: #ea580c; }
+
+.rank-crown { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 1.5rem; }
+.podium-avatar {
+    width: 70px; height: 70px; background: #27272a; color: #fff;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    margin: 0 auto; font-size: 1.8rem; font-weight: 900; font-family: 'Oswald', sans-serif;
+    border: 3px solid rgba(255,255,255,0.1);
+}
+.rank-1 .podium-avatar { border-color: #c9a227; }
+
+.podium-name { font-family: 'Oswald', sans-serif; color: #fff; margin-bottom: 5px; letter-spacing: 1px; }
+.podium-points { font-family: 'Oswald', sans-serif; color: #dc2626; font-size: 1.4rem; font-weight: 800; margin-bottom: 5px; }
+.podium-tier { font-size: 0.65rem; font-weight: 900; color: #71717a; letter-spacing: 2px; }
+
+/* Table Styling */
+.leaderboard-console-card { background: rgba(24, 24, 27, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; }
+.table-console { background: transparent; }
+.table-console thead th { border-bottom: 1px solid rgba(255,255,255,0.05); color: #71717a; font-size: 0.7rem; font-weight: 900; letter-spacing: 2px; padding: 20px; }
+.ranking-row { border-bottom: 1px solid rgba(255,255,255,0.02); transition: all 0.2s; }
+.ranking-row:hover { background: rgba(255,255,255,0.01); }
+.top-rank { background: rgba(201, 162, 39, 0.02); }
+
+.rank-cell { vertical-align: middle; }
+.rank-number { font-family: 'Oswald', sans-serif; font-size: 1.1rem; color: #a1a1aa; font-weight: 700; }
+.top-rank .rank-number { color: #c9a227; }
+
+.contender-avatar-mini { width: 36px; height: 36px; background: #27272a; color: #a1a1aa; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+
+.points-display { font-family: 'Oswald', sans-serif; font-size: 1.2rem; color: #fff; font-weight: 700; }
+
+.accuracy-progress { width: 120px; margin: 0 auto; display: flex; align-items: center; gap: 10px; }
+.progress-bg { flex: 1; height: 4px; background: #27272a; border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: #dc2626; box-shadow: 0 0 10px #dc2626; }
+.accuracy-val { font-size: 0.6rem; font-weight: 900; color: #dc2626; }
+
+.badge-premium { font-size: 0.65rem; font-weight: 900; padding: 4px 10px; border-radius: 4px; letter-spacing: 1px; }
+.badge-premium.gold { background: rgba(201, 162, 39, 0.1); color: #c9a227; }
+.badge-premium.purple { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+.badge-premium.grey { background: rgba(113, 113, 122, 0.1); color: #71717a; }
+
+/* Side Cards */
+.broadcast-side-card { background: #121214; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; overflow: hidden; }
+.side-card-header { padding: 15px 20px; background: rgba(255,255,255,0.02); }
+.side-card-header.gold-edge { border-left: 4px solid #c9a227; }
+.side-card-header.red-edge { border-left: 4px solid #dc2626; }
+
+.reward-item { display: flex; gap: 20px; }
+.reward-icon { width: 44px; height: 44px; background: rgba(255,255,255,0.03); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #fff; }
+.reward-title { font-family: 'Oswald', sans-serif; color: #fff; font-size: 0.9rem; letter-spacing: 1px; }
+.reward-desc { font-size: 0.7rem; color: #71717a; font-weight: 600; line-height: 1.4; }
+
+.scoring-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.02); font-size: 0.75rem; font-weight: 700; color: #a1a1aa; }
+.scoring-row.highlight { color: #fff; }
+.pts-val { color: #22c55e; font-family: 'Oswald', sans-serif; font-size: 0.9rem; }
+.xsmall { font-size: 0.6rem; }
+</style>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const pagination = new SmartPagination({
+        containerSelector: '.table-console tbody',
+        itemSelector: 'tr.ranking-row',
+        paginationContainerId: 'paginationControls',
+        itemsPerPage: 10
+    });
+
+    window._leaderFilter = new AdvancedFilter('.table-console tbody', 'tr.ranking-row', (visibleItems) => {
+        pagination.setFilteredItems(visibleItems);
+    });
+
+    const searchInput = document.getElementById('leaderboardSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            window._leaderFilter.search(e.target.value);
+        });
+    }
+
+    pagination.init();
+});
+</script>
+{% endblock %}

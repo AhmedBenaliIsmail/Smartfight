@@ -1,0 +1,267 @@
+{% extends 'admin/base_admin.html.twig' %}
+{% set breadcrumb_title = 'Matchmaking Voting Pool' %}
+
+{% block title %}Manage Voting Pool — SmartFight Admin{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .proposal-card {
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        .proposal-card:hover {
+            border-color: #dc2626;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .vote-badge {
+            background: rgba(220, 38, 38, 0.1);
+            color: #dc2626;
+            font-size: 1.25rem;
+            font-weight: 800;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+    </style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center justify-content-between mb-5">
+        <div>
+            <h1 class="h2 fw-bold text-white mb-1">VOTING POOL MANAGEMENT</h1>
+            <p class="text-muted mb-0">Select matchups for fans to vote on. High-voted bouts appear on the Community Card.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button id="aiGenerateBtn" class="btn btn-primary px-4 fw-bold" style="background:#8b5cf6; border:none;">
+                <i class="fa-solid fa-wand-magic-sparkles me-2"></i>AI GENERATE PROPOSALS
+            </button>
+            <button class="btn btn-danger px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#newProposalModal">
+                <i class="fa-solid fa-plus me-2"></i>ADD TO POOL
+            </button>
+        </div>
+    </div>
+
+    <script>
+    document.getElementById('aiGenerateBtn').addEventListener('click', async function() {
+        if(!confirm('This will use DeepSeek AI to analyze the entire roster and create 5 high-excitement match proposals for fan voting. Proceed?')) return;
+        
+        const btn = this;
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>GENERATING...';
+        
+        try {
+            const res = await fetch('{{ path('api_ai_generate_proposals') }}', { method: 'POST' });
+            const data = await res.json();
+            if(data.success) {
+                alert('Success! ' + data.message);
+                window.location.reload();
+            } else {
+                alert('Error: ' + (data.error || 'Unknown error'));
+            }
+        } catch(e) {
+            alert('Connection failed: ' + e.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    });
+    </script>
+
+    <div class="row">
+        <div class="col-lg-12">
+            {% for proposal in proposals %}
+            <div class="proposal-card d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-4">
+                    <div class="vote-badge text-center">
+                        <div class="small text-muted uppercase" style="font-size:0.6rem;">VOTES</div>
+                        {{ proposal.voteCount }}
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-4 mb-2">
+                            <!-- Fighter 1 -->
+                            <div class="d-flex align-items-center gap-2">
+                                {% if proposal.fighter1.photoFilename %}
+                                    <img src="{{ asset('uploads/boxers/' ~ proposal.fighter1.photoFilename) }}" style="width:48px; height:48px; border-radius:50%; object-fit:cover; border:2px solid #ef4444;" alt="">
+                                {% else %}
+                                    <div style="width:48px; height:48px; border-radius:50%; border:2px solid #ef4444; background:#18181b; display:flex; align-items:center; justify-content:center; color:#71717a;"><i class="fa-solid fa-user"></i></div>
+                                {% endif %}
+                                <div>
+                                    <div class="text-white fw-bold" style="font-size:1.1rem; text-transform:uppercase;">{{ proposal.fighter1.fullName }}</div>
+                                    <div class="small text-muted" style="font-size:0.75rem; font-weight:600; letter-spacing:0.5px;">{{ proposal.fighter1.wins }}-{{ proposal.fighter1.losses }}-{{ proposal.fighter1.draws }} ({{ proposal.fighter1.koWins }} KOs)</div>
+                                </div>
+                            </div>
+                            
+                            <!-- VS Badge -->
+                            <div class="text-danger fw-bold" style="font-style:italic; font-size:1.2rem;">VS</div>
+
+                            <!-- Fighter 2 -->
+                            <div class="d-flex align-items-center gap-2 flex-row-reverse text-end">
+                                {% if proposal.fighter2.photoFilename %}
+                                    <img src="{{ asset('uploads/boxers/' ~ proposal.fighter2.photoFilename) }}" style="width:48px; height:48px; border-radius:50%; object-fit:cover; border:2px solid #3b82f6;" alt="">
+                                {% else %}
+                                    <div style="width:48px; height:48px; border-radius:50%; border:2px solid #3b82f6; background:#18181b; display:flex; align-items:center; justify-content:center; color:#71717a;"><i class="fa-solid fa-user"></i></div>
+                                {% endif %}
+                                <div>
+                                    <div class="text-white fw-bold" style="font-size:1.1rem; text-transform:uppercase;">{{ proposal.fighter2.fullName }}</div>
+                                    <div class="small text-muted" style="font-size:0.75rem; font-weight:600; letter-spacing:0.5px;">{{ proposal.fighter2.wins }}-{{ proposal.fighter2.losses }}-{{ proposal.fighter2.draws }} ({{ proposal.fighter2.koWins }} KOs)</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-muted small mt-1" style="font-size:0.8rem;">
+                            <span class="badge bg-dark border border-secondary me-2 px-2 py-1">{{ proposal.weightDivision ? proposal.weightDivision.name : 'Unassigned' }}</span>
+                            <i class="fa-regular fa-clock me-1"></i> Added on {{ proposal.proposedAt|date('M d, Y') }}
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge {{ proposal.status == 'ACCEPTED' ? 'bg-success-lt' : 'bg-warning-lt' }}">
+                        {{ proposal.status }}
+                    </span>
+                    <form method="post" action="{{ path('app_match_proposal_delete', {id: proposal.id}) }}" onsubmit="return confirm('Remove this from the voting pool?');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger border-0">
+                            <i class="fa-solid fa-trash-can fa-lg"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-5 fan-card">
+                <i class="fa-solid fa-layer-group fa-3x text-muted mb-3"></i>
+                <h3 class="text-white">Voting Pool is Empty</h3>
+                <p class="text-muted">Start by adding a potential matchup for the fans to vote on.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- New Proposal Modal -->
+<div class="modal fade" id="newProposalModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0" style="background: #09090b; box-shadow: 0 0 50px rgba(220, 38, 38, 0.15);">
+            <div class="modal-header border-secondary px-4 py-3" style="background: linear-gradient(to right, #18181b, #09090b);">
+                <div class="d-flex align-items-center gap-2">
+                    <div style="width: 32px; height: 32px; background: #dc2626; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <h5 class="modal-title text-white fw-bold">PRO MATCHMAKER TOOL</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="matchmakerForm" action="{{ path('app_match_proposal_new') }}" method="post">
+                <div class="modal-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3 h-100" style="background: #18181b; border: 1px solid #27272a;">
+                                <label class="form-label text-danger small uppercase fw-bold mb-3" style="letter-spacing:1px;">BOXER A (RED CORNER)</label>
+                                <select id="fighterA" name="fighter1Id" class="form-select bg-dark text-white border-secondary py-2" required>
+                                    <option value="">Select Fighter...</option>
+                                    {% for fighter in fighters %}
+                                        <option value="{{ fighter.fighterId }}" data-division="{{ fighter.weightDivision.id }}" data-division-name="{{ fighter.weightDivision.name }}">
+                                            {{ fighter.fullName }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3 h-100" style="background: #18181b; border: 1px solid #27272a;">
+                                <label class="form-label text-primary small uppercase fw-bold mb-3" style="letter-spacing:1px;">BOXER B (BLUE CORNER)</label>
+                                <select id="fighterB" name="fighter2Id" class="form-select bg-dark text-white border-secondary py-2" disabled required>
+                                    <option value="">Choose Boxer A first...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="p-3 rounded-3" style="background: #18181b; border: 1px solid #27272a; border-left: 4px solid #dc2626;">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <label class="form-label text-muted small uppercase fw-bold mb-1">SANCTIONED DIVISION</label>
+                                        <div id="divisionLabel" class="h5 mb-0 text-white fw-bold">Select boxers to determine division</div>
+                                        <input type="hidden" id="weightDivisionInput" name="weightDivisionId">
+                                    </div>
+                                    <i class="fa-solid fa-scale-balanced fa-2x text-muted opacity-25"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-dark px-4" data-bs-dismiss="modal">CANCEL</button>
+                    <button type="submit" id="submitBtn" class="btn btn-danger px-5 py-2 fw-bold" disabled>
+                        ACTIVATE VOTING POOL
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fighterA = document.getElementById('fighterA');
+    const fighterB = document.getElementById('fighterB');
+    const divisionLabel = document.getElementById('divisionLabel');
+    const weightDivisionInput = document.getElementById('weightDivisionInput');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const allFighters = [
+        {% for fighter in fighters %}
+        {
+            id: "{{ fighter.fighterId }}",
+            name: "{{ fighter.fullName }}",
+            divisionId: "{{ fighter.weightDivision.id }}",
+            divisionName: "{{ fighter.weightDivision.name }}"
+        },
+        {% endfor %}
+    ];
+
+    fighterA.addEventListener('change', function() {
+        const selectedOption = fighterA.options[fighterA.selectedIndex];
+        const divisionId = selectedOption.getAttribute('data-division');
+        const divisionName = selectedOption.getAttribute('data-division-name');
+
+        if (!divisionId) {
+            fighterB.disabled = true;
+            fighterB.innerHTML = '<option value="">Choose Boxer A first...</option>';
+            divisionLabel.textContent = 'Select boxers to determine division';
+            submitBtn.disabled = true;
+            return;
+        }
+
+        // Enable B and filter
+        fighterB.disabled = false;
+        fighterB.innerHTML = '<option value="">Select Opponent...</option>';
+        
+        allFighters.filter(f => f.divisionId === divisionId && f.id !== fighterA.value).forEach(f => {
+            const opt = document.createElement('option');
+            opt.value = f.id;
+            opt.textContent = f.name;
+            fighterB.appendChild(opt);
+        });
+
+        divisionLabel.textContent = divisionName + ' DIVISION';
+        weightDivisionInput.value = divisionId;
+        
+        checkReady();
+    });
+
+    fighterB.addEventListener('change', checkReady);
+
+    function checkReady() {
+        if (fighterA.value && fighterB.value) {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
+        }
+    }
+});
+</script>
+{% endblock %}

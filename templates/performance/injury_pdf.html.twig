@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Injury Report — {{ fighter.fullName }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, Helvetica, sans-serif; background: #0f0f13; color: #e0e0e0; padding: 30px; }
+        
+        .header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #ef5350; }
+        .header h1 { font-size: 22px; color: #ef5350; margin-bottom: 5px; letter-spacing: 2px; text-transform: uppercase; }
+        .header p { font-size: 11px; color: #888; }
+        
+        .analyst-box { background: #1c1c24; border: 1px solid #2d2d35; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        .analyst-box h3 { color: #fafafa; font-size: 14px; margin-bottom: 3px; }
+        .analyst-box p { color: #888; font-size: 10px; }
+        
+        .fighter-info { background: #1c1c24; border: 1px solid #2d2d35; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        .fighter-info h2 { font-size: 18px; color: #fafafa; margin-bottom: 10px; }
+        .fighter-info table { width: 100%; font-size: 11px; }
+        .fighter-info td { padding: 4px 0; color: #ccc; }
+        .fighter-info td.label { color: #888; width: 40%; }
+        
+        .risk-section { background: #1c1c24; border: 1px solid #2d2d35; border-radius: 8px; padding: 20px; margin-bottom: 20px; text-align: center; }
+        .risk-score { font-size: 48px; font-weight: 900; margin-bottom: 5px; }
+        .risk-score.high { color: #ef5350; }
+        .risk-score.medium { color: #f59e0b; }
+        .risk-score.low { color: #00e676; }
+        .risk-label { font-size: 10px; color: #888; letter-spacing: 2px; text-transform: uppercase; }
+        .risk-badge { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-top: 8px; }
+        .risk-badge.high { background: rgba(239,68,68,0.2); color: #ef5350; }
+        .risk-badge.medium { background: rgba(245,158,11,0.2); color: #f59e0b; }
+        .risk-badge.low { background: rgba(0,230,118,0.2); color: #00e676; }
+        
+        .detail-row { display: table; width: 100%; margin-bottom: 15px; }
+        .detail-box { display: table-cell; width: 50%; padding: 0 5px; vertical-align: top; }
+        .detail-box-inner { background: #1c1c24; border: 1px solid #2d2d35; border-radius: 8px; padding: 12px; text-align: center; }
+        .detail-box-inner .label { font-size: 9px; color: #888; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px; }
+        .detail-box-inner .value { font-size: 14px; font-weight: bold; }
+        .detail-box-inner .value.warning { color: #f59e0b; }
+        .detail-box-inner .value.danger { color: #ef5350; }
+        
+        .recommendation { background: rgba(0,230,118,0.05); border: 1px solid rgba(0,230,118,0.3); border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        .recommendation h4 { color: #00e676; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px; }
+        .recommendation p { color: #e0e0e0; font-size: 12px; }
+        
+        .analysis-section { background: #1c1c24; border-left: 3px solid #ef5350; border-radius: 0 8px 8px 0; padding: 15px; margin-bottom: 20px; }
+        .analysis-section h4 { color: #fafafa; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+        .analysis-section p { color: #aaa; font-size: 11px; line-height: 1.6; }
+        
+        .metrics-row { display: table; width: 100%; margin-bottom: 20px; }
+        .metric { display: table-cell; width: 33.33%; text-align: center; padding: 10px; }
+        .metric .number { font-size: 22px; font-weight: 900; color: #fafafa; }
+        .metric .label { font-size: 9px; color: #888; letter-spacing: 1px; text-transform: uppercase; }
+        
+        .algorithm { background: #09090b; border: 1px dashed #3f3f46; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        .algorithm h4 { color: #f87171; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+        .algorithm .formula { font-family: 'Courier New', monospace; color: #f87171; font-size: 12px; margin-bottom: 8px; }
+        .algorithm .desc { color: #888; font-size: 10px; line-height: 1.5; }
+        
+        .footer { text-align: center; margin-top: 30px; padding-top: 15px; border-top: 1px solid #2d2d35; }
+        .footer p { font-size: 9px; color: #555; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛡 Injury Risk Assessment Report</h1>
+        <p>SmartFight AI Biomechanical Analysis Engine — Confidential</p>
+    </div>
+    
+    <div class="analyst-box">
+        <h3>🩺 Dr. James Wong | PhD Biomechanics</h3>
+        <p>Senior Injury Prediction Analyst — SmartFight Neural Division</p>
+    </div>
+    
+    <div class="fighter-info">
+        <h2>{{ fighter.fullName }}</h2>
+        <table>
+            <tr><td class="label">Division</td><td>{{ fighter.weightDivision ? fighter.weightDivision.name : 'Unclassified' }}</td></tr>
+            <tr><td class="label">Record</td><td>{{ fighter.wins }}W - {{ fighter.losses }}L - {{ fighter.draws }}D</td></tr>
+            <tr><td class="label">Age</td><td>{{ fighter.age ?? 'N/A' }}</td></tr>
+            <tr><td class="label">Total Fights</td><td>{{ fighter.totalFights }}</td></tr>
+            <tr><td class="label">KO Losses</td><td>{{ fighter.koLosses }}</td></tr>
+            <tr><td class="label">Style</td><td>{{ fighter.calculatedFightingStyle }}</td></tr>
+            <tr><td class="label">ELO Rating</td><td>{{ fighter.eloRating|round(1) }}</td></tr>
+        </table>
+    </div>
+
+    {% set riskClass = prediction.risk_level|default('Low') == 'High' ? 'high' : (prediction.risk_level|default('Low') == 'Medium' ? 'medium' : 'low') %}
+
+    <div class="risk-section">
+        <div class="risk-score {{ riskClass }}">{{ prediction.risk_percentage|default(0) }}%</div>
+        <div class="risk-label">Aggregate Risk Probability</div>
+        <div class="risk-badge {{ riskClass }}">{{ prediction.risk_level|default('Low') }} RISK</div>
+    </div>
+
+    <div class="detail-row">
+        <div class="detail-box">
+            <div class="detail-box-inner">
+                <div class="label">Primary Vulnerability</div>
+                <div class="value warning">🥊 {{ prediction.vulnerable_zone|default('N/A') }}</div>
+            </div>
+        </div>
+        <div class="detail-box">
+            <div class="detail-box-inner">
+                <div class="label">Alert Readiness</div>
+                <div class="value danger">{{ prediction.days_to_alert|default(30) }} days</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="recommendation">
+        <h4>✅ Recommendation</h4>
+        <p>{{ prediction.mitigation_strategy|default('Standard maintenance and peak conditioning.') }}</p>
+    </div>
+
+    <div class="analysis-section">
+        <h4>🧠 Deep Neural Scan Report</h4>
+        <p>{{ prediction.detailed_analysis|default('No detailed analysis available.') }}</p>
+    </div>
+
+    <div class="metrics-row">
+        <div class="metric">
+            <div class="number">{{ prediction.accuracy|default(92)|round }}%</div>
+            <div class="label">Accuracy</div>
+        </div>
+        <div class="metric">
+            <div class="number">3</div>
+            <div class="label">Weeks Early</div>
+        </div>
+        <div class="metric">
+            <div class="number">{{ prediction.roi|default(300) }}%</div>
+            <div class="label">ROI</div>
+        </div>
+    </div>
+    
+    <div class="algorithm">
+        <h4>Algorithm Used</h4>
+        <div class="formula">R = 10 + AgeFactor + LoadFactor + TraumaFactor</div>
+        <div class="desc">
+            AgeFactor = max(0, (age - 30) × 3) | 
+            LoadFactor = total_fights × 0.8 | 
+            TraumaFactor = ko_losses × 15 |
+            Capped at 95%
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Generated {{ "now"|date("Y-m-d H:i") }} — SmartFight AI v2.0 — Dr. James Wong, PhD Biomechanics — CONFIDENTIAL</p>
+    </div>
+</body>
+</html>

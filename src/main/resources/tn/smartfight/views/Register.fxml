@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.smartfight.controller.RegisterController"
+            styleClass="root">
+
+    <center>
+        <VBox alignment="CENTER" spacing="14" maxWidth="400">
+            <padding><Insets top="40" bottom="40" left="40" right="40"/></padding>
+            <Label text="Create Account" styleClass="h1"/>
+
+            <VBox spacing="6">
+                <Label text="Username"/>
+                <TextField fx:id="usernameField" promptText="Choose a username"/>
+            </VBox>
+            <VBox spacing="6">
+                <Label text="Email"/>
+                <TextField fx:id="emailField" promptText="your@email.com"/>
+            </VBox>
+            <VBox spacing="6">
+                <Label text="Password"/>
+                <PasswordField fx:id="passwordField" promptText="Password"/>
+            </VBox>
+            <VBox spacing="6">
+                <Label text="Confirm Password"/>
+                <PasswordField fx:id="confirmPasswordField" promptText="Confirm password"
+                               onAction="#onRegister"/>
+            </VBox>
+
+            <Button text="Register" onAction="#onRegister" styleClass="btn-primary" maxWidth="Infinity"/>
+            <Button fx:id="resendButton" text="Resend Verification Email"
+                    onAction="#onResendEmail" disable="true" maxWidth="Infinity"/>
+            <Label fx:id="statusLabel" styleClass="caption" wrapText="true"/>
+            <Separator/>
+            <Button text="Back to Login" onAction="#onBackToLogin"
+                    styleClass="btn-outline" maxWidth="Infinity"/>
+        </VBox>
+    </center>
+</BorderPane>

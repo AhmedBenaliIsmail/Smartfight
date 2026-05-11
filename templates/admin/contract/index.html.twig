@@ -1,0 +1,473 @@
+{% extends 'admin/base_admin.html.twig' %}
+{% set breadcrumb_title = 'Fighter Contracts' %}
+
+{% block title %}SmartFight Admin — Fighter Contracts{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --glass-bg: rgba(9, 9, 11, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-red: #dc2626;
+        }
+
+        body {
+            background: url('{{ asset('mma_broadcast_background_1777553049093.png') }}') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+        }
+
+        .sf-pro-dashboard {
+            padding: 2rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .broadcast-banner {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(0, 0, 0, 0.8));
+            backdrop-filter: blur(30px);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            padding: 3rem;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.7);
+        }
+
+        .broadcast-banner::before {
+            content: "OFFICIAL PAYROLL";
+            position: absolute;
+            top: -10px;
+            right: -20px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 10rem;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.02);
+            pointer-events: none;
+            letter-spacing: 10px;
+        }
+
+        .stat-card-glass {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .stat-card-glass:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-red);
+            transform: translateY(-5px);
+        }
+
+        .pro-table-wrapper {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.8);
+        }
+
+        .pro-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 12px;
+        }
+
+        .pro-table thead th {
+            color: #71717a;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            padding: 1rem 1.5rem;
+            font-weight: 800;
+        }
+
+        .pro-table tbody tr {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .pro-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.07) !important;
+            transform: scale(1.01) translateX(10px);
+            box-shadow: -10px 0 0 0 var(--accent-red), 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .pro-table td {
+            padding: 1.5rem;
+            border: none;
+        }
+
+        .pro-table td:first-child { border-radius: 16px 0 0 16px; }
+        .pro-table td:last-child { border-radius: 0 16px 16px 0; }
+
+        .purse-amount {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to bottom, #fff, #ef4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-broadcast {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            border: none;
+            color: #fff;
+            padding: 0.8rem 2rem;
+            border-radius: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(220, 38, 38, 0.3);
+        }
+        .btn-broadcast:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(220, 38, 38, 0.5);
+            color: #fff;
+        }
+
+        .sf-search-input {
+            background: rgba(0,0,0,0.4) !important;
+            border: 1px solid var(--glass-border) !important;
+            color: #fff !important;
+            border-radius: 12px !important;
+            padding-left: 3rem !important;
+        }
+    </style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="sf-pro-dashboard">
+    <!-- Broadcast Analytics Header -->
+    <div class="broadcast-banner">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="badge bg-danger mb-3 px-3 py-2" style="letter-spacing:2px; font-weight:900; font-size:0.65rem;">LIVE PAYROLL CONSOLE</div>
+                <h1 class="display-4 text-white fw-bold mb-2" style="font-family:'Oswald',sans-serif; letter-spacing:2px;">FIGHTER PURSES</h1>
+                <p class="text-muted fs-5 mb-4">Managing ${{ totalContractValue|default(0)|number_format(0) }} in athlete agreements for the 2026 season.</p>
+                
+                <div class="d-flex gap-3">
+                    <button class="btn btn-broadcast" data-bs-toggle="modal" data-bs-target="#createContractModal">
+                        <i class="fa-solid fa-plus-circle me-2"></i>New Agreement
+                    </button>
+                    <a href="{{ path('admin_contract_pdf_list') }}" class="btn btn-outline-light border-secondary px-4 py-2 d-flex align-items-center gap-2" style="border-radius:12px; font-weight:700;">
+                        <i class="fa-solid fa-file-pdf text-danger"></i> Audit Logs
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="stat-card-glass">
+                            <div class="text-muted xsmall mb-1">TOTAL PAYOUTS</div>
+                            <div class="h3 fw-bold text-white mb-0" style="font-family:'Oswald';">${{ totalPaid|default(0)|number_format(0) }}</div>
+                            <div class="progress mt-2" style="height: 4px; background: rgba(255,255,255,0.05);">
+                                <div class="progress-bar bg-success" style="width: 65%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-card-glass">
+                            <div class="text-muted xsmall mb-1">PENDING APPROVAL</div>
+                            <div class="h3 fw-bold text-danger mb-0" style="font-family:'Oswald';">{{ pendingCount|default(0) }}</div>
+                            <div class="text-muted xsmall mt-1">Awaiting bout results</div>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-3">
+                        <div class="stat-card-glass d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="text-muted xsmall mb-0">ACTIVE CONTRACTS</div>
+                                <div class="h4 fw-bold text-white mb-0">{{ contracts|length }} Active</div>
+                            </div>
+                            <i class="fa-solid fa-shield-halved fa-2x text-muted opacity-25"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Filters Glass Bar -->
+    <div class="d-flex flex-wrap gap-3 mb-4 p-4 rounded-4" style="background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); backdrop-filter: blur(10px);">
+        <div class="position-relative" style="flex: 1; min-width: 300px;">
+            <i class="fa-solid fa-magnifying-glass position-absolute" style="left: 1.2rem; top: 50%; transform: translateY(-50%); color: #71717a; z-index: 5;"></i>
+            <input type="text" id="contractSearch" class="form-control sf-search-input py-3" placeholder="Search boxer, event or division..." data-live-search=".pro-table tbody" data-live-search-item="tr" />
+        </div>
+        
+        <div class="d-flex gap-3">
+            <select class="form-select bg-dark text-white border-secondary rounded-3 px-4" style="width: 180px;" onchange="window._contractFilter.filter('status', this.value)">
+                <option value="all">Status: All</option>
+                <option value="paid">Status: Paid</option>
+                <option value="ready">Status: Ready</option>
+                <option value="pending">Status: Pending</option>
+            </select>
+            
+            <div class="btn-group bg-dark rounded-3 border border-secondary overflow-hidden">
+                <button class="btn btn-sm text-muted px-3 border-end border-secondary" onclick="window._contractFilter.sort('pay', 'number', 'desc')">
+                    <i class="fa-solid fa-arrow-up-wide-short me-2"></i>Sort Pay
+                </button>
+                <button class="btn btn-sm text-muted px-3" onclick="window._contractFilter.sort('name', 'string', 'asc')">
+                    <i class="fa-solid fa-arrow-down-a-z me-2"></i>Name
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Grid Glass Container -->
+    <div class="pro-table-wrapper mb-5">
+        <table class="pro-table">
+            <thead>
+                <tr>
+                    <th>Fighter Identity</th>
+                    <th>Sanctioned Event</th>
+                    <th>Base Pay</th>
+                    <th>Win Bonus</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-end">Total Purse</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contract in contracts %}
+                    <tr data-search-content="{{ contract.fighter.fullName|lower }} {{ contract.event.eventName|lower }} {{ contract.fighter.weightDivision ? contract.fighter.weightDivision.name|lower : '' }}"
+                        data-filter-status="{% if contract.isPaid %}paid{% elseif contract.calculatedPayout is not null %}ready{% else %}pending{% endif %}"
+                        data-filter-event="{{ contract.event.eventName }}"
+                        data-sort-pay="{{ contract.basePay + contract.winBonus }}"
+                        data-sort-name="{{ contract.fighter.fullName }}">
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="position-relative">
+                                    {% if contract.fighter.photoFilename %}
+                                        <img src="{{ asset('uploads/boxers/' ~ contract.fighter.photoFilename) }}" class="fighter-photo" alt="" style="width:50px; height:50px; border-radius:12px; object-fit:cover;">
+                                    {% else %}
+                                        <div class="fighter-photo d-flex align-items-center justify-content-center bg-dark" style="width:50px; height:50px; border-radius:12px;">
+                                            <i class="fa-solid fa-user text-muted opacity-25"></i>
+                                        </div>
+                                    {% endif %}
+                                    {% if contract.isPaid %}
+                                        <div class="position-absolute bottom-0 end-0 bg-success rounded-circle border border-dark" style="width:12px; height:12px;"></div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-white mb-0" style="font-size: 0.95rem;">{{ contract.fighter.fullName }}</div>
+                                    <div class="text-muted xsmall" style="font-size: 0.6rem; letter-spacing: 1px; text-transform: uppercase;">{{ contract.fighter.weightDivision ? contract.fighter.weightDivision.name : 'Open Division' }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-white fw-bold mb-0" style="font-size: 0.85rem;">{{ contract.event.eventName }}</div>
+                            <div class="text-muted xsmall" style="font-size: 0.7rem;">{{ contract.event.eventDate ? contract.event.eventDate|date('M d, Y') : 'TBA' }}</div>
+                        </td>
+                        <td>
+                            <div class="text-white fw-bold" style="font-size: 0.9rem;">${{ contract.basePay|number_format(0) }}</div>
+                            <div class="text-muted xsmall" style="font-size: 0.6rem; opacity: 0.5;">GUARANTEED</div>
+                        </td>
+                        <td>
+                            <div class="text-warning fw-bold" style="font-size: 0.9rem;">+${{ contract.winBonus|number_format(0) }}</div>
+                            <div class="text-muted xsmall" style="font-size: 0.6rem; opacity: 0.5;">INCENTIVE</div>
+                        </td>
+                        <td class="text-center">
+                            {% if contract.isPaid %}
+                                <span class="status-pill paid"><i class="fa-solid fa-check-circle"></i> Settled</span>
+                            {% elseif contract.calculatedPayout is not null %}
+                                <span class="status-pill ready"><i class="fa-solid fa-bolt"></i> Ready</span>
+                            {% else %}
+                                <span class="status-pill pending"><i class="fa-solid fa-clock"></i> Active</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            {% if contract.calculatedPayout is not null %}
+                                <div class="purse-amount">${{ contract.calculatedPayout|number_format(0) }}</div>
+                                <div class="text-muted xsmall" style="font-size: 0.6rem; opacity: 0.6;">DEDUCTION: 10% AGENT</div>
+                            {% else %}
+                                <span class="text-muted" style="letter-spacing: 2px; opacity: 0.2;">-------</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                {% if not contract.isPaid %}
+                                    <form method="post" action="{{ path('admin_contract_toggle_weight', {'id': contract.id}) }}" class="d-inline">
+                                        <button class="action-btn-circle {{ contract.isMissedWeight ? 'bg-danger text-white border-0' : '' }}" title="Weight Penalty">
+                                            <i class="fa-solid fa-weight-scale"></i>
+                                        </button>
+                                    </form>
+                                    {% if contract.calculatedPayout is not null %}
+                                        <form method="post" action="{{ path('admin_contract_pay', {'id': contract.id}) }}">
+                                            <button class="btn btn-sm btn-success px-3 fw-bold" style="border-radius: 12px; font-size: 0.65rem; height: 44px; text-transform:uppercase; letter-spacing:1px;">PAY NOW</button>
+                                        </form>
+                                    {% endif %}
+                                {% endif %}
+                                <a href="{{ path('admin_contract_pdf', {'id': contract.id}) }}" class="action-btn-circle" title="View Document">
+                                    <i class="fa-solid fa-file-invoice"></i>
+                                </a>
+                                <form method="post" action="{{ path('admin_contract_delete', {'id': contract.id}) }}" onsubmit="return confirm('Revoke official agreement?');">
+                                    <button class="action-btn-circle text-danger"><i class="fa-solid fa-trash-can"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-folder-open fa-3x mb-3 opacity-25"></i>
+                            <p>No active contracts found in the organization archives.</p>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- Pagination Controls -->
+    <div id="paginationControls" class="pagination-container"></div>
+</div>
+
+<!-- Create Contract Modal (Pro Cinematic Edition) -->
+<div class="modal fade" id="createContractModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" action="{{ path('admin_contract_create') }}" class="modal-content" style="background: rgba(9, 9, 11, 0.95); backdrop-filter: blur(40px); border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: 0 40px 100px rgba(0,0,0,0.8); overflow: hidden;">
+            <div class="modal-header border-0 p-4 pb-0">
+                <div>
+                    <h5 class="modal-title text-white fw-bold mb-0" style="font-family:'Oswald',sans-serif; font-size: 1.8rem; letter-spacing: 2px;">
+                        <span class="text-danger">NEW</span> AGREEMENT
+                    </h5>
+                    <p class="text-muted small mb-0">Legalizing bout participation & purse details</p>
+                </div>
+                <button type="button" class="btn-close btn-close-white opacity-25" data-bs-dismiss="modal"></button>
+            </div>
+            
+            <div class="modal-body p-4">
+                <div class="mb-4">
+                    <label class="form-label xsmall fw-bold text-muted uppercase mb-2" style="letter-spacing:1.5px;">1. Sanctioned Event</label>
+                    <select name="event_id" id="eventSelect" class="form-select bg-dark border-secondary text-white py-3 rounded-3" required>
+                        <option value="">Choose organization event...</option>
+                        {% for event in events %}
+                        <option value="{{ event.eventId }}">{{ event.eventName }} ({{ event.eventDate|date('Y-m-d') }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label xsmall fw-bold text-muted uppercase mb-2" style="letter-spacing:1.5px;">2. Assign Athlete</label>
+                    <select name="fighter_id" id="fighterSelect" class="form-select bg-dark border-secondary text-white py-3 rounded-3" required>
+                        <option value="">Select an Event first...</option>
+                    </select>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label xsmall fw-bold text-muted uppercase mb-2" style="letter-spacing:1.5px;">Base Pay ($)</label>
+                        <input type="number" step="0.01" name="base_pay" class="form-control bg-dark border-secondary text-white py-3 rounded-3" required placeholder="Guaranteed">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label xsmall fw-bold text-muted uppercase mb-2" style="letter-spacing:1.5px;">Win Bonus ($)</label>
+                        <input type="number" step="0.01" name="win_bonus" class="form-control bg-dark border-secondary text-white py-3 rounded-3" required placeholder="Incentive">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-link text-muted text-decoration-none" data-bs-dismiss="modal">Discard</button>
+                <button type="submit" class="btn btn-broadcast px-5">
+                    Sign & Deploy
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Advanced Filter & Pagination initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            const pagination = new SmartPagination({
+                containerSelector: '.pro-table tbody',
+                itemSelector: 'tr:not(.text-center)', // Exclude empty state
+                paginationContainerId: 'paginationControls',
+                itemsPerPage: 8
+            });
+
+            window._contractFilter = new AdvancedFilter('.pro-table tbody', 'tr:not(.text-center)', (visibleItems) => {
+                pagination.setFilteredItems(visibleItems);
+            });
+
+            const searchInput = document.getElementById('contractSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    window._contractFilter.search(e.target.value);
+                });
+            }
+
+            pagination.init();
+        });
+
+        // Pagination initialization
+        new SmartPagination({
+            containerSelector: '.pro-table tbody',
+            itemSelector: 'tr',
+            paginationContainerId: 'paginationControls',
+            itemsPerPage: 6
+        });
+
+        // Modal Fighter Selection Logic
+        const eventFighters = {{ eventFightersJson|raw }};
+        const eventSelect = document.getElementById('eventSelect');
+        const fighterSelect = document.getElementById('fighterSelect');
+
+        eventSelect.addEventListener('change', function() {
+            const eventId = this.value;
+            fighterSelect.innerHTML = '<option value="">Select Fighter...</option>';
+            
+            if (eventId && eventFighters[eventId]) {
+                const fighters = eventFighters[eventId];
+                for (const [id, name] of Object.entries(fighters)) {
+                    const opt = document.createElement('option');
+                    opt.value = id;
+                    opt.textContent = name;
+                    fighterSelect.appendChild(opt);
+                }
+            } else if (!eventId) {
+                fighterSelect.innerHTML = '<option value="">Select an Event first...</option>';
+            } else {
+                fighterSelect.innerHTML = '<option value="">No fighters found for this event</option>';
+            }
+        });
+    </script>
+    <style>
+        .sf-search-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #121214;
+            border: 1px solid #27272a;
+            border-radius: 12px;
+            margin-top: 8px;
+            z-index: 1050;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .sf-search-item {
+            transition: all 0.2s;
+        }
+        .sf-search-item:hover {
+            background: rgba(220, 38, 38, 0.08);
+        }
+        .xsmall { font-size: 0.65rem; }
+    </style>
+{% endblock %}

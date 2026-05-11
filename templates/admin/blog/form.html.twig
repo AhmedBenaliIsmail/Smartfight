@@ -1,0 +1,247 @@
+{% extends 'admin/base_admin.html.twig' %}
+{% set breadcrumb_title = is_edit ? 'Elite Editor' : 'Create Article' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .media-dropzone {
+            border: 2px dashed #27272a;
+            background: #09090b;
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .media-dropzone:hover {
+            border-color: #dc2626;
+            background: #111114;
+        }
+        .media-dropzone.active {
+            border-color: #dc2626;
+            background: rgba(220, 38, 38, 0.05);
+        }
+        .preview-glow {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, rgba(220,38,38,0.1), transparent);
+            z-index: 1;
+            pointer-events: none;
+        }
+        .studio-card {
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 16px;
+            padding: 2rem;
+        }
+        .upload-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .pro-progress-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid #27272a;
+            border-top: 4px solid #dc2626;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Anti-Autofill Fix */
+        .studio-headline:-webkit-autofill,
+        .studio-headline:-webkit-autofill:hover, 
+        .studio-headline:-webkit-autofill:focus {
+            -webkit-text-fill-color: #fff;
+            -webkit-box-shadow: 0 0 0px 1000px #09090b inset;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+        .studio-headline:focus {
+            background: #09090b !important;
+            color: #fff !important;
+            border-bottom-color: #dc2626 !important;
+            outline: none;
+            box-shadow: none;
+        }
+    </style>
+{% endblock %}
+
+{% block admin_content %}
+<div id="loading-overlay" class="upload-overlay d-none">
+    <div class="pro-progress-circle mb-4"></div>
+    <h2 class="text-white fw-bold mb-2">SYNCING MEDIA...</h2>
+    <div class="h1 text-danger fw-bold" id="upload-percent-large">0%</div>
+    <p class="text-muted">Synchronizing with the SmartFight Network...</p>
+</div>
+
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-5">
+        <div>
+            <h1 class="h2 fw-bold text-white mb-1">ARTICLE STUDIO</h1>
+            <p class="text-muted">High-Fidelity Content Management</p>
+        </div>
+    </div>
+
+    {{ form_start(form, {attr: {id: 'studio-form', novalidate: 'novalidate'}}) }}
+    <div class="row g-4">
+        <!-- Media Sidebar -->
+        <div class="col-lg-5 order-lg-2">
+            <div class="studio-card sticky-top" style="top: 2rem;">
+                <h3 class="h5 text-white mb-4"><i class="fa-solid fa-photo-film me-2 text-danger"></i>MEDIA HUB</h3>
+                
+                <!-- Video Section -->
+                <div class="mb-4">
+                    <label class="form-label text-muted small">VIDEO CONTENT (MP4/WEBM)</label>
+                    <div class="media-dropzone" id="video-zone">
+                        <i class="fa-solid fa-clapperboard fs-1 text-muted mb-3 d-block"></i>
+                        <span class="text-white small fw-bold">Drop Video or Click</span>
+                        <div id="video-preview-meta" class="mt-2 small text-danger d-none">Ready to Stream</div>
+                        <div class="d-none">{{ form_widget(form.videoFile) }}</div>
+                    </div>
+                </div>
+
+                <!-- Image Section -->
+                <div class="mb-4">
+                    <label class="form-label text-muted small">COVER ART (720p Recommended)</label>
+                    <div class="media-dropzone" id="image-zone">
+                        <i class="fa-solid fa-image fs-1 text-muted mb-3 d-block"></i>
+                        <span class="text-white small fw-bold">Drop Art or Click</span>
+                        <img id="image-preview-el" class="img-fluid d-none mt-2 rounded" src="">
+                        <div class="d-none">{{ form_widget(form.imageFile) }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Editor -->
+        <div class="col-lg-7">
+            <div class="studio-card mb-4">
+                <div class="mb-4">
+                    {{ form_label(form.title, 'HEADLINE', {label_attr: {class: 'form-label text-muted small'}}) }}
+                    {{ form_widget(form.title, {attr: {class: 'form-control studio-headline', style: 'background:#09090b;border:0;border-bottom:2px solid #27272a;color:#fff;border-radius:0;padding:1rem 0;font-size:2rem;font-weight:700;'}}) }}
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        {{ form_label(form.category, 'CATEGORY', {label_attr: {class: 'form-label text-muted small'}}) }}
+                        {{ form_widget(form.category, {attr: {class: 'form-select', style: 'background:#09090b;border:1px solid #27272a;color:#fff;'}}) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_label(form.status, 'STATUS', {label_attr: {class: 'form-label text-muted small'}}) }}
+                        {{ form_widget(form.status, {attr: {class: 'form-select', style: 'background:#09090b;border:1px solid #27272a;color:#fff;'}}) }}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    {{ form_label(form.summary, 'EXECUTIVE SUMMARY', {label_attr: {class: 'form-label text-muted small'}}) }}
+                    {{ form_widget(form.summary, {attr: {class: 'form-control', rows: 3, style: 'background:#09090b;border:1px solid #27272a;color:#fff;'}}) }}
+                </div>
+
+                <div class="mb-4">
+                    {{ form_label(form.content, 'FULL ARTICLE CONTENT', {label_attr: {class: 'form-label text-muted small'}}) }}
+                    {{ form_widget(form.content, {attr: {class: 'form-control', rows: 12, style: 'background:#09090b;border:1px solid #27272a;color:#fff;'}}) }}
+                </div>
+
+                <div class="d-flex gap-3">
+                    <button type="submit" class="btn btn-danger btn-lg px-5 fw-bold" style="background:#dc2626;">
+                        <i class="fa-solid fa-paper-plane me-2"></i>{{ is_edit ? 'SYNC CHANGES' : 'PUBLISH TO FANS' }}
+                    </button>
+                    <a href="{{ path('admin_blog_index') }}" class="btn btn-outline-secondary btn-lg">DISCARD</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{ form_end(form) }}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const videoZone = document.getElementById('video-zone');
+    const imageZone = document.getElementById('image-zone');
+    const videoInput = document.querySelector('input[type="file"][name*="videoFile"]');
+    const imageInput = document.querySelector('input[type="file"][name*="imageFile"]');
+    const form = document.getElementById('studio-form');
+    const overlay = document.getElementById('loading-overlay');
+    const percentEl = document.getElementById('upload-percent-large');
+
+    // Proxy Clicks
+    videoZone.onclick = () => videoInput.click();
+    imageZone.onclick = () => imageInput.click();
+
+    // Visual Previews
+    imageInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (re) => {
+                const img = document.getElementById('image-preview-el');
+                img.src = re.target.result;
+                img.classList.remove('d-none');
+                imageZone.querySelector('i').classList.add('d-none');
+                imageZone.querySelector('span').innerText = 'Art Selected';
+            }
+            reader.readAsDataURL(file);
+        }
+    };
+
+    videoInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            document.getElementById('video-preview-meta').classList.remove('d-none');
+            videoZone.querySelector('span').innerText = file.name.substring(0, 20) + '...';
+        }
+    };
+
+    // Pro XHR Submit
+    form.onsubmit = (e) => {
+        e.preventDefault();
+        overlay.classList.remove('d-none');
+
+        const formData = new FormData(form);
+        const xhr = new XMLHttpRequest();
+
+        xhr.upload.addEventListener('progress', (ev) => {
+            if (ev.lengthComputable) {
+                const p = Math.round((ev.loaded / ev.total) * 100);
+                percentEl.innerText = p + '%';
+            }
+        });
+
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 400) {
+                // Check if we are still on the form page (means there was a validation error)
+                if (xhr.responseText.indexOf('id="studio-form"') !== -1) {
+                    // Re-render the page content to show errors
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(xhr.responseText, 'text/html');
+                    document.body.innerHTML = doc.body.innerHTML;
+                    
+                    // We need to re-initialize scripts because document.body.innerHTML doesn't run scripts
+                    location.reload(); 
+                    alert('Upload failed: Please check if all fields are filled correctly.');
+                } else {
+                    // Success! Redirect to index
+                    window.location.href = "{{ path('admin_blog_index') }}";
+                }
+            } else {
+                alert('Studio Error: Server could not process high-fidelity media. Status: ' + xhr.status);
+                overlay.classList.add('d-none');
+            }
+        };
+
+        xhr.open('POST', form.action, true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.send(formData);
+    };
+});
+</script>
+{% endblock %}

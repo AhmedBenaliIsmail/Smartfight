@@ -1,0 +1,243 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Schedule Fight — SmartFight Admin{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ path('app_results') }}" style="color:#a1a1aa;text-decoration:none;">Fight Results</a></li>
+    <li class="breadcrumb-item active">Schedule Fight</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 fw-bold" style="color:#fafafa;">Schedule Fight</h1>
+        <p class="mb-0" style="color:#a1a1aa;font-size:.875rem;">Add a new fight to an upcoming event</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button type="button" id="aiMatchmakingBtn" class="btn btn-sm px-3" style="background:rgba(139, 92, 246, 0.1);color:#8b5cf6;border:1px solid #8b5cf6;"><i class="fa-solid fa-wand-magic-sparkles me-1"></i>AI Suggestions</button>
+        <a href="{{ path('app_results') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+    </div>
+</div>
+
+<form method="post">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-calendar-plus me-2" style="color:#dc2626;"></i>Setup Fight</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Event <span style="color:#dc2626;">*</span></label>
+                            <select name="eventId" class="form-select" required>
+                                <option value="">Select Event...</option>
+                                {% for event in events %}
+                                    <option value="{{ event.eventId }}">{{ event.eventName }} ({{ event.eventDate|date('Y-m-d') }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fight Number</label>
+                            <select name="fightNumber" class="form-select" required>
+                                <option value="1">Fight 1</option>
+                                <option value="2">Fight 2</option>
+                                <option value="3">Fight 3</option>
+                            </select>
+                            <small class="text-muted">Max 3 per event</small>
+                        </div>
+                        
+                        <div class="col-12 text-center my-3"><span class="badge bg-danger rounded-pill px-3 py-2 fs-6">VS</span></div>
+
+                        <div class="col-md-6">
+                            <label class="form-label text-danger fw-bold">Red Corner (Fighter 1) <span style="color:#dc2626;">*</span></label>
+                            <div class="text-center mb-2">
+                                <div id="f1-photo-preview" class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width:80px; height:80px; background:#27272a; border:2px solid #ef4444; overflow:hidden;">
+                                    <i class="fa-solid fa-user fa-2x text-muted"></i>
+                                </div>
+                            </div>
+                            <select name="fighter1Id" class="form-select f-selector" data-preview="#f1-photo-preview" required style="border-left: 4px solid #ef4444;">
+                                <option value="">Select Fighter...</option>
+                                {% for fighter in fighters %}
+                                    <option value="{{ fighter.fighterId }}" data-photo="{{ fighter.photoFilename ? asset('uploads/boxers/' ~ fighter.photoFilename) : '' }}">{{ fighter.fullName }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-primary fw-bold">Blue Corner (Fighter 2) <span style="color:#dc2626;">*</span></label>
+                            <div class="text-center mb-2">
+                                <div id="f2-photo-preview" class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width:80px; height:80px; background:#27272a; border:2px solid #3b82f6; overflow:hidden;">
+                                    <i class="fa-solid fa-user fa-2x text-muted"></i>
+                                </div>
+                            </div>
+                            <select name="fighter2Id" class="form-select f-selector" data-preview="#f2-photo-preview" required style="border-left: 4px solid #3b82f6;">
+                                <option value="">Select Fighter...</option>
+                                {% for fighter in fighters %}
+                                    <option value="{{ fighter.fighterId }}" data-photo="{{ fighter.photoFilename ? asset('uploads/boxers/' ~ fighter.photoFilename) : '' }}">{{ fighter.fullName }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4" id="simulationCard" style="display:none; background:#09090b; border:1px solid #3b82f6;">
+                <div class="card-header" style="background:#1e3a8a; border-bottom:none;">
+                    <h4 class="card-title mb-0 text-white"><i class="fa-solid fa-robot me-2"></i>AI Fight Simulator</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row text-center mb-3">
+                        <div class="col-5">
+                            <h5 class="text-danger mb-1" id="simF1Prob">0%</h5>
+                            <small class="text-muted">Win Probability</small>
+                        </div>
+                        <div class="col-2 d-flex align-items-center justify-content-center">
+                            <span class="badge bg-secondary">VS</span>
+                        </div>
+                        <div class="col-5">
+                            <h5 class="text-primary mb-1" id="simF2Prob">0%</h5>
+                            <small class="text-muted">Win Probability</small>
+                        </div>
+                    </div>
+                    <div class="progress mb-4" style="height: 10px; background-color: #1e3a8a;">
+                        <div id="simProgressBar" class="progress-bar bg-danger" role="progressbar" style="width: 50%;"></div>
+                    </div>
+                    <div class="p-3 mb-3 rounded" style="background:rgba(255,255,255,0.05);">
+                        <h6 class="text-warning">Predicted Outcome</h6>
+                        <p class="mb-0 text-light fw-bold" id="simOutcome">-</p>
+                        <p class="mb-0 text-muted small mt-1" id="simKeyFactor">-</p>
+                    </div>
+                    <div class="p-3 rounded" style="background:rgba(255,255,255,0.05); border-left: 4px solid #8b5cf6;">
+                        <h6 style="color:#a855f7;">Simulation Narrative</h6>
+                        <p class="mb-0 text-light small" id="simNarrative">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-body p-3 d-flex gap-2">
+                    <button type="button" class="btn btn-outline-primary py-2" id="btnSimulateFight" style="flex: 1;"><i class="fa-solid fa-gamepad me-2"></i>Simulate Fight</button>
+                    <button type="submit" class="btn btn-danger py-2" style="flex: 2;"><i class="fa-solid fa-calendar-check me-2"></i>Schedule Match</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectors = document.querySelectorAll('.f-selector');
+    
+    selectors.forEach(select => {
+        select.addEventListener('change', function() {
+            const previewId = this.getAttribute('data-preview');
+            const preview = document.querySelector(previewId);
+            const selectedOption = this.options[this.selectedIndex];
+            const photoUrl = selectedOption.getAttribute('data-photo');
+            
+            if (photoUrl) {
+                preview.innerHTML = `<img src="${photoUrl}" style="width:100%; height:100%; object-fit:cover;" />`;
+            } else {
+                preview.innerHTML = `<i class="fa-solid fa-user fa-2x text-muted"></i>`;
+            }
+        });
+    });
+
+    // AI Matchmaking Suggestions
+    document.getElementById('aiMatchmakingBtn').addEventListener('click', async function(e) {
+        e.preventDefault();
+        const btn = this;
+        const originalText = btn.innerHTML;
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i>Getting suggestions...';
+        
+        try {
+            const response = await fetch('{{ path("api_ai_matchmaking") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ count: 5 })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.success && data.matches && data.matches.length > 0) {
+                const match = data.matches[0];
+                
+                // Populate the form
+                const f1Select = document.querySelector('select[name="fighter1Id"]');
+                const f2Select = document.querySelector('select[name="fighter2Id"]');
+                
+                f1Select.value = match.fighter1_id;
+                f1Select.dispatchEvent(new Event('change'));
+                
+                f2Select.value = match.fighter2_id;
+                f2Select.dispatchEvent(new Event('change'));
+                
+                // Show suggestion reason
+                alert(`✅ Match Suggested:\n\n${match.reason}\n\nExcitement Level: ${match.excitement_level}\n\nReview and schedule!`);
+            } else {
+                alert('⚠️ Could not generate matchmaking suggestions: ' + (data.error || 'Not enough fighters'));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error calling AI service: ' + error.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    });
+    // AI Match Simulator
+    document.getElementById('btnSimulateFight').addEventListener('click', async function(e) {
+        e.preventDefault();
+        const f1Id = document.querySelector('select[name="fighter1Id"]').value;
+        const f2Id = document.querySelector('select[name="fighter2Id"]').value;
+
+        if (!f1Id || !f2Id) {
+            return alert('Please select both fighters first.');
+        }
+
+        const btn = this;
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i>Simulating...';
+
+        try {
+            const response = await fetch('{{ path("api_ai_simulate") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fighter1_id: parseInt(f1Id), fighter2_id: parseInt(f2Id) })
+            });
+
+            const data = await response.json();
+            if (data.success && data.data) {
+                const sim = data.data;
+                document.getElementById('simulationCard').style.display = 'block';
+                document.getElementById('simF1Prob').innerText = sim.win_probability_f1 + '%';
+                document.getElementById('simF2Prob').innerText = sim.win_probability_f2 + '%';
+                document.getElementById('simProgressBar').style.width = sim.win_probability_f1 + '%';
+                document.getElementById('simOutcome').innerText = sim.predicted_outcome;
+                document.getElementById('simKeyFactor').innerText = sim.key_factor;
+                document.getElementById('simNarrative').innerText = sim.narrative;
+            } else {
+                alert('Error simulating fight: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Simulation error:', error);
+            alert('Failed to run simulation.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,341 @@
+{% extends 'admin/base_admin.html.twig' %}
+{% set breadcrumb_title = 'Finance Department' %}
+
+{% block title %}Finance Department | Broadcast Revenue Control{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4 bg-dark min-vh-100">
+    <div class="d-flex align-items-center justify-content-between mb-5">
+        <div class="header-broadcast">
+            <div class="live-signal mb-2">
+                <span class="pulse-dot"></span>
+                <span class="live-text">FINANCIAL LEDGER — LIVE REVENUE</span>
+            </div>
+            <h1 class="display-5 fw-bold text-white mb-0" style="font-family: 'Oswald', sans-serif; letter-spacing: 2px;">FINANCE DEPARTMENT</h1>
+            <p class="text-muted mb-0 fs-6">Global platform revenue monitoring & balance sheets</p>
+        </div>
+        <div class="d-flex gap-3">
+            <button class="btn btn-glass" onclick="window.print()">
+                <i class="fa-solid fa-file-export me-2"></i> EXPORT BILAN
+            </button>
+        </div>
+    </div>
+
+    {# Top Stats #}
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="finance-stat-card gold">
+                <div class="stat-icon"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+                <div class="stat-label">TOTAL REVENUE</div>
+                <div class="stat-value">${{ stats.total_revenue|number_format(2) }}</div>
+                <div class="stat-trend">+12% vs last month</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="finance-stat-card blue">
+                <div class="stat-icon"><i class="fa-solid fa-ticket"></i></div>
+                <div class="stat-label">TICKETS SOLD</div>
+                <div class="stat-value">{{ stats.confirmed_count }}</div>
+                <div class="stat-trend">Across {{ revenuePerEvent|length }} events</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="finance-stat-card emerald">
+                <div class="stat-icon"><i class="fa-solid fa-chart-line"></i></div>
+                <div class="stat-label">AVG. ORDER VALUE</div>
+                <div class="stat-value">${{ (stats.confirmed_count > 0 ? stats.total_revenue / stats.confirmed_count : 0)|number_format(2) }}</div>
+                <div class="stat-trend">High retention rate</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="finance-stat-card crimson">
+                <div class="stat-icon"><i class="fa-solid fa-ban"></i></div>
+                <div class="stat-label">REFUND RATE</div>
+                <div class="stat-value">{{ (stats.total_bookings > 0 ? (stats.cancelled_count / stats.total_bookings) * 100 : 0)|number_format(1) }}%</div>
+                <div class="stat-trend">Below industry avg</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        {# Revenue Chart #}
+        <div class="col-lg-8">
+            <div class="broadcast-card p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h5 class="text-white fw-bold mb-0"><i class="fa-solid fa-wave-square me-2 text-primary"></i>REVENUE TREND (LAST 30 DAYS)</h5>
+                    <span class="badge bg-primary-lt">DAILY AGGREGATION</span>
+                </div>
+                <div id="revenueChart" style="height: 350px;"></div>
+            </div>
+        </div>
+        {# Ticket Type Distribution #}
+        <div class="col-lg-4">
+            <div class="broadcast-card p-4 h-100">
+                <h5 class="text-white fw-bold mb-4"><i class="fa-solid fa-chart-pie me-2 text-warning"></i>REVENUE BY TICKET TYPE</h5>
+                <div id="typeChart" style="height: 300px;"></div>
+                <div class="mt-4">
+                    {% for type in revenueByType %}
+                    <div class="d-flex align-items-center justify-content-between mb-2 small">
+                        <span class="text-muted">{{ type.ticket_type }}</span>
+                        <span class="text-white fw-bold">${{ type.total|number_format(0) }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Bilan Financier #}
+    <div class="broadcast-card overflow-hidden">
+        <div class="p-4 border-bottom border-secondary d-flex align-items-center justify-content-between">
+            <h5 class="text-white fw-bold mb-0"><i class="fa-solid fa-list-check me-2 text-emerald"></i>BILAN FINANCIER PAR ÉVÉNEMENT</h5>
+            <div class="search-box-console">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="eventSearch" placeholder="Filter ledger...">
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0 align-middle">
+                <thead>
+                    <tr class="text-muted small text-uppercase">
+                        <th class="ps-4">Event Description</th>
+                        <th>Bookings</th>
+                        <th>Revenue</th>
+                        <th>Performance</th>
+                        <th class="text-end pe-4">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in revenuePerEvent %}
+                    <tr class="sf-finance-row" data-search-content="{{ event.eventName|lower }}">
+                        <td class="ps-4">
+                            <div class="fw-bold text-white">{{ event.eventName }}</div>
+                            <div class="text-muted x-small">Broadcast ID: #KO-{{ loop.index + 1000 }}</div>
+                        </td>
+                        <td>{{ event.bookings }}</td>
+                        <td class="fw-bold text-emerald">${{ event.revenue|number_format(2) }}</td>
+                        <td style="width: 200px;">
+                            {% set percent = (stats.total_revenue > 0 ? (event.revenue / stats.total_revenue) * 100 : 0) %}
+                            <div class="progress bg-dark border border-secondary" style="height: 6px;">
+                                <div class="progress-bar bg-primary" style="width: {{ percent }}%"></div>
+                            </div>
+                        </td>
+                        <td class="text-end pe-4">
+                            {% if event.revenue > 10000 %}
+                                <span class="badge bg-success-lt">BLOCKBUSTER</span>
+                            {% elseif event.revenue > 0 %}
+                                <span class="badge bg-primary-lt">PROFITABLE</span>
+                            {% else %}
+                                <span class="badge bg-secondary-lt">UPCOMING</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">No financial data available for listed events.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination Hub -->
+        <div id="financePagination" class="sf-pagination-container pb-4"></div>
+    </div>
+</div>
+
+<style>
+.header-broadcast { border-left: 4px solid #dc2626; padding-left: 20px; }
+.pulse-dot { width: 8px; height: 8px; background: #dc2626; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #dc2626; animation: blink 1.5s infinite; }
+@keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+.live-text { font-size: 0.65rem; font-weight: 900; color: #dc2626; letter-spacing: 2px; margin-left: 8px; }
+
+.finance-stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 24px; position: relative; overflow: hidden; transition: all 0.3s; }
+.finance-stat-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.05); }
+.finance-stat-card .stat-icon { position: absolute; right: -10px; bottom: -10px; font-size: 5rem; opacity: 0.05; transform: rotate(-15deg); }
+.finance-stat-card .stat-label { font-size: 0.7rem; font-weight: 900; color: #71717a; letter-spacing: 1.5px; margin-bottom: 8px; }
+.finance-stat-card .stat-value { font-size: 2rem; font-weight: 800; font-family: 'Oswald', sans-serif; margin-bottom: 5px; }
+.finance-stat-card .stat-trend { font-size: 0.7rem; font-weight: 600; }
+
+.finance-stat-card.gold { border-top: 4px solid #fbbf24; }
+.finance-stat-card.gold .stat-value { color: #fbbf24; }
+.finance-stat-card.gold .stat-trend { color: #d97706; }
+
+.finance-stat-card.blue { border-top: 4px solid #3b82f6; }
+.finance-stat-card.blue .stat-value { color: #3b82f6; }
+.finance-stat-card.blue .stat-trend { color: #2563eb; }
+
+.finance-stat-card.emerald { border-top: 4px solid #10b981; }
+.finance-stat-card.emerald .stat-value { color: #10b981; }
+.finance-stat-card.emerald .stat-trend { color: #059669; }
+
+.finance-stat-card.crimson { border-top: 4px solid #ef4444; }
+.finance-stat-card.crimson .stat-value { color: #ef4444; }
+.finance-stat-card.crimson .stat-trend { color: #dc2626; }
+
+.broadcast-card { background: #121214; border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; }
+.bg-primary-lt { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
+.bg-success-lt { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+.bg-secondary-lt { background: rgba(113, 113, 122, 0.1); color: #71717a; border: 1px solid rgba(113, 113, 122, 0.2); }
+
+.text-emerald { color: #10b981; }
+.x-small { font-size: 0.7rem; }
+
+.search-box-console { background: #09090b; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 15px; display: flex; align-items: center; gap: 10px; }
+.search-box-console input { background: transparent; border: none; color: #fff; outline: none; font-size: 0.85rem; width: 200px; }
+.search-box-console i { color: #71717a; }
+
+.btn-glass { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-weight: 700; padding: 10px 20px; border-radius: 8px; transition: all 0.3s; }
+.btn-glass:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+.btn-glass:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+
+/* Pagination Styling */
+.sf-pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+.page-btn {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #09090b;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: #71717a;
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+.page-btn:hover:not(:disabled) {
+    border-color: rgba(255,255,255,0.3);
+    color: #fff;
+    background: #18181b;
+}
+.page-btn.active {
+    background: #dc2626 !important;
+    border-color: #dc2626 !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+.page-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+.page-info {
+    margin-left: 15px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.75rem;
+    color: #52525b;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Revenue Trend Curve
+    const dailyData = {{ dailyRevenue|json_encode|raw }};
+    const options = {
+        series: [{
+            name: 'Revenue',
+            data: dailyData.map(d => d.total)
+        }],
+        chart: {
+            type: 'area',
+            height: 350,
+            toolbar: { show: false },
+            zoom: { enabled: false },
+            background: 'transparent'
+        },
+        colors: ['#3b82f6'],
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.7,
+                opacityTo: 0.3,
+                stops: [0, 90, 100]
+            }
+        },
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 3 },
+        xaxis: {
+            categories: dailyData.map(d => d.date),
+            labels: { style: { colors: '#71717a' } },
+            axisBorder: { show: false },
+            axisTicks: { show: false }
+        },
+        yaxis: {
+            labels: { 
+                style: { colors: '#71717a' },
+                formatter: function(val) { return "$" + val.toLocaleString(); }
+            }
+        },
+        grid: {
+            borderColor: 'rgba(255,255,255,0.05)',
+            strokeDashArray: 4
+        },
+        theme: { mode: 'dark' }
+    };
+    new ApexCharts(document.querySelector("#revenueChart"), options).render();
+
+    // 2. Ticket Type Distribution
+    const typeData = {{ revenueByType|json_encode|raw }};
+    const typeOptions = {
+        series: typeData.map(t => parseFloat(t.total)),
+        labels: typeData.map(t => t.ticket_type),
+        chart: {
+            type: 'donut',
+            height: 300,
+            background: 'transparent'
+        },
+        colors: ['#fbbf24', '#3b82f6', '#10b981', '#f472b6', '#a78bfa'],
+        legend: { show: false },
+        dataLabels: { enabled: false },
+        stroke: { show: false },
+        theme: { mode: 'dark' },
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '75%',
+                    labels: {
+                        show: true,
+                        total: {
+                            show: true,
+                            label: 'TOTAL REVENUE',
+                            formatter: function (w) {
+                                return '$' + w.globals.seriesTotals.reduce((a, b) => a + b, 0).toLocaleString(undefined, {maximumFractionDigits: 0});
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+    new ApexCharts(document.querySelector("#typeChart"), typeOptions).render();
+
+    // 3. Pagination & Filter Integration
+    if (typeof SmartPagination !== 'undefined') {
+        const pagination = new SmartPagination({
+            containerSelector: 'tbody',
+            itemSelector: '.sf-finance-row',
+            paginationContainerId: 'financePagination',
+            itemsPerPage: 8
+        });
+
+        const filter = new AdvancedFilter('tbody', '.sf-finance-row', (visibleItems) => {
+            pagination.setFilteredItems(visibleItems);
+        });
+
+        document.getElementById('eventSearch').addEventListener('input', (e) => {
+            filter.search(e.target.value);
+        });
+    }
+});
+</script>
+<script src="{{ asset('frontoffice/js/pagination.js') }}"></script>
+{% endblock %}
