@@ -94,7 +94,9 @@ class BlogArticle
     public function setStatus(string $status): static { $this->status = $status; return $this; }
     public function getViewCount(): int { return $this->viewCount; }
     public function getCreatedAt(): \DateTimeInterface { return $this->createdAt; }
+    public function setCreatedAt(\DateTimeInterface $createdAt): static { $this->createdAt = $createdAt; return $this; }
     public function getUpdatedAt(): \DateTimeInterface { return $this->updatedAt; }
+    public function setUpdatedAt(\DateTimeInterface $updatedAt): static { $this->updatedAt = $updatedAt; return $this; }
     public function getImagePath(): ?string { return $this->imagePath; }
     public function setImagePath(?string $imagePath): static { $this->imagePath = $imagePath; return $this; }
     public function getVideoPath(): ?string { return $this->videoPath; }

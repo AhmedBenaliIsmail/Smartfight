@@ -23,7 +23,7 @@ class MatchProposalAdminController extends AbstractController
 
         return $this->render('admin/match_proposal/index.html.twig', [
             'proposals' => $proposals,
-            'active_sidebar' => 'proposals',
+            'active_sidebar' => 'match_proposals',
         ]);
     }
 
@@ -78,7 +78,7 @@ class MatchProposalAdminController extends AbstractController
             'weightClasses' => $weightClasses,
             'selectedWeightClass' => $selectedWeightClass,
             'fighters' => $fighters,
-            'active_sidebar' => 'proposals',
+            'active_sidebar' => 'match_proposals',
         ]);
     }
 

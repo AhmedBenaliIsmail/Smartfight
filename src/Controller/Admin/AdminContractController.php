@@ -58,6 +58,7 @@ class AdminContractController extends AbstractController
             'totalCommitted' => $totalCommitted,
             'totalPaidOut' => $totalPaidOut,
             'eventFightersJson' => json_encode($eventFighters),
+            'active_sidebar' => 'contracts',
         ]);
     }
 

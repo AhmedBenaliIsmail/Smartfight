@@ -1399,7 +1399,7 @@ ALTER TABLE `match_proposal`
 -- Constraints for table `notifications`
 --
 ALTER TABLE `notifications`
-  ADD CONSTRAINT `FK_6000B0D364B64DCC` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`);
+  ADD CONSTRAINT `FK_6000B0D364B64DCC` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `performance_score`

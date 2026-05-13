@@ -153,6 +153,7 @@ class RankingService
             $f1->setDraws($f1->getDraws() + 1); $f2->setDraws($f2->getDraws() + 1);
         } else {
             $winner = $fight->getWinner(); $loser = $fight->getLoser();
+            if (!$winner || !$loser) return;
             $winner->setWins($winner->getWins() + 1); $loser->setLosses($loser->getLosses() + 1);
 
             $method = strtoupper($fight->getMethodOfVictory() ?? '');

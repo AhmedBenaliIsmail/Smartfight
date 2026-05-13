@@ -19,7 +19,7 @@
     <a href="{{ path('app_events') }}" class="btn btn-sm" style="background:#27272a;color:#a1a1aa;border:none;"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
 </div>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     <div class="row g-4">
         <div class="col-lg-8">
             <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
@@ -101,6 +101,32 @@
                 </div>
             </div>
             
+            <div class="card mb-4" style="background:#18181b;border:1px solid #27272a;">
+                <div class="card-header" style="background:#18181b;border-bottom:1px solid #27272a;">
+                    <h3 class="card-title mb-0" style="color:#fafafa;font-size:.9375rem;font-weight:600;"><i class="fa-solid fa-image me-2" style="color:#dc2626;"></i>Event Poster</h3>
+                </div>
+                <div class="card-body p-4">
+                    {% if event and event.posterFilename %}
+                    <div class="mb-3" style="border-radius:10px;overflow:hidden;height:200px;">
+                        <img id="posterPreview" src="{{ asset('uploads/events/' ~ event.posterFilename) }}"
+                             alt="Current Poster" style="width:100%;height:100%;object-fit:cover;">
+                    </div>
+                    {% else %}
+                    <div id="posterPlaceholder" class="mb-3 d-flex align-items-center justify-content-center"
+                         style="height:160px;background:#09090b;border:2px dashed #27272a;border-radius:10px;">
+                        <div class="text-center text-muted">
+                            <i class="fa-solid fa-image fa-2x mb-2"></i>
+                            <div class="small">No poster uploaded</div>
+                        </div>
+                    </div>
+                    <img id="posterPreview" src="" alt="" style="display:none;width:100%;height:200px;object-fit:cover;border-radius:10px;" class="mb-3">
+                    {% endif %}
+                    <label class="form-label small text-muted">Upload Poster (JPG, PNG, WEBP)</label>
+                    <input type="file" name="posterFile" id="posterFileInput" class="form-control" accept="image/*"
+                           onchange="previewPoster(this)">
+                </div>
+            </div>
+
             <div class="card" style="background:#18181b;border:1px solid #27272a;">
                 <div class="card-body p-4">
                     <button type="submit" class="btn btn-danger w-100 py-2"><i class="fa-solid fa-floppy-disk me-2"></i>Save Boxing Event</button>
@@ -177,6 +203,20 @@ document.addEventListener('DOMContentLoaded', function() {
     citySelector.addEventListener('change', updateVenues);
     if (citySelector.value) updateVenues();
 });
+
+function previewPoster(input) {
+    const preview = document.getElementById('posterPreview');
+    const placeholder = document.getElementById('posterPlaceholder');
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            if (placeholder) placeholder.style.display = 'none';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
 </script>
 {% endblock %}
 

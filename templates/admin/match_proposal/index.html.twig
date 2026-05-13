@@ -1,4 +1,5 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base_admin.html.twig' %}
+{% set breadcrumb_title = 'Matchmaking Voting Pool' %}
 
 {% block title %}Manage Voting Pool — SmartFight Admin{% endblock %}
 
@@ -26,15 +27,21 @@
             border-radius: 10px;
             border: 1px solid rgba(220, 38, 38, 0.2);
         }
+        @keyframes ai-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(139,92,246,0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(139,92,246,0); }
+        }
+        .ai-icon-pulse { animation: ai-pulse 2s ease-in-out infinite; }
+        @keyframes result-pop {
+            0% { transform: scale(0.7); opacity: 0; }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .result-icon-animate { animation: result-pop 0.4s cubic-bezier(.34,1.56,.64,1) forwards; }
     </style>
 {% endblock %}
 
-{% block breadcrumb %}
-    <li class="breadcrumb-item"><a href="{{ path('app_dashboard') }}" style="color:#a1a1aa;text-decoration:none;">Dashboard</a></li>
-    <li class="breadcrumb-item active">Matchmaking Voting Pool</li>
-{% endblock %}
-
-{% block content %}
+{% block admin_content %}
 <div class="container-fluid py-4">
     <div class="d-flex align-items-center justify-content-between mb-5">
         <div>
@@ -52,29 +59,58 @@
     </div>
 
     <script>
-    document.getElementById('aiGenerateBtn').addEventListener('click', async function() {
-        if(!confirm('This will use DeepSeek AI to analyze the entire roster and create 5 high-excitement match proposals for fan voting. Proceed?')) return;
-        
-        const btn = this;
-        const originalText = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>GENERATING...';
-        
-        try {
-            const res = await fetch('{{ path('api_ai_generate_proposals') }}', { method: 'POST' });
-            const data = await res.json();
-            if(data.success) {
-                alert('Success! ' + data.message);
-                window.location.reload();
-            } else {
-                alert('Error: ' + (data.error || 'Unknown error'));
+    document.addEventListener('DOMContentLoaded', function() {
+        const _aiBtn = document.getElementById('aiGenerateBtn');
+
+        _aiBtn.addEventListener('click', function() {
+            new bootstrap.Modal(document.getElementById('aiConfirmModal')).show();
+        });
+
+        document.getElementById('aiConfirmProceedBtn').addEventListener('click', async function() {
+            bootstrap.Modal.getInstance(document.getElementById('aiConfirmModal')).hide();
+
+            const originalText = _aiBtn.innerHTML;
+            _aiBtn.disabled = true;
+            _aiBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>GENERATING...';
+
+            try {
+                const res = await fetch('{{ path('api_ai_generate_proposals') }}', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    _showAiResult('success', data.message);
+                } else {
+                    _showAiResult('error', data.error || 'Unknown error');
+                }
+            } catch(e) {
+                _showAiResult('error', 'Connection failed: ' + e.message);
+            } finally {
+                _aiBtn.disabled = false;
+                _aiBtn.innerHTML = originalText;
             }
-        } catch(e) {
-            alert('Connection failed: ' + e.message);
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = originalText;
+        });
+
+        function _showAiResult(type, message) {
+            const isSuccess = type === 'success';
+            document.getElementById('aiResultModalContent').style.boxShadow =
+                isSuccess ? '0 0 50px rgba(139,92,246,0.18)' : '0 0 50px rgba(220,38,38,0.18)';
+            const iconEl = document.getElementById('aiResultIcon');
+            iconEl.className = 'mb-3 result-icon-animate';
+            iconEl.innerHTML = isSuccess
+                ? '<i class="fa-solid fa-wand-magic-sparkles" style="color:#8b5cf6;font-size:2.8rem;"></i>'
+                : '<i class="fa-solid fa-triangle-exclamation" style="color:#dc2626;font-size:2.8rem;"></i>';
+            document.getElementById('aiResultTitle').textContent = isSuccess ? 'Proposals Generated!' : 'Something Went Wrong';
+            document.getElementById('aiResultMessage').textContent = message;
+            const okBtn = document.getElementById('aiResultOkBtn');
+            okBtn.className = isSuccess ? 'btn px-5 fw-bold' : 'btn px-5 fw-bold btn-outline-danger';
+            okBtn.style.cssText = isSuccess ? 'background:#8b5cf6;border:none;color:white;' : '';
+            okBtn.dataset.reload = isSuccess ? '1' : '0';
+            new bootstrap.Modal(document.getElementById('aiResultModal')).show();
         }
+
+        document.getElementById('aiResultOkBtn').addEventListener('click', function() {
+            if (this.dataset.reload === '1') window.location.reload();
+            else bootstrap.Modal.getInstance(document.getElementById('aiResultModal')).hide();
+        });
     });
     </script>
 
@@ -142,6 +178,61 @@
                 <p class="text-muted">Start by adding a potential matchup for the fans to vote on.</p>
             </div>
             {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- AI Confirm Modal -->
+<div class="modal fade" id="aiConfirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0" style="background:#09090b; box-shadow:0 0 50px rgba(139,92,246,0.18);">
+            <div class="modal-header border-0 px-4 pt-4 pb-2">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="ai-icon-pulse" style="width:44px;height:44px;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.35);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                        <i class="fa-solid fa-wand-magic-sparkles" style="color:#8b5cf6;font-size:1.1rem;"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title text-white fw-bold mb-0">AI PROPOSAL GENERATOR</h5>
+                        <div class="small" style="color:#8b5cf6;font-size:0.72rem;letter-spacing:0.5px;">8-VECTOR SCORE IA ALGORITHM</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body px-4 py-3">
+                <p class="text-muted mb-3" style="line-height:1.65;font-size:0.9rem;">
+                    Analyzes the <span class="text-white fw-semibold">entire fighter roster</span> and generates high-excitement match proposals for fan voting using a deterministic AI scoring model.
+                </p>
+                <div class="p-3 rounded-3" style="background:#18181b;border:1px solid #27272a;border-left:3px solid #8b5cf6;">
+                    <div class="small text-muted" style="font-size:0.72rem;line-height:1.7;letter-spacing:0.3px;">
+                        <i class="fa-solid fa-check-circle me-1" style="color:#8b5cf6;"></i> Weight Integrity &nbsp;·&nbsp;
+                        <i class="fa-solid fa-check-circle me-1" style="color:#8b5cf6;"></i> ELO Parity &nbsp;·&nbsp;
+                        <i class="fa-solid fa-check-circle me-1" style="color:#8b5cf6;"></i> Record Balance<br>
+                        <i class="fa-solid fa-check-circle me-1" style="color:#8b5cf6;"></i> Height/Reach &nbsp;·&nbsp;
+                        <i class="fa-solid fa-check-circle me-1" style="color:#8b5cf6;"></i> Lethality &nbsp;·&nbsp;
+                        <i class="fa-solid fa-check-circle me-1" style="color:#8b5cf6;"></i> Precision &nbsp;·&nbsp;
+                        <i class="fa-solid fa-check-circle me-1" style="color:#8b5cf6;"></i> Diversity
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 px-4 pb-4 pt-2 gap-2">
+                <button type="button" class="btn btn-dark px-4" data-bs-dismiss="modal">CANCEL</button>
+                <button type="button" id="aiConfirmProceedBtn" class="btn px-5 fw-bold" style="background:#8b5cf6;border:none;color:white;">
+                    <i class="fa-solid fa-wand-magic-sparkles me-2"></i>PROCEED
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Result Modal -->
+<div class="modal fade" id="aiResultModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0" id="aiResultModalContent" style="background:#09090b;">
+            <div class="modal-body px-4 pt-5 pb-4 text-center">
+                <div id="aiResultIcon" class="mb-3"></div>
+                <h4 id="aiResultTitle" class="text-white fw-bold mb-2" style="font-size:1.25rem;"></h4>
+                <p id="aiResultMessage" class="text-muted mb-4" style="line-height:1.65;font-size:0.9rem;max-width:320px;margin-left:auto;margin-right:auto;"></p>
+                <button type="button" id="aiResultOkBtn" class="btn px-5 fw-bold"></button>
+            </div>
         </div>
     </div>
 </div>

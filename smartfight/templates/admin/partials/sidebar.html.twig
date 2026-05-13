@@ -19,7 +19,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if active_sidebar|default('') == 'predictions' %}active{% endif %}" href="{{ path('admin_prediction_index') }}">
+                    <a class="nav-link {% if active_sidebar|default('') == 'predictions' %}active{% endif %}" href="{{ path('app_predictions') }}">
                         <span class="nav-link-icon"><i class="fa-solid fa-bullseye fa-fw"></i></span>
                         <span class="nav-link-title">Predictions</span>
                     </a>
@@ -37,9 +37,31 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if active_sidebar|default('') == 'notifications' %}active{% endif %}" href="{{ path('admin_notification_index') }}">
+                    <a class="nav-link {% if active_sidebar|default('') == 'notifications' %}active{% endif %}" href="javascript:void(0)">
                         <span class="nav-link-icon"><i class="fa-solid fa-bell fa-fw"></i></span>
                         <span class="nav-link-title">Notifications</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div style="padding:1rem 1rem .4rem;font-size:.7rem;font-weight:600;color:#52525b;text-transform:uppercase;letter-spacing:.1em;">Operations</div>
+            <ul class="navbar-nav flex-column px-2 gap-1">
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'finance' %}active{% endif %}" href="{{ path('admin_finance_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-vault fa-fw"></i></span>
+                        <span class="nav-link-title">Finance</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'contracts' %}active{% endif %}" href="{{ path('admin_contract_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-file-invoice-dollar fa-fw"></i></span>
+                        <span class="nav-link-title">Contracts</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_sidebar|default('') == 'match_proposals' %}active{% endif %}" href="{{ path('app_match_proposal_index') }}">
+                        <span class="nav-link-icon"><i class="fa-solid fa-square-poll-vertical fa-fw"></i></span>
+                        <span class="nav-link-title">Match Proposals</span>
                     </a>
                 </li>
             </ul>

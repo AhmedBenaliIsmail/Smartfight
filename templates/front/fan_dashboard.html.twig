@@ -363,18 +363,30 @@
     <div class="row g-4 mb-5">
         {% for event in upcomingEvents %}
         <div class="col-md-4">
-            <div class="fan-card p-3 d-flex align-items-center justify-content-between h-100">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="bg-danger text-center p-2 rounded text-white" style="min-width: 60px;">
-                        <div class="fw-bold">{{ event.eventDate|date('d') }}</div>
-                        <div class="small">{{ event.eventDate|date('M') }}</div>
-                    </div>
-                    <div>
-                        <h5 class="mb-1 fw-bold fs-6">{{ event.eventName }}</h5>
-                        <div class="text-muted small"><i class="fa-solid fa-location-dot me-1"></i>{{ event.city }}</div>
+            <div class="fan-card h-100 overflow-hidden" style="padding:0;">
+                {% if event.posterFilename %}
+                <div style="height:160px;overflow:hidden;position:relative;">
+                    <img src="{{ asset('uploads/events/' ~ event.posterFilename) }}"
+                         alt="{{ event.eventName }}"
+                         style="width:100%;height:100%;object-fit:cover;filter:brightness(0.8);">
+                    <div class="position-absolute bottom-0 start-0 p-2">
+                        <span class="badge bg-danger" style="font-size:0.7rem;">{{ event.organization }}</span>
                     </div>
                 </div>
-                <a href="{{ path('app_event_fights', {id: event.id}) }}" class="btn btn-outline-danger btn-sm rounded-pill">Card</a>
+                {% endif %}
+                <div class="p-3 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-danger text-center p-2 rounded text-white" style="min-width: 60px;">
+                            <div class="fw-bold">{{ event.eventDate|date('d') }}</div>
+                            <div class="small">{{ event.eventDate|date('M') }}</div>
+                        </div>
+                        <div>
+                            <h5 class="mb-1 fw-bold fs-6">{{ event.eventName }}</h5>
+                            <div class="text-muted small"><i class="fa-solid fa-location-dot me-1"></i>{{ event.city }}</div>
+                        </div>
+                    </div>
+                    <a href="{{ path('app_event_fights', {id: event.id}) }}" class="btn btn-outline-danger btn-sm rounded-pill">Card</a>
+                </div>
             </div>
         </div>
         {% else %}

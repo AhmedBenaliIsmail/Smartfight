@@ -72,14 +72,18 @@ class PredictionService
 
     private function getUserRank(User $user): int
     {
-        // Simple DQL to count users with more points
-        return (int) $this->em->createQuery('SELECT COUNT(u.userId) FROM App\Entity\User u 
-            LEFT JOIN u.roles r 
-            WHERE (r.roleName != :adminRole OR r.roleName IS NULL) 
-            AND u.predictionPoints > :pts')
-            ->setParameter('adminRole', 'ADMIN')
-            ->setParameter('pts', $user->getPredictionPoints())
-            ->getSingleScalarResult() + 1;
+        // Count non-admin users with more prediction points
+        $allUsers = $this->em->createQuery(
+            'SELECT u FROM App\Entity\User u WHERE u.predictionPoints > :pts'
+        )->setParameter('pts', $user->getPredictionPoints())->getResult();
+
+        $count = 0;
+        foreach ($allUsers as $u) {
+            if (!in_array('ROLE_ADMIN', $u->getRoles(), true)) {
+                $count++;
+            }
+        }
+        return $count + 1;
     }
 
 

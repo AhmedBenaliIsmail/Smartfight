@@ -141,23 +141,30 @@ class ResultController extends AbstractController
                 $decisionType = null;
             }
 
-            $ok = $service->enterResult(
-                $id, $winnerId,
-                $request->request->get('method', 'DECISION'),
-                (int)$request->request->get('round', 1),
-                $decisionType,
-                null,
-                $fightDate,
-                $request->request->get('highlightVideoUrl'),
-                $request->files->get('videoFile')
-            );
+            try {
+                $ok = $service->enterResult(
+                    $id, $winnerId,
+                    $request->request->get('method', 'DECISION'),
+                    (int)$request->request->get('round', 1),
+                    $decisionType,
+                    null,
+                    $fightDate,
+                    $request->request->get('highlightVideoUrl'),
+                    $request->files->get('videoFile')
+                );
 
-            if ($ok) {
-                $this->addFlash('success', 'Result finalized! You can now add detailed stats.');
-                return $this->redirectToRoute('app_result_manage_card', ['id' => $fr->getEvent()->getEventId()]);
+                if ($ok) {
+                    $this->addFlash('success', 'Result finalized! You can now add detailed stats.');
+                    return $this->redirectToRoute('app_result_manage_card', ['id' => $fr->getEvent()->getEventId()]);
+                }
+
+                $this->addFlash('error', 'Could not save result.');
+            } catch (\Exception $e) {
+                if ($request->isXmlHttpRequest()) {
+                    return $this->json(['error' => $e->getMessage()], 500);
+                }
+                $this->addFlash('error', 'Server error: ' . $e->getMessage());
             }
-
-            $this->addFlash('error', 'Could not save result.');
         }
 
         return $this->render('result/enter.html.twig', [

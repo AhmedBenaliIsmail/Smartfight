@@ -248,61 +248,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const percentEl = document.getElementById('upload-percent-large');
 
     finalizeForm.onsubmit = function(e) {
-        const videoInput = document.getElementById('videoFileInput');
-        if (!videoInput || !videoInput.files || videoInput.files.length === 0) return true; 
-
-        e.preventDefault();
-        overlay.classList.remove('d-none');
-
-        const formData = new FormData(finalizeForm);
-        const xhr = new XMLHttpRequest();
-
-        xhr.upload.addEventListener('progress', (ev) => {
-            if (ev.lengthComputable) {
-                const p = Math.round((ev.loaded / ev.total) * 100);
-                percentEl.innerText = p + '%';
-            }
-        });
-
-        xhr.onload = function() {
-            if (xhr.status >= 200 && xhr.status < 400) {
-                window.location.href = "{{ path('app_results') }}";
-            } else {
-                alert('SYNC ERROR: PROCESS FAILED (STATUS ' + xhr.status + ')');
-                overlay.classList.add('d-none');
-            }
-        };
-
-        xhr.open('POST', window.location.href, true);
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        xhr.send(formData);
-    };
-
-    const methodSelect = document.getElementById('method-select');
-    const decisionCol = document.getElementById('decision-type-col');
-
-    if (methodSelect) {
-        const syncDecisionUI = () => {
-            decisionCol.style.display = (methodSelect.value === 'DECISION') ? 'block' : 'none';
-        };
-        syncDecisionUI();
-        methodSelect.addEventListener('change', syncDecisionUI);
-    }
-});
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const finalizeForm = document.getElementById('finalize-form');
-    const overlay = document.getElementById('loading-overlay');
-    const percentEl = document.getElementById('upload-percent-large');
-
-    finalizeForm.onsubmit = function(e) {
-        // Only use AJAX if there's a file to upload
         const videoInput = document.querySelector('input[name="videoFile"]');
         if (!videoInput || !videoInput.files || videoInput.files.length === 0) {
-            // Standard submit for no video (faster)
-            return true; 
+            return true;
         }
 
         e.preventDefault();
@@ -320,16 +268,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
         xhr.onload = function() {
             if (xhr.status >= 200 && xhr.status < 400) {
-                // Success! Redirect to results index
                 window.location.href = "{{ path('app_results') }}";
             } else {
-                alert('Sync Error: The SmartFight server could not process the match data. Status: ' + xhr.status);
+                let msg = 'Status: ' + xhr.status;
+                try {
+                    const r = JSON.parse(xhr.responseText);
+                    if (r.error) msg = r.error;
+                } catch (e) {}
+                alert('Sync Error: ' + msg);
                 overlay.classList.add('d-none');
             }
         };
 
         xhr.onerror = function() {
-            alert('Network Error: The connection to the SmartFight server was lost during synchronization.');
+            alert('Network Error: Connection to the SmartFight server was lost.');
             overlay.classList.add('d-none');
         };
 
@@ -342,11 +294,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const decisionCol = document.getElementById('decision-type-col');
 
     if (methodSelect) {
-        // Sync visibility on load
         const syncDecisionUI = () => {
             decisionCol.style.display = (methodSelect.value === 'DECISION') ? 'block' : 'none';
         };
-        
         syncDecisionUI();
         methodSelect.addEventListener('change', syncDecisionUI);
     }

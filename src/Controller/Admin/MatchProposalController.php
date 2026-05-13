@@ -21,7 +21,8 @@ class MatchProposalController extends AbstractController
         return $this->render('admin/match_proposal/index.html.twig', [
             'proposals' => $repo->findBy([], ['voteCount' => 'DESC']),
             'fighters' => $fighterRepo->findAll(),
-            'weightDivisions' => $wdRepo->findAll()
+            'weightDivisions' => $wdRepo->findAll(),
+            'active_sidebar' => 'match_proposals',
         ]);
     }
 

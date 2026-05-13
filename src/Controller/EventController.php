@@ -9,6 +9,7 @@ use App\Repository\FighterRepository;
 use App\Repository\FightResultRepository;
 use App\Repository\WeightDivisionRepository;
 use App\Repository\RankingRepository;
+use App\Repository\FighterContractRepository;
 use App\Repository\MatchProposalRepository;
 use App\Service\FightResultService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,6 +17,7 @@ use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/events')]
@@ -114,12 +116,29 @@ class EventController extends AbstractController
             $e->setVenue(trim($request->request->get('venue', '')));
             $e->setCity(trim($request->request->get('city', '')));
             $e->setOrganization(trim($request->request->get('organization', 'INDEPENDENT')));
+            $this->handlePosterUpload($request, $e);
             $em->persist($e);
             $em->flush();
             $this->addFlash('success', 'Boxing event card created.');
             return $this->redirectToRoute('app_events');
         }
         return $this->render('event/form.html.twig', ['event' => null]);
+    }
+
+    private function handlePosterUpload(Request $request, Event $event): void
+    {
+        /** @var UploadedFile|null $file */
+        $file = $request->files->get('posterFile');
+        if (!$file instanceof UploadedFile) {
+            return;
+        }
+        $dir = $this->getParameter('kernel.project_dir') . '/public/uploads/events';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        $filename = uniqid('poster_') . '.' . $file->guessExtension();
+        $file->move($dir, $filename);
+        $event->setPosterFilename($filename);
     }
 
     #[Route('/champions-event/new', name: 'app_event_champions_new', methods: ['GET', 'POST'])]
@@ -187,6 +206,7 @@ class EventController extends AbstractController
             $e->setVenue(trim($request->request->get('venue', '')));
             $e->setCity(trim($request->request->get('city', '')));
             $e->setOrganization(trim($request->request->get('organization', 'INDEPENDENT')));
+            $this->handlePosterUpload($request, $e);
             $em->flush();
             $this->addFlash('success', 'Event updated.');
             return $this->redirectToRoute('app_events');
@@ -195,11 +215,26 @@ class EventController extends AbstractController
     }
 
     #[Route('/{id}/delete', name: 'app_event_delete', methods: ['POST'])]
-    public function delete(int $id, EventRepository $repo, EntityManagerInterface $em): Response
-    {
+    public function delete(
+        int $id,
+        EventRepository $repo,
+        EntityManagerInterface $em,
+        EventBookingRepository $bookingRepo,
+        FightResultRepository $fightResultRepo,
+        FighterContractRepository $contractRepo,
+        MatchProposalRepository $matchProposalRepo,
+    ): Response {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $e = $repo->find($id);
-        if ($e) { $em->remove($e); $em->flush(); $this->addFlash('success', 'Event deleted.'); }
+        if ($e) {
+            foreach ($bookingRepo->findBy(['event' => $e]) as $child) { $em->remove($child); }
+            foreach ($fightResultRepo->findByEvent($id) as $child) { $em->remove($child); }
+            foreach ($contractRepo->findBy(['event' => $e]) as $child) { $em->remove($child); }
+            foreach ($matchProposalRepo->findBy(['event' => $e]) as $child) { $em->remove($child); }
+            $em->remove($e);
+            $em->flush();
+            $this->addFlash('success', 'Event deleted.');
+        }
         return $this->redirectToRoute('app_events');
     }
 

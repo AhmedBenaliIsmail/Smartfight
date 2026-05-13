@@ -4,122 +4,150 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**SmartFight** is a Symfony 7.1 UFC/MMA management application with two interfaces: an admin dashboard and a public fan-facing site. It manages fighters, events, bookings, fight results, predictions, rankings, blog content, and notifications.
+SmartFight is a Symfony 7.1 web application for a professional combat sports management platform. It supports two distinct user-facing interfaces — an **Admin back-office** for league management and a **Fan front-office** for public engagement — backed by an AI layer powered by the DeepSeek LLM API (with deterministic heuristic fallbacks when the API is unavailable).
 
-## Development Commands
+## Tech Stack
 
-All commands run from the repo root (where `composer.json` lives). The root Symfony app is the **primary** one — ignore the `smartfight/` subdirectory (it is a legacy/alternate version).
+- **Framework**: Symfony 7.1 (PHP ≥ 8.2)
+- **Database**: MySQL (primary, via `DATABASE_URL` env) or PostgreSQL (Docker compose default)
+- **ORM**: Doctrine with PHP attribute mappings (`src/Entity/`)
+- **Templates**: Twig (`templates/`)
+- **Auth**: Form login + Google OAuth (`KnpUOAuth2ClientBundle`) + WebAuthn/Face-ID
+- **AI**: DeepSeek Chat API (`AIService`), with full heuristic fallbacks
+- **Other**: VichUploader (file uploads), KnpPaginator, DomPDF, endroid/qr-code, Symfony Mailer
+
+## Environment Setup
+
+Copy `.env.example` to `.env.dev` and fill in:
+- `DATABASE_URL` — MySQL DSN
+- `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — Google OAuth
+- `MAILER_DSN` — Gmail SMTP
+- `DEEPSEEK_API_KEY` — AI features (optional; heuristic fallbacks activate when absent)
+
+## Common Commands
 
 ```bash
-# Start dev server
+# Install dependencies
+composer install
+
+# Run the dev server
 symfony server:start
+# or
+php -S localhost:8001 -t public/
 
-# Clear cache (required after config changes or entity changes in prod)
-php bin/console cache:clear
+# Database
+php bin/console doctrine:database:create
+php bin/console doctrine:migrations:migrate
 
-# Database migrations
-php bin/console doctrine:migrations:diff    # generate migration from entity changes
-php bin/console doctrine:migrations:migrate # apply pending migrations
+# Seed test data
+php bin/console app:seed-data
 
-# Code generation
-php bin/console make:entity
-php bin/console make:controller
-php bin/console make:form
-
-# Create admin user
+# Create an admin user
 php bin/console app:create-admin
 
-# Docker (PostgreSQL for local dev alternative)
-docker compose up -d
-```
+# Update event statuses (SCHEDULED → LIVE → COMPLETED)
+php bin/console app:update-event-status
 
-The `.env` file (not committed) must be created from `.env.example`. The app defaults to MySQL; Docker spins up PostgreSQL.
+# Clear cache
+php bin/console cache:clear
+
+# Run all migrations fresh
+php bin/console doctrine:schema:drop --force && php bin/console doctrine:migrations:migrate
+```
 
 ## Architecture
 
-### Two Parallel Codebases (Important)
+### Dual-Interface Split
 
-1. **Root Symfony app** (`src/`, `templates/`, `config/`) — the live, working application.
-2. **Static HTML prototypes** (`FrontOffice/`, `BackOffice/`) — design reference only, not served by Symfony.
-3. **`smartfight/` subdirectory** — a separate, older Symfony project. Not the active codebase.
+The app has two separate template hierarchies and navigation systems:
 
-### Request Flow
+- **Admin** (`/` and `/admin/*`): extends `templates/admin/base_admin.html.twig`. `DashboardController` redirects non-admins to the fan dashboard.
+- **Fan front-office** (`/fan/*`, `/bookings`, `/predictions`, `/front/*`): extends `templates/front/base_front.html.twig`.
 
-Routes are defined via PHP attributes on controllers in `src/Controller/`. All routes load from `config/routes.yaml` via attribute scanning of `src/Controller/`.
+Routes are discovered via PHP attributes on controllers (`config/routes.yaml` uses attribute scanning).
 
-The entry point `/` (`app_dashboard`) checks `ROLE_ADMIN` and redirects non-admins to `app_fan_dashboard` (front-facing dashboard).
+### Security & Roles
 
-### Controller Layout
+`config/packages/security.yaml` defines:
+- `ROLE_ADMIN` → `ROLE_USER` (hierarchy)
+- Login by `username` (not email). Email is used only for notifications.
+- `app_login` is both the login path and check path.
+- Google OAuth handled by `src/Security/GoogleAuthenticator.php`.
+- Face-ID/WebAuthn: `FaceIdController` stores `webauthnCredentialId` on `User`. The visual face-matching endpoint (`/face-id/verify-visual`) is a demo — it finds the first user with a stored photo and logs them in unconditionally.
 
-```
-src/Controller/
-├── Admin/          # Admin-only: BlogController, BookingAdminController, MatchProposalAdminController, ReactionController, AdminContractController
-├── Front/          # Fan-facing: BlogController, BookingController, FanDashboardController, ReactionController
-├── AIController    # POST /api/ai/* — stat suggestions + matchmaking (ROLE_ADMIN only)
-├── DashboardController   # / — redirects based on role
-├── SecurityController    # /login, /register, /forgot-password, /reset-password, /verify-email
-├── FaceIdController      # /face-id/* — WebAuthn/Face ID registration + authentication
-├── GoogleController      # /connect/google/* — OAuth2 Google login
-└── ... (EventController, FighterController, ResultController, PredictionController, etc.)
-```
-
-### Template Hierarchy
+### Entity Model (key relationships)
 
 ```
-templates/base.html.twig
-├── templates/admin/base_admin.html.twig    → all admin views
-└── templates/front/base_front.html.twig   → all fan-facing views
+User ──< Role (ManyToMany via user_roles)
+Fighter ──> WeightDivision
+Fighter ──> User (manager)
+Event ── EventBooking ──> User
+FightResult ──> Event, Fighter (x2), WeightDivision
+FightStatistic ──> FightResult (per-round CompuBox stats)
+Ranking ──> Fighter, WeightDivision (per-org snapshots)
+MatchProposal ──> Fighter (x2), WeightDivision
+Prediction ──> User, FightResult
+BlogArticle ──> BlogCategory
+Notification ──> User
 ```
 
-Admin sidebar and navbar are **Twig partials** (`templates/admin/partials/sidebar.html.twig`, `navbar.html.twig`) — unlike the static prototypes, they are included once, not duplicated per page.
+### AI Layer (`src/Service/AIService.php`)
 
-### Role System
+All AI methods follow the same pattern:
+1. Compute a heuristic baseline (deterministic, no API call).
+2. Build a JSON-only prompt and call `callDeepSeek()`.
+3. On failure (API key missing, timeout, JSON parse error), return the heuristic result with `is_fallback: true`.
 
-Roles use a custom `Role` entity (table `role`, field `roleName`) mapped many-to-many to `User` via `user_roles`. Symfony's `getRoles()` on `User` maps these to `ROLE_<UPPERCASE_ROLENAME>` strings (e.g., `ROLE_ADMIN`, `ROLE_USER`). The security provider loads users by `username` (not email).
+AI endpoints are all under `#[Route('/api/ai')]` in `AIController` and require `ROLE_ADMIN`.
 
-Password recovery and registration both accept username **or** email as identifier.
+Key AI operations:
+- `analyzeFightDynamics` — pre-fight win probability (ELO/heuristic matrix)
+- `generatePostFightRecap` — journalistic recap after a fight
+- `generateScoutingReport` — tactical coaching breakdown
+- `suggestFightStats` — CompuBox-style per-round stats
+- `predictInjuryRisk` — biomechanical injury risk from fighter age/load/KO history
+- `generateFighterProfile` — AI style tag and bio for fighter profiles
 
-### AI Features
+### Ranking Engine (`src/Service/RankingService.php`)
 
-`AIService` (`src/Service/AIService.php`) calls the DeepSeek API (`deepseek-chat` model) for:
-- `POST /api/ai/stat-suggestions` — auto-fill round fight stats
-- `POST /api/ai/matchmaking-suggestions` — suggest balanced fighter pairings
+Implements a Glicko-ELO hybrid with:
+- Dynamic K-factor (60 for <12 fights, 32 otherwise)
+- KO/decision bonuses
+- Strength of Schedule (SoS) via recursive average opponent ELO
+- Inactivity decay (0 points after 2 years inactive)
+- Formula: `P = (RatingVector × 0.45) + (SoS × 0.35) + (LegacyBonus × 0.20)`
+- Rankings are wiped and rebuilt per division/org on every `processCompletedFight()` call, generating rows for WBC, WBA, IBF, WBO, and MEDIA organizations.
 
-`MatchmakingService` wraps `AIService` with an algorithmic fallback (ELO ±150 tolerance, same weight class). Requires `DEEPSEEK_API_KEY` in `.env`.
+### Matchmaking Engine (`src/Service/MatchmakingService.php`)
 
-### Key Services
+Two paths:
+- **AI-assisted** (`/api/ai/matchmaking-suggestions`): sends fighter data to DeepSeek, falls back to local algorithm.
+- **Local 8-vector Score IA** (`/api/ai/generate-proposals`): purely deterministic, no API dependency. Scores pairs 0–100 across weight integrity (25 pts), ELO parity (20), record parity (15), height/reach balance (15), lethality (10), precision (10), diversity bonus (5). Persists results as `MatchProposal` entities with status `PENDING`.
 
-| Service | Responsibility |
+### Console Commands
+
+| Command | Purpose |
 |---|---|
-| `AIService` | DeepSeek API calls for stats + matchmaking |
-| `MatchmakingService` | Matchmaking with AI + algorithmic fallback |
-| `BookingService` | Event ticket booking logic |
-| `PredictionService` | Fan fight prediction logic |
-| `RankingService` | Fighter ranking calculation |
-| `NotificationService` | Fan notification dispatch |
-| `QrCodeService` | QR code generation for bookings |
+| `app:update-event-status` | Transitions SCHEDULED→LIVE (on event date) and LIVE→COMPLETED (when all fights done) |
+| `app:seed-data` | Populates test fighters, events, and results |
+| `app:create-admin` | Interactive admin user creation |
 
-### Authentication Methods
+### File Uploads
 
-1. **Form login** — username + password, CSRF-protected
-2. **Google OAuth** — via `GoogleAuthenticator` (`src/Security/GoogleAuthenticator.php`) + KnpU OAuth2 bundle
-3. **Face ID** — browser WebAuthn API + `face-api.js` loaded via CDN; credential stored on `User.webauthnCredentialId` / `webauthnPublicKey`
+VichUploader handles fighter photos (`photo_filename`) and event posters (`poster_filename`). Uploaded files land in `public/uploads/`.
 
-Email verification is required after registration (token in `User.verificationToken`).
+### PDF / QR Generation
 
-### Database
+- `PdfService` wraps DomPDF, rendering Twig templates to PDF (contracts, rankings, fight hub).
+- `QrCodeService` wraps endroid/qr-code for booking QR codes.
 
-Doctrine ORM with attribute-based mapping on entities in `src/Entity/`. Column names use camelCase (`fighterId`, `userId`, `firstName`) while Doctrine's underscore naming strategy applies to auto-generated tables. Custom `@ORM\Column(name: ...)` overrides are common — check entity definitions before querying raw SQL.
+### Notifications
 
-Primary key pattern: `userId`, `fighterId`, etc. (not `id`).
+`NotificationService` persists `Notification` entities. `notifyAllFans()` iterates all users with `ROLE_USER` — no pub/sub, no queue. Called automatically after fight results are processed and rankings update.
 
-## Environment Variables
+## Key Conventions
 
-| Variable | Purpose |
-|---|---|
-| `DATABASE_URL` | MySQL or PostgreSQL connection string |
-| `APP_SECRET` | Symfony app secret (32 chars) |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth |
-| `MAILER_DSN` | SMTP mailer (Gmail TLS port 587 recommended) |
-| `DEEPSEEK_API_KEY` | AI features (optional; fallback works without it) |
-| `DEFAULT_URI` | Base URL for absolute link generation in emails |
+- Entity column names use camelCase (`name: 'fighterId'`) while PHP properties are also camelCase. The ORM naming strategy is `underscore_number_aware` but explicit `name:` overrides are common — check the `#[ORM\Column]` annotation before assuming column names.
+- `Fighter::getCalculatedFightingStyle()` returns AI style tag if set, otherwise derives it from KO rate / accuracy / volume heuristics.
+- `FaceIdController::verifyVisual` is a demo shortcut — it matches any stored face photo, not the submitted one.
+- The database is MySQL in production (`.env.example`) but the Docker compose file uses PostgreSQL. The migrations and schema may have diverged between environments.

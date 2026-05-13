@@ -13,7 +13,7 @@ class Notification
     private ?int $notificationId = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'userId', referencedColumnName: 'userId', nullable: false)]
+    #[ORM\JoinColumn(name: 'userId', referencedColumnName: 'userId', nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
 
     #[ORM\Column(type: 'string', length: 255)]

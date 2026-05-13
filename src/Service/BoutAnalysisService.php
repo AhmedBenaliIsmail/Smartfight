@@ -63,15 +63,18 @@ class BoutAnalysisService
             $analysis[] = "A grueling stalemate defined by extreme statistical parity. Neither combatant could definitively solve the other's defensive structure, resulting in a razor-close deadlock.";
         } else {
             $winner = $result->getWinner();
-            $method = $result->getMethodOfVictory();
-            
-            if ($method === FightResult::METHOD_KO) {
-                $analysis[] = "A clinical stoppage victory for {$winner->getLastName()}, who translated statistical pressure into a terminal finish in Round {$result->getRoundNumber()}.";
-                $insights[] = "{$winner->getLastName()} demonstrated elite 'Stop-Start' kinetic efficiency, concluding the bout before it reached the judges.";
+            if ($winner) {
+                $method = $result->getMethodOfVictory();
+                if ($method === FightResult::METHOD_KO) {
+                    $analysis[] = "A clinical stoppage victory for {$winner->getLastName()}, who translated statistical pressure into a terminal finish in Round {$result->getRoundNumber()}.";
+                    $insights[] = "{$winner->getLastName()} demonstrated elite 'Stop-Start' kinetic efficiency, concluding the bout before it reached the judges.";
+                } else {
+                    $type = $result->getDecisionType() ?: 'Decision';
+                    $analysis[] = "A strategic masterclass by {$winner->getLastName()}, utilizing superior ring generalship to secure a {$type} over the distance.";
+                    $insights[] = "Tactical discipline and range management were the primary differentiators for the victor.";
+                }
             } else {
-                $type = $result->getDecisionType() ?: 'Decision';
-                $analysis[] = "A strategic masterclass by {$winner->getLastName()}, utilizing superior ring generalship to secure a {$type} over the distance.";
-                $insights[] = "Tactical discipline and range management were the primary differentiators for the victor.";
+                $analysis[] = "The bout concluded without an official verdict recorded.";
             }
         }
 
